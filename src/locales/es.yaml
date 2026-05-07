@@ -1,0 +1,1128 @@
+returnToStart: Volver al Inicio
+subtitle: Espejo del pasado, fuego del presente, y brújula del futuro... ¿Qué te
+  susurra la baraja Katina?
+splashText: Las profecías se despliegan para ti...
+startButton: Comenzar Tu Lectura
+nameLabel: Nombre
+namePlaceholder: ¿Cuál es tu nombre?
+dobLabel: Fecha de Nacimiento
+pobLabel: Lugar de Nacimiento
+pobPlaceholder: Ciudad, País
+statusLabel: Estado Civil
+submitButton: Seleccionar Cartas y Leer mi Fortuna
+past: Pasado
+present: Presente
+future: Futuro
+loading: Los espíritus susurran... Leyendo la energía de las cartas...
+downloadBtn: Descargar Lectura (PDF)
+shareBtn: Compartir
+restartBtn: Comenzar un Nuevo Viaje
+errorSilent: Los espíritus están en silencio en este momento, por favor
+  inténtalo de nuevo más tarde.
+errorInterrupted: Un flujo de energía mística fue interrumpido. (Ocurrió un error)
+copiedMsg: ¡Lectura copiada al portapapeles!
+statusOptions:
+  single: Soltero/a
+  relationship: En una Relación
+  married: Casado/a
+  engaged: Comprometido/a
+  complicated: Es Complicado
+  breakup: Pasando por una Ruptura
+headings: |-
+  **Ecos del Pasado** (análisis de la carta del pasado)
+  **Vientos del Presente** (análisis de la carta del presente)
+  **Susurros del Futuro** (análisis de la carta del futuro)
+languageName: Spanish
+cards:
+  selana:
+    name: Selana
+    general: No se encontró ninguna explicación.
+    upright: No sentirte triste por el pasado, agradecer lo que tienes y seguir con
+      la creencia de que hoy será mejor que mañana. No debemos olvidar que es
+      una carta que representa el alma, en esta carta no se puede hacer análisis
+      de personaje. Selena representa uniones felices.
+    reversed: Es el presagio de conflictos espirituales y desacuerdos en el
+      matrimonio y las relaciones. Es la expresión de mentiras que se dicen.
+      Ocultar los verdaderos pensamientos significa ocultar los verdaderos
+      sentimientos y pensamientos con una apariencia diferente.
+  abonoz:
+    name: Abonoz
+    general: El color oscuro simboliza que ocurrirá un desastre. Abonoz, que expresa
+      llanto violento, llanto, no poder conseguir algo deseado, mal ánimo, mal
+      final de vida, evoca el sentimiento de extinción.
+    upright: Los problemas serán graves y no podrás encontrar una nueva dirección en
+      la vida. Un estado de ánimo constantemente triste indica que sus
+      iniciativas nunca progresarán en una dirección positiva. Indica que
+      cualquier tema discutido no tendrá éxito. Es un símbolo que expresa
+      claramente mala suerte y que lo que deseas no se hará realidad.
+    reversed: Nos dice que se acerca una tristeza mala, pero esta tristeza no durará
+      mucho en nuestras vidas. Como resultado de mostrar fortaleza y paciencia,
+      se logrará el alivio esperado y la mala suerte nos abandonará. Tarde o
+      temprano, cuando las cosas van mal, se pondrán en duda nuevos comienzos y
+      una nueva dirección en nuestras vidas.
+  tattaret:
+    name: Tattaret
+    general: Tiene una mirada melancólica y una belleza impresionante. Expresa
+      constantemente las negatividades que experimenta en su propia vida y le
+      encanta llamar la atención. Hay serias diferencias entre su apariencia y
+      sus palabras. Ella siempre oculta sus verdaderos sentimientos y mira la
+      vida desde una perspectiva lógica. Ella es una persona fértil. Y si el
+      tema consultado es dentro de la familia, simboliza a la joven adulta. Si
+      la pregunta es ¿habrá alguien en mi vida? Si es así, esta persona debe ser
+      interpretada de forma independiente. Si es un individuo que se ha mostrado
+      en línea con una relación, entonces se debe explicar el carácter de la
+      persona.
+    upright: Expresa el deseo de casarse. Describe los matrimonios que se celebrarán
+      en función de intereses financieros personales. Tattaret prefiere
+      matrimonios relacionados con las posibilidades financieras de la vida que
+      con el amor. Quiere una vida cómoda.
+    reversed: Representa a una mujer celosa a la que le gusta mentir. Es una persona
+      en la que nunca se debe confiar.
+  assyranta:
+    name: asirio
+    general: Tiene un estilo de caminar atractivo. Es una persona de piel oscura,
+      amigable y con buenas relaciones interpersonales. Por lo general, tiene
+      sentimientos fuertes y tiende a los géneros astrológicos y de adivinación
+      como pasatiempos. Elige sus frases con mucho cuidado, incluso habla como
+      un pensador filosófico y tiene tanto conocimiento que te aleja de ti. Es
+      una mujer bondadosa, sin segundas intenciones, y una mujer enamorada.
+      Siempre está interesada en el arte y la ciencia. Assyranta es un miembro
+      de la familia, tía, tía. , madre, etc. representan personas personales.
+      Teniendo esto en cuenta, se debe interpretar la asyranta con respecto a la
+      pregunta que hicimos. Si aparece en la casa que representa el yo del
+      cliente, entonces significa que está bajo la influencia de una persona con
+      estas características.
+    upright: Es una madre o miembro de la familia compasiva, honesta y servicial.
+      Ella siempre expresa bondad y belleza. Si apareció en un hogar cercano a
+      la persona, entonces el asyrant debe interpretarse mezclando las 2 cartas.
+      Por ejemplo, como si hubieras heredado tu rasgo de tu madre.
+    reversed: Significa que habrá problemas entre personas casadas o amantes o
+      personas comprometidas dentro de la familia, generalmente estos problemas
+      están relacionados con cuestiones financieras. Tengamos en cuenta que dije
+      que esta carta evoca buenas intenciones dondequiera que se abra, por lo
+      que cabe señalar que los problemas experimentados serán temporales.
+  sunit:
+    name: suní
+    general: Realmente no le gusta que se burlen de él o que sea demasiado crítico.
+      Tiene una ambición altísima y sus objetivos e ideales están siempre al más
+      alto nivel. Debido a su naturaleza fácil de creer, tiene tendencia a
+      dejarse engañar por las mujeres. Quiere dominar y tener voz y voto sobre
+      las mujeres. Por eso siempre quiere tener el control y pedirme todo.
+      Quiere atención y atención constantes hacia él. Tiene un temperamento
+      duro, pero es un hombre amoroso.
+    upright: Será una experiencia de amor apasionada, y esta persona hará que te
+      apegues tanto sensualmente como enamoradamente. Debido al carácter de la
+      persona y a sus características estructurales, puede haber muchos
+      altibajos en su relación. Es más, si existe una relación en el pasado, una
+      pareja de estas características puede volver a tu vida. Es la persona que
+      presagia un nuevo amor.
+    reversed: Las actitudes duras y tensas de Sunit harán que la relación termine.
+      Se producirán discusiones violentas, compromisos, promesas, rupturas
+      matrimoniales, etc. Dado que Sunit actúa de acuerdo con sus propios
+      intereses, su relación ahora llegará a un callejón sin salida.
+  turan:
+    name: turán
+    general: Es un mentiroso y una persona política. Debido a su carácter político,
+      es muy difícil entender cuando ama o no ama. Valora muy bien a la persona
+      con la que está, pero de repente destruye ese valor y te sientes como pez
+      fuera del agua. Siempre hay una relación turbulenta con el gobernante de
+      Turan, pero las mujeres que están bajo su influencia no pueden renunciar a
+      él, como si tuviera una pluma del diablo. El gobernante de Turan no tiene
+      resistencia a los acontecimientos difíciles, tiene un carácter cobarde y
+      tímido. Su debilidad es que se puede abusar de su buena voluntad porque se
+      adapta rápidamente a todos. También es un tramposo en materia comercial.
+    upright: "Las personas que han experimentado una ruptura pueden reencontrarse
+      con la persona que describí anteriormente, y las personas que no tienen un
+      amante pueden conocer a alguien con esta característica. Significado de
+      expansión inversa: La persona con la que estás en una relación no es
+      honesta, dice mentiras y también es propensa a temas malos como la magia y
+      la adivinación, que no están representados en términos religiosos, o el
+      significado cambia aquí para parejas que están juntas con respecto a la
+      pregunta que hiciste, indica que no pueden unirse debido a una energía en
+      esta dirección."
+    reversed: No se encontró ninguna explicación.
+  munzur:
+    name: Munzur
+    general: Le da gran importancia a su cabello y a su forma de vestir. Pero las
+      joyas que más prefiere sí lo son. Munzur, una mujer morena, es limpia y
+      ordenada. Si el consultado es un hombre, es leal y meticuloso, al mismo
+      tiempo le da importancia al orden y quiere encontrar los objetos que ha
+      puesto en su lugar. A un hombre le gusta la garganta munzur, le encanta
+      disfrutar de la vida y siempre ama a una mujer que sepa cocinar bien. 3)
+      Significados de las tarjetas de la serie Ruby
+    upright: En la relación prevalece la paciencia extrema. Y la persona es honesta
+      y coherente en esta relación. Una mujer que se apropia en gran medida de
+      su relación se cansará de las actitudes fluctuantes del munzur. Y las
+      situaciones que se repiten constantemente no podrán establecer un
+      equilibrio en la dirección de no poder resolver los problemas del pasado.
+      Si munzur representa a la mujer, las mismas expresiones son válidas para
+      el lado femenino.
+    reversed: Es un personaje tacaño y demasiado sensible a los asuntos financieros.
+      Es una persona con poca confianza en sí misma que no puede expresar sus
+      sentimientos con claridad. Tiene la enfermedad de mentir.
+  yakut:
+    name: Rubí
+    general: Como se puede entender por el color rojo, representa el amor. Destaca
+      la pasión, el sentimiento, la existencia de las emociones más profundas y
+      la unidad del gran amor. La misma expresión se interpreta para hombres y
+      mujeres.
+    upright: Destaca que existirá un amor real, fuerte y grande. Las emociones
+      experimentadas se sentirán mutuamente y habrá intimidad física, y dos
+      cuerpos se unirán en uno solo.
+    reversed: El cliente que pregunta a alguien que ha experimentado una ruptura
+      expresa una relación que se ha reconstruido muchas veces pero que no ha
+      tenido éxito. Incluso si hay una separación, significa que el amor todavía
+      existe, pero en algún momento el corazón se rompe. Si esta tarjeta aparece
+      en un cliente que no tiene ninguna relación, significa que no podrá
+      encontrar el amor verdadero por un tiempo y tendrá un poco más de tiempo.
+  ariman:
+    name: en el alma
+    general: No se encontró ninguna explicación.
+    upright: Indica que hay atracción sexual. Dice que se establecerán equilibrios
+      con la pareja y si hay una estabilidad perturbada, se equilibrará. Para
+      quienes no están en pareja, da la buena noticia de que se establecerán
+      equilibrios a favor del amor.
+    reversed: Mientras ocultes tu verdadera identidad y tu yo, no podrás establecer
+      el equilibrio en el amor. Tus pensamientos deben ser únicos y naturales.
+      Mientras no intentes establecer el equilibrio, estás condenado a
+      experimentar las negatividades de la vida. No debes tener una naturaleza
+      celosa ni una postura insegura. Mientras esté en esta dirección, es
+      posible que no pueda establecer el equilibrio en la relación existente.
+      Para alguien que no está en una relación; Debes hacer las paces con la
+      vida y desear el equilibrio y la sincronización perfectos para ti. Si
+      haces esto, el universo te ofrecerá todas sus bellezas.
+  selcukassa:
+    name: selcukasa
+    general: En el contacto sensual no es posible olvidar la selcukassa. Siempre
+      deja una huella inolvidable en la relación. Representa un amor secundario
+      en la relación, cuenta que una mujer que tiene una relación ilícita o una
+      persona que no tiene relación puede enamorarse de una persona de estas
+      características.
+    upright: Hay una relación prohibida. Y esta relación está dirigida por
+      Selçukassa. El proceso avanza como él desea. Si le pasó a una persona que
+      no está en una relación, entonces es momento de saludar a un amante
+      atractivo con quien poder tener una relación sensual y tener pasión.
+    reversed: Si el cliente está en una relación prohibida, sufre de amor en esta
+      relación, no quiere compartir a su ser amado, pero aún así no quiere
+      terminar esta relación porque le encanta ser la segunda mujer y lo valora
+      mucho. Para la persona que no está en una relación, Selçukassa lo
+      atormentará, pero lo atará a sí mismo con pasión. No podrá escapar de la
+      sombra de la mujer, habrá flujos y reflujos constantes, pero en algún
+      momento dirá adiós a su relación con Selçukassa.
+  urmia:
+    name: Urmía
+    general: Urmia es una persona exitosa, tiene una apariencia fría cuando se la ve
+      desde afuera. Definitivamente logrará el éxito en todo lo que se proponga.
+      Como Urmia es emocionalmente sensible, se queda atrapada en los problemas
+      que encuentra y no sabe qué hacer. Esta es una situación temporal para
+      ella. La persona que resuelve el problema es Urmia &#39; será él mismo. Si
+      aparece en la sección de influencias ambientales del cliente, Urmia es
+      confiable, servicial y amiga. Representa que una persona con esta
+      característica ayudará a nuestra relación. Para los que no estamos en una
+      relación, esta carta, que también aparece en el apartado de influencias
+      ambientales, nos indica que seremos arrastrados a una relación por una
+      persona de estas características.
+    upright: Si tenemos un problema en nuestra relación, significa que un amigo en
+      quien confiamos nos iluminará y apoyará en esta relación. Sin embargo, si
+      proviene de la casa que representa a la persona, urmia indica que no se
+      puede dejar atrás la relación que tienes y la pasión es muy fuerte. Urmia,
+      que proviene de una persona que no está en pareja, puede conocer a una
+      mujer con este rasgo o iniciar una bonita relación que será facilitada por
+      una persona con los mismos rasgos.
+    reversed: Indica la existencia de obstáculos difíciles y momentos devastadores
+      en su vida amorosa. Urmia también está experimentando graves problemas en
+      su hogar. La mala suerte seguirá en su vida amorosa. No podrá reunirse con
+      su pareja por un tiempo. Urmia, que viene por alguien que no está en
+      pareja, tendrá una relación de estas características, pero terminará en
+      separación, y la mala suerte perjudicará la relación.
+  saah:
+    name: saah
+    general: Es una persona que espera extrema atención. Es una persona amada a
+      quien sus amigos y familiares se preocupan. Tiene un lado tranquilizador.
+      Es justo y tiene un enfoque orientado a la solución de los problemas.
+    upright: Saah llama a tu puerta con oportunidades inesperadas y sorpresas en la
+      dirección del amor. Si el cliente es una pareja que ha vivido una ruptura,
+      ya sea hombre o mujer, entonces esta persona volverá y se ofrecerá una
+      buena oportunidad en el amor. Saah piensa constantemente en su amor y
+      espera el momento adecuado para declararlo.
+    reversed: En la dirección del amor, Saah dañará completamente la relación con
+      las políticas equivocadas que sigue. Si Saah viene a un cliente que no
+      está en una relación, entonces significa que la persona que viene no será
+      buena para él, escuchará una confesión de amor, pero hay que tener cuidado
+      de que esta confesión no sea una confesión honesta.
+  tagral:
+    name: Tagral
+    general: Los clientes que tengan o pretendan tener una relación con Tagral no
+      deben ser amables con esta persona. Deben dirigir su relación como si el
+      que huye fuera perseguido. Sólo así los esfuerzos y el trabajo duro no
+      serán en vano. Tagral no es una persona aburrida en una relación porque
+      siente curiosidad por viajar, explorar y aprender. Su único problema es
+      que no puede aceptar fácilmente ser dominado por una mujer. Tagral es
+      alguien a quien le gusta que lo admiren y lo feliciten. No es partidario
+      del matrimonio en las relaciones amorosas, pero quiere tener una relación
+      ilimitada y es una persona con alta tendencia al coito sensual.
+    upright: Para quienes están en pareja, su amor por Tagral continuará. Tagral
+      tiene gran entusiasmo e impaciencia hacia el cliente. Cualquiera que sea
+      la carta que aparezca en dirección este, las dos deben combinarse para ver
+      cuál es este entusiasmo o alegría. La aparición de Tagral en el cliente
+      que no está en una relación significa que se experimentará un nuevo
+      comienzo en su vida con Tagral que tiene pensamientos filosóficos y está
+      acostumbrado a la soledad. Si se trata del cliente que está separado,
+      Tagral indica los esfuerzos realizados en dirección al amor. se le pagará
+      a cambio.
+    reversed: Para el cliente que está en pareja, el Tagral preferirá la soledad y
+      la relación terminará. El Tagral para el cliente que no está en pareja
+      experimentará un nuevo amor pero será abandonado. El Tagral para el
+      cliente que ha vivido una ruptura supondrá que los esfuerzos serán en vano
+      y lamentablemente no serán recompensados.
+  kalif:
+    name: Califa
+    general: Si Kalif es un hombre, es propenso a hacer trampa. Estará con muchas
+      mujeres y siempre tiene una relación secreta y prohibida que le oculta a
+      su esposa. Si Kalif es mujer, significa que conocerá a una persona que
+      puede traicionar a su hombre e influir en él. Sin embargo, esta reunión se
+      mantendrá en secreto. Para los clientes que no están en una relación,
+      conocerán a alguien con las características que mencioné anteriormente.
+      Deben prestar atención a lo que sucede en la vida de esta persona. A Kalif
+      le encantan los enfrentamientos abiertos. Gracias a su valentía y
+      asertividad, se siente independiente y libre. También es una persona a la
+      que le gusta hacer un día del día. En las relaciones casuales, siempre da
+      la espalda y se va, sin dejar rastro. 4) Significados de las cartas de la
+      serie Esmeralda
+    upright: Representa a una persona muy apegada a la vida con pasión por la vida y
+      que tiene debilidad por los placeres mundanos. Kalif expresa que los
+      enfrentamientos y las conversaciones mutuas son el método más permanente
+      respecto a la pregunta formulada. En el cliente que ha vivido una ruptura,
+      explica que él y su pareja permanecerán separados por un tiempo. Sin
+      embargo, cabe aclarar si esta separación se mantendrá por mucho tiempo o
+      por poco tiempo con las tarjetas apareciendo en dirección este. Una
+      persona que no está en una relación debe mirar la carta en dirección este
+      en lugar de buscar amor y cariño por un tiempo y si conocerá a la persona
+      adecuada a corto o largo plazo.
+    reversed: En el cliente que ha vivido una separación; Indica la existencia de
+      violencia, opresión, una pareja engreída y que existen obstáculos para que
+      esta persona regrese. El obstáculo que hay se debe decir mirando la
+      tarjeta en dirección este. Para el cliente que no ha tenido relación;
+      Indica que las expectativas en el amor llegarán a su fin.
+  zumrudun_ruhu_bedes:
+    name: Bedes Espíritu de Esmeralda
+    general: La persona que tiene el espíritu de Zümrüd es justa y no vengativa. Sin
+      embargo, siempre tiene un carácter desconfiado, siempre mezcla
+      pensamientos negativos en su subconsciente y convierte los pequeños
+      problemas en grandes problemas. Por eso siempre se queja y se siente
+      estancado. No comprende que los reveses que encuentra tienen como objetivo
+      darle más experiencia en la vida. De hecho, si se relajara y dejara que
+      sus pensamientos fueran un poco libres, la vida no sería tan difícil para
+      él.
+    upright: El cliente se encuentra en una situación en la que no sabe qué hacer.
+      Tiene una tristeza escondida en su rostro. Sin embargo, todas las
+      negatividades que ha vivido en su vida son para fortalecer sus días.
+      Debería sacudirse y dirigirse con una perspectiva analítica. Tiene la
+      fuerza y ​​la capacidad para superar las dificultades. Por eso no debe
+      perder la fe. Debe aspirar a la armonía en su estilo de acción y desear el
+      equilibrio.
+    reversed: Deterioro de la salud, malestar psicológico y espiritual, traumas
+      graves, pérdida de un ser querido, ruptura de la unidad familiar.
+      Sintiendo que el amor nunca lo encontrará.
+  zumrut:
+    name: Esmeralda
+    general: La Esmeralda de las Aguas es fuente de curación, éxito en el amor,
+      mejora en la salud, sin importar el área de lucha, ya que la esmeralda
+      representa el agua de la vida, indica que habrá una recuperación en toda
+      mala situación.
+    upright: La gloria, la fama, la riqueza, la victoria, todo lo que traerá el
+      éxito son presagios del éxito y de la certeza de ganar, independientemente
+      de la pregunta que se haga.
+    reversed: Cualquiera que sea la pregunta, representa un fracaso. Si consideramos
+      que el agua es fuente de vida, indica que el éxito llegará, pero
+      necesitamos esforzarnos un poco más.
+  mida:
+    name: Qué
+    general: Nunca se rinde hasta alcanzar sus objetivos. Da importancia a sus
+      propias habilidades. Le gusta aprender pero no le gusta ser profesor.
+      Generalmente prefiere guardarse la información para sí mismo. Tiene
+      inseguridades en el amor; de hecho, a pesar de que tiene tanto éxito, no
+      confía mucho en la otra parte enamorada. Por eso exhibe situaciones
+      opresivas y restrictivas, y su naturaleza excesivamente celosa hace
+      progresar la relación hasta un punto en el que es difícil salir de ella.
+      Por tanto, es la mujer la que se engaña. Si el hombre aparece en la casa
+      representando al cliente, entonces es el hombre el que está engañado. El
+      hecho de que Mida se sienta importante, se elogie constantemente y le haga
+      pensar que es indispensable en las relaciones bilaterales indica a veces
+      que no puede ver la verdad. Suele desempeñar el papel de mujer/hombre
+      engañado.
+    upright: Es una persona extremadamente celosa que constantemente se arrastra a
+      pensamientos paranoicos subconscientes. Esta característica demuestra que
+      hay discusiones y peleas en la relación. No hay una actitud honesta en el
+      amor experimentado. Mida, que aparece en un cliente masculino o femenino,
+      indica que la relación terminará al darse cuenta de que la relación es un
+      cuadro color de rosa y que hay una situación que está oculta y oculta para
+      él/ella. Sin embargo, si Mida aparece como una carta que representa a la
+      persona, entonces se mencionarán los rasgos de carácter que mencioné
+      anteriormente.
+    reversed: Indica que los fuertes vientos se calmarán en la relación, y si hay
+      una tercera mujer u hombre que impide el amor, será eliminado. Si se trata
+      de un cliente que no está en una relación, es un símbolo de una mujer que
+      crea obstáculos al amor al afectar negativamente sus propios pensamientos,
+      y significa que esta persona será eliminada y no podrá afectar
+      negativamente los pensamientos de la persona. Ya sea hombre o mujer, lo
+      que aquí se representa es mida, la mujer real.
+  parsadra:
+    name: Parsandra
+    general: Nunca está satisfecho con nada de lo que tiene. Tiene una crítica sobre
+      cada tema. Si Parsadra, la mujer de los acontecimientos, prefiriera
+      mantenerse al margen de los temas por un tiempo, la paz de nadie se vería
+      perturbada. Le encanta intervenir en las relaciones amorosas y
+      matrimoniales. Quiere impedir la felicidad de todos. Espera que la gente
+      experimente su propia infelicidad. Parsadra hace que las personas sean
+      fáciles de llenar. Por eso tiene un carácter persuasivo. Parece un amigo,
+      pero es un enemigo.
+    upright: Se refiere a graves problemas en el amor por influencia de una tercera
+      mujer. Para los clientes que no tienen amante, describe a una mujer que
+      parece ser una amiga pero en realidad no lo es, que no quiere su felicidad
+      en el amor. Si confías en las palabras de esta persona, será inevitable
+      que exhibas actitudes equivocadas de las que te arrepentirás.
+    reversed: Habla de una viuda de mente fija que no puede afrontar los
+      acontecimientos con flexibilidad. Sus acciones estúpidas debido a que
+      habla demasiado causan problemas tanto para ella como para quienes están
+      en su relación.
+  aral:
+    name: aral
+    general: Tiene dinero, herencia de su familia, etc. Tiene derechos. Sus
+      horizontes están abiertos. Concede importancia a la educación, la ciencia
+      y el arte. Zümrüdün Bey representa a un hombre de la familia, padre,
+      hermano mayor, hermano, tío, etc. Mientras que Aral solo tiene los
+      significados que mencioné; Lo que se debe notar aquí es que, por ejemplo,
+      cuando viene ARAL + DASTAR + SELÇUKASSA, también representa a una persona
+      que está casada pero tiene una relación prohibida.
+    upright: Aral ofrece una perspectiva analítica a sus seres más cercanos con
+      sensibilidad y emociones intensas. Es comprensivo y no traiciona
+      fácilmente. Es un socio confiable. Si el cliente, hombre o mujer, recibe
+      esta tarjeta, veremos el amor de una persona a quien no podemos ver ni
+      ignorar, y conoceremos el amor de este amor.
+    reversed: Zümrüdün Bey traiciona a la persona con la que tiene una relación. Un
+      secreto oculto será revelado. Si encontramos una apertura en la
+      combinación ARAL + LIBRO, indica que aprenderemos este secreto. Al mismo
+      tiempo, Aral también indica desacuerdos y discusiones con personas como
+      hermanos, tíos, etc.
+  eprahhat:
+    name: Eprahhat
+    general: Tiene una naturaleza que se presta a mentir. Por mucho sacrificio que
+      hagas no podrás ayudarlo, es egoísta e ingrato. Eprahhat describe cambios
+      y movimientos rápidos. Indica que experimentaremos desarrollos inesperados
+      en la vida.
+    upright: Cuando menos lo esperamos, una nueva relación nos sorprenderá y un
+      individuo con una inteligencia aguda y una memoria fuerte aparecerá en tu
+      vida. Para las parejas que tienen problemas en sus relaciones, si hay un
+      problema de adaptación, se puede solucionar. En algunos eventos, hay
+      situaciones irreales. La persona debe mirar la tarjeta al costado y
+      aclarar la interpretación.
+    reversed: No podremos alcanzar nuestras expectativas en cuanto a nuestra vida
+      amorosa por un tiempo, y los clientes casados ​​no podrán resolver sus
+      problemas por un tiempo.
+  hesse:
+    name: Hesse
+    general: Hesse, visto en la casa femenina, representa una persona sensible. Es
+      una persona que actúa más emocionalmente que lógicamente. Hesse también
+      tiene una cualidad característicamente cambiante, enfatizando a la persona
+      que crea confusión en su mente al pensar en los demás. 5) Significados de
+      las cartas de la serie Diamond
+    upright: La persona que tiene problemas en su relación explica que el amante que
+      hizo las paces volverá con un amor fuerte y real. Para aquellos que no
+      están en una relación, enfatiza que existirá un amor fuerte y real y que
+      la persona experimentará desarrollos que los harán sonreír.
+    reversed: Se refiere a problemas como actitudes inestables, mobbing y sentirse
+      bajo mucha presión en una relación. Cuenta que no habrá retorno por un
+      tiempo para las personas que están separadas. Destaca que el amor
+      verdadero aún no es visible para las personas que no tienen un amante.
+  Isfahan:
+    name: Isfahán
+    general: No se encontró ninguna explicación.
+    upright: Si hay problemas en la relación que vive el cliente, recomienda no
+      hacer peticiones a la persona llorando o quejándose. Los problemas en la
+      relación se solucionarán. Sin embargo, la persona debe dejar de dominar a
+      la otra persona. Las diferencias de opinión pueden llevar al fin de la
+      relación. Si ambas partes se dan el derecho de hablar en su relación, se
+      puede llegar a un acuerdo. Isfahán significa que debemos cambiar nuestra
+      perspectiva de manera positiva. Isfahan, que llega al cliente que no está
+      en una relación. Para encontrar la pareja que buscas en el amor, aconseja
+      hacer las paces con la vida y con uno mismo en lugar de arrepentirse.
+      Indica que si cambia su perspectiva sobre sí mismo, entonces tendrá una
+      hermosa relación.
+    reversed: Aconseja al cliente que no actúe apresuradamente, que no actúe
+      impulsivamente, sino que piense cuidadosamente y actúe lógicamente con su
+      pareja en la relación que mantiene. Aconseja al cliente que no está en una
+      relación que no actúe apresuradamente en las elecciones y preferencias que
+      hará en su vida amorosa. Y prohíbe conversaciones excesivas e
+      innecesarias.
+  elmas:
+    name: Diamante
+    general: Big Diamond indica elegancia llamativa y hacerse notar. Además, el
+      diamante es la carta del cuidado. El dinero simboliza alcanzar riqueza y
+      comodidad material. Si la persona tiene una expectativa monetaria en su
+      objetivo, es un indicio de que esta situación será posible.
+    upright: Poseer propiedades significa oro, dinero y riqueza.
+    reversed: Si se experimenta una dificultad o se espera un beneficio monetario,
+      cuando el diamante viene en el ángulo opuesto, indica que tendremos menos
+      de lo esperado.
+  dastar:
+    name: Dastar
+    general: Tiene un carácter tranquilo y moderado. Siempre tiene éxito en la vida.
+      Dastar, que tiene una actitud tranquila, no apresura nada en la vida.
+      Representa a una persona que lo piensa dos o incluso 3 veces antes de
+      hacer algo.
+    upright: Esta carta vista en un cliente que está en una relación es un presagio
+      de engaño. Cuenta que el ser amado está en una relación con otra mujer.
+      Indica que su vida amorosa se verá ensombrecida por esta persona. El
+      dastar visto en el cliente que no está en una relación representa a una
+      dama que es amiga de él y lo conoce simplemente por una relación de
+      interés. Si la pregunta que se hace es sobre el amor, indica que la
+      persona con la que tendrá una relación tiene una relación secreta en su
+      vida que desconoce. Esta persona es una persona que ha tenido una relación
+      en el pasado pero aún no ha podido romper los vínculos. También puede
+      suceder.
+    reversed: El Dastar visto en el cliente que no tiene amante indica que hay una
+      persona astuta en su círculo cercano que abusará de su buena voluntad. El
+      Dastar visto en el cliente que está en pareja advierte que una mujer con
+      pensamientos astutos y astutos herirá nuestro amor y actuará con paciencia
+      para alejarnos de nuestra pareja. Es una tarjeta de advertencia.
+  adhamdeva:
+    name: Adhamdeva
+    general: Es un personaje tan insoportable que te hace querer alejarte de mí. Su
+      ego es demasiado alto. Él piensa que sólo él es importante en este mundo.
+      Y nada más importa. Es una persona a la que le encanta gastar dinero en
+      exceso. Si realmente ama a una persona, su amor durará para siempre.
+      Dependiendo del tipo de preguntas formuladas, a veces simboliza al cónyuge
+      engañado. En ocasiones indica que debemos estar preparados para escuchar
+      confesiones de amor.
+    upright: Decepción, tristeza, estar expuesto a la traición o malas palabras de
+      un amigo. Significa que una mala persona que lastima a la gente con sus
+      acciones secretas nos hará daño a nosotros. Si el Deva viene de un lugar
+      lejano, entonces el daño que nos hará una persona con estas
+      características no será tan dominante. Significa que se notará a la
+      persona y se tomarán precauciones. Para los clientes que están esperando
+      una relación, una confesión de amor indica escuchar una confesión, y si
+      hay dudas, indica despejar dudas en la relación.
+    reversed: Si se ve a Deva en la casa que representa a la persona, indica una
+      mujer maliciosa y codiciosa de dinero.
+  gamhat:
+    name: Gamhat
+    general: Sentimos que es una persona poco confiable porque tiene relaciones con
+      muchas mujeres. Y tenemos que confiar en él. Sin embargo, si realmente se
+      enamora, será leal. Si su amor no es real, te cansarás de seguir a Gamhat.
+      Como es perfeccionista, querrá tener lo mejor de todo. Por más leal que
+      sea en la amistad, la amistad y las relaciones familiares, lamentablemente
+      no será tan leal en el amor.
+    upright: Los clientes que están en una relación indican que el amor se verá
+      dañado debido a las inseguridades. Dice que la verdad será revelada. Se
+      debe determinar cómo y de qué manera se desarrollará esta situación
+      combinándola con la tarjeta que viene con el gamhat. A Gamhat, que llega
+      al cliente que no está en una relación, se le debe explicar que el cliente
+      que tiene inseguridades no puede experimentar el amor porque no ve con
+      buenos ojos las relaciones bilaterales, y que puede deshacerse de su
+      pasado o tener una relación confiando un poco en personas masculinas o
+      femeninas.
+    reversed: Los clientes que tienen problemas en su vida amorosa quieren vengarse
+      de sus parejas por sus inseguridades. Y representa socios egoístas que
+      nunca perdonan los errores. Gamhat, que se dirige al cliente que no está
+      en pareja, afirma que aún no tiene pareja porque es perfeccionista y le
+      cuesta confiar en las relaciones bilaterales, porque esta situación
+      dificulta las cosas.
+  dare:
+    name: Atrevimiento
+    general: Sin embargo, en el fondo tiene una suave y buena intención.
+      Generalmente se refiere al cónyuge que ha sido engañado.
+    upright: Derramar lágrimas excesivas, no poder conseguir a la persona que
+      queremos tener, presencia de problemas graves. Sin embargo, todas las
+      dificultades quedarán en un segundo plano y el destino convertirá tus
+      lágrimas en lágrimas de felicidad. El Reto que deseas estará en el centro
+      de tu vida.
+    reversed: Presagia que habrá grandes ruinas en la vida amorosa y acontecimientos
+      molestos que pondrán nuestra relación patas arriba. La melancolía y la
+      tristeza nos afectarán. Los factores externos y personas ajenas a nuestra
+      relación nos afectarán negativamente. Al mismo tiempo, cuando tiene el
+      efecto contrario en el análisis del personaje de Dare, también da la
+      noticia del significado del asesinato y el crimen.
+  zara:
+    name: Zara
+    general: Su única característica negativa es que es un poco restrictivo en
+      cuestiones financieras. Si Zara, representada en la baraja, representa a
+      la mujer, significa que se sentarán las bases sólidas de un gran y
+      apasionado amor. 6) Significados de las cartas estampadas Las barajas
+      estampadas no tienen un símbolo del zodíaco.
+    upright: Si los clientes en una relación están pasando por un período
+      problemático, habrá una fuerte recuperación en sus relaciones. Un amor
+      grande y verdadero superará todo tipo de problemas. La aparición de Zara
+      en un cliente que no está en una relación indica que la persona saludará a
+      una relación real, fuerte y nueva.
+    reversed: El cliente que está en una relación no podrá recuperar su relación por
+      un tiempo. El amor no es fuerte, los problemas están en la raíz de la
+      relación. Cada uno de los socios se comporta de forma cínica y
+      excesivamente celosa. Esto impide que la relación se recupere. El cliente
+      que no está en una relación no podrá iniciar una nueva relación por un
+      tiempo, la razón es que sospecha.
+  Capa:
+    name: Ancla
+    general: Anchor representa coherencia y confianza en una relación que va bien.
+    upright: Indica la confianza del cliente en las oportunidades financieras que
+      tiene (trabajo, dinero, carrera) y estar seguro de la otra persona en su
+      vida amorosa. Hay fidelidad en el amor. Para la clienta, la azada
+      representa que el hombre está rodeado de muchas mujeres, pero el corazón
+      del hombre está del lado de la clienta. Y representa el matrimonio. Para
+      el cliente que no tiene amante, la azada simboliza que la nueva pareja se
+      incorporará a su vida y que el sentimiento de confianza y lealtad estará a
+      primer plano.
+    reversed: Indica que el cliente tiene inseguridades sobre las oportunidades
+      financieras (trabajo, dinero, carrera), que no puede confiar en la otra
+      persona en su vida amorosa y que experimenta inseguridades y
+      comportamientos inconsistentes en la relación. Además, la pareja actuará
+      de acuerdo con la dirección de su comportamiento, y si hay decepción, la
+      pareja se anclará en otras relaciones. Para el cliente que no tiene
+      relación, hay una nueva pareja. Como el cliente no puede confiar en esta
+      persona, cederá y no la incluirá en su vida.
+  tilki:
+    name: Zorro
+    general: El zorro es astuto e ingenioso; Siempre tiene planes estratégicos de
+      vida para aprovechar todo tipo de oportunidades. Siempre tiene un plan
+      subconsciente, observa a las personas desde lejos y siempre espera el
+      momento adecuado para llevar a cabo los procesos que le propone. El zorro,
+      que es el presagio del estado de alerta, es el presagio de un amigo con
+      esta característica que nos ayuda/será también nuestro amigo.
+    upright: El estado de alerta y la astucia están en duda. Estas dos son las armas
+      más importantes de la persona representada por el zorro. La exitosa Fox
+      escuchará buenas palabras sobre su trabajo. La persona que representa al
+      Zorro tiene una inteligencia aguda y una memoria fuerte. Detecta de
+      antemano los desastres que le sucederán y toma las precauciones
+      correspondientes. Si aparece el Libro Fox +, estas características serán
+      reveladas y el zorro perderá su poder.
+    reversed: Indica una persona celosa e intrigante. Nos aconseja mantener los ojos
+      abiertos ante el daño de alguien astuto y engañoso. Nos advierte que el
+      zorro está haciendo planes negativos para nosotros y que no hay que tener
+      cuidado con este tema. También indica que si hay alguien que nos interesa
+      en el amor, intentaremos diferentes formas poco inteligentes de llegar a
+      esa persona.
+  Cicekler:
+    name: flores
+    general: Las flores indican encontrarse con una situación alentadora. Anuncian
+      días llenos de felicidad. Indican que la suerte será buena y se logrará el
+      equilibrio y la armonía con la vida. Para el cliente indica que se
+      encontrará a sí mismo, su alma se aliviará y alcanzará todas las bellezas
+      que desea en la vida.
+    upright: Aparecen la felicidad, la esperanza y la belleza. El optimismo y la
+      esperanza influirán en el cliente. Y sea cual sea su intención, todo
+      progresará hacia mejor.
+    reversed: Cuando observamos la naturaleza en nuestra vida real, no debemos
+      olvidar que los árboles y las flores se renuevan cada año. Incluso si las
+      flores aparecen en el ángulo opuesto, siempre expresan bondad y belleza.
+      Destaca la necesidad de no perder el coraje y la determinación.
+  yildizlar:
+    name: estrellas
+    general: Las estrellas son las determinantes del destino. Debes recordar que las
+      estrellas no deben contarse en tu vida real. De lo contrario, se cree que
+      traerá mala suerte. Cuando vemos una estrella fugaz también nos aconseja
+      no dejar de pedir un deseo.
+    upright: Indica que quienes lo rodean se preocupan por el cliente y que quienes
+      lo rodean escuchan sus palabras. Si la persona aparece en la casa que lo
+      representa es que tiene bastante talento. Afecta a las personas que lo
+      rodean. Toma conciencia de lo que puede hacer. La competencia desaparece
+      en el camino de la persona cuyas estrellas aparecen en su tarjeta. Indica
+      que la persona que ama enamorada lo notará y lo cuidará.
+    reversed: Indica que el cliente es una persona odiada por quienes lo rodean.
+      Indica que no se le nota. Indica que ha perdido la atención y el amor de
+      sus amigos y de la persona que le gusta. Indica que el cliente odiará a
+      quienes lo molestan y cortará su relación con todo su entorno y sus seres
+      queridos.
+  alyans:
+    name: Pacto
+    general: Para el cliente que no está en una relación, el anillo de bodas indica
+      matrimonio, compromiso y el comienzo serio de una nueva relación. Si se
+      invierte, indica que una relación terminará con engaño y traición. Para el
+      cliente que está en una relación, comprometerse o casarse indica que la
+      relación está progresando en una dirección positiva. Si está al revés,
+      significa trampa o separación. Para el cliente casado, simboliza
+      situaciones como la aparición de problemas en el matrimonio, divorcio,
+      separación. Al mismo tiempo, si viene con tarjetas como anillo de bodas +
+      diamante + río Nilo + esmeralda, simboliza riqueza.
+    upright: Indica una relación feliz y la coronación de la relación con el matrimonio.
+    reversed: Indica una relación infeliz, parejas casadas que separan sus lechos,
+      posibilidad de divorcio y también de infidelidad. Con el anillo de bodas +
+      Dastar significa traición definitiva, con el anillo de bodas + dastar
+      significa divorcio y el fin de la relación.
+  dag:
+    name: Montaña
+    general: La Montaña simboliza el poder. Enfatiza que no importa lo que
+      experimentemos en la vida, siempre nos mantenemos firmes. La Montaña
+      también indica una gran ayuda de una persona inesperada. Tiene
+      significados relacionados con la incautación de una gran fortuna. La
+      montaña indica que recibiremos ayuda de un círculo de amigos fuertes y
+      leales siempre que necesitemos ayuda.
+    upright: Indica fuerza. Nos dice que podemos afrontar las difíciles pruebas del
+      destino. Nos dice que somos espiritualmente fuertes. Indica que si hay un
+      desarrollo negativo que esperamos en nuestras vidas, ese desarrollo
+      desaparecerá y nunca podrá dañarnos. Señala los problemas y peligros que
+      nos sucederán. Enfatiza a la(s) persona(s) que están tratando de hacer el
+      mal. Nos dice que habrá grandes discusiones y malas palabras. También nos
+      habla de la relación amorosa que el amor está al filo de un cuchillo,
+      habrá una separación y la suerte en el amor irá por mal rumbo y se
+      producirá una separación. Para quienes no están en una relación, enfatiza
+      que la suerte en el amor no será visible por un tiempo. Para recibir
+      noticias, se debe combinar un mensaje que viene de lejos con la tecnología
+      actual y el tipo de noticia debe combinarse con tarjetas abiertas. Para
+      los clientes que esperan una relación amorosa, indica el regreso de la
+      persona esperada. Para los clientes que no están en una relación, indica
+      que escucharán noticias sobre las novedades respecto al amor que están
+      esperando. También indica el regreso de la persona/personas que continúan
+      su vida en tierras lejanas.
+    reversed: Indica que viviremos un gran colapso y que nuestro trabajo e
+      iniciativas fracasarán. Enfatiza experimentar la infelicidad al máximo.
+      Los grandes desastres y las ruinas nos afectarán negativamente
+      espiritualmente y nuestros sueños desaparecerán. 6.07 )Yatağan Yatağan ;
+      Habla de un peligro al que podemos enfrentarnos en cualquier momento. Sin
+      embargo, también significa que puede solucionar problemas que no van bien.
+      Si Yatağan + sol se unen, evoca este significado. Nos advierte que
+      tengamos cuidado con las personas que no conocemos. Si viene con una carta
+      positiva nos dice que ese extraño no puede hacernos daño. Al mismo tiempo,
+      si viene al lado de la tarjeta que representa a algún miembro de la
+      familia, indica desacuerdos con personas como padre, tío, tía, hermano,
+      etc. Nos encontraremos con problemas que debemos solucionar en nuestra
+      vida, pero podremos dejarlos todos en un segundo plano. Seremos
+      conscientes de los peligros y discusiones que se producirán. No nos
+      enfrentaremos a problemas tan grandes como esperábamos. Destaca que si
+      Yatağan + derviche + libro viene con él, todo irá bien. 6.08) Carta Carta
+      indica que recibiremos noticias sobre los temas que esperábamos o no
+      esperábamos en nuestras vidas. Estas noticias pueden ser tristes o no, por
+      lo que conviene interpretarlas mirando las cartas que tienen al lado. Por
+      ejemplo; camino + carta significa que recibirás nuevas oportunidades y
+      nuevas noticias sobre el trabajo y el amor... Cuando la carta viene al
+      revés indica que estás recibiendo malas noticias. Sin embargo, esto se
+      debe hacer mirando la tarjeta al lado de qué tipo de noticia se trata. Por
+      ejemplo, hora inversa + letra inversa significa que las noticias esperadas
+      a partir de la hora no llegarán por un tiempo y la persona no regresará a
+      donde pertenece. conformado...
+  agac:
+    name: Árbol
+    general: El árbol representa salud, amor fuerte y resiliencia ante las pesadas
+      cargas de la vida.
+    upright: Para el cliente que está en una relación, indica que la pareja en
+      cuestión ama al cliente con un amor profundo y un amor sólido. Para el
+      cliente que no está en pareja, le da la buena noticia de una nueva
+      relación con raíces sólidas. Para la persona que experimenta problemas
+      relacionados con la salud, indica recuperación y estar en forma. Para la
+      persona que espera un bebé, indica que el parto se producirá de forma
+      saludable. Se deben tener en cuenta las palabras y noticias pronunciadas
+      por el derviche. El cliente enfrentará los hechos. Cualquiera que sea la
+      verdad aprendida, si hay algún tema que le molesta, se aclarará. Si
+      aprendes la verdad, evitarás cometer errores. La verdad allanará el camino
+      para que ganes confianza en ti mismo. El sufrimiento que has sufrido hasta
+      ahora te ha permitido adquirir una gran experiencia, actuarás considerando
+      estas experiencias por el resto de tu vida. Las predicciones sobre el
+      futuro serán positivas.
+    reversed: El cliente que está en una relación expresa que la relación no se
+      puede construir sobre una base sólida, que el amor de la persona a la que
+      se le pide no es realista y que la relación puede llegar al punto de
+      ruptura en cualquier momento. El cliente que no está en pareja tendrá que
+      vivir en relaciones poco saludables durante un tiempo más. También indica
+      enfermedades. Sin embargo, si el árbol está al revés y recto, la
+      enfermedad será temporal. 6.10) El derviche simboliza una persona sabia e
+      iluminada con sentimientos extremadamente fuertes. Además, la persona que
+      ve el símbolo derviche debe prestar atención a sus sentimientos e
+      intuiciones. Al mismo tiempo, el derviche es el presagio del apoyo que se
+      recibirá de un vidente consultado y de una persona con sólidos
+      conocimientos. Se debe prestar atención a las palabras de esta persona y
+      escuchar sus advertencias. Indica que la persona que no toma en cuenta las
+      palabras del derviche cometerá errores y equivocaciones. El derviche
+      inverso enfatiza las mentiras que se le dicen a la persona. Muestra que la
+      persona no ha aprendido de los procesos negativos vividos hasta el
+      momento. Las mentiras te harán perder la confianza.
+  yol:
+    name: Camino
+    general: El camino simboliza buena suerte, buena fortuna y oportunidades
+      inesperadas.
+    upright: Si el cliente se encuentra en una etapa de decisión, la decisión a
+      tomar será la correcta. A la persona le llegarán buenas oportunidades
+      inesperadas en la vida amorosa y empresarial. Todos los deseos y anhelos
+      se harán realidad. El camino, que es la buena noticia de un buen futuro,
+      dice que la mala vida de la persona cambiará para mejor.
+    reversed: Si el cliente se encuentra en una etapa de decisión, indica que esta
+      decisión es una decisión equivocada. Si el cliente está entre una opción,
+      indica que la elección no le beneficiará.
+  gunes:
+    name: Sol
+    general: "Buena suerte, rompiendo el ciclo fatídico que va mal, si el cliente
+      está pasando por un período problemático, este período problemático
+      quedará completamente en un segundo plano. No hay ningún cambio en el
+      significado de la carta, al revés o al revés. En nuestra vida real,
+      incluso si ponemos el Sol boca abajo, sigue brillando con la misma
+      magnificencia. No importa con qué baraja de cartas venga el Sol, su
+      significado nunca cambia, siempre representa bondad, belleza y curación.
+      Por ejemplo, yatagan + sol: Representa el fin de la separación y la
+      resolución de los problemas actuales."
+    upright: No se encontró ninguna explicación.
+    reversed: No se encontró ninguna explicación.
+  deve:
+    name: el debe
+    general: El camello advierte sobre bloqueos en materia financiera, resistencia
+      al fluir normal de la vida, incapacidad para aceptar, vacilaciones en las
+      relaciones amorosas y para tener paciencia.
+    upright: Será posible resolver los problemas económicos y financieros. En
+      cualquier cosa en la que la persona muestre paciencia, recibirá su
+      recompensa. O si el asunto que plantea es un asunto que requiere
+      paciencia, recibirá su recompensa si muestra paciencia y perseverancia.
+    reversed: Habrá un colapso en materia económica y financiera. La persona
+      afrontará la prueba más negativa y más paciente de su vida. Durante este
+      período, la persona deberá tener cuidado con los recursos económicos y
+      evitar gastos excesivos. De lo contrario, si no puede utilizar su tiempo
+      de manera eficiente, los intentos no tendrán éxito y tendrá que afrontar
+      pérdidas. Además, si la pregunta que se hace es sobre una relación
+      amorosa, habrá algunos bloqueos en el amor, pero si se muestra paciencia y
+      aguante. , esta situación apenas se recuperará.
+  kalp:
+    name: Corazón
+    general: El corazón es el símbolo del Amor. Habrá un nuevo amor en todos los
+      aspectos. Los amantes serán enteros en un solo cuerpo.
+    upright: Representa la existencia o experiencia de un amor real y grande.
+    reversed: Separación de camas, fin de relaciones. Indica la existencia de un
+      corazón herido pero fuerte. El dueño del corazón es una persona tan fuerte
+      que por mucho dolor que sufra, el amor volverá a tocar a su puerta.
+  bahceler:
+    name: jardines
+    general: No se encontró ninguna explicación.
+    upright: En el cliente que no tiene relación; Indica establecer una relación
+      amorosa con una persona que conoces por casualidad en una organización o
+      una comunidad. Esta relación a largo plazo, que incluirá un sentido de
+      lealtad y confianza, hará que la persona se sienta feliz. La pareja en la
+      nueva relación debe interpretarse combinándola con la carta que
+      complementa los jardines. La interpretación debe combinarse con los
+      jardines según la estructura característica de la persona. Para el cliente
+      que está en una relación, indica que habrá encuentros con la persona que
+      ama y valora.
+    reversed: En el cliente que no tiene relación; Indica que la relación esperada
+      no será soportable por un tiempo. Si es Jardines (Invertido/Recto, no
+      importa) + Navegación (Recto), entonces indica que una relación hermosa y
+      auspiciosa está en la puerta. En el cliente que está en una relación; Es
+      señal de que la relación continuará con frescura y belleza. Sin embargo,
+      también tiene significados negativos. Cuando Bahçeler (Invertido) +
+      Yatağan (Vertical), indica que la relación terminará.
+  anahtar:
+    name: Llave
+    general: La clave indica que los secretos ocultos serán resueltos, cualquier
+      signo de interrogación que inquiete tu mente encontrará una solución.
+      Indica que la persona mirará el futuro con más optimismo y experimentará
+      avances al ser recompensado con amor sagrado por el universo.
+    upright: Cliente sin relación; Te alejarás de la psicología del aislamiento.
+      Ganarás un círculo de amigos. Si tu pregunta es sobre el amor y la llave
+      viene con el corazón, entonces indica que abrirás la puerta a una hermosa
+      relación. Nuevamente con una interpretación diferente, cuando la llave
+      viene con la puerta, el camino y el velero, indica lograr todas tus
+      ambiciones y vivir una vida muy hermosa. La clave que le llega al cliente
+      que está en una relación indica que la persona adelantará de manera
+      positiva un tema que desea mucho a su favor. Si esta persona viene con la
+      llave + el anillo de bodas, entonces da la buena noticia de que recibirá
+      una propuesta de matrimonio. Indica que la persona encontrará el sentido
+      de la vida, la fuente de la vida y que todos los secretos ocultos serán
+      revelados. Indica que el alma será libre y la persona se hará especial. La
+      persona encontrará prosperidad al aprender un secreto importante para sí
+      misma. Indica que encontrará las respuestas a las preguntas que busca en
+      una dirección diferente. También nos da la buena noticia de que lograremos
+      un enriquecimiento espiritual.
+    reversed: Hay soledad y alejamiento de la vida, indica total introversión y
+      aislamiento del mundo exterior. El cliente que está en una relación no
+      podrá alcanzar sus expectativas por un tiempo y se encerrará en su propio
+      mundo interior. Valide + tecla inversa indica el cierre del destino. 6.17)
+      El libro indica no poder encontrar el sentido de la vida, sentirse
+      constantemente culpable y no poder enriquecerse espiritualmente si uno se
+      carga con los pensamientos negativos que guarda en el subconsciente. La
+      persona tendrá que afrontar un doloroso secreto que sacudirá su vida, le
+      herirá profundamente. Se sentirá débil e indefenso. Todos estos posibles
+      problemas serán experiencias para la persona y la guiarán a lo largo de su
+      vida. De hecho, las negatividades le permitirán a la persona en qué
+      dirección debe moverse realmente.
+  baykus:
+    name: Búho
+    general: No se encontró ninguna explicación.
+    upright: Están en juego la sabiduría, la inteligencia, la experiencia y la
+      inspiración para nuevas ideas. El símbolo de la madurez, el contacto con
+      la naturaleza, el arte, la ciencia y la literatura. Adquirir nuevas
+      actividades. Todo lo experimentado, bueno o malo, hará que la persona
+      tenga experiencia y sea sabia. La persona confirma todas las verdades en
+      las que cree. El búho representa el aprendizaje correcto del conocimiento
+      y su pronunciación en la dirección correcta.
+    reversed: Enfatiza que las cuestiones que cree conocer están equivocadas. Te
+      habla de tener prejuicios. Le dice que está haciendo un juicio equivocado
+      y que, como resultado, se entristecerá. Si se juntan Búho Invertido +
+      Turan, significa una persona grosera, grosera e inculta. (Se da a Turan
+      como ejemplo. Urmia o Saah pueden estar en su lugar; el significado se
+      expresa combinando las dos cartas como en el ejemplo que mencioné).
+  mezar:
+    name: Tumba
+    general: Tumba significa muerte. Lleva el significado de muerte real o muerte
+      figurada. También proporciona información sobre el fin de una mala suerte
+      o la muerte de un paciente.
+    upright: Significa que todo llegará a su fin. Si la carta de Tumba y las otras
+      cuatro cartas son negativas, por ejemplo, Valide+Yatağan+Camino inverso,
+      significa el fin de la vida. Nos dice que el cuerpo cambiará de tamaño y
+      el alma abandonará el cuerpo. Al mismo tiempo, Grave significa que si hay
+      un problema que estamos experimentando, tenemos miedo de afrontarlo y no
+      tenemos el coraje.
+    reversed: La tumba al revés en una persona enferma indica muerte. La tumba al
+      revés en un cliente que está pasando por una ruptura indica que no se
+      puede aceptar la separación. La persona sigue en esa relación y rechaza
+      las innovaciones.
+  yelkenli:
+    name: Velero
+    general: El velero es el presagio de viajes planificados o no planificados.
+    upright: Representa nuevas experiencias, nuevos espacios de vida y bellezas que
+      influyen en nuestras vidas. Indica buena suerte y oportunidades que traen
+      éxito. También es el presagio de un viaje de un lugar a otro.
+    reversed: Expresa que la inactividad y una vida estancada afecta negativamente a
+      la persona. Destaca que los planes esperados no se harán realidad. Si la
+      persona tiene intención de realizar un viaje, dice que no podrá realizar
+      este viaje por un tiempo. También representa mala suerte, malos intentos y
+      decepciones.
+  nil_nehri:
+    name: Río Nilo
+    general: No se encontró ninguna explicación.
+    upright: El trabajo realizado desde el pasado hasta el presente ha sido
+      fructífero y la persona seguramente será recompensada por ello. Cualquier
+      cosa que se apunte ahora definitivamente cosechará sus frutos en el
+      futuro. La persona alcanzará sus objetivos en cuanto a carrera, amor y
+      nuevos comienzos. De hecho, si el río Nilo viene acompañado de una pareja
+      en la expansión amorosa, la persona le abrirá la puerta a conocer y/o
+      casarse con una persona rica y exitosa en el amor, o a una relación seria
+      con una persona de estas características.
+    reversed: Indica que la persona concede gran importancia a su vida profesional y
+      tiene un carácter adicto al trabajo. El río Nilo inverso indica que habrá
+      situaciones fallidas en el amor, los negocios y la vida profesional. La
+      persona se sentirá decepcionada en todos los aspectos y no podrá obtener
+      la recompensa de sus esfuerzos.
+  afyon:
+    name: Opio
+    general: No se encontró ninguna explicación.
+    upright: Indica que se olvidarán todo tipo de dolor y pena. La persona ha pasado
+      por muchas torturas y dolores hasta llegar al día de hoy. Pero superará
+      todo esto y experimentará buenos avances. Saludará a los días de paz. El
+      opio, que afirma que el tiempo es la cura para todo, indica que todas las
+      dificultades serán superadas, las penas quedarán atrás y hará feliz a la
+      persona. Si el opio viene con la carta que representa a la pareja, indica
+      que esta persona es adicta a los juegos de azar, al alcohol y a sustancias
+      adictivas. Si el corazón y el opio vienen con él, significa que el amor es
+      fuerte y ninguna fuerza causará destrucción en el amor.
+    reversed: El dolor continuo desde el pasado hasta el presente no se borrará de
+      la mente y el corazón de la persona. Por mucho que la persona luche por
+      olvidar el pasado, no podrá deshacerse de sus traumas. No podrá tolerar
+      nuevas relaciones. O, en una relación, tendrá que afrontar su pasado, por
+      lo que surgirán problemas en la relación. Afyon, visto en el cliente que
+      no está en una relación, describe el dolor del amor experimentado en el
+      pasado; Por este motivo, la persona no se siente preparada para nuevos
+      procesos. El Opio Invertido que viene al lado de la carta que representa a
+      la persona indica que ésta no puede encontrar el camino correcto por sí
+      misma porque tiene tendencia a las sustancias nocivas. Nunca se deben
+      formular tendencias que lo dirijan; No puedes esperar que la persona actúe
+      de acuerdo con tus sugerencias. Se puede recomendar la meditación para la
+      situación actual observada.
+  kizCocugu:
+    name: niña
+    general: No se encontró ninguna explicación.
+    upright: Indica que la persona tiene nuevos fans a su alrededor. Para el cliente
+      que está en una relación, representa que la persona con la que está en una
+      relación puede ser candidata a cónyuge en el futuro. Para el cliente
+      casado, presagia la llegada de un hijo. También dice que la persona
+      protege a otra persona a su alrededor a quien ama y valora. Podría ser un
+      niño u otra persona que valore. Si la persona viene con sus tarjetas,
+      indica que está casada y feliz. Si viene a la casa representando al
+      cliente, representa ser misericordioso y concienzudo.
+    reversed: Indica que la persona no es apreciada ni apreciada por las personas
+      que la rodean. La Chica al Revés que se ve en el cliente casado indica que
+      él/ella no podrá tener un hijo debido al embarazo esperado por un tiempo.
+      Simboliza que habrá decepción con las personas que ama y por las que se
+      preocupa.
+  fareler:
+    name: Ratones
+    general: No se encontró ninguna explicación.
+    upright: Indica que ha sido tratado injustamente como resultado de un problema y
+      que no ha podido obtener lo que le corresponde por la situación. La
+      pérdida de la persona es mayor de lo que piensa; Esta pérdida puede ser
+      material o puede estar relacionada con una pérdida espiritual. Si los
+      ratones aparecen en la segunda o tercera casa en representación del
+      cliente, entonces la persona compensará la pérdida. También advierte que
+      la persona no debe contar su secreto a una persona en la que confía y debe
+      proteger sus pertenencias de valor material.
+    reversed: La persona que ha sido tratada injustamente como resultado de un
+      problema recibirá su justicia. Indica que las pérdidas materiales y
+      morales de la persona no la sacudirán tanto como cree. Si la persona tiene
+      un amigo cercano o un amante, representa confianza incondicional en
+      él/ella. Sin embargo, si viene con cartas como ratones + serpiente +
+      dastar, entonces indica que no debes confiar. Además, los ratones son el
+      presagio de la manifestación incondicional de la justicia.
+  kapi:
+    name: Puerta
+    general: No se encontró ninguna explicación.
+    upright: Indica ganar respeto y reputación. La persona alcanzará el éxito en un
+      campo en el que lucha. Además, dependiendo del tipo de problema
+      relacionado con el amor, las finanzas, el dinero, por ejemplo puerta +
+      hora, la tarjeta de la puerta indica que una persona ofrecerá la ayuda
+      esperada. Quienes están esperando una relación amorosa, indica que
+      encontrarán una buena oportunidad.
+    reversed: Una persona enfrentará varios problemas y problemas en su vida, pero
+      no debe desesperarse. Porque incluso si es difícil, ganará respeto y
+      reputación. Si viene con cartas negativas como Puerta Inversa + Yatağan,
+      etc., entonces la suerte se moverá en una dirección negativa y la persona
+      no podrá alcanzar sus expectativas.
+  kale:
+    name: Col rizada
+    general: No se encontró ninguna explicación.
+    upright: Kale significa reconciliación con un cliente que ha vivido una
+      separación; Para el cliente que está casado, indica que su matrimonio está
+      sobre terreno sólido. Para el cliente que no tiene ninguna relación,
+      indica que entrará en una relación fuerte y sólida. Castle indica que la
+      vida transcurrirá sin problemas, en paz y tranquilidad y que tendrán una
+      larga vida.
+    reversed: Kale significa que no hay paz en un cliente que ha experimentado una
+      separación; Para el cliente que está casado, indica que su matrimonio no
+      está sobre una base sólida. Para el cliente que no tiene relación, indica
+      que no tendrá relación por un tiempo. El castillo invertido indica que la
+      vida será problemática, inquieta y llena de discusiones, deterioro de la
+      salud y debilitamiento en los asuntos económicos.
+  samyeli:
+    name: Samyeli
+    general: No se encontró ninguna explicación.
+    upright: Samyeli expresa que las personas cuyos encuentros están escritos en sus
+      frentes se unirán en el futuro. También indica que emprenderemos el camino
+      luego de recibir noticias sobre la persona que amamos y quién es nuestro
+      destino. La persona se encontrará con la persona que quiere ver en un
+      momento inesperado. Las personas que tienen la idea de instalarse en una
+      ciudad diferente se darán cuenta de estos pensamientos. Sin embargo; Si
+      viene con Samyeli + camino, indica un movimiento definitivo. Si viene con
+      Samyeli + esmeralda o diamante, indica que cuestiones como la herencia
+      pasarán a primer plano y la persona obtendrá propiedades o dinero
+      inesperados.
+    reversed: Samyeli invertido expresa separaciones y divisiones fatídicas. También
+      describe un encuentro con el que no estaremos contentos. A las personas
+      que están pensando en mudarse les indica que se mudarán a un mal ambiente
+      donde su comodidad se verá perturbada. Para las personas que están
+      esperando una herencia, indica que los procesos esperados no se
+      desarrollarán por un tiempo.
+  kopek:
+    name: Perro
+    general: No se encontró ninguna explicación.
+    upright: El perro es el mejor amigo del hombre. Es leal y un verdadero amigo.
+      Indica obtener la ayuda y el apoyo de un amigo. Advierte que se conocerá
+      información sobre una persona. Al mismo tiempo, le aconseja no rechazar la
+      ayuda de una persona a la que conoce desde hace mucho tiempo.
+    reversed: Perro Invertido es un amigo infiel. Indica experimentar la deslealtad
+      de un amigo o un amante. Al mismo tiempo, aconseja a la persona no aceptar
+      oportunidades que le parezcan atractivas. Advierte que las personas que
+      parecen ser amigas perjudicarán a las personas.
+  ev:
+    name: ev
+    general: No se encontró ninguna explicación.
+    upright: Representa ganancias como casa, buena suerte, dinero, riqueza. Habla de
+      la felicidad familiar. Habla de la recuperación de matrimonios y
+      relaciones rotos. Indica que todos los esfuerzos en materia familiar darán
+      frutos. Da buenas noticias de que surgirán nuevas y auspiciosas
+      oportunidades para la persona. También indica un buen vecino. La cruz
+      significa tortura, tormento y tristeza dolorosa. Significa estar fascinado
+      por el dolor físico y psicológico. Indica que la confianza en uno mismo se
+      verá afectada. Significa cometer errores sin querer y afrontar los
+      errores. Significa encontrar inseguridades en el amor. Si viene con cartas
+      de persona como la cruz, turan, etc.; Significa no respetar o desagradar a
+      la persona que aparece.
+    reversed: Una casa invertida indica situaciones como mala suerte, falta de
+      dinero, pérdida de herencia. Describe la infelicidad experimentada dentro
+      de la familia. Enfatiza que una relación o matrimonio terminará. Indica
+      que habrá discusiones por temas familiares y que la persona no será
+      recompensada por todos sus esfuerzos por su familia. También indica un mal
+      vecino. 6.31) Cross Reverse Cross enfatiza que un posible evento triste
+      quedará en un segundo plano. Dice que la persona preverá un error y lo
+      corregirá.
+  bulutlar:
+    name: nubes
+    general: No se encontró ninguna explicación.
+    upright: Las nubes indican novedades que serán beneficiosas para la persona. Las
+      nubes blancas expresan la existencia de un amor puro, verdadero e
+      inocente. Proporcionan información de que todos los malos traumas quedarán
+      en un segundo plano, dejando atrás los problemas.
+    reversed: Las Nubes Invertidas indican que se está experimentando un evento
+      desafortunado. Significa que la persona no es amada por la pareja que
+      piensa. Trae inseguridades y mala suerte en el amor. Indica no poder
+      superar los traumas de un evento.
+  ay:
+    name: Oh
+    general: No se encontró ninguna explicación.
+    upright: La luna significa un colapso espiritual. Indica que las lágrimas, el
+      miedo y la ansiedad inquietan/inquietarán a la persona. Un proceso que
+      sale mal y los deseos no se cumplen harán que la persona se sienta
+      extremadamente incómoda e infeliz. Si viene con cartas positivas como Ay +
+      Ariman y Atart, la persona quedará aliviada de esta situación.
+    reversed: La Luna significa un colapso espiritual. Las lágrimas indican que el
+      miedo y la ansiedad hacen o harán que la persona se sienta incómoda. Un
+      proceso que va mal y los deseos no se cumplen harán que la persona se
+      sienta extremadamente incómoda e infeliz. Si la Luna + viene con cartas
+      positivas como Ariman y Atart, la persona se verá aliviada de esta
+      situación. Los significados son los mismos en expansiones rectas e
+      inversas.
+  yilan:
+    name: Serpiente
+    general: No se encontró ninguna explicación.
+    upright: La persona se enfrentará a los conceptos de engaño y traición. Esta
+      situación que se le hace puede ser un amigo, amante o un miembro de su
+      familia. Si la persona Serpiente viene con sus cartas, esta persona puede
+      ser representada. Por ejemplo, si se juntan Snake + Gamhat, se da
+      información sobre haber sido traicionado por un socio poco confiable.
+    reversed: Da el mensaje de que el amigo cercano o el amante de la persona ha
+      traicionado o engañado sin querer. Cuando la serpiente está boca abajo,
+      indica perdón. Sin embargo, cuando la serpiente está boca abajo +
+      horizontal, significa que no habrá perdón.
+  supurge:
+    name: Fregar
+    general: No se encontró ninguna explicación.
+    upright: La escoba indica discusiones, peleas, palabras hirientes. También
+      enfatiza que la persona es vista por el entorno externo. Indica procesos
+      complejos dentro de la familia, separación e infelicidad en las relaciones
+      amorosas y la relación sacudida por dudas.
+    reversed: La escoba indica discusiones breves, peleas, palabras hirientes.
+      También enfatiza que la persona es vista por el entorno externo, pero a
+      estas personas no les importa. Indica procesos complejos a corto plazo en
+      la familia, separación e infelicidad a corto plazo en las relaciones
+      amorosas y la relación sacudida por dudas.
+  balik:
+    name: Pez
+    general: No se encontró ninguna explicación.
+    upright: Piscis indica indecisión y dificultad para tomar decisiones. Indica una
+      postura impaciente, una decisión que hay que tomar sin esperar más,
+      independientemente del tema que haya que decidir. La persona no quiere ser
+      derrotada en la vida que vive. Quiere tomar una decisión lógica por sí
+      mismo, pero le indica que no encuentra la salida porque está
+      experimentando una gran indecisión.
+    reversed: Piscis indica que se tomarán indecisiones y elecciones. Una postura
+      paciente indica que cualquiera que sea el asunto que deba decidirse, la
+      decisión se tomará sin más espera. La persona no será derrotada en su
+      vida. Él tomará la decisión lógica por sí mismo. Esta decisión fortalecerá
+      sus esperanzas y le permitirá mirar la vida de una manera más positiva. 7.
+      Espíritu Maglar de los Magos
+  atart:
+    name: Atart
+    general: No se encontró ninguna explicación.
+    upright: Representa el espíritu de bondad y bondad. Describe estar protegido por
+      el universo. Para las personas que están esperando el matrimonio, indica
+      que el matrimonio se producirá. Para las parejas que están separadas,
+      indica que la separación terminará, y para las personas que están
+      esperando una relación, indica una unión fuerte, feliz que traerá gran
+      alegría.
+    reversed: Expresa el espíritu de bondad y bondad. Describe estar protegido por
+      el universo. Para las personas que están esperando el matrimonio, indica
+      que el matrimonio se producirá. Para las parejas que han estado separadas
+      indica que la separación terminará, y para las que esperan una relación,
+      indica una unión fuerte, feliz y que les dará una gran alegría. Su
+      significado es el mismo en expansión inversa/adelante, no cambia.
+  valide:
+    name: Válido
+    general: No se encontró ninguna explicación.
+    upright: Valide significa mala suerte, infelicidad, mala suerte que se vuelve
+      mala. Las expectativas no avanzan en dirección positiva, estar expuesto a
+      energías negativas por parte de una mujer, por lo tanto significa
+      experimentar gran tristeza y dolor en el amor.
+    reversed: Valide significa mala suerte, infelicidad, mala suerte que se vuelve
+      mala. Las expectativas no avanzan en dirección positiva, estar expuesto a
+      energías negativas por parte de una mujer, por lo tanto significa
+      experimentar gran tristeza y dolor en el amor.

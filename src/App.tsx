@@ -4,42 +4,19 @@ import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import en from './locales/en.yaml';
+import tr from './locales/tr.yaml';
+import es from './locales/es.yaml';
+import fr from './locales/fr.yaml';
+import zh from './locales/zh.yaml';
+import ko from './locales/ko.yaml';
 import { Sparkles, Moon, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2 } from 'lucide-react';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const KATINA_DECK = [
-  { name: "Derviş", desc: "Bilgelik, yalnızlık, sabır ve manevi rehberlik." },
-  { name: "Sfenks", desc: "Sırlar, çözülmesi gereken gizemler, bilinmezlik." },
-  { name: "Tılsım", desc: "Korunma, şans, maddi kazanç veya uğurlu bir eşya." },
-  { name: "Yakut Valide", desc: "Tutku, ateş elementi, güçlü ve otoriter bir kadın." },
-  { name: "Zümrüt Bey", desc: "Su elementi, duygusal, romantik ve anlayışlı bir erkek." },
-  { name: "Elmas Hanım", desc: "Toprak elementi, pratik, güvenilir ve maddiyata önem veren bir kadın." },
-  { name: "Abanoz Paşa", desc: "Hava elementi, zeki, iletişimci ama bazen mesafeli bir erkek." },
-  { name: "Çapa", desc: "Güven, sadakat, bir yere veya kişiye bağlılık, umut." },
-  { name: "Süpürge", desc: "Temizlenme, kavga, hayatından bir şeyleri çıkarma gerekliliği." },
-  { name: "Yılan", desc: "İhanet, gizli düşmanlık, kıskançlık veya sinsilik." },
-  { name: "Güneş", desc: "Büyük şans, mutluluk, aydınlanma ve başarı." },
-  { name: "Ay", desc: "Sezgiler, romantizm, melankoli ve değişken ruh halleri." },
-  { name: "Yıldız", desc: "Umut, ilham, hayallerin gerçekleşmesi, ruhsal rehberlik." },
-  { name: "Kitap", desc: "Sırlar, eğitim, öğrenilmesi gereken şaşırtıcı bir gerçek." },
-  { name: "Mektup", desc: "Haberler, beklenen bir mesaj veya önemli bir iletişim." },
-  { name: "Kalp", desc: "Büyük aşk, sevgi, şefkat ve duygusal mutluluk." },
-  { name: "Yüzük", desc: "Bağlılık, evlilik, ortaklık, ciddi bir tamamlanma." },
-  { name: "Ağaç", desc: "Köklenme, sağlık, büyüme, aile soyu ve uzun ömür." },
-  { name: "Dağ", desc: "Engeller, aşılması zor durumlar, gecikmeler ve sınanmalar." },
-  { name: "Yol", desc: "Seçimler, ayrılıklar ya da yeni bir hayata doğru atılan adım." },
-  { name: "Fareler", desc: "Kayıplar, içten içe kemiren endişe ve stres." },
-  { name: "Tilki", desc: "Kurnazlık, dikkatli olunması gereken bir fırsatçılık." },
-  { name: "Bahçe", desc: "Sosyalleşme, çevre, kalabalıklar ve toplum içindeki yeriniz." },
-  { name: "Tabut", desc: "Bitişler, büyük değişim, bir devrin kapanıp yenisinin başlaması." },
-  { name: "Baykuş", desc: "Bilgelik, gece gelen haberler veya etrafı gözlemleme zamanı." },
-  { name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
-  { name: "Çöl", desc: "Yalnızlık, kuraklık, sabır gerektiren boşluk dönemi." },
-  { name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
-  { name: "Kale", desc: "Güvenlik, sağlam yapı, dış etkenlere karşı korunaklı olma." },
-  { name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." } // 30 cards total
-];
+import katinaDeckInfo from './data/deck_info.json';
+
+const KATINA_DECK = katinaDeckInfo;
 
 type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
 
@@ -51,75 +28,29 @@ type UserInfo = {
   language: Language;
 };
 
-type Card = { name: string; desc: string };
+type Card = { id: string; name: string; desc: string };
 
-const t: Record<string, Record<Language, string>> = {
-  returnToStart: { tr: 'Giriş Ekranına Dön', en: 'Return to Start', es: 'Volver al Inicio', fr: 'Retour au Début', zh: '返回开始', ko: '시작으로 돌아가기' },
-  subtitle: { 
-    tr: 'Geçmişin aynası, bugünün ateşi ve geleceğin pusulası... Katina destesi sana ne fısıldıyor?', 
-    en: 'Mirror of the past, fire of the present, and compass of the future... What does the Katina deck whisper to you?', 
-    es: 'Espejo del pasado, fuego del presente, y brújula del futuro... ¿Qué te susurra la baraja Katina?', 
-    fr: 'Miroir du passé, feu du présent, et boussole du futur... Que vous murmure le jeu Katina ?',
-    zh: '过去的镜子，现在的火焰，未来的指南针…… 卡提娜牌组在向你低语什么？',
-    ko: '과거의 거울, 현재의 불꽃, 미래의 나침반... 카티나 덱이 당신에게 무엇을 속삭이나요?'
-  },
-  splashText: { 
-    tr: 'Kehanetler senin için aralanıyor...', 
-    en: 'The prophecies are unwrapping for you...', 
-    es: 'Las profecías se despliegan para ti...', 
-    fr: 'Les prophéties se dévoilent pour vous...',
-    zh: '预言正在为你展开...',
-    ko: '예언이 당신을 위해 펼쳐지고 있습니다...'
-  },
-  startButton: { tr: 'Falına Başla', en: 'Start Your Reading', es: 'Comenzar Tu Lectura', fr: 'Commencer Votre Lecture', zh: '开始占卜', ko: '운세 읽기 시작' },
-  nameLabel: { tr: 'İsmin', en: 'Name', es: 'Nombre', fr: 'Nom', zh: '姓名', ko: '이름' },
-  namePlaceholder: { tr: 'Adın nedir?', en: 'What is your name?', es: '¿Cuál es tu nombre?', fr: 'Quel est votre nom ?', zh: '你的名字是什么？', ko: '이름이 무엇인가요?' },
-  dobLabel: { tr: 'Doğum Tarihin', en: 'Date of Birth', es: 'Fecha de Nacimiento', fr: 'Date de Naissance', zh: '出生日期', ko: '생년월일' },
-  pobLabel: { tr: 'Doğum Yerin', en: 'Place of Birth', es: 'Lugar de Nacimiento', fr: 'Lieu de Naissance', zh: '出生地', ko: '출생지' },
-  pobPlaceholder: { tr: 'Şehir, Ülke', en: 'City, Country', es: 'Ciudad, País', fr: 'Ville, Pays', zh: '城市, 国家', ko: '도시, 국가' },
-  statusLabel: { tr: 'İlişki Durumun', en: 'Relationship Status', es: 'Estado Civil', fr: 'Situation Amoureuse', zh: '感情状况', ko: '연애 상태' },
-  submitButton: { tr: 'Kartları Seç ve Falıma Bak', en: 'Select Cards & Read My Fortune', es: 'Seleccionar Cartas y Leer mi Fortuna', fr: 'Sélectionner des Cartes et Lire ma Fortune', zh: '选择卡牌并占卜', ko: '카드 선택 및 운세 보기' },
-  past: { tr: 'Geçmiş', en: 'Past', es: 'Pasado', fr: 'Passé', zh: '过去', ko: '과거' },
-  present: { tr: 'Şimdi', en: 'Present', es: 'Presente', fr: 'Présent', zh: '现在', ko: '현재' },
-  future: { tr: 'Gelecek', en: 'Future', es: 'Futuro', fr: 'Futur', zh: '未来', ko: '미래' },
-  loading: { 
-    tr: 'Ruhlar fısıldıyor... Kartların enerjisi okunuyor...', 
-    en: 'The spirits are whispering... Reading the cards\' energy...', 
-    es: 'Los espíritus susurran... Leyendo la energía de las cartas...', 
-    fr: 'Les esprits murmurent... Lecture de l\'énergie des cartes...',
-    zh: '灵体在低语... 正在读取卡牌的能量...',
-    ko: '영혼들이 속삭이고 있습니다... 카드의 에너지를 읽는 중...'
-  },
-  downloadBtn: { tr: 'Falı İndir (PDF)', en: 'Download Reading (PDF)', es: 'Descargar Lectura (PDF)', fr: 'Télécharger la Lecture (PDF)', zh: '下载占卜 (PDF)', ko: '운세 다운로드 (PDF)' },
-  shareBtn: { tr: 'Paylaş', en: 'Share', es: 'Compartir', fr: 'Partager', zh: '分享', ko: '공유' },
-  restartBtn: { tr: 'Yeni Bir Yolculuğa Çık', en: 'Start a New Journey', es: 'Comenzar un Nuevo Viaje', fr: 'Commencer un Nouveau Voyage', zh: '开始新的旅程', ko: '새로운 여정 시작' },
-  errorSilent: { 
-    tr: 'Ruhlar şu an sessiz, lütfen daha sonra tekrar dene.', 
-    en: 'The spirits are silent right now, please try again later.', 
-    es: 'Los espíritus están en silencio en este momento, por favor inténtalo de nuevo más tarde.', 
-    fr: 'Les esprits sont silencieux pour le moment, veuillez réessayer plus tard.',
-    zh: '灵体此刻沉默不语，请稍后再试。',
-    ko: '영혼들이 지금은 침묵하고 있습니다. 나중에 다시 시도해주세요.'
-  },
-  errorInterrupted: { 
-    tr: 'Mistik bir enerji akışı kesintiye uğradı. (Hata oluştu)', 
-    en: 'A mystical energy flow was interrupted. (An error occurred)', 
-    es: 'Un flujo de energía mística fue interrumpido. (Ocurrió un error)', 
-    fr: "Un flux d'énergie mystique a été interrompu. (Une erreur s'est produite)",
-    zh: '神秘的能量流被中断了。（发生错误）',
-    ko: '신비한 에너지의 흐름이 끊겼습니다. (오류 발생)'
-  },
-  copiedMsg: { tr: 'Fal metni panoya kopyalandı!', en: 'Reading copied to clipboard!', es: '¡Lectura copiada al portapapeles!', fr: 'Lecture copiée dans le presse-papiers !', zh: '占卜内容已复制到剪贴板！', ko: '운세 결과가 클립보드에 복사되었습니다!' }
-};
+const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
 
-const STATUS_OPTIONS: Array<{value: string, tr: string, en: string, es: string, fr: string, zh: string, ko: string}> = [
-  { value: 'single', tr: 'Bekar', en: 'Single', es: 'Soltero/a', fr: 'Célibataire', zh: '单身', ko: '싱글' },
-  { value: 'relationship', tr: 'İlişkisi Var', en: 'In a Relationship', es: 'En una Relación', fr: 'En Couple', zh: '恋爱中', ko: '연애 중' },
-  { value: 'married', tr: 'Evli', en: 'Married', es: 'Casado/a', fr: 'Marié(e)', zh: '已婚', ko: '기혼' },
-  { value: 'engaged', tr: 'Nişanlı', en: 'Engaged', es: 'Comprometido/a', fr: 'Fiancé(e)', zh: '已订婚', ko: '약혼' },
-  { value: 'complicated', tr: 'Karmaşık', en: 'It\'s Complicated', es: 'Es Complicado', fr: 'C\'est Compliqué', zh: '关系复杂', ko: '복잡함' },
-  { value: 'breakup', tr: 'Ayrılık Sürecinde', en: 'Going through a Breakup', es: 'Pasando por una Ruptura', fr: 'En Pleine Rupture', zh: '正在分手', ko: '이별 중' }
-];
+const t: Record<string, Record<Language, string>> = new Proxy({} as any, {
+  get: (_, key: string) => {
+    return new Proxy({} as any, {
+      get: (_, lang: string) => {
+        return locales[lang as Language]?.[key];
+      }
+    });
+  }
+});
+
+const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
+
+const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS_KEYS.map(key => {
+  const opt: any = { value: key };
+  Object.keys(locales).forEach(l => {
+    opt[l as Language] = locales[l as Language]?.statusOptions?.[key];
+  });
+  return opt;
+});
 
 function App() {
   const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
@@ -127,6 +58,7 @@ function App() {
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imageError, setImageError] = useState<Record<string, boolean>>({});
 
   const drawRancomCards = () => {
     const deck = [...KATINA_DECK];
@@ -149,24 +81,6 @@ function App() {
     setIsGenerating(true);
     setStep('RESULT');
 
-    const languageNames: Record<Language, string> = {
-      tr: 'Turkish',
-      en: 'English',
-      es: 'Spanish',
-      fr: 'French',
-      zh: 'Chinese',
-      ko: 'Korean'
-    };
-
-    const headings: Record<Language, string> = {
-      tr: `**Geçmişin Yankıları** (geçmiş kartının analizi)\n**Şu Anın Rüzgarı** (şimdi kartının analizi)\n**Geleceğin Fısıltısı** (gelecek kartının analizi)`,
-      en: `**Echoes of the Past** (analysis of the past card)\n**Winds of the Present** (analysis of the present card)\n**Whispers of the Future** (analysis of the future card)`,
-      es: `**Ecos del Pasado** (análisis de la carta del pasado)\n**Vientos del Presente** (análisis de la carta del presente)\n**Susurros del Futuro** (análisis de la carta del futuro)`,
-      fr: `**Échos du Passé** (analyse de la carte du passé)\n**Vents du Présent** (analyse de la carte du présent)\n**Murmures du Futur** (analyse de la carte du futur)`,
-      zh: `**过去的余音** (过去卡牌的解析)\n**现在的风向** (现在卡牌的解析)\n**未来的低语** (未来卡牌的解析)`,
-      ko: `**과거의 메아리** (과거 카드 분석)\n**현재의 바람** (현재 카드 분석)\n**미래의 속삭임** (미래 카드 분석)`
-    };
-
     const statusText = STATUS_OPTIONS.find(o => o.value === userInfo.relationship)?.[userInfo.language as keyof typeof STATUS_OPTIONS[0]] || userInfo.relationship;
 
     const promptText = `You are 'MadameSoul', a mystic, wise Katina tarot expert holding ancient secrets. Speak to the person in front of you with compassion, honesty, and depth (incorporating your own feelings, using second-person "You"). 
@@ -177,18 +91,18 @@ Person's Information:
 - Place of Birth: ${userInfo.birthplace}
 - Relationship Status: ${statusText}
 
-Selected Katina Cards (Original Turkish names):
-1. Past (Roots of the Past): ${cards[0].name} - ${cards[0].desc}
-2. Present (Current Energy): ${cards[1].name} - ${cards[1].desc}
-3. Future (Probable Path): ${cards[2].name} - ${cards[2].desc}
+Selected Katina Cards:
+1. Past (Roots of the Past): ${t.cards?.[cards[0].id]?.name || cards[0].name} - ${t.cards?.[cards[0].id]?.general || cards[0].desc}
+2. Present (Current Energy): ${t.cards?.[cards[1].id]?.name || cards[1].name} - ${t.cards?.[cards[1].id]?.general || cards[1].desc}
+3. Future (Probable Path): ${t.cards?.[cards[2].id]?.name || cards[2].name} - ${t.cards?.[cards[2].id]?.general || cards[2].desc}
 
 Please blend the energy of these 3 cards with the person's birth details and life situation to write a mystical and epic reading.
 Present your reading under 3 main headings:
-${headings[userInfo.language]}
+${t.headings[userInfo.language]}
 
 End with a Guidance/Advice section giving them invaluable advice. 
 Please produce a wonderful reading purely as text (Markdown supported).
-CRITICAL: The entire reading MUST be written in ${languageNames[userInfo.language]}. Do not use any other language!`;
+CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.language]}. Do not use any other language!`;
 
     try {
       const response = await ai.models.generateContent({
@@ -598,13 +512,34 @@ CRITICAL: The entire reading MUST be written in ${languageNames[userInfo.languag
 
                       <div className="absolute top-[3.5rem] w-8 h-px bg-[#ecd8a6]/30" />
                       
-                      <div className="flex-1 flex items-center justify-center mt-12">
-                        <Sparkles className="w-10 h-10 text-[#ecd8a6]/40 mb-2" />
+                      <div className="flex-1 flex w-full items-center justify-center mt-4 mb-4 relative min-h-[160px] group/img">
+                        {!imageError[drawnCards[index]?.id] ? (
+                          <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+                            className="relative w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md overflow-hidden border border-[#ecd8a6]/30 shadow-[0_5px_15px_rgba(0,0,0,0.5)] group-hover/img:shadow-[0_0_35px_rgba(236,216,166,0.25)] group-hover/img:border-[#ecd8a6]/60 transition-all duration-500 ease-out"
+                          >
+                            <img 
+                              src={`/cards/${drawnCards[index]?.id}.jpg`} 
+                              alt={t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}
+                              onError={() => setImageError(prev => ({...prev, [drawnCards[index]?.id]: true}))}
+                              className="w-full h-full object-cover transition-transform duration-700 ease-out"
+                            />
+                            
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover/img:translate-x-full transition-transform duration-1000 ease-in-out z-20 pointer-events-none" />
+                          </motion.div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md border border-dashed border-[#ecd8a6]/20 bg-[#ecd8a6]/5 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                            <Sparkles className="w-8 h-8 text-[#ecd8a6]/30 mb-2 animate-pulse" />
+                            <span className="text-[10px] text-[#ecd8a6]/40 uppercase tracking-widest font-serif">{t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="w-full relative z-10 mb-4">
-                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{drawnCards[index]?.name}</h3>
-                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-3 px-2">{drawnCards[index]?.desc}</p>
+                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}</h3>
+                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-3 px-2">{t.cards?.[drawnCards[index]?.id]?.general || t.cards?.[drawnCards[index]?.id]?.desc || drawnCards[index]?.desc}</p>
                       </div>
                     </div>
                   </motion.div>
