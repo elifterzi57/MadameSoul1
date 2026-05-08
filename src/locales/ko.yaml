@@ -33,624 +33,1004 @@ headings: |-
 languageName: Korean
 cards:
   selana:
-    name: 셀라나
-    general: 설명이 없습니다.
-    upright: 과거에 대해 슬퍼하지 않고, 현재에 감사하며, 내일보다 오늘이 더 나을 것이라는 믿음을 계속 이어가세요. 영혼을 나타내는
-      카드라는 점을 잊지 말아야 하며, 이 카드에서는 캐릭터 분석을 할 수 없습니다. 셀레나는 행복한 노동조합을 대표합니다.
-    reversed: 그것은 결혼과 관계에서 영적 갈등과 불일치의 전조입니다. 거짓말을 하고 있다는 표현이다. 자신의 진정한 생각을 숨긴다는 것은
-      자신의 진정한 감정과 생각을 다른 모습으로 숨기는 것을 의미합니다.
+    name: Selana
+    general: Açıklama bulunamadı.
+    upright: Geçmişe dair üzüntü hissetmemek , sahip oldukların için şükür etmek ve
+      bugünün yarından daha iyi olacağı inancı ile devam etmek.Ruhu temsil eden
+      bir kart olduğunu unutmamalıyız , karakter analizi bu kartta yapılmaz
+      .Selana mutlu birliktelikleri ifade eder.
+    reversed: Evlilikte , ilişkilerde ruhsal çatışmaların anlaşmazlıkların
+      habericisidir.Yalanların söylenildiğinin ifadesidir.Gerçek düşüncelerin
+      saklanması , kişinin farklı bir görünüş ile gerçek duygu ve düşüncelerini
+      gizlemesidir.
   abonoz:
-    name: 아보노즈
-    general: 어두운 색은 재난이 일어날 것을 상징합니다. 격렬한 눈물, 울음, 원하는 것을 이루지 못하는 것, 나쁜 영혼, 나쁜 삶의 종말을
-      표현하는 아보노즈는 소멸의 느낌을 불러일으킨다.
-    upright: 문제가 심해지고 인생에서 새로운 방향을 찾을 수 없습니다. 끊임없이 슬픈 기분은 당신의 계획이 결코 긍정적인 방향으로 진전되지
-      않을 것임을 나타냅니다. 논의된 주제가 무엇이든 성공하지 못할 것임을 나타냅니다. 원하는 일이 이루어지지 않고 불운을 뚜렷이 표현하는
-      상징입니다.
-    reversed: 나쁜 슬픔이 다가오고 있지만 이 슬픔은 우리 삶에서 오래 지속되지 않을 것임을 알려줍니다. 불굴의 의지와 인내심을 보여준
-      결과, 기대했던 안도감이 달성되고 불운이 우리를 떠날 것입니다. 우리 삶의 새로운 시작과 새로운 방향은 일이 잘못될 때 조만간 문제가
-      될 것입니다.
+    name: Abonoz
+    general: Karanlık rengin , felaketinin yaşanılacağını sembolize eder.Şiddetli
+      gözyaşı dökme, ağlama , istenilen bir şeyin elde edilememesi , kötü ruh ,
+      kötü yaşam sonlanışı ifade eden Abonoz , yok olma hissini çağrıştırır.
+    upright: Sıkıntıların şiddetli olacağı , yaşamda yeni bir yön bulamayacak
+      olma.Daimi sürecek üzüntülü bir ruh hali , girişimlerin asla olumlu yönde
+      ilermeyeceğini ifade eder.Danışılan konu ne olursa olsun hayırsız
+      olacağını bildirir.Şansızlık ve istenilenlerin gerçek olmayacağını net
+      dile getiren semboldür.
+    reversed: Kötü bir hüznün yaklaşıcağını haber verir , ancak bu hüzün hayatımızda
+      fazla kalıcı olmayacaktır.Metanet ve sabır gösterilmesi sonucunda
+      beklenilen , ferahlığa ulaşılacak , kötü şans üzerimizden gidecektir.Yeni
+      başlangıçlar , hayatımıza yeni yön verme er yada geç ters geldiğinde söz
+      konusu olacaktır.
   tattaret:
-    name: 타타렛
-    general: 우울한 외모와 인상적인 미모를 자랑한다. 그녀는 자신의 삶에서 경험하는 부정적인 면을 끊임없이 표현하고 관심을 받는 것을
-      좋아합니다. 그의 외모와 말에는 심각한 차이가 있습니다. 그녀는 항상 자신의 진정한 감정을 숨기고 논리적인 관점에서 삶을 바라본다.
-      그녀는 번식력이 좋은 개인입니다. 그리고 상담 대상이 가족 내라면 그녀는 어른이 된 어린 소녀를 상징한다. 질문이 있다면 내 인생에
-      누군가가 있을까요? 이렇다면 이 사람은 독립적으로 해석해야 합니다. 그가 관계에 맞춰 자신을 보여준 개인이라면 그 사람의 성격을
-      설명해야합니다.
-    upright: 결혼하고 싶다는 마음을 표현한 것입니다. 이는 개인의 재정적 이해관계에 따라 결혼이 이루어지는 것을 설명합니다.
-      Tattaret은 사랑보다는 삶의 재정적 가능성과 관련된 결혼을 선호합니다. 그는 편안한 삶을 원합니다.
-    reversed: 거짓말을 좋아하고 질투심 많은 여자를 상징합니다. 절대로 믿어서는 안되는 사람입니다.
+    name: Tattaret
+    general: Melankolik bakışları ve etkileyici bir güzelliği vardır.Sürekli kendi
+      hayatında yaşadığı olumsuzlukları ifade eder ve dikkat çekmeyi çok sever.
+      Görünüşü ile sözleri arasında ciddi farklılıklar vardır. Her zaman gerçek
+      duygularını gizler, hayata mantık çerçevesinden bakar.Doğurgan bir
+      bireydir.Ve danışılan konu aile içiyse , yetişkin genç kızı simgeler. Eğer
+      soru hayatımda birisi olacak mı ? şeklinde ise bu kişi bağımsız
+      yorumlanmalıdır.Yaşanılan bir beraberlik doğrultusunda kendisini göstermiş
+      bir birey ise ozaman kişinin karakteri anlatılmalıdır.
+    upright: Evlenme arzusunu ifade eder.Kişisel maddi çıkarlar üzerine yapılacak
+      evlilikleri anlatır.Tattaret aşktan , sevgiden ziyade hayatınmaddi
+      olanakları ile ilgili evlilikleri tercih eder.Rahat bir yaşam ister.
+    reversed: Kıskanç , yalan söylemeyi seven bir kadını temsil eder.Asla
+      güvenilmemesi gereken bir kişidir.
   assyranta:
-    name: 아시리아 말
-    general: 그녀는 걷는 스타일이 매력적이다. 그녀는 피부색이 검고, 대인관계가 좋은 친근한 사람입니다. 평소 감정이 강하고, 취미로
-      천문이나 운세 장르를 좋아하는 경향이 있다. 그녀는 신중하게 문장을 선택하고, 심지어 철학적 사상가처럼 말하며, 당신을 당신에게서
-      멀어지게 할 정도로 지식이 풍부합니다. 그녀는 속마음이 없는 선량한 여성이자 사랑의 여성입니다. 그녀는 항상 예술과 과학에 관심이
-      있습니다. Assyranta는 가족, 이모, 이모입니다. , 어머니 등은 개인을 나타냅니다. 이를 염두에 두고 우리가 질문한 질문에
-      관한 assyranta를 해석해야 합니다. 내담자의 자아를 대표하는 집에 나타난다면 이는 그가 이러한 특성을 가진 사람의 영향을 받고
-      있음을 의미합니다.
-    upright: 그녀는 동정심 많고 정직하며 도움이 되는 어머니 또는 가족입니다. 그녀는 항상 선함과 아름다움을 표현합니다. 그 사람과 가까운
-      가정에 나타난 경우에는 2개의 카드를 혼합하여 가해자를 해석해야 합니다. 예를 들어, 마치 어머니로부터 기능을 물려받은 것처럼.
-    reversed: 결혼한 사람이나 연인, 가족 내 약혼자 사이에 문제가 생길 것을 의미하며, 일반적으로 이러한 문제는 재정적인 문제와 관련이
-      있습니다. 이 카드는 펼치는 곳마다 좋은 의미를 불러일으킨다고 했으니, 겪게 되는 문제는 일시적일 것이라는 점을 명심해야 합니다.
+    name: Assyranta
+    general: Cazibeli bir yürüyüş tarzı vardır kendisinin.Esmer , cana yakın insan
+      ilişkileri iyi bir kişidir.Genellikle hisleri kuvvetlidir , hobi olarak
+      astro, fal türlerine eğilimi vardır.Cümlerlerini büyük bir titizlikle
+      seçer , hatta bir felsefi düşünür gibi konuşur , ve okadar bilgilidir ki
+      sizi sizden alır.İyi huylu , art niyet düşünceleri olmayan ,aşk kadınıdır
+      kendisi.Sanata - bilime her zaman ilgi duyar .Assyranta aile bireyinden ,
+      hala , teyze , anne v.b kişi kişileri temsil eder. Bu düşünce ile
+      sorduğumuz soruya ilişkin assyranta yorumlanmalıdır.Danışan kişinin
+      kendini temsil eden hanesinde çıkmışsa , ozaman bu özelliklerdeki bir
+      kişinin etkisi altında kalıyor demektir.
+    upright: Merhametli , dürüst , yardım sever bir anne veya aile bireylerinden
+      birisidir.Her zaman iyiliği güzelliği ifade eder. Kişinin kendisine yakın
+      bir hanede çıkmışsa assyranta ozaman 2 kart harmanlanarak
+      yorumlanmalıdır.Örneğin , özelliğinizi annenizden almışsınız gibi..
+    reversed: Aile içerisinde evli kişilerin veya sevgili , nişanlı olan bireylerin
+      arasında sorunlar yaşanılacak anlamına gelir , genellikle bu sorunlar
+      parasal konuya yöneliktir.Dikkat edelim ki bu kart nerede açılırsa açılsın
+      iyi anlamı çağrıştırır demiştim , bu nedenle yaşanılan sorunların geçici
+      olacağını belirtmek gerekir.
   sunit:
-    name: 수니파
-    general: 그는 놀림을 받거나 지나치게 비판받는 것을 정말로 좋아하지 않습니다. 그는 야망이 매우 높으며 그의 목표와 이상은 항상 최고
-      수준에 있습니다. 믿기 ​​쉬운 성격 탓에 여자에게 속는 경향이 있다. 그는 여성을 지배하고 발언권을 갖고 싶어합니다. 이런 이유로
-      그는 항상 통제하고 싶어하고 나에게 모든 것을 요구합니다. 그는 그에게 지속적인 관심과 관심을 원합니다. 성격은 까다롭지만 사랑이
-      많은 사람이다.
-    upright: 그것은 열정적인 사랑의 경험이 될 것이며, 이 사람은 당신을 감각적으로나 사랑에 빠지게 만들 것입니다. 그 사람의 성격과 구조적
-      특성으로 인해 관계에 많은 우여곡절이 있을 수 있습니다. 더욱이, 과거에 인연이 있었다면 이러한 특성을 지닌 파트너가 다시 당신의
-      삶에 돌아올 수도 있습니다. 그는 새로운 사랑의 전조가 되는 사람이다.
-    reversed: Sunit의 가혹하고 긴장된 태도로 인해 관계가 종료됩니다. 폭력적인 말다툼, 약혼, 약속, 결혼 파탄 등이 발생하게 됩니다.
-      Sunit은 자신의 이익에 따라 행동하므로 이제 귀하의 관계는 막 다른 골목으로 진행됩니다.
+    name: Sunit
+    general: Kendisi ile alay edilmesinden , aşırı eleştirisel davranılmasından
+      gerçekten hoşlanmaz.Aşırı derecede hırsı yüksektir , hedefleri idealleri
+      hep üst seviyededir. Kadınlara çabuk inan yapısı nedeniyle , aldatılmaya
+      müsait bir yanı vardır.Kadınlar üzerinde hakimiyet ve söz sahibi olmak
+      ister.Bu nedenle hep kontrol benim elimde olsun , herşey benden sorulsun
+      ister.Kendisine sürekli ilgi alaka gösterilsin ister.Sert bir mizacı
+      vardır ama aşk adamıdır.
+    upright: Tutkulu yaşanılan bir aşk olacak , bu kişi seni hem tensel yönden ,
+      hemde aşk yönünde bağlanmana sebep olacak.Kişinin karakteri ve yapısal
+      özelliği gereği , ilişkinde bol bol inişler çıkışlar yaşanabilir.Ayrıca
+      geçmişte yaşanılmış bir beraberlik söz konusu ise , bu özelliklere sahip
+      bir partner yaşantınıza tekrar geri gelebilir.Yep yeni bir aşkın da
+      habercisi olan kişidir.
+    reversed: Sunitin ortaya koyduğu sert ve gergin tavırlar , ilişkinin sona
+      ermesine sebep olacak , Şiddetli tartışmalar , nişan , söz, evliliğin
+      sarsılması v.b durumlar yaşanılacak.Sunit kendi menfaatlerine göre hareket
+      ettiği için , ilişkin artık çıkmaz bir yolda ilerleyecek ve sonlanacaktır.
   turan:
-    name: 투란
-    general: 그는 거짓말쟁이이고 정치적인 사람이다. 그의 정치적 성격 때문에 그가 언제 사랑하고 사랑하지 않는지 이해하기가 매우 어렵습니다.
-      그는 함께 있는 사람을 매우 소중히 여기지만 갑자기 그 가치를 파괴하고 당신은 물 밖으로 나온 물고기처럼 느껴집니다. 투란의
-      통치자와는 늘 파란만장한 관계가 있지만 그의 영향력 아래 있는 여성들은 마치 그가 악마의 깃털을 가진 것처럼 그를 포기할 수 없다.
-      투란의 통치자는 어려운 사건에 저항하지 않으며 비겁하고 소심한 성격을 가지고 있습니다. 누구에게나 빨리 적응하기 때문에 선의가 악용될
-      수 있다는 것이 약점이다. 그는 또한 상업적인 문제에서도 사기꾼입니다.
-    upright: "이별을 경험한 사람은 위에서 설명한 사람과 재회할 수 있고, 애인이 없는 사람은 이 기능을 통해 누군가를 만날 수 있습니다.
-      역확장 의미: 연애 중인 사람이 솔직하지 않고, 거짓말을 하고, 마술, 점술 등 종교적인 용어로 표현되지 않는 나쁜 주제에 관심이
-      있거나, 질문한 내용에 대해 함께 있는 커플의 경우 의미가 바뀌면 이 방향의 에너지로 인해 함께 할 수 없음을 나타냅니다."
-    reversed: 설명이 없습니다.
+    name: Turan
+    general: Yalancı ve politik birisidir.Politik yapısından dolayı ne zaman
+      sevdiğini veya ne zaman sevmediğini anlamak oldukça zordur.Birlikte olduğu
+      kişiye oldukça iyi değer verir , ama bir anda da o verdiği değeri yok eder
+      , kendinizi sudan çıkmış balık gibi hissedersiniz. Turan Hükümdarıyla her
+      zaman çalkantılı bir ilişki yaşanılır ama ne var ki kendisinde sanki
+      şeytan tüyü varmış gibi , etkisi altında olan kadınlar ondan vazgeçemezler
+      .Turan Hükümdarının zor olaylara karşı dayanıklığı söz konusu değildir ,
+      korkak , çekingen bir yapısı vardır. En zayıf yönü herkese çabuk ayak
+      uydurması nedeniyle , iyi niyetinin suistimal edilmesidir.Ayrıca ticari
+      meselelerde hile yapan birisidir.
+    upright: "Ayrılık yaşayan kişiler yukarıda tanımladığım kişi ile tekrar bir
+      araya gelebilirler, sevgilisi olmayan kişiler bu özellikle birisi ile
+      tanışma, sağlayabilirler. Ters Açılım  Anlamı : Birliktelik yaşadığınız
+      kişi , dürüst davranmamakta , yalanlar söylemekte ve ayrıca dini yönden
+      tasvir edilmeyen sihir , kısmet bağlama gibi kötü konulara da eğilim
+      duymakta veya sorduğunuz soruya ilişkin birlikte olan çiftler için burada
+      anlam değişir bu yönde bir enerjiden dolayı bir araya gelemediklerine
+      işaret eder."
+    reversed: Açıklama bulunamadı.
   munzur:
-    name: 문주르
-    general: 그녀는 머리와 옷차림을 매우 중요하게 생각합니다. 하지만 그녀가 가장 좋아하는 주얼리는 바로 이것이다. 갈색 머리의 여성
-      Munzur는 단정하고 깔끔합니다. 상담받는 사람이 남자라면 그는 충성심이 강하고 꼼꼼하며 동시에 주문을 중요시하며 자신이 제자리에
-      둔 물건을 찾고 싶어합니다. 남자는 목구멍을 좋아하고 인생을 즐기기를 좋아하며 요리를 잘하는 여자를 항상 사랑합니다. 3)루비 시리즈
-      카드의 의미
-    upright: 관계에서는 극도의 인내심이 우세합니다. 그리고 그 사람은 이 관계에 대해 정직하고 일관적입니다. 자신의 관계에 대한 대부분의
-      주도권을 갖고 있는 여성은 문주르의 변덕스러운 태도에 싫증을 낼 것입니다. 그리고 끊임없이 반복되는 상황은 과거의 문제를 해결하지
-      못하는 방향으로 균형을 이루지 못할 것이다. 문주르가 여성을 대표한다면, 여성 측에서도 같은 표현이 유효하다.
-    reversed: 금전적인 문제에 지나치게 예민한 인색한 성격이다. 자신의 감정을 명확하게 표현하지 못하는 자신감이 낮은 사람이다. 그에겐
-      거짓말이라는 병이 있다.
+    name: Munzur
+    general: Saçlarına giyinişine son derece önem verir.Ama en tercih ettiği ziynet
+      eşyalarıdır.Esmer bir kadın olan munzur , tertipli ve düzenlidir.
+      Danışılan kişi erkek ise , sadakatli ve titizdir , aynı zamanda düzene
+      önem verir , koyduğu eşyaları yerli yerinde bulmak ister. Erkek olan
+      munzur boğazına düşkündür , hayattan keyif almayı sever , güzel yemek
+      yapabilen kadını  her zaman sever. 3)Yakut Serisi Kartların Anlamları
+    upright: Yaşanılan ilişkide aşırı derecede sabır hakimdir.Ve kişi bu birliktelik
+      için dürüst net tutarlıdır.İlişkisini fazla derecede sahiplenen kadın
+      munzurun gel gitli tavırlarından yorulacaktır.Ve sürekli tekrar eden
+      durumlar , geçmişteki sorunların çözülememesi yönünde , bir türlü dengeyi
+      kuramayacaklardır.Kadını temsil ediyorsa munzur aynı ifadeler kadın taraf
+      içinde geçerlidir.
+    reversed: Maddi konulara gereğinden fazla duyarlı olan cimri bir
+      karakterdir.Duygularını net olarak dile getiremeyen özgüveni gelişmemiş
+      bir kişidir.Yalan söyleme hastalığı vardır.
   yakut:
-    name: 루비
-    general: 빨간색의 색상에서 알 수 있듯이 사랑을 나타냅니다. 그것은 열정, 감정, 가장 깊은 감정의 존재, 그리고 위대한 사랑의 통일성을
-      강조합니다. 남성과 여성에 대해서도 동일한 표현이 해석됩니다.
-    upright: 진실하고 강하며 위대한 사랑이 존재할 것임을 강조합니다. 경험한 감정은 서로 느껴지고, 육체적인 친밀감이 생기고, 두 몸이 한
-      몸이 되어 온전해지는 것입니다.
-    reversed: 이별을 경험한 사람에게 묻는 내담자는 여러 번 만났지만 성공하지 못한 관계를 표현한다. 이별이 있어도 사랑은 여전히
-      ​​존재하지만 어느 순간 마음이 무너진다는 뜻이다. 관계가없는 고객에게이 카드가 나타나면 한동안 진정한 사랑을 찾지 못하고 조금 더
-      시간을 갖게 될 것임을 의미합니다.
+    name: Yakut
+    general: Kırmızının da renginden anlaşılacağı gibi aşkı temsil eder.Tutkuyu ,
+      hissiyatı , en derin yaşanılan duyguların varlığını büyük aşkın birliğini
+      vurgular.Kadın erkek için aynı tabirle yorumlama yapılır.
+    upright: Gerçek , güçlü büyük bir aşkın var olacağını / olduğunu.Yaşanılan
+      duyguların karşılıklı hissedildiğini ve tensel yakınlaşmanın olacağını ,
+      iki bedenin tek bir bedende bütün olacağını vurgular.
+    reversed: Ayrılık yaşamış birisi ise soran danışan , defalarca bir araya
+      gelinmiş ama başarılı olunamamış bir birlikteliği ifade eder.Ayrılık olsa
+      bile aşkın hala varlığını ama bir noktada da kalbin kırıldığını ifade
+      eder. Hiç ilişkisi olmayan bir danışanda bu kart çıkıyorsa şayet o zamanda
+      gerçek aşkı bir süre daha bulamayacağını biraz daha zamanının var
+      olacağını ifade eder.
   ariman:
-    name: 영혼 속에
-    general: 설명이 없습니다.
-    upright: 성적 매력이 있음을 나타냅니다. 파트너와의 균형이 이루어지며, 안정이 흐트러지면 균형이 맞춰진다는 의미입니다. 연애 중이 아닌
-      사람들에게는 사랑을 위해 균형이 확립될 것이라는 좋은 소식을 전합니다.
-    reversed: 진정한 정체성과 자아를 숨기는 한 사랑의 균형을 이룰 수 없습니다. 당신의 생각은 독특하고 자연스러워야 합니다. 균형을
-      잡으려고 노력하지 않는 한, 인생의 부정적인 면을 경험할 운명에 처해 있습니다. 질투심이 많고 불안한 태도를 취해서는 안됩니다. 이
-      방향으로 있는 한, 기존 관계에서 균형을 이루지 못할 수도 있습니다. 연애 중이 아닌 사람의 경우; 당신은 삶의 평화를 찾아야 하며
-      자신을 위한 완벽한 타이밍과 균형을 원해야 합니다. 당신이 이렇게 한다면, 우주는 당신에게 그 모든 아름다움을 제공할 것입니다.
+    name: Ariman
+    general: Açıklama bulunamadı.
+    upright: Cinsel yönden çekiciliğin olduğunu ifade eder.Partner ile dengelerin
+      kurulacağını ve bozulmuş bir istikrar düzen var ise , denge altına
+      alacağını anlatır.İlişkisi olmayanlar için , aşktan yana yine dengelerin
+      kurulacağının müjdesini verir.
+    reversed: Gerçek kimliğini , benliğini sakladığın müddetçe aşkta dengeyi
+      kuramayacaksın,düşüncelerin kendine özgü ve doğal olmalı , dengeyi kurmaya
+      yanaşmadığın müddetçe ,hayatın hep olumsuzluklarını yaşamaya
+      mahkumsun.Kıskanç bir yapı ve güvensiz bir duruş tarzın olmamalı bu yönde
+      olduğun müddetçe var olan ilişkide dengeleri kuramayabilirsin.İlişkisi
+      olmayan birisi için ; hayatla barışmalı ve artık kendinle ilgili mükemmel
+      zamanlamayı dengeyi istemelisin , eğer bunları yaparsan , evren sana tüm
+      güzelliklerini sunacaktır.
   selcukassa:
-    name: 셀쿠카사
-    general: 감각적 접촉에서는 셀주까싸를 잊는 것이 불가능합니다. 그것은 항상 관계에 잊을 수 없는 흔적을 남깁니다. 관계 속의 2차 사랑을
-      표현하는 것으로, 불륜의 관계를 맺고 있는 여성이나 관계가 없는 사람이 이러한 특징을 지닌 사람과 사랑에 빠질 수 있음을 말한다.
-    upright: 금지된 관계가 있습니다. 그리고 이 관계는 Selçukassa가 감독합니다. 그가 원하는 대로 과정이 진행된다. 연애 중이 아닌
-      사람에게 그런 일이 일어났다면 감각적 관계를 맺고 열정을 가질 수있는 매력적인 연인에게 인사 할 때입니다.
-    reversed: 내담자가 금지된 관계에 있는 경우, 그는 이 관계에서 사랑으로 고통받고 사랑하는 사람을 공유하고 싶지 않지만 여전히 이 관계를
-      끝내고 싶지 않습니다. 왜냐하면 그는 두 번째 여성이 되는 것을 좋아하고 그것을 매우 소중히 여기기 때문입니다. 연애 중이 아닌
-      사람의 경우 Selçukassa는 그를 괴롭히지만 열정으로 그를 자신과 묶을 것입니다. 그는 여자의 그림자에서 벗어날 수 없을 것이며
-      끊임없는 밀물과 썰물이있을 것이지만 어느 시점에서 그는 Selçukassa와의 관계에 작별 인사를 할 것입니다.
+    name: Selçukassa
+    general: Tensel temaslarda , selçukassanın unutulması çok mümkün değildir.Her
+      zaman yaşadığı ilişkide unutulmaz bir iz bırakır.Yaşanılan birliktetlikte
+      ikincil bir aşkı temsil eder , yasak ilişki yaşayan kadını veyahut
+      ilişkisi olmayan bir kişi için , bu özelliklerde bir kişiye gönlünü
+      kaptırabileceğini anlatmaktadır.
+    upright: Yasak bir ilişki yaşanılmaktadır.Ve bu birlikteliğe Selçukassa yön
+      vermektedir.O nasıl isterse süreç o şekilde ilerlemektedir.İlişkisi
+      olmayan bir kişide çıkmışsa eğer , ozaman tensel birliktelik
+      yaşayabileceği , tutkunun olabileceği cazibeli bir sevgiliye merhaba
+      demenin vakti gelmiş demektir.
+    reversed: Danışan yasak bir ilişki içerindeyse , bu ilişkide aşktan yana acı
+      çekiyor sevdiğini paylaşmak istemiyor , ama yine de ikinci kadın olmayı
+      çok sevdiği değer verdiğinden dolayı bu ilişkiyi bitirmek
+      istemiyor.İlişkisi olmayan kişi için , selçukassa ona eziyet edecek ama
+      tutku ile kendisine bağlayacaktır.Kadının gölgesinden kurtulamayacak ,
+      sürekli olarak yaşayacağı gel gitler olacak ama bir noktada da selçukassa
+      ile ilişkisine veda edecektir.
   urmia:
-    name: 우르미아
-    general: 우르미아는 성공한 사람으로, 겉으로 보면 냉철한 외모를 갖고 있다. 그녀는 자신이 생각하는 모든 일에서 확실히 성공할 것입니다.
-      Urmia는 감정적으로 예민하기 때문에 직면한 문제에 갇혀 어떻게 해야할지 모릅니다. 그녀에게 이것은 일시적인 상황이다. 문제를
-      해결한 사람은 바로 우르미아&#39; 그 자체가 될 것입니다. 고객의 환경 영향 섹션에 나타나면 Urmia는 신뢰할 수 있고 도움이
-      되며 친구입니다. 이 특성을 가진 사람이 우리의 관계에 도움이 될 것임을 나타냅니다. 연애를 하고 있지 않은 사람들을 위해 환경적
-      영향 부분에도 등장하는 이 카드는 우리가 이런 특징을 가진 사람에 의해 연애에 끌려들어갈 것임을 알려준다.
-    upright: 우리 관계에 문제가 있다면 우리가 신뢰하는 친구가 우리를 이 관계에서 깨우쳐 주고 지지해 줄 것이라는 뜻입니다. 그러나 그
-      사람을 대표하는 집에서 나온다면 우르미아는 뒤에 있는 관계를 떠날 수 없으며 열정이 매우 강하다는 것을 나타냅니다. 연애를 하지 않는
-      사람에게서 나오는 우르미아는 이 특징을 가진 여자를 만날 수도 있고, 같은 특징을 가진 사람에 의해 촉진될 아름다운 관계를 시작할
-      수도 있다.
-    reversed: 이는 그녀의 연애 생활에 어려운 장애물과 파괴적인 시기가 존재함을 나타냅니다. Urmia는 또한 그녀의 가정에서 심각한 문제를
-      겪고 있습니다. 그녀의 연애 생활에는 불운이 계속될 것이다. 그녀는 한동안 파트너와 함께 할 수 없습니다. 연애를 하지 않는 사람을
-      찾아오는 우르미아는 이러한 특성으로 연애를 하게 되지만 결국 이별로 끝나고, 불운이 관계에 상처를 주게 된다.
+    name: Urmia
+    general: Urmia , başarılı bir kişidir , dışarıdan bakıldığında soğuk bir
+      görüntüsü vardır.Aklına koyduğu her işte başarıyı mutlaka yakalar.Urmia ,
+      duygusal yönden hasas olduğu için , karşısına çıkan problemlerde
+      kilitlenir , ne yapacağını bilemez.Bu onun için geçici bir
+      durumdur.Problemi yine çözüme ulaştıran kişi urmia &#39; nın kendisi
+      olacaktır. Danışan kişinin çevresel etkiler hanesinde görülüyorsa Urmia ,
+      güvenilir , yardımsever , arkadaştır.Bu özellikteki bir kişinin ilişkimize
+      yardımı olacağını temsil eder.İlişkisi olmayanlar için yine çevresel
+      etkiler hanesinde gelen bu kart , bu özelliklerdeki bir kişi tarafından
+      bir ilişki yaşamaya sürükleneceğimizi anlatır.
+    upright: Yaşadığımız beraberlikte bir sorunumuz varsa , güven duyduğumuz bir
+      arkadaşımızın bu ilişkide , bizi aydınlatacağını ve desteğini bizden
+      esirgemeyeceğini ifade eder.Ancak kişiyi temsil eden hanede gelmişse urmia
+      , sahip olduğunuz beraberliği geride bırakamaycağınıza , tutkunun çok
+      güçlü olduğuna işaret eder.İlişkisi olmayan kişide gelen urmia , bu
+      özellikteki bir kadın ile tanışabilir veya aynı özellikleri içeren kişi
+      tarafından vesile olacak güzel bir ilişkiye başlanılır.
+    reversed: Aşk hayatında aşılması güç engellerin , yıpratıcı zamanların varlığını
+      gösterir.Ayrıca Urmia hanesinde de ciddi sorunlar yaşamaktadır.Aşk
+      hayatında şansızlıklar devam edecektir.Partneri ile bir süre daha bir
+      araya gelemeyecektir.İlişkisi olmayan birisi için gelen urmia , bir ilişki
+      yaşanılacak bu özelliklerde ancak , ayrılıkla sonuçlanacaktır , şanssızlık
+      ilişkiyi yaralayacaktır.
   saah:
-    name: 사아
-    general: 그는 극도의 관심을 기대하는 사람이다. 그는 친구와 가족의 보살핌을 받는 사랑받는 사람입니다. 그에게는 든든한 면이 있다. 그는
-      공정하고 문제에 대한 해결 지향적 접근 방식을 가지고 있습니다.
-    upright: 사아는 사랑을 향한 예상치 못한 기회와 놀라움으로 여러분의 문을 두드립니다. 만약 클라이언트가 이별을 경험한 상대라면 남자든
-      여자든 이 사람은 다시 돌아와 자신에게 사랑의 좋은 기회를 제공할 것이다. 사아는 자신의 사랑에 대해 끊임없이 고민하며 사랑을 선언할
-      적절한 시기를 기다리고 있다.
-    reversed: 사랑이라는 방향으로 사아는 자신이 따르는 잘못된 정책으로 관계를 완전히 손상시키게 된다. 사아가 연애 중이 아닌 의뢰인에게
-      오면 오는 사람이 그에게 좋지 않을 것이라는 뜻이며 사랑에 대한 고백을 듣게 되겠지만이 고백이 솔직한 고백이 아니라는
-      점에주의해야합니다.
+    name: Saah
+    general: Aşırı derecede ilgi bekleyen bir kişidir.Dost ve aile çevresi
+      tarafından önemsenen sevilen birisidir.Güven verici bir yanı
+      vardır.Adaletlidir , sorunlara karşı çözümsel yönde yaklaşım sergiler.
+    upright: Saah aşk yönünde beklenmedik fırsatlar la, sürprizlerle kapınızı
+      çalar.Danışan ayrılık yaşamış bir partner ise  kadın veya erkek fark etmez
+      , o zaman aşkta bu kişi geri gelecek ve kendisine güzel bir fırsat sunacak
+      demektir. Saah sürekli sevdiğini düşünür ve ilanı aşk etmek için doğru
+      zamanı bekliyordur.
+    reversed: Saah aşk yönünde , yanlış izlediği politikalarla ilişkiyi tamamen
+      zarara götürecektir.İlişkisi olmayan danışanda  saah gelmiş ise , ozaman
+      da gelen kişinin kendisi için hayırlı olmayacağına , aşkla ilgili bir
+      itiraf duyacağına ama bu itirafın dürüst bir itiraf olmadığına dikkat
+      edilmesi gerekliliğini ifade eder.
   tagral:
-    name: 타그랄
-    general: Tagral과 관계를 맺고 있거나 맺을 예정인 내담자는 이 사람에게 관대해서는 안 됩니다. 도망치는 사람을 쫓는 것처럼 관계를
-      이끌어가야 한다. 그래야만 노력과 수고가 헛되지 않을 것입니다. 타그랄은 여행, 탐험, 학습에 호기심이 많기 때문에 관계가 지루하지
-      않습니다. 그의 유일한 문제는 여성이 지배하는 것을 쉽게 받아들이지 못한다는 것입니다. 타그랄은 존경받고 칭찬받기를 좋아하는
-      사람입니다. 연애에 있어서는 결혼을 찬성하지 않으나, 무한한 관계를 원하고, 관능적인 성교 성향이 높은 인물이다.
-    upright: 연애중인 이들이라면 타그랄과의 사랑은 계속될 것이다. Tagral은 고객에 대해 큰 열정과 조바심을 가지고 있습니다. 동쪽
-      방향으로 어떤 카드가 나오든 두 카드를 섞어서 이 열정이나 기쁨이 무엇인지 살펴봐야 합니다. 연애 중이 아닌 내담자에게 타그랄이
-      등장한다는 것은 철학적 사고를 갖고 외로움에 익숙한 타그랄과 함께 그의 삶에 새로운 시작이 경험된다는 것을 의미한다. 별거중인
-      내담자에게 오면 타그랄은 사랑을 향한 노력을 나타냅니다. 대가로 지급됩니다.
-    reversed: 연애중인 내담자의 경우 타그랄은 외로움을 선호하고 관계는 끝나게 됩니다. 연애 중이 아닌 고객을 위한 타그랄은 새로운 사랑을
-      경험하게 되지만 버려지게 됩니다. 이별을 경험한 고객을 위한 타그랄은 노력이 물거품이 되고 불행히도 보상을 받지 못할 것임을
-      의미합니다.
+    name: Tagral
+    general: Tagral ile birliktelik yaşayan veya yaşamaya niyeti olan danışanlar ,
+      bu kişiye karşı nazik davranmamalıdır.Kaçan kovalanır misali ilişkisine
+      yön vermelidir. Ancak bu şekilde emekler , çabalar boşa heba olmaz.Tagral
+      gezmeyi , keşif etmeyi , öğrenmeye meraklı olan yapısından ilişkide sıkıcı
+      bir tip olmaz .Tek sorunu bir kadının egemenliği altına girmeyi kolay
+      kolay kabul edemeyişidir. Kendisinin beğenilmesinden , iltifat
+      edilmesinden hoşlanan birisidir  Tagral.Aşk ilişkilerinde evliliktan yana
+      olmaz ama , sınırsız bir ilişki yaşamak ister tensel birleşmelere eğilimi
+      yüksek bir kişidir.
+    upright: İlişkisi olanlar için , Tagral ile aşkı devam edecektir.Danışan kişiye
+      karşı Tagralın , büyük bir çoşkusu ve sabırsızlığı söz konusudur.Doğu
+      yönünde çıkan kart ne ise ikisi harmanlanarak bu çoşkunun veya sevincin ne
+      olduğuna bakılmalıdır.İlişkisi olmayan danışanda gelen Tagral , felsefi
+      düşünceleri olan , yanlızlığa alışmış Tagral ile hayatında yeni bir
+      başlangıç yaşanılacak demektir.Ayrı olan danışanda gelmiş ise Tagral , Aşk
+      yönünde verilen çabaların karşılığı alınacaktır.
+    reversed: İlişkisi olan danışanda , Tagral yanlızlığı tercih edecek ve
+      birliktelik sona erecektir.İlişkisi olmayan danışanda gelen Tagral , yeni
+      bir aşk yaşayacak ama terk edilecektir.Ayrılık yaşamış danışanda gelen
+      Tagral ,emekler , çabalar ziyan olacak ve karşılığı ne yazık ki
+      alınamayacaktır.
   kalif:
-    name: 칼리프
-    general: Kalif가 남자라면 바람을 피우는 경향이 있습니다. 그는 많은 여자들과 함께하게 될 것이며, 아내에게는 항상 숨겨지는 은밀하고
-      금지된 관계를 가지고 있다. 칼리프가 여자라면 자신의 남자를 배신하고 영향력을 행사할 수 있는 사람을 만나게 된다는 뜻이다. 하지만
-      이 만남은 비밀로 유지될 예정이다. 연애 중이 아닌 고객의 경우 위에서 언급한 특성을 가진 사람을 만날 것입니다. 그들은 이 사람의
-      삶에서 무슨 일이 일어나고 있는지 주의를 기울여야 합니다. Kalif는 공개 대결을 좋아합니다. 그의 용기와 주장 덕분에 그는
-      독립심과 자유로움을 느낍니다. 그 사람도 하루 중 하루를 만드는 걸 좋아하는 사람이에요. 우연한 관계에서 그는 항상 등을 돌리고
-      떠나며 흔적을 남기지 않습니다. 4) 에메랄드 계열 카드의 의미
-    upright: 삶에 대한 열정으로 삶에 대한 집착이 강하고, 세속적인 쾌락에 약한 사람을 상징합니다. Kalif는 대결과 상호 대화가 질문에
-      대한 가장 영구적인 방법이라고 표현합니다. 이별을 경험한 내담자는 자신과 파트너가 한동안 떨어져 있을 것이라고 설명한다. 하지만
-      카드가 동쪽 방향으로 나타나며 이러한 분리가 오랜 시간 동안 지속될 것인지, 아니면 짧은 시간 동안 지속될 것인지는 명확하게 밝혀야
-      합니다. 연애 중이 아닌 사람은 잠시 사랑과 애정을 구하고 단기 또는 장기적으로 적합한 사람을 만날지 여부를 알아보기보다는 동쪽
-      방향의 카드를 보아야 합니다.
-    reversed: 별거를 경험한 내담자의 경우; 폭력, 억압, 자만하는 파트너의 존재와 이 사람이 돌아오는 데 장애물이 있음을 나타냅니다. 동쪽
-      방향의 카드를 보면 어떤 장애물이 있는지 말해야 합니다. 관계가 없었던 고객의 경우; 사랑에 대한 기대가 무너지게 될 것을
-      암시합니다.
+    name: Kalif
+    general: Erkek olan kalif , aldatmaya meyillidir.Bir çok kadınla beraber
+      olacaktır , ve eşinden gizlediği hep bir gizli yasak ilişkisi vardır.Kadın
+      ise kalif , erkeğine ihanet edebileceği onu etkisi altına alan bir kişi
+      ile tanışacak demektir.Ancak bu tanışma gizli tutulacaktır. İlişkisi
+      olmayan danışanlarda ise , yukarıda bahsettiğim özelliklerdeki kalifle
+      tanışma olacaktır.Bu kişinin hayatında olan bitene dikkat etmeleri
+      gerekir. Kalif , açık hesaplaşmaları sever.Cesur ve atılganlığı sayesinde
+      bağımsız ve özgür hisseder kendisiniAyrıca gününü gün etmeyi de seven bir
+      kişidir, günü birlik yaşadığı ilişkerde hep arkasını döner ve gider , asla
+      iz bırakmaz. 4)Zümrüt Serisi Kartların Anlamları
+    upright: Yaşama tutkusu ile hayata sıkı sıkıya bağlanmış , dünyevi zevklere
+      zaafları olan kişiyi temsil eder.Kalif , hesaplaşmaların , karşılıklı
+      konuşmaların sorulan soru ile ilgili en kalıcı yöntem olduğunu ifade
+      eder.Ayrılık yaşamış danışanda , partner ile bir müddet daha yollarının
+      ayrı kalacağını anlatır.Ancak bu ayrılık doğu yönünde çıkan kartlarla uzun
+      mu kısa mı , devam edecek netleştirilmelidir. İlişkisi olmayan kişide ,
+      bir müddet daha aşkı , sevgiyi arayacağına , doğru kişi ile kısa mı uzun
+      mu vadede tanışma olacağına doğu yönündeki karta bakıp harmanlanmalıdır.
+    reversed: Ayrılık yaşamış danışanda ; şiddet , baskı , kendini beğenmiş bir
+      partnerin varlığını ve bu kişinin geriye dönmesinde engeller olduğunu
+      anlatır.Ne engeli olduğu doğu yönündeki karta bakıp söylenmelidir.İlişkisi
+      olmamış danışanda ; aşk yönünde beklentilerin sona ereceğine işaret eder.
   zumrudun_ruhu_bedes:
-    name: 베데스 스피릿 오브 에메랄드
-    general: Zümrüd의 정신을 지닌 사람은 공정하고 보복적이지 않습니다. 그러나 그는 항상 의심이 많은 성격을 갖고 있으며, 항상
-      잠재의식 속에 부정적인 생각을 섞어 놓고 작은 문제를 큰 문제로 바꾸어 놓는다. 이런 이유로 그는 항상 징징대고 답답함을 느낀다.
-      그는 자신이 직면한 좌절이 자신을 인생에서 더 많은 경험을 쌓게 하기 위한 것임을 이해하지 못합니다. 사실, 그가 긴장을 풀고 생각을
-      조금 자유롭게 하게 된다면 인생은 그에게 그다지 어렵지 않을 것입니다.
-    upright: 의뢰인은 어찌할 바를 모르는 상황에 처해 있습니다. 그의 얼굴에는 슬픔이 숨겨져 있습니다. 그러나 그가 인생에서 경험한 모든
-      부정적인 일은 그의 나날을 더욱 강하게 만들었습니다. 자신을 흔들어 분석적인 시각으로 지도해야 한다. 그는 어려움을 극복하는 힘과
-      능력을 가지고 있습니다. 그러므로 그는 믿음을 잃어서는 안 됩니다. 그는 자신의 행동 스타일과 욕구 균형의 조화를 목표로 해야
-      합니다.
-    reversed: 건강 악화, 심리적으로나 영적으로 기분이 좋지 않음, 심각한 트라우마 경험, 사랑하는 사람의 상실, 가족 단결의 붕괴. 사랑이
-      그를 찾지 못할 것 같은 느낌.
+    name: Zümrüdün Ruhu Bedes
+    general: Zümrüd &#39;ün ruhuna sahip olan kişi , adaletlidir , kinci
+      değildir.Ancak her zaman kuşkucu bir yapısı vardır , bilinç altında
+      olumsuz düşünceleri hep harmanlar , küçük sorunları büyük problem haline
+      dönüştürür. Bu nedenle de hep sızlanır , kendisini çıkmazda hisseder.
+      Başına gelen aksiliklerin , yaşamda kendisini daha da tecrübeli yapması
+      için olduğunu anlamaz.Aslında biraz rahat , özgür bıraksa düşüncelerini
+      hayat o kadar onun için zor olmayacaktır.
+    upright: Danışan ne yapacağını bilemez bir haldedir.Yüzünde gizlediği bir hüznü
+      vardır.Halbuki hayatında tüm yaşadığı olumsuzluklar, bugünlerini daha
+      güçlü kılmak içindir.Silkelenmeli ve çözümsel bakış açısı ile kendisine
+      yön vermelidir.Zorlukların üstesinden gelecek güce , kabiliyete
+      sahiptir.Bu nedenle inancını kaybetmemelidir.Hareket tarzında uyumu
+      hedeflemeli ve dengeyi istemelidir.
+    reversed: Sağlıkta bozulma , psikolojik ruhsal yönden kendini iyi hissetmeme ,
+      ciddi travmaların yaşanması , sevgilinin yok olması ,aile birliğinin
+      bozulması . Aşkın hiç kendisini bulmayacakmış hissine kapılması.
   zumrut:
-    name: 에메랄드
-    general: 물의 에메랄드는 투쟁의 영역에 관계없이 치유, 사랑의 성공, 건강 개선의 원천입니다. 에메랄드는 생명수를 상징하기 때문에 모든
-      나쁜 상황에서 회복이 있음을 나타냅니다.
-    upright: 영광, 명성, 부, 승리, 성공을 가져올 모든 것은 질문에 관계없이 성공의 전조이자 승리의 확실성입니다.
-    reversed: 질문이 무엇이든 그것은 실패를 나타냅니다. 물이 생명의 근원이라는 것을 생각하면 성공이 올 것을 의미하지만 조금 더 노력해야 합니다.
+    name: Zümrüt
+    general: Suların Zümrüdü , bir şifa kaynağıdır , aşkta başarı , sağlıkta
+      iyileşme , mücadele edilen alan ne olursa olsun , zümrüt hayat suyunu
+      ifade ettiğinden , her kötü durumda mutlaka bir toparlanmanın da olacağını
+      bildirmektedir.
+    upright: Şan , şöhret , zenginlik , galibiyet, başarı getirecek olan her şey
+      sorulan soru ne olursa olsun , başarının , kazanmanın kesinliğinin
+      habercisidir.
+    reversed: Danışılan soru ne olursa olsun , başarısızlığı ifade eder.Suyun
+      hayatın kaynağı olduğunu düşünürsek  , başarının geleceğini ama biraz daha
+      çaba sarf etmemiz gerektiğini ifade eder.
   mida:
-    name: 무엇
-    general: 그는 목표를 달성할 때까지 결코 포기하지 않습니다. 그는 자신의 기술을 중요하게 생각합니다. 그는 배우는 것을 좋아하지만 교사가
-      되는 것을 좋아하지 않습니다. 그는 일반적으로 정보를 자신에게만 보관하는 것을 선호합니다. 그는 사랑에 불안감을 가지고 있습니다.
-      사실 그는 그렇게 성공했음에도 불구하고 사랑에 있어서 상대방을 그다지 신뢰하지 않습니다. 그렇기 때문에 억압적이고 구속적인 상황을
-      보이고, 지나치게 질투심이 강한 성격은 헤어나기 어려울 정도로 관계를 진전시킨다. 그러므로 속은 것은 여자이다. 만약 그 남자가
-      의뢰인을 대리하여 집안에 나타난다면, 그 남자는 속은 것입니다. 미다가 중요하다고 느끼고 끊임없이 자신을 칭찬하며 자신이 양국 관계에
-      없어서는 안될 존재라고 생각하게 만드는 것은 때때로 그가 진실을 볼 수 없다는 것을 나타냅니다. 그는 보통 속은 여자 / 남자의
-      역할을합니다.
-    upright: 그는 무의식적인 편집증적인 생각에 끊임없이 자신을 끌어들이는 극도로 질투심 많은 사람입니다. 이 특징은 관계에 논쟁과 싸움이
-      있음을 보여줍니다. 경험하는 사랑에는 정직한 태도가 없습니다. 남성 의뢰인이나 여성 의뢰인에게 등장하는 미다는 그 관계가 장밋빛
-      그림이라는 사실과 자신에게 숨겨지고 숨겨지는 상황이 있음을 깨닫고 관계가 종료될 것임을 암시한다. 하지만 미다가 인물을 대표하는
-      카드로 등장한다면 위에서 언급한 캐릭터 특성이 언급될 것이다.
-    reversed: 관계의 거친 바람이 잔잔해지고, 사랑을 가로막는 제3의 여자나 남자가 있으면 탈락하게 될 것을 의미합니다. 연애 중이 아닌
-      의뢰인의 경우 자신의 생각에 부정적인 영향을 미쳐 사랑에 장애물을 만드는 여성의 상징이며, 이 사람이 제거되고 그 사람의 생각에
-      부정적인 영향을 미칠 수 없음을 의미합니다. 남자든 여자든 여기서 대표되는 것은 진짜 여자인 미다이다.
+    name: Mida
+    general: Amaçlarına ulaşıncaya kadar asla peşini bırakmaz.Kendince el
+      marifetlerine önem verir.Öğrenmeyi sever ama öğretici olmayı
+      sevmez.Bilgiyi genelde kendisine saklamayı tercih eder. Aşk yönünde
+      güvensizlikleri vardır , aslında bu kadar başarılı olmasına rağmen , aşka
+      dair karşı tarafa pek güvenmez.Bu yüzden baskılayıcı kısıtlayıcı durumlar
+      sergiler , aşırı kıskanç yapısı ilişkiyi çıkılması güç noktaya
+      ilerletir.Bu nedenle aldatılan kadın olur.Erkek danışanı temsil eden
+      hanede çıkarsa mida , ozaman aldatılan erkek olur. Midanın kendisini
+      önemli hissetmesi , sürekli olarak kendini övmesi ve ikili ilişkilerde
+      vazgeçilmez olduğunu düşündürmesi bazen gerçekleri göremediğine işaret
+      eder.Genellikle aldatılan kadın / erkek rolünü oynar.
+    upright: Aşırı derece kıskanç , sürekli bilinç altında paranoyak düşüncelere
+      kendisini sürükleyen bir kişidir.Bu özelliği ilişkide , tartışmaların ,
+      kavgaların yaşandığını gösterir.Yaşanılan aşkta dürüst bir tutum yoktur .
+      Kadın veya erkek danışanda gelen Mida , ilişkinin pembe tablodan ibaret
+      olduğunu ve kendisinden gizlenmiş , saklanmış bir durumun varlığını fark
+      ederek , ilişkinin sonlandırılacağına işaret eder.Ancak mida kişiyi temsil
+      eden kart olarak çıkıyorsa , ozaman yukarıda belirtmiş olduğum karakter
+      özelliklerine değinilecektir.
+    reversed: Yaşanılan birliktelikte , sert rüzgarların durulacağına , aşka engel
+      olan üçüncü bir kadın ve veya erkek varsa devreden çıkacağına işaret
+      eder.İlişkisi olmayan danışanda gelirse mida , kendi düşüncelerini olumsuz
+      yönde etkileyen bir kadının aşka dair engeller yarattığının sembolüdür ,
+      ve bu kişinin devreden çıkacağı kişinin düşüncelerini olumsuz yönde
+      etkilemeyi başaramayacağını ifade eder. kadın veya erkek danışanda burada
+      temsil olunan mida yani gerçek kadındır.
   parsadra:
-    name: 파사드라
-    general: 그는 자신이 가진 어떤 것에도 결코 만족하지 않습니다. 그녀는 모든 주제에 대해 비판을 가지고 있습니다. 사건의 여인 파사드라가
-      잠시 동안 주제에서 벗어나기를 선호한다면 누구도 평화를 방해하지 않을 것입니다. 그는 사랑과 결혼 관계에 개입하는 것을 좋아합니다.
-      그는 모든 사람의 행복을 막고 싶어합니다. 그는 사람들이 자신의 불행을 경험하기를 기대합니다. Parsadra를 사용하면 사람들을
-      쉽게 채울 수 있습니다. 그렇기 때문에 그는 설득력 있는 특징을 갖고 있다. 그는 친구인 것 같지만 적이다.
-    upright: 제3의 여자의 영향으로 사랑에 심각한 문제가 생기는 것을 말한다. 연인이 없는 내담자들을 위해 친구인 것처럼 보이지만 실제로는
-      친구가 아닌 여성, 사랑 속에서 자신의 행복을 원하지 않는 여성을 묘사한다. 이 사람의 말을 믿으면 후회할 잘못된 태도를 보일 수밖에
-      없습니다.
-    reversed: 사건에 유연하게 접근하지 못하는 고정관념을 지닌 과부의 이야기를 담고 있다. 너무 많은 말투로 인한 그녀의 어리석은 행동은
-      자신과 주변 사람들 모두에게 문제를 야기합니다.
+    name: Parsadra
+    general: Sahip olduğu  hiçbir şeyden memnun kalmaz. Her konuya bir eleştirisi
+      vardır.Olayların kadını olan parsadra biraz konuların dışında kalabilmeyi
+      tercih etse aslında kimsenin huzuru bozulmayacaktır. Aşk ve evlilik
+      ilişkilerinde araya girmeyi çok sever.Herkesin mutluluğuna engel olmak
+      ister.Kendi mutsuzluğunu insanlarında deneyimlemesini bekler.Parsadra
+      insanı kolay dolduruşa getirir.Bu sebeple de ikna edici bir özelliği
+      vardır.Dost gibi görünür ama düşman olan kişidir.
+    upright: Aşkta üçüncü bir kadının etkisi yüzünden ciddi sorunların yaşanmasını
+      ifade eder.Sevgilisi olmayan danışanlar için , aşk yönünde mutluluğunu
+      istemeyen dost gibi görünen ama aslında dost olmayan bir kadını anlatır.Bu
+      kişinin söylediği sözlere itibar ederseniz , pişman olacağınız yanlış
+      tavırlar sergilemeniz kaçınılmaz olacaktır.
+    reversed: Olaylara esnek yaklaşamayan , sabit fikirli , dul bir kadını
+      anlatır.Çok fazla konuşmaları yüzünden aptalca hareketleri  hem kendi
+      başını hemde ilişkisi olanların sorunlar yaşamasına  neden olur.
   aral:
-    name: 아랄
-    general: 그는 돈과 가족으로부터의 유산 등을 가지고 있습니다. 그는 권리를 가지고 있습니다. 그의 시야는 열려있습니다. 그는 교육,
-      과학, 예술을 중요하게 생각합니다. Zümrüdün Bey는 가족, 아버지, 형, 형제, 삼촌 등의 남자를 나타냅니다. Aral만이
-      제가 언급한 의미를 가지고 있습니다. 여기서 주목해야 할 점은 예를 들어 ARAL + DASTAR + SELÇUKASSA가 오면
-      결혼했지만 금지된 관계에 있는 사람을 나타내기도 한다는 것입니다.
-    upright: 아랄은 예민함과 강렬한 감정으로 자신과 가장 가까운 사람들에게 분석적인 관점을 제공합니다. 그는 이해심이 많고 쉽게 배신하지
-      않습니다. 그는 믿을 수 있는 파트너입니다. 남자든 여자든 내담자가 이 카드를 받으면 우리는 볼 수도, 무시할 수도 없는 상대의
-      사랑을 보게 되고, 이 사랑의 사랑을 알게 될 것이다.
-    reversed: Zümrüdün Bey는 자신이 관계에 있는 사람을 배신합니다. 숨겨진 비밀이 밝혀집니다. ARAL + BOOK 조합에서
-      오프닝을 만나면 이 비밀을 알게 될 것임을 나타냅니다. 동시에 아랄은 형제자매, 삼촌 등과 같은 사람들과의 의견 차이와 논쟁도
-      나타냅니다.
+    name: Aral
+    general: Paralıdır , aileden kalma miras v.b. haklara sahiptir.Ufku
+      açıktır.Eğitime , bilime, sanata önem verir.Zümrüdün Beyi aileden bir
+      erkeği temsil eder , baba ,ağabey,erkek kardeş,amca v.b. Tek başına Aral
+      belirttiğim anlamlara sahipken; burada dikkat edilmesi gereken husus ,
+      örneğin ARAL + DASTAR+SELÇUKASSA  geldiğinde evli ama yasak ilişki yaşayan
+      kişiyi de temsil eder.
+    upright: Aral hasasiyetle , yoğun duygularla en yakınlarına çözümsel bakış açısı
+      sunar.Anlayış gösterir ve kolay kolay ihanet etmez.Güvenilir bir
+      partnerdir.Danışan kadın / erkek kişide bu kart geldiyse , gözle
+      göremediğimiz veya görmezden geldiğimiz bir kişinin aşkını , sevgisini
+      görür hale geleceğiz ve bu aşkın sevgisini bileceğiz.
+    reversed: Zümrüdün Beyi ilişki yaşadığı kişiye ihanet etmektedir.Gizli saklanmış
+      bir sır açığa çıkacaktır , ARAL + KİTAP birleşiminde bir açılım ile
+      karşılaştıysak bu sırrı öğreneceğimize işaret eder. Aynı zamanda Aral ,
+      kardeş , amca , v.b kişilerle ters düşmeye , tartışmalara da işaret eder.
   eprahhat:
-    name: 에프라핫
-    general: 그는 거짓말을 잘하는 성격을 갖고 있다. 아무리 희생해도 그를 도울 수 없으며 그는이기적이고 배은망덕합니다. Eprahhat은
-      급격한 변화와 움직임을 설명합니다. 이는 우리가 인생에서 예상치 못한 발전을 경험하게 될 것임을 나타냅니다.
-    upright: 우리가 전혀 예상치 못한 순간, 새로운 관계가 우리를 휩쓸고, 예리한 지능과 강한 기억력을 가진 개인이 당신의 삶에 나타날
-      것입니다. 관계에 문제가 있는 파트너의 경우 적응에 문제가 있으면 해결될 수 있습니다. 어떤 경우에는 비현실적인 상황이 발생하기도
-      합니다. 그 사람은 옆에 있는 카드를 보고 해석을 명확히 해야 합니다.
-    reversed: 우리는 연애 생활에 대한 기대에 한동안 도달하지 못할 것이며, 기혼 고객도 한동안 문제를 해결하지 못할 것입니다.
+    name: Eprahhat
+    general: Yalan söylemeye , müsait bir yapısı vardır.Ne kadar fedakarlık
+      yaparsanız yapın yaranamazsınız , bencil ve nankördür. Eprahhat , hızlı
+      değişiklikleri , hareketi anlatır.Yaşamda beklenmedik gelişmeler
+      yaşayacağımıza işaret eder.
+    upright: Hiç ummadığımız , beklemediğimiz bir anda yeni bir ilişki ayağımızı
+      yerden kesecek , zekası keskin ve güçlü hafızaya sahip bir birey
+      yaşantınızda yer alacak.İlişkisinde sorun yaşayan partnerler için , Uyum
+      adaptasyonu ile ilgili problem varsa çözülebilir.Yaşanılan bazı olaylarda
+      gerçek olmayan durumlar söz konusudur.Kişi yandaki karta bakıp yorumu
+      netleştirmelidir.
+    reversed: Aşk hayatımızla ilgili beklentilerimize , bir süre daha ulaşamayacağız
+      , evli olan danışanlar sorunlarını bir süre daha çözemeyeceklerdir.
   hesse:
-    name: 헤세
-    general: 여자집에서 보이는 헤세는 예민한 사람을 상징한다. 논리적이기보다는 감정적으로 행동하는 사람이다. 헤세 역시 변화무쌍한 성격을
-      갖고 있는데, 남을 생각하여 마음에 혼란을 일으키는 사람을 강조하는 것이다. 5) 다이아몬드 시리즈 카드의 의미
-    upright: 관계에 문제가 있는 사람은 화해한 연인이 진정한 사랑을 가지고 돌아올 것이라고 설명합니다. 연애 중이 아닌 사람들에게는 진실하고
-      강한 사랑이 존재하며, 그 사람이 미소를 지을 수 있는 발전을 경험하게 될 것임을 강조합니다.
-    reversed: 이는 불안정한 태도, 집단 따돌림, 관계에서 심한 압박감을 느끼는 등의 문제를 말합니다. 헤어진 사람들은 한동안 돌아오지 못할
-      것임을 알려준다. 연인이 없는 개인에게는 아직 진정한 사랑이 보이지 않는다는 점을 강조한다.
+    name: Hesse
+    general: Kadın hanesinde görülen Hesse , hasas bir kişiyi ifade eder.Mantıktan
+      ziyade daha çok duygusal yönü ile hareket eden bir kişidir. Hesse
+      karakteristik olarak değişken bir özelliğe de sahiptir , başkalarını
+      düşünerek zihninde karmaşıklığa yol açan kişiyi de vurgular. 5) Elmas
+      Serisi Kartların Anlamları
+    upright: İlişkisinde sorunlar yaşayan kişi , barışmayı giden sevgilinin gerçek ,
+      güçlü bir aşk ile tekrar geri döneceğini anlatır.İlişkisi olmayanlar için
+      , gerçek güçlü bir aşkın var olacağını , kişinin yüzünü güldürecek
+      gelişmeler yaşayacağını vurgular.
+    reversed: Yaşanılan bir ilişkide , dengesiz tutumların , mobing , ağır baskı
+      altında hissetme gibi  sorunları ifade eder.Ayrı olan kişilerde bir müddet
+      daha geri dönüş olmayacağını anlatır.Sevgilisi olmayan bireylerde , gerçek
+      aşkın henüz görünürde olmadığını vurgular.
   Isfahan:
-    name: 이스파한
-    general: 설명이 없습니다.
-    upright: 내담자가 겪고 있는 관계에 문제가 있을 경우 울거나 징징거리는 방식으로 요청하지 말 것을 권합니다. 관계의 문제가 해결될
-      것입니다. 그러나 그 사람은 다른 파트너를 지배하는 것을 중단해야 합니다. 의견 차이로 인해 관계가 끝날 수도 있습니다. 양측이 서로
-      관계에 대해 말할 권리를 부여하면 타협이 이루어질 수 있습니다. 이스파한은 우리의 관점을 긍정적인 방향으로 바꿔야 한다는 뜻입니다.
-      연애를 하지 않는 의뢰인에게 찾아오는 이스파한. 원하는 사랑의 상대를 찾기 위해서는 후회하기보다는 삶과 자신의 평화를 이루라고
-      조언한다. 자신을 바라보는 관점을 바꾸면 아름다운 관계를 맺게 될 것임을 암시한다.
-    reversed: 그는 내담자에게 성급하게 행동하지 말고, 충동적으로 행동하지 말고, 자신이 속한 관계의 파트너와 신중하게 생각하고 논리적으로
-      행동하라고 조언합니다. 그는 관계에 있지 않은 내담자에게 연애 생활에서 내릴 선택과 선호에 있어서 성급하게 행동하지 말라고
-      조언합니다. 그리고 불필요한 불필요한 대화를 과도하게 금지합니다.
+    name: İsfahan
+    general: Açıklama bulunamadı.
+    upright: Danışanın  yaşadığı  birlikteliktelikte  , sorunlar problemler söz
+      konusu ise , kişiye ağlanarak , sızlanarak ricalarda bulunmamanızı
+      önerir.İlişkide sorunlar çözülecektir.Ancak kişi karşısındaki partneri ,
+      egemenliği altına almaktan vazgeçmelidir.Fikir ayrılıkları ilişkinin
+      sonunu getirebilir.Her iki taraf ilişkisinde birbirine söz hakkı tanırsa ,
+      uzlaşma sağlanılabilir.İsfahan , içinde bulunduğumuz bakış açımızı olumlu
+      yönde değiştirmemiz gerektiğini ifade eder.İlişkisi olmayan danışanda
+      gelen isfahan , aşka dair aranılan partnerin bulunabilmesi için  , kişinin
+      ah vah etmek yerine hayatla kendisi ile barışmayı öğütler. Kendisine olan
+      bakış açısını değiştirirse ozaman güzel bir beraberliğe de kavuşacağına
+      işaret etmektedir.
+    reversed: Danışanın yaşadığı birliktelikte , aceleci tavırlarla hareket
+      etmemesini , fevri davranmamasını , iyice düşünüp , taşınıp partneri ile
+      mantıklı hareket etmesini öğütler.İlişkisi olmayan danışan , Aşk hayatında
+      yapacağı seçim ve tercihlerde aceleci davranmamasını öğütler.Ve çok aşırı
+      gereksiz konuşmaları yasaklar.
   elmas:
-    name: 다이아몬드
-    general: 빅 다이아몬드는 눈길을 사로잡는 우아함과 주목을 받는 것을 의미합니다. 또한, 다이아몬드는 보살핌을 받는 카드입니다. 돈은 부와
-      물질적 안락을 상징합니다. 그 사람이 자신의 목표에 대해 금전적 기대를 갖고 있다면, 이는 이러한 상황이 가능하다는 표시입니다.
-    upright: 재산을 소유한다는 것은 금, 돈, 부를 의미합니다.
-    reversed: 어려움을 겪거나 금전적 이익이 예상되는 경우 다이아몬드가 반대 각도로 오면 예상보다 적은 금액을 받게 될 것임을 나타냅니다.
+    name: Elmas
+    general: Büyük Elmas , Göz alıcı bir zerafete , fark edilmeye , işaret
+      eder.Ayrıca elmas önemsenmenin kartıdır. Para , zenginlik ve maddi konfora
+      ulaşmayı sembolize eder.Kişinin hedefinde parasal bir beklenti var ise ,
+      bu durumun mümkün olacağının göstergesidir.
+    upright: Mal  sahibi olmak , altın , para ve zenginlik demektir.
+    reversed: Yaşanılan bir zorluk veya beklenilen parasal bir menfaat varsa elmas
+      ters açıda geldiğinde beklenilenden daha azına sahip olacağımıza işaret
+      eder.
   dastar:
-    name: 다스타
-    general: 차분하고 온건한 성격을 가지고 있습니다. 그는 인생에서 항상 성공합니다. 차분한 태도를 지닌 다스타는 인생에서 어떤 일에도
-      서두르지 않는다. 그는 어떤 일을 하기 전에 두 번, 심지어 세 번 생각하는 사람을 대표합니다.
-    upright: 연애중인 고객에게 보이는 이 카드는 속임수의 선구자입니다. 사랑하는 사람이 다른 여자와 연애 중임을 알려줍니다. 이는 그의 사랑
-      생활이 이 사람에 의해 가려질 것임을 나타냅니다. 연애 중이 아닌 의뢰인에게서 보이는 달스타는 그와 친구로 지내며 순전히 이해관계로
-      만나는 여자를 의미한다. 질문이 사랑에 관한 것이라면, 그 사람과 관계를 맺게 될 사람이 자신의 삶에서 자신이 모르는 비밀스러운
-      관계를 가지고 있음을 나타냅니다. 이 사람은 과거에 인연을 맺었지만 아직도 인연을 끊지 못하고 있는 사람입니다. 그런 일이 일어날
-      수도 있습니다.
-    reversed: 애인이 없는 의뢰인에게서 보이는 다스타는 그의 가까운 주변에 자신의 선의를 악용하는 교활한 사람이 있음을 나타냅니다. 연애중인
-      의뢰인에게서 보이는 다스타는 교활하고 교활한 생각을 가진 여자가 우리의 사랑을 상하게 할 것이며 인내심을 가지고 파트너를 우리에게서
-      빼앗아 갈 것이라고 경고합니다. 경고카드입니다.
+    name: Dastar
+    general: Sakin ve ılımlı bir yapısı vardır.Hayatta her zaman başarılıdır.Sakin
+      tavırları olan Dastar , hayatta hiçbir şeyi aceleye getirmez.Bir şey
+      yapmadan önce iki kere hatta 3 kere düşünen kişiyi temsil eder.
+    upright: İlişkisi yaşayan danışanda görülen bu kart aldatılmanın
+      habercisidir.Sevilen kişinin başka bir hanım ile ilişkisinin de olduğunu
+      anlatır.Aşk hayatında bu kişi yüzünden gölge düşeceğini ifade
+      eder.İlişkisi olmayan danışanda görülen dastar , kendisi ile dost olan bir
+      hanımın tamamen çıkar ilişkisi ile onunla görüşme sağladığını temsil
+      eder.Sorulan soru aşka dair ise ozamanda kişinin ilişki yaşayacağı kişinin
+      hayatında bilmediği , gizli bir birlikteliğinin de olduğuna işaret eder.Bu
+      kişi geçmişinde ilişki yaşamış ama hala bağlarını koparamamış kişi de
+      olabilir.
+    reversed: Sevgilisi olmayan danışanda görülen Dastar , yakın çevresinde kurnaz
+      ve iyi niyetini suistimal edecek bir kişinin var olduğunu ifade
+      eder.İlişki yaşayan danışanda görülen Dastar ,kurnaz ve sinsi düşünceleri
+      olan bir kadının aşkımızı yaralayacağına partnerimizi elimizden almak için
+      sabırla hareket edeceğine karşı uyarır.Uyarı kartıdır.
   adhamdeva:
-    name: 아드함데바
-    general: 나에게서 멀어지고 싶게 만드는 참을 수 없는 캐릭터다. 그의 자존심이 너무 높습니다. 그는 이 세상에서 자신만이 중요하다고
-      생각합니다. 그리고 다른 것은 중요하지 않습니다. 그는 돈을 과도하게 쓰는 것을 좋아하는 사람이다. 만약 그가 누군가를 진심으로
-      사랑한다면, 그의 사랑은 영원히 지속될 것입니다. 질문 유형에 따라 바람피운 배우자를 상징하는 경우도 있습니다. 때때로 그것은 우리가
-      사랑의 고백을 들을 준비가 되어 있어야 함을 나타냅니다.
-    upright: 실망, 슬픔, 친구의 배신이나 나쁜 말에 노출되는 것. 은밀한 행동으로 사람에게 해를 끼치는 나쁜 사람이 우리에게 해를 끼칠
-      것이라는 뜻이다. 데바가 먼 곳에서 온다면 이러한 특성을 가진 사람이 우리에게 입힐 피해는 그다지 크지 않을 것입니다. 이는 그
-      사람이 주목을 받고 예방 조치가 취해질 것임을 의미합니다. 관계를 기다리는 내담자에게 사랑 고백은 고백을 듣는 것을 의미하고, 의심이
-      있으면 관계에 대한 의심을 해소한다는 것을 의미합니다.
-    reversed: 그 사람을 대표하는 집에 데바가 보인다면 그것은 돈을 탐하는 사악한 여자를 의미합니다.
+    name: Adhamdeva
+    general: Benden uzak olsun dedirtecek kadar çekilmez bir karakterdir.Egosu fazla
+      yüksektir.Bu dünyada sadece kendisinin önemli olduğunu düşünür.Ve başka
+      hiç bir şeyin önemi yoktur. Para harcamayı aşırı seven bir kişidir.Bir
+      kişiyi gerçekten severse ,sevgisi de sonsuza kadar sürer. Danışılan
+      soruların türüne göre bazen aldatılan eşi simgeler.Bazen de aşk itirafları
+      duymaya hazır olmamız gerektiğini ifade eder.
+    upright: Hayal kırıklığı , üzüntü , bir dostun bir arkadaşın ihanetine , kötü
+      sözlerine maruz kalma.İçten pazarlıklı yaptıkları ile insanların canını
+      inciten kötü bir kişinin bize zarar vereceğini ifade eder. Açılımda uzak
+      bir hanede gelmişse Deva , ozaman bu özelliklerdeki kişinin bize vereceği
+      zarar okadar baskın olmayacaktır.Kişi fark edilecek ve önlemler alınacak
+      demektir.Aşk itirafı ilişki bekleyen danışanlar için , itiraf duymaya ,
+      şüpheler varsa ilişkide , şüphelerden arınmaya işaret eder.
+    reversed: Deva , kişiyi temsil eden hanede görülüyorsa , paragöz, kötü niyetli
+      bir kadına işaret eder.
   gamhat:
-    name: 감하트
-    general: 그는 많은 여성들과 관계를 맺고 있기 때문에 신뢰할 수 없는 사람이라고 느낍니다. 그리고 우리는 그를 믿어야 합니다. 그러나
-      그가 정말로 사랑에 빠지면 그는 충실할 것입니다. 그의 사랑이 진짜가 아니라면 Gamhat을 따르는 데 지칠 것입니다. 그는
-      완벽주의자이기 때문에 모든 면에서 최선을 다하고 싶어할 것입니다. 그는 우정, 우정, 가족 관계에 충실하지만 불행히도 사랑에는
-      충실하지 않을 것입니다.
-    upright: 연애 중인 고객은 불안감으로 인해 사랑이 손상될 것임을 나타냅니다. 진실이 밝혀질 것이라고 합니다. 이 상황이 어떻게, 어떤
-      식으로 진행될지는 감핫에 딸려오는 카드와 섞어서 만들어가야 할 것이다. 연애를 하지 않는 내담자에게 찾아오는 감핫은 불안한 내담자는
-      쌍방관계를 좋게 보지 않기 때문에 사랑을 경험할 수 없고, 남자/여자를 조금만 믿어야 과거를 청산하거나 관계를 맺을 수 있다는 점을
-      설명해야 한다.
-    reversed: 연애생활에 문제가 있는 내담자는 파트너의 불안감 때문에 복수를 하고 싶어 한다. 그리고 결코 실수를 용서하지 않는 이기적인
-      파트너를 나타냅니다. 연애 중이 아닌 내담자에게 보내는 감핫은 완벽주의자이기 때문에 아직 파트너가 없고, 상황이 어려워서 양자 관계에
-      대한 신뢰가 어렵다고 말한다.
+    name: Gamhat
+    general: Çok kadınla ilişki yaşaması onun güvenilir olmayan bir kişi olduğunu
+      hissederiz.Ve güvenmemiz de gerekir.Ancak gerçekten aşık olursa ,
+      sadakatli olur , aşkı , sevgisi gerçek değilse , ozaman Gamhat &#39;ı
+      takip etmekten çok yorulursunuz.Mükemmelci olması nedeniyle , herşeyin en
+      iyisine sahip olmak isteyecektir.Dostluk , arkadaşlık ve ailevi
+      ilişkilerde ne kadar sadakatliyse aşkta ne yazıkki okadar sadakatli
+      olamayacaktır.
+    upright: İlişkisi olan danışanlar , güvensizlikler yüzünden aşkın yara alacağına
+      işaret eder.Gerçeklerin açığa çıkacağını anlatır.Bu durumun nasıl ve ne
+      şekilde yol alacağı, gamhatın yanında gelen kartla harmanlanarak
+      yapılmalıdır. İlişkisi olmayan danışanda gelen Gamhat , güvensizlikler
+      yaşayan danışanın ikili ilişkilere sıcak bakmadığından dolayı aşkı
+      yaşayamadığına geçmişinden sıyrılmasına ve veya  erkek/ kadın kişilere
+      biraz güvenmesi ile bir ilişkisi olabileceği anlatılmalıdır.
+    reversed: Aşk hayatında sorunlar yaşayan danışanlar , güvensizlikler yüzünden
+      partnerlerinden öç almak istemektedirler.Ve egoist , hataları asla
+      affetmeyen partnerleri temsil eder.İlişkisi olmayan danışana yönelik gelen
+      Gamhat , mükemmelci olduğundan dolayı , ikili ilişkilerde zor güvendikleri
+      için henüz bir partnerleri olmadığına çünkü bur durumun işleri
+      zorlaştırdığını ifade eder.
   dare:
-    name: 도전
-    general: 그러나 마음 속으로는 부드럽고 좋은 의도를 가지고 있습니다. 일반적으로 바람을 피운 배우자를 말합니다.
-    upright: 눈물을 너무 많이 흘리는 것, 갖고 싶은 사람을 얻지 못하는 것, 심각한 문제가 있는 것. 그러나 모든 어려움은 뒤에 남아 있을
-      것이며 운명은 당신의 눈물을 행복의 눈물로 바꿀 것입니다. 당신이 원하는 도전이 당신 삶의 중심에 있을 것입니다.
-    reversed: 연애 생활에 큰 폐허가 있을 것이며 우리 관계를 뒤집어 놓을 짜증나는 전개가 있을 것이라고 예고합니다. 우울함과 슬픔이
-      우리에게 영향을 미칠 것입니다. 외부 요인과 우리 관계 외부의 사람들은 우리에게 부정적인 영향을 미칠 것입니다. 동시에 <데어>의
-      성격 분석에 있어서는 반대의 효과를 발휘할 때, 살인과 범죄의 의미에 대한 소식을 전하기도 한다.
+    name: Dare
+    general: Ancak içinde derinlerde bir yerde yumuşak , iyi niyeti vardır.Genelde
+      aldatılan Eşi ifade eder.
+    upright: Aşırı gözyaşı dökmek , sahip olmayı sitediğimiz kişiyi elde edememe ,
+      ciddi sorunların varlığı.Ancak bütün zorluklar geri planda kalacak ve
+      kader gözyaşlarınızı mutluluk gözyaşlarına çevirecek.İstediğiniz Dare ,
+      hayatınızın ben merkezinde yer alacaktır.
+    reversed: Aşk hayatında büyük yıkıntıların ilişkimizi alt üst edecek can sıkıcı
+      gelişmelerin yaşanılacağının habercisidir.Melankoli ve hüzün bizi etkisi
+      altına alacaktır.Dış etkenler ilişkimiz dışındaki insanlar bizi olumsuz
+      yönde etkileyecektir.Aynı zamanda Dare karakter analizinde ters etkide
+      geldiğinde , cinayet , suç işleme anlamlarının da haberini verir.
   zara:
-    name: 자라
-    general: 유일한 나쁜 특징은 재정 문제에 있어서 약간 제한적이라는 것입니다. 덱에 등장하는 자라가 여성을 상징한다면 위대하고 열정적인
-      사랑의 견고한 기반이 마련된다는 뜻이다. 6) 패턴 카드의 의미 패턴 덱에는 별자리 기호가 없습니다.
-    upright: 관계에 있는 내담자가 문제의 시기를 겪고 있다면 관계가 크게 회복될 것입니다. 위대하고 진실한 사랑은 온갖 어려움을 극복할
-      것입니다. 연애 중이 아닌 고객에게 Zara가 나타나는 것은 그 사람이 실제적이고 강력하며 새로운 관계에 인사할 것임을 나타냅니다.
-    reversed: 연애 중인 내담자는 한동안 관계를 회복할 수 없게 된다. 사랑은 강하지 않으며 문제는 관계의 뿌리에 있습니다. 각 파트너는
-      냉소적이고 지나치게 질투심이 많습니다. 이렇게 하면 관계가 회복되지 않습니다. 연애 중이 아닌 의뢰인은 한동안 새로운 연애를 시작할
-      수 없게 되는데, 그 이유는 그가 의심스럽기 때문이다.
+    name: Zara
+    general: Tek kötü özelliği , biraz maddi konularda parayı kısıtlayıcı
+      davranmasıDeste de temsil olunan Zara kadını temsil ediyorsa , büyük ve
+      tutkulu bir aşkın güçlü temelleri atılacak demektir. 6) Desenli Kartların
+      Anlamları Desenli destelerin burçsal bir sembolü bulunmamaktadır.
+    upright: İlişkisi olan danışanlar sorunlu bir dönemden geçmekteyseler,
+      ilişkilerinde güçlü bir şekilde toparlanma olacaktır.Büyük ve gerçek bir
+      aşkın , her türlü sıkıntısının üstesinden gelinecektir.İlişkisi olmayan
+      danışanda gelen Zara , kişinin gerçek , güçlü yep yeni bir ilişkiye
+      merhaba diyeceğine işaret eder.
+    reversed: İlişkisi olan danışan , bir süre daha beraberliğini
+      toparlayamayacaktır.Aşk sevgi güçlü değil , ilişkinin temelinde sorunlar
+      yatmaktadır.partnerlerden her biri , alaycı tavır , aşırı
+      kıskanç,davranmaktadır.Bu durum da ilişkinin toparlanmasına engel
+      olmaktadır.İlişkisi olmayan danışan , bir süre daha yeni ilişkiye
+      başlayamayacaktır , sebebi şüpheci olmasıdır.
   Capa:
     name: 닻
-    general: 앵커는 잘 진행되고 있는 관계에 대한 일관성과 신뢰를 나타냅니다.
-    upright: 이는 고객이 가지고 있는 재정적 기회(직업, 돈, 경력)에 대한 자신감과 상대방의 연애 생활에 대한 확신을 나타냅니다. 사랑에는
-      충실함이 있습니다. 여성 내담자에게 있어서 괭이는 남자가 많은 여자에게 둘러싸여 있지만, 남자의 마음은 여자 의뢰인의 편에 있다는
-      것을 상징한다. 그리고 그것은 결혼을 상징합니다. 애인이 없는 내담자에게 괭이는 새로운 파트너가 자신의 삶에 동참하게 될 것이며
-      신뢰와 충성심이 최우선이 될 것임을 상징합니다.
-    reversed: 이는 내담자가 재정적 기회(직업, 돈, 경력)에 대해 불안감을 갖고 있고, 연애 생활에서 상대방을 신뢰할 수 없으며, 관계에서
-      불안감과 일관성 없는 행동을 경험하고 있음을 나타냅니다. 또한, 파트너는 귀하의 행동 방향에 따라 행동할 것이며, 실망스러운 경우
-      파트너는 다른 관계에 자신을 고정시킬 것입니다. 관계가 없는 고객에게는 새로운 파트너가 있습니다. 내담자는 이 사람을 믿을 수 없기
-      때문에 양보하고 그를 자신의 삶에 포함시키지 않을 것입니다.
+    general: 신뢰, 충성, 장소나 사람에 대한 헌신, 희망.
+    upright: Danışanın sahip olduğu , maddi olanaklara güvenini (İş,para,kariyer) ,
+      aşk hayatında da karşısındaki kişiden emin olmaya işaret eder.Aşkta
+      sadakat söz konusudur.Kadın danışan için çapa ,erkeğin çok fazla kadın
+      tarafından çevrelendiğini ancak erkeğin gönlünün kadın danışandan yana
+      olduğunu temsil eder.Ve evliliği temsil eder.Sevgilisi olmayan danışanda
+      Çapa, yeni partnerin hayatına katılacağına , güven - sadakat duygusu ön
+      planda olarak beraberliğin yaşanılacağını ifade eder.
+    reversed: Danışanın sahip olduğu , maddi olanaklara güvensizlikler yaşadığını
+      (İş,Para,Kariyer), aşk hayatında karşısındaki kişiye güvenemediğine ,
+      ilişkide güvensizlikler,tutarsız davranışlar yaşanılmasına işaret
+      eder.Ayrıca partner sizin davranışlarınızın yönüne göre hareket edecektir
+      , hayal kırıklığı söz konusu olursa , partner başka ilişkilere çapasını
+      atacaktır.İlişkisi olmayan danışanda , yeni bir partner söz konusu ,
+      danışan bu kişiye güvenemeyeceğinden yol verecektir, onu hayatına dahil
+      etmeyecektir.
   tilki:
     name: 여우
-    general: 여우는 교활하고 수완이 뛰어납니다. 그는 항상 모든 종류의 기회를 활용하기 위한 전략적인 계획을 가지고 있습니다. 그는 항상
-      잠재의식적인 계획을 가지고 있고, 멀리서 사람들을 관찰하며, 자신이 마음속에 넣은 프로세스를 수행할 적절한 시기를 항상 기다립니다.
-      경계심의 전조인 여우는 우리를 돕거나 친구가 될 친구의 전조입니다.
-    upright: 경계심과 교활함이 문제입니다. 이 두 가지는 여우로 대표되는 인물의 가장 중요한 무기이다. 성공한 여우는 자신의 일에 대해 좋은
-      말을 듣게 될 것입니다. 여우를 대표하는 사람은 예리한 지능과 강한 기억력을 가지고 있습니다. 그는 자신에게 닥칠 재난을 미리
-      감지하고 그에 따라 예방 조치를 취한다. Fox + Book이 나오면 이러한 기능이 드러나고 여우는 힘을 잃게 됩니다.
-    reversed: 질투심 많고 계획적인 사람을 나타냅니다. 교활하고 속이는 사람으로부터 해를 입지 않도록 눈을 크게 뜨라고 조언합니다. 여우가
-      우리를 위해 부정적인 계획을 세우고 있으므로 이 문제를 조심하지 말라고 경고합니다. 또한 우리가 사랑에 관심이 있는 사람이 있다면
-      우리는 그 사람에게 다가가기 위해 지능적이지 않은 다양한 방법을 시도할 것임을 나타냅니다.
+    general: 교활함, 주의가 필요한 기회주의.
+    upright: Uyanıklık ve kurnazlık söz konusu.Bu ikisi tilki tarafından temsil
+      edilen kişinin en önemli silahları.Başarılı olan Tilki , yaptığı
+      çalışmalarla ilgili güzel sözler , duyacaktır.Tilkiyi temsil eden kişi ,
+      keskin zekaya , güçlü hafızaya sahiptir.Başına gelecek olan felaketleri
+      önceden tespit eder , ona göre önlemler alır.Tilki + Kitap beraberinde
+      gelirse , bu özellikler açığa çıkar ve tilki gücünü kaybeder.
+    reversed: Kıskanç , içten pazarlıklı bir kişiyi işaret eder.Sinsi ve hilekar
+      birisinden zarar görmeye   bu nedenle gözlerimizi dört açmamızı
+      öğütler.Tilkinin bizimle ilgili olumsuz planlar yaptığını ve bu hususla
+      ilgili dikkatli olmamanız konusunda bizi uyarır.Aşk yönünde ilgi
+      duyduğumuz birisi varsa bu kişiye ulaşmakla ilgili değişik akılda olmayan
+      yollar deneyeceğimizi de ifade eder.
   Cicekler:
-    name: 월경
-    general: 꽃은 고무적인 상황에 직면했음을 나타냅니다. 행복 가득한 날을 예고합니다. 행운이 따르게 되고 삶의 균형과 조화가 이루어지게 될
-      것임을 나타냅니다. 내담자에게 이는 자신을 발견하고 영혼이 안도하며 인생에서 원하는 모든 아름다움을 얻게 될 것임을 나타냅니다.
-    upright: 행복, 희망, 아름다움이 나타납니다. 낙관주의와 희망은 내담자에게 영향을 미칠 것입니다. 그리고 그가 무엇을 의도하든 모든 것이
-      더 나은 방향으로 진행될 것입니다.
-    reversed: 우리가 실생활에서 자연을 관찰할 때, 나무와 꽃은 매년 새로워진다는 사실을 잊지 말아야 합니다. 꽃은 반대 각도로 피어도
-      언제나 선함과 아름다움을 표현합니다. 용기와 결단력을 잃지 말아야 함을 강조합니다.
+    name: 꽃
+    general: 행복, 아름다움, 선물 및 즐거운 놀라움.
+    upright: Mutluluk , umut ve güzellik görünüyor.İyimserlik ve umut danışan kişiyi
+      etkisi altına alacak.Ve niyetinde ne varsa herşey iyiye güzele doğru
+      ilerleyecektir.
+    reversed: Gerçek hayatımızda doğayı gözlemlediğimizde , ağaçların , çiçeklerin
+      her yıl yenilendiğini unutmamalıyız.Çiçekler ters açıda da gelse her zaman
+      iyiyi güzelliği ifade eder.Cesaretin ve azmin kaybedilmemesi gerekliliğini
+      vurgular.
   yildizlar:
     name: 별
-    general: 별은 운명을 결정하는 요소이다. 실생활에서는 별을 세어서는 안 된다는 점을 기억해야 합니다. 그렇지 않으면 불운이 찾아온다고
-      믿어집니다. 떨어지는 별을 보면 소원을 소홀히 하지 말라고 조언하기도 합니다.
-    upright: 이는 내담자가 주변 사람들의 관심을 받고 있으며 그의 말을 주변 사람들이 경청하고 있음을 나타냅니다. 자신을 대표하는 집에
-      인물이 나타난다면 그 사람은 꽤 재능이 있는 사람이다. 그는 주변 사람들에게 영향을 미칩니다. 그는 자신이 무엇을 할 수 있는지
-      깨닫게 됩니다. 카드에 별이 표시된 사람의 길에서는 경쟁이 사라집니다. 사랑하는 사람의 관심과 사랑을 받게 될 징조입니다.
-    reversed: 이는 내담자가 주변 사람들에게 미움을 받는 사람임을 나타냅니다. 이는 그가 주목받지 못했다는 것을 나타냅니다. 친구와 좋아하는
-      사람의 관심과 사랑을 잃었음을 나타냅니다. 이는 내담자가 자신을 화나게 한 사람들을 미워하고 전체 환경 및 사랑하는 사람들과의 관계를
-      끊을 것임을 나타냅니다.
+    general: 희망, 영감, 이루어지는 꿈, 영적 인도.
+    upright: Danışanın , çevresi tarafından önemsendiğinin , sözlerinin çevresi
+      tarafından dinlenildiğini ifade eder.Kişiyi temsil eden hanede çıkmış ise
+      , oldukça yeteneklidir.Çevresindeki kişileri etkiler.Yapabileceklerinin
+      farkına varılır.Yıldızlar kartında çıkan kişininn yolunda rekabet yok
+      olur.Aşkta sevdiği kişi tarafından fark edileceğine önemseneceğine işaret
+      eder.
+    reversed: Danışanın çevresi tarafından nefret edilen bir kişi olduğuna işaret
+      eder.Fark edilmediğine işaret eder.Arkadaşlarının ve hoşlandığı kişinin
+      ilgisini sevgisini kaybettiğini işaret eder.Danışanın kendisini üzenlerden
+      nefret edeceğine , tüm çevresi ,sevdiği ile ilişkisini keseceğine işaret
+      eder.
   alyans:
-    name: 계약
-    general: 연애 중이 아닌 고객에게 결혼반지는 결혼, 약혼, 새로운 관계의 진지한 시작을 의미합니다. 반대로 하면 관계가 속임수와 배신으로
-      끝날 것임을 나타냅니다. 연애 중인 내담자에게 약혼이나 결혼은 관계가 긍정적인 방향으로 발전하고 있음을 나타냅니다. 거꾸로 하면
-      바람피우거나 이별을 뜻합니다. 기혼 고객의 경우 결혼 문제, 이혼, 별거 등의 상황을 상징합니다. 동시에
-      결혼반지+다이아몬드+나일강+에메랄드 등의 카드가 함께 나오면 부를 상징한다.
-    upright: 행복한 관계와 결혼 관계의 정점을 나타냅니다.
-    reversed: 이는 불행한 관계, 부부의 침대 분리, 이혼 가능성 및 부정 행위를 나타냅니다. 결혼반지 + 다스타는 확실한 배신을 의미하고,
-      결혼반지 + 다스타는 이혼과 관계의 끝을 의미합니다.
+    name: 결혼 반지
+    general: 헌신, 결혼, 파트너십, 진지한 완성.
+    upright: Mutlu bir beraberliğe , ilişkinin evlilikle taçlanmasına işaret eder.
+    reversed: Mutsuz bir beraberliğe , evli çiftlerin yataklarını ayırmasına ,
+      boşanma ihtimaline ve ayrıca aldatmaya işaret eder. Alyansla beraber +
+      Dastar  kesin ihaneti , Alyansla beraber + yatağan boşanma ve ilişkinin
+      bitimini ifade eder.
   dag:
     name: 산
-    general: 산은 권력을 상징합니다. 우리가 인생에서 어떤 경험을 하든 우리는 항상 굳건히 서 있다는 점을 강조합니다. 산은 또한 예상치
-      못한 사람의 강력한 도움을 나타냅니다. 큰 재산을 빼앗는 것과 관련된 의미를 가지고 있습니다. 산은 우리가 도움이 필요할 때마다
-      충성스럽고 강한 친구들로부터 도움을 받게 될 것임을 나타냅니다.
-    upright: 그것은 힘을 나타냅니다. 그것은 우리가 어려운 운명의 시험에 대처할 수 있음을 알려줍니다. 그것은 우리가 영적으로 강하다는 것을
-      말해줍니다. 이는 우리 삶에서 우리가 기대하는 부정적인 발전이 있다면 이러한 발전은 사라질 것이며 결코 우리에게 해를 끼칠 수 없음을
-      나타냅니다. 그것은 우리에게 일어날 문제와 위험을 지적합니다. 악을 행하려는 사람(들)을 강조합니다. 큰 다툼과 나쁜 말이 있을
-      것임을 알려줍니다. 사랑은 칼날에 서게 되어 이별이 생기고, 사랑에 운이 나쁜 방향으로 흘러 이별이 일어난다는 연애관계에 대해서도
-      알려준다. 연애 중이 아닌 이들에게는 사랑의 행운이 한동안 눈에 띄지 않을 것임을 강조한다. 뉴스를 받기 위해서는 멀리서 오는
-      메시지가 오늘날의 기술과 결합되어야 하고, 이 뉴스의 종류가 열린 카드와 결합되어야 합니다. 사랑의 관계를 기대하는 고객에게는
-      기대하는 사람이 돌아옴을 나타냅니다. 연애 중이 아닌 고객의 경우, 기다리고 있는 사랑의 발전에 대한 소식을 듣게 될 것임을
-      나타냅니다. 또한 먼 땅에서 삶을 이어가는 사람/사람들의 귀환을 나타냅니다.
-    reversed: 이는 우리가 큰 붕괴를 경험할 것이며 우리의 일과 계획이 실패할 것임을 나타냅니다. 불행을 최대한 경험하는 것을 강조합니다.
-      큰 재난과 폐허는 우리에게 영적으로 부정적인 영향을 미치고 우리의 꿈도 사라지게 됩니다. 6.07) 야타간 야타간 ; 우리가 언제든지
-      직면할 수 있는 위험에 대해 이야기합니다. 하지만 잘 풀리지 않는 문제를 해결할 수 있다는 뜻이기도 합니다. Yatağan + 태양이
-      합쳐지면 이런 의미를 불러일으킵니다. 모르는 사람을 조심하라고 경고합니다. 긍정적인 카드가 나오면 이 낯선 사람이 우리에게 해를 끼칠
-      수 없다는 뜻입니다. 동시에 가족 구성원을 나타내는 카드 옆에 오면 아버지, 삼촌, 이모, 형제 등 사람들과의 의견 차이를
-      나타냅니다. 우리 삶에서 해결해야 할 문제에 직면하게 되겠지만 그 모든 것을 배경으로 남겨 둘 수 있습니다. 우리는 앞으로 일어날
-      위험과 논의를 인식할 것입니다. 예상했던 것만큼 큰 문제는 발생하지 않을 것입니다. 그는 Yatağan + dervish + 책이
-      그와 함께 오면 모든 것이 잘 될 것이라고 강조합니다. 6.08 ) 편지 편지는 우리가 살아가면서 예상했거나 예상하지 못했던 문제에
-      대한 소식을 받게 될 것임을 나타냅니다. 이러한 소식은 슬픈 소식일 수도 있고 아닐 수도 있으므로 옆에 있는 카드를 보고 해석해야
-      합니다. 예를 들어; 도로 + 편지는 일과 사랑에 대한 새로운 기회와 새로운 소식을 받게 된다는 것을 의미합니다... 편지가 거꾸로
-      오면 나쁜 소식을 받는다는 것을 의미합니다. 하지만 이는 어떤 뉴스인지 옆에 있는 카드를 보고 판단해야 합니다. 예를 들어 역시 +
-      역문자는 그 시각에 기대되는 소식이 한동안 오지 않아 그 사람이 원래 있던 곳으로 돌아오지 않는다는 뜻이다. 모양의...
+    general: 장애물, 극복하기 어려운 상황, 지연 및 시련.
+    upright: Güce işaret eder.Kaderin zor imtihanları ile başa
+      çıkabileceğimizi.Ruhsal yönden güçlü olduğumuzu anlatır.Hayatımızda
+      beklediğimiz olumsuz bir gelişme varsa, bu gelişmelerin uzaklaşacağına ve
+      bize asla zarar veremeyeceğini ifade eder. Başımıza gelecek olan sorunlara
+      , tehlikelere işaret eder.Kötülük yapmaya çalışan kişi / kişileri
+      vurgular.Büyük tartışmaları , kötü sözler duyulacağını anlatır.Ayrıca aşk
+      ilişkisi ile ilgili de aşkın bıçak sırtında olduğunu ayrılığın olacağını
+      ve aşkta ki şansın kötü yönde ilerleyeceğini , ayrılığın yaşanılacağını
+      anlatır.İlişkisi olmayanlar için ,aşktan yana şansın bir süre daha
+      görünürde olmayacağını vurgular. Haberler almaya , uzaktan gelen bir yazı
+      , günümüz teknolojisi ile bağdaştırılarak bu haberin ne çeşit olduğu
+      yanında açılan kartlarla harmanlanarak belirtilmelidir.Aşk ilişkisinde
+      beklentide olan danışanlar için , beklenilen kişinin dönmesine işaret
+      eder.İlişkisi olmayan danışanda , beklediği aşk ile ilgili gelişmelerin
+      yaşanması ile iligili haberler duyacağına işaret eder.Aynı zamanda uzak
+      diyarlarda yaşamına devam eden kişi / kişilerin geri dönmesine de işaret
+      eder.
+    reversed: Büyük bir yıkılış yaşayacağımızı, işlerimizin, girişimlerimizin
+      başarısızlıkla sonuçlanacağına işaret eder.Mutsuzluğu dibine kadar
+      yaşamayı vurgular.Büyük felaketler yıkıntılar, ruhsal yönden bizi kötü
+      etkileyecek, hayallerimiz yok olacaktır. 6.07 )Yatağan Yatağan ; her an
+      karşı karşıya kalabileceğimiz bir tehlikeyi anlatır.Ancak yolunda gitmeyen
+      sorunları problemleri de çözümleyebilir demektir.Yatağan + güneş birlikte
+      gelirse bu anlamı çağrıştırır. Tanımadığımız insanlara karşı dikkatli
+      olmamız hususunda bizi uyarır.Eğer olumlu bir kart ile beraberinde gelirse
+      bu yabancının bize zarar veremeyeceğini söyler. Aynı zamanda aileden bir
+      kişiyi temsil eden kartın yanına gelirse , ozamanda baba,amca,teyze ,
+      kardeş v.b kişilerle anlaşmazlığa düşmeyi anlatır. Hayatımızda 
+      çözümlenmesi gereken sorunlarla karşılaşacağız ancak , hepsini geri planda
+      bırakabilmeyi de başarabileceğiz.Tehlike ve yaşanılacak tartışmalarında
+      farkına  varılacaktır.Beklediğimiz ölçüde büyük meselelerle karşı karışıya
+      kalmayacağız.Yatağan+ derviş+kitap ile beraberinde gelirse , herşeyin
+      yolunda gideceğini vurgular. 6.08 ) Mektup Mektup, yaşantımızda
+      beklediğimiz veya beklemediğimiz meselelerle ilgili haberler alacağımıza
+      işaret eder. Bu haberler üzüntülü de olabilir üzüntüsüzde bu nedenle
+      yanındaki kartlara bakılarak yorum yapılmalı.Örneğin;  yol + mektup, iş ve
+      aşk ile ilgili yeni fırsatlar yeni haberler alacaksınız gibi... Mektup
+      ters geldiğinde kötü bir haber almayı işaret eder.Ancak bu haberin ne
+      çeşit bir haber olduğunu yanındaki karta bakarak yapılmalıdır.örneğin ,
+      ters saah + ters mektup saahtan beklenilen haber bir müddet daha
+      gelmeyecek , kişi ait olduğu yere dönmeyecektir. şeklinde...
   agac:
     name: 나무
-    general: 나무는 건강, 강한 사랑, 삶의 무거운 짐에 대한 회복력을 상징합니다.
-    upright: 연애 중인 내담자에게 있어서는 상대방이 깊은 사랑, 굳건한 사랑으로 내담자를 사랑하고 있음을 나타낸다. 연애 중이 아닌
-      내담자에게는 뿌리 깊은 새로운 인연의 희소식을 선사한다. 건강 관련 문제를 겪고 있는 사람에게는 회복과 건강을 나타냅니다. 아이를
-      낳을 예정인 사람에게는 건강하게 출산이 이루어질 징조입니다. 탁발승이 말하는 말과 소식을 고려해야 합니다. 의뢰인은 사실을 직시하게
-      됩니다. 배운 진실이 무엇이든, 당신을 화나게 하는 문제가 있다면 그것은 분명해질 것입니다. 진실을 배우면 실수를 피할 수 있습니다.
-      진리는 당신이 자신감을 얻을 수 있는 길을 열어줄 것입니다. 지금까지 겪은 고통으로 인해 큰 경험을 얻게 되었으며, 평생 동안 이러한
-      경험을 고려하여 행동하게 될 것입니다. 미래에 대한 예측은 긍정적일 것입니다.
-    reversed: 관계를 맺고 있는 내담자는 관계가 견고한 기초 위에 세워질 수 없으며, 요청받는 사람의 사랑이 비현실적이며, 관계가 언제든지
-      한계점에 올 수 있다는 것을 표현합니다. 연애를 하지 않는 내담자는 한동안 건강하지 못한 관계 속에서 살아야 할 것이다. 질병을
-      나타내기도 합니다. 그러나 나무가 거꾸로 있고 나무가 곧은 경우 질병은 일시적입니다. 6.10) Dervish는 매우 강한 감정을
-      가진 깨달은 현명한 사람을 상징합니다. 또한 데르비쉬 상징을 보는 사람은 자신의 감정과 직관에 주의를 기울여야 합니다. 동시에
-      데르비쉬는 자문을 받은 선견자이자 강한 지식을 가진 사람으로부터 받게 될 지원의 전조이다. 이 사람의 말에 주의를 기울여야 하고 그의
-      경고에 귀를 기울여야 합니다. 탁발승의 말을 고려하지 않는 사람은 실수와 실수를 저지를 것임을 나타냅니다. 역 탁발승은 사람에게 하는
-      거짓말을 강조합니다. 이는 그 사람이 지금까지 경험한 부정적인 과정으로부터 교훈을 얻지 못했다는 것을 보여줍니다. 거짓말은 자신감을
-      잃게 만듭니다.
+    general: 뿌리 내림, 건강, 성장, 가족의 혈통 및 장수.
+    upright: İlişkisi olan danışanda , sorulan partnerin derin bir aşk ile sağlam
+      bir sevgi ile danışanı sevdiğine işaret eder.İlişkisi olmayan danışanda,
+      kökleri sağlam yeni bir beraberliğin müjdesini verir. Sağlıkla ilgili
+      sorunlar yaşayan kişi, iyileşme , zinde olmaya işaret eder.Bebek bekleyen
+      kişi için doğumun sağlıklı bir şekilde gerçekleşeceğine işaret eder.
+      Dervişin söylediği sözler ve haberler , dikkate alınmalıdır.Danışan ,
+      gerçeklerle yüzleşecektir.Öğrenilen gerçek ne ise ,üzüldüğünüz bir konu
+      var ise , aydınlanacaktır.Gerçeği öğrendiğiniz takdirde ,yanlış yapmaktan
+      kaçınılacaktır.Gerçek kendinize olan güveninizi kazanmanın yolunu
+      açacaktır.Bugüne kadar çektiğiniz eziyetler büyük bir tecrübe edinmenize
+      olanak sağladı , yaşamınızın geri kalan kısımında bu tecrübeleri gözönüne
+      getirerek hareket edeceksiniz.Geleceğe dair yapılan tahminler olumlu yönde
+      olacaktır.
+    reversed: İlişkisi olan danışanda , ilişkinin sağlam bir zemin üzerine inşaa
+      edilemediğini , sorulan kişinin sevgisinin gerçekçi olmadığını , ilişkinin
+      her an kopma noktasına gelebileceğini ifade eder.İlişkisi olmayan danışan
+      , bir süre daha sağlıksız beraberlikler yaşamak zorunda kalacaktır.
+      Hastalıklara da işaret eder. Ancak ağaç ters + yatağan düz gelirse
+      hastalık geçici olacaktır. 6.10 ) Derviş Hisleri son derece kuvvetli aydın
+      ,bilge bir kişiyi sembolize eder.Ayrıca Derviş sembolü görülen kişinin
+      hislerine , sezgilerine dikkat etmesi gerekir.Aynı zamanda Derviş ,
+      danışılan kahin ve ilmi kuvvetli bir kişiden alınacak desteğin de
+      habercisidir.Bu kişinin sözlerine dikkat edilmeli , uyarıları
+      dinlenmelidir. Dervişin sözlerini dikkate almayan kişinin hata ve
+      yanlışlar yapacağına işaret eder.Ters gelen derviş , kişiye söylenen
+      yalanları vurgular.Bugüne kadar yaşanılan olumsuz süreçlerden , kişinin
+      ders almadığını gösterir.Yalanlar , güveninizi kaybetmenize sebep
+      olacaktır.
   yol:
-    name: 도로
-    general: 길은 행운, 행운, 예상치 못한 기회를 상징합니다.
-    upright: 고객이 결정 단계에 있다면 내려야 할 결정은 올바른 결정이 될 것입니다. 연애나 사업생활을 하는 사람에게는 뜻밖의 좋은 기회가
-      찾아올 것입니다. 모든 욕망과 욕망이 이루어질 것입니다. 좋은 미래의 좋은 소식인 길은 그 사람의 나쁜 삶이 더 나은 방향으로 바뀔
-      것임을 알려줍니다.
-    reversed: 클라이언트가 결정 단계에 있다면 이는 이 결정이 잘못된 결정임을 나타냅니다. 클라이언트가 선택 사이에 있다면 선택이 그 또는
-      그녀에게 도움이 되지 않음을 나타냅니다.
+    name: 길
+    general: 선택, 이별 또는 새로운 삶을 향한 발걸음.
+    upright: Danışan bir karar aşamasındaysa , verilecek karar doğru bir karar
+      olacaktır.Aşk ve iş yaşantısında beklenmedik hayırlı fırsatlar kişinin
+      karşısına çıkacaktır.Tüm arzular , istekler gerçekleşecektir.İyi bir
+      geleceğin müjdesi olan yol , kişinin kötü giden yaşantısının iyi yönde
+      değişime uğrayacağını anlatır.
+    reversed: Danışan bir karar aşamasındaysa , bu kararın yanlış bir karar olduğunu
+      ifade eder.Bir tercih arasındaysa , yapılacak tercihin , seçimin kendisine
+      hayır menfaat sağlamayacağına işaret eder.
   gunes:
-    name: 해
-    general: "행운을 빌어요, 나쁜 운명의 고리를 깨고 클라이언트가 문제의 시기를 겪고 있다면 이 문제의 시기는 완전히 배경에 남아 있을
-      것입니다. 거꾸로든 거꾸로든 카드의 의미에는 변화가 없습니다. 우리의 실생활에서는 태양을 거꾸로 뒤집어도 여전히 같은 장엄하게
-      빛납니다. 태양이 어떤 카드 덱과 함께 나오든 그 의미는 결코 변하지 않으며 항상 선함, 아름다움, 치유를 나타냅니다. 예를 들어,
-      야타간 + 태양: 분리의 종말과 현재 문제의 해결을 나타냅니다."
-    upright: 설명이 없습니다.
-    reversed: 설명이 없습니다.
+    name: 태양
+    general: 큰 행운, 행복, 깨달음 및 성공.
+    upright: Açıklama bulunamadı.
+    reversed: Açıklama bulunamadı.
   deve:
-    name: 그는 반드시
-    general: 낙타는 재정적 문제의 막힘, 정상적인 삶의 흐름에 대한 저항, 받아들이지 못함, 사랑 관계의 주저함 및 인내심에 대해 경고합니다.
-    upright: 경제적, 재정적 문제를 해결하는 것이 가능할 것입니다. 그 사람이 무엇에든지 인내를 나타내면 상을 받게 될 것입니다. 또는 그가
-      묻는 문제가 인내가 필요한 문제라면, 인내와 인내를 나타내면 상을 받게 될 것입니다.
-    reversed: 경제, 금융 문제에 있어서 붕괴가 있을 것입니다. 그 사람은 인생에서 가장 부정적이고 가장 인내심이 강한 시험에 직면하게 될
-      것입니다. 이 기간 동안 개인은 재정 자원에 주의하고 과도한 지출을 피해야 합니다. 그렇지 않고, 시간을 효율적으로 사용할 수
-      없다면, 그 시도는 성공하지 못할 것이며 손실을 겪게 될 것입니다. 또한, 질문이 사랑의 관계에 관한 것이라면 사랑에 막힘이 있을 수
-      있지만, 인내심과 인내력을 보인다면. , 이 상황은 거의 회복되지 않을 것입니다.
+    name: 낙타
+    general: 재정 문제에 대한 인내, 완고함 또는 긴 여정.
+    upright: Ekonomik ve finansal problemlerin çözümü mümkün olacaktır.Kişi hangi
+      konuda sabır gösteriyorsa mükafaatını alacaktır.Veya sorduğu konu sabır
+      gerektirmesi gereken bir mesele ise , sabır ve dayanıklılık göstermesi
+      durumunda mükaafatını alacaktır.
+    reversed: Ekonomik ve finansal konularla ilgili dibe çöküş söz konusu
+      olacaktır.Kişi hayatının en olumsuz , en sabır gösterilmesi gereken
+      imtihanı ile yüz yüze gelecektir.Kişinin içinde bulunduğu bu dönemde ,
+      parasal kaynaklara dikkat etmesi ve aşırı harcamalardan kaçınması
+      gerekecektir.Aksi takdirde , zamanını verilmli kullanamaz ise , girişimler
+      başarı ile sonuçlanmayacak , kayıplarla yüzleşmek zorunda
+      kalınacaktır.Ayrıca sorulan soru aşk ilişkisi yönünde ise , aşkta birtakım
+      tıkanmalar söz konusu olacak ama sabır ve dayanıklık gösterilmesi
+      durumunda , zar zor bu durum toparlanacaktır.
   kalp:
-    name: 마음
-    general: 하트는 사랑의 상징입니다. 모든 면에서 새로운 사랑이 있을 것입니다. 연인들은 한 몸으로 온전해질 것입니다.
-    upright: 그것은 실제적이고 위대한 사랑의 존재나 경험을 나타냅니다.
-    reversed: 침대 분리, 관계 종료. 상처받았지만 강한 마음의 존재를 나타냅니다. 마음의 주인은 아무리 고통을 당해도 사랑이 다시 그의
-      문을 두드릴 만큼 강한 사람입니다.
+    name: 심장
+    general: 큰 사랑, 애정, 동정심 및 감정적인 행복.
+    upright: Gerçek ve büyük bir aşkın varlığını ve veya yaşanılacağını temsil eder.
+    reversed: Yatakların ayrılması , ilişkilerde bitiş yaşanması.Yaralanmış ancak
+      güçlü bir kalbin varlığına işaret eder.Kalbin sahibi okadar güçlü bir
+      kişidir ki , ne kadar acı çekerse çeksin aşk onun kapısını tekrar
+      çalacaktır.
   bahceler:
     name: 정원
-    general: 설명이 없습니다.
-    upright: 관계가 없는 고객의 경우; 조직이나 공동체에서 우연히 만난 사람과 사랑의 관계를 맺는 것을 의미합니다. 충성심과 신뢰감을
-      포함하는 이러한 장기적인 관계는 그 사람을 행복하게 만들 것입니다. 새로운 관계의 파트너는 정원을 보완하는 카드와 혼합하여 해석되어야
-      합니다. 그 해석은 사람의 특징적인 구조에 따라 정원과 결합되어야 한다. 연애 중인 내담자에게는 자신이 사랑하고 소중하게 여기는
-      사람과의 만남이 있게 될 징조입니다.
-    reversed: 관계가 없는 고객의 경우; 기대했던 관계가 당분간은 살 수 없을 것임을 나타냅니다. 정원(역전/직선 상관 없음) +
-      항해(직선)이면 아름답고 상서로운 인연이 문 앞에 있음을 나타냅니다. 관계에 있는 고객의 경우; 신선함과 아름다움으로 관계가 계속 될
-      징조입니다. 그러나 부정적인 의미도 있습니다. Bahçeler(역방향) + Yatağan(직립)이면 관계가 종료됨을 나타냅니다.
+    general: 사교, 환경, 군중 및 사회에서의 당신의 위치.
+    upright: İlişkisi olmayan danışanda ; bir organizasyon veya bir toplulukta ,
+      tesadüfen karşılaşma sağladığınız bir kişi ile aşk ilişkisi kurulmaya
+      işaret eder.Uzun vadeli , sadakat ve güven duygusunun yer alacağı bu
+      ilişki ,  kişinin kendisini mutlu hissetmesine neden olacaktır. Yeni
+      ilişkideki partner bahçeleri tamamlayan kart ile harmanlarak
+      yorumlanmalıdır.Kişinin karakteristik yapısına göre bahçeler ile  yorum
+      birleştirilmelidir. İlişkisi olan danışanda , Sevdiği değer verdiği kişi
+      ile buluşmaların olacağına işaret eder.
+    reversed: İlişkisi olmayan danışanda ; beklenilen ilişkinin bir süre daha
+      yaşanılır olmayacağına işaret eder.Bahçeler (Ters / Düz fark etmez ) +
+      Yelkenli (Düz ) ise ozaman güzel hayırlı bir ilişkinin kapıda olduğunu
+      haber verir.İlişkisi olan danışanda ; ilişkisinin tazelikle güzellikle
+      devam edeceğinin habercisidir. ancak olumsuz anlamları da
+      mevcuttur.Bahçeler (Ters ) + Yatağan (Düz) olduğunda ilişkinin sona
+      ereceğinin habercisidir.
   anahtar:
     name: 열쇠
-    general: 열쇠는 숨겨진 비밀이 풀리고, 마음을 괴롭히는 물음표가 무엇이든 해결책을 찾게 될 것임을 나타냅니다. 우주로부터 신성한 사랑의
-      보상을 받아 미래를 더욱 낙관적으로 바라보고 발전을 경험하게 될 것을 의미합니다.
-    upright: 관계가 없는 고객; 자신을 고립시키는 심리학에서 벗어나게 될 것입니다. 당신은 친구의 서클을 얻게 될 것입니다. 당신의 질문이
-      사랑에 관한 것이고 열쇠가 마음과 함께 온다면, 그것은 당신이 아름다운 관계의 문을 열 것임을 나타냅니다. 다시 말하면, 다른
-      해석으로 열쇠가 문, 길, 범선과 함께 오면 모든 야망을 달성하고 매우 아름다운 삶을 사는 것을 의미합니다. 연애중인 내담자에게 오는
-      열쇠는 그 사람이 자신이 매우 원하는 문제를 긍정적인 방식으로 추진할 것임을 나타냅니다. 열쇠+결혼반지가 이 사람과 함께 오면 결혼
-      프러포즈를 받을 것이라는 좋은 소식을 전한다. 삶의 의미, 삶의 근원을 찾게 되고 숨겨진 비밀이 모두 드러나게 될 것을 의미합니다.
-      이는 영혼이 자유로워지고 그 사람이 자신을 특별하게 만들 것임을 나타냅니다. 그 사람은 중요한 비밀을 스스로 배우면 번영을 누릴
-      것입니다. 자신이 찾고 있는 질문에 대한 답을 다른 방향에서 찾을 것임을 나타냅니다. 또한 우리가 영적인 풍요를 이룰 것이라는 좋은
-      소식도 줍니다.
-    reversed: 삶으로부터의 외로움과 소외감은 완전한 내향성과 외부 세계로부터 자신을 고립시키는 것을 나타냅니다. 연애중인 내담자는 한동안
-      자신의 기대를 달성하지 못하고 자신의 내면 세계로 물러나게 될 것이다. Valide + 역방향 키는 운명의 폐쇄성을 나타냅니다.
-      6.17) 이 책은 삶의 의미를 찾지 못하고, 끊임없이 죄책감을 느끼며, 잠재의식 속에 간직하고 있는 부정적인 생각들로 자신을
-      부담시키면 영적으로 풍요로워지지 못한다는 것을 나타냅니다. 그 사람은 자신의 삶을 뒤흔들고 깊은 상처를 입힐 고통스러운 비밀에
-      직면해야 할 것입니다. 그는 약하고 무방비 상태라고 느낄 것입니다. 이러한 모든 가능한 문제는 그 사람의 경험이 될 것이며 평생 동안
-      그를 인도할 것입니다. 사실, 부정적인 태도는 그 사람이 실제로 어떤 방향으로 움직여야 하는지를 가능하게 해줄 것입니다.
+    general: 해결책과 새로운 시작. 비밀이 밝혀짐.
+    upright: İlişkisi olmayan danışan ; Kendi kendinizi yanlızlaştırdığınız
+      psikolojiden uzaklaşacaksınız.Dost çevresi edineceksiniz.Eğer sorunuz aşk
+      ile ilgiliyse anahtar kalp ile beraberinde gelmişse , ozaman güzel bir
+      ilişkinin kapısını aralayacağınıza işaret eder. Yine farklı bir açılım ile
+      anahtar , kapı, yol ve yelkenli ile beraberinde geldiğinde tüm emellere
+      kavuşmaya , çok güzel bir hayat yaşamaya işaret eder.İlişki yaşayan
+      danışanda gelen anahtar , kişinin beraberliğinde çok istediği bir konuyu
+      kendi lehine olumlu yönde ilerleteceğine işaret eder.Anahtar + alyans bu
+      kişi için beraberinde gelmişse , ozaman bir evlenme teklifi alacağının
+      müjdesini sunar. Hayatın anlamını , yaşamın kaynağını bulmaya , gizli
+      kalmış tüm sırların açığa çıkmasına.Ruhun özgür kalacağına ve kişinin
+      kendisini özel kılacağına işaret eder.Kişi kendisi için mühim bir sırrı
+      öğrenerek ,refaha çıkacaktır.Aradığı soruların yanıtlarını , farklı bir
+      yönde bulacağına işaret eder. Manevi yönden zenginleşmeye ulaşacağının da
+      müjdesini bize sunar.
+    reversed: Yanlızlık ve yaşamdan uzaklaşma söz konusu , tamamen içe kapanma , dış
+      dünyaya karşı kendisini soyutlamaya işaret eder.İlişki yaşayan danışan ,
+      bir süre daha beklentilerini elde edemeyecek , kendi iç dünyasına
+      çekilecektir.Valide + ters anahtar , kısmet kapalılığına işaret eder. 6.17
+      ) Kitap Hayatın anlamını bulamamaya , kendisini sürekli olarak suçluluk
+      psikolojisinde hissetmeye , bilinç altında muhafaza ettiği olumsuz
+      düşünceleri kendisine yük ettiği takdirde , manevi yönden zenginleşememeye
+      işaret eder. Kişi hayatını sarsacak , onu derinden yaralayacak , acı bir
+      sır ile yüzleşmek zorunda kalacaktır.Kendisini güçsüz ve savunmasız
+      hissedecektir.Tüm bu yaşanması muhtemel sıkıntılar , kişi için birer
+      tecrübe olacak , hayatı boyunca ona yol gösterecektir.Aslında
+      olumsuzluklar , kişinin kendisinin gerçekte ne yönde ilerlemesi
+      gerektiğine olanak sağlayacaktır.
   baykus:
     name: 올빼미
-    general: 설명이 없습니다.
-    upright: 새로운 아이디어에 대한 지혜, 지능, 경험, 영감이 문제입니다. 자연, 예술, 과학, 문학과 접촉하는 성숙함의 상징입니다.
-      새로운 추구를 획득합니다. 경험한 모든 것이 좋든 나쁘든 그 사람을 경험있고 현명하게 만들 것입니다. 그 사람은 자신이 믿는 모든
-      진실을 확인합니다. 올빼미는 올바른 지식 학습과 올바른 방향으로 발음을 나타냅니다.
-    reversed: 자신이 알고 있다고 생각하는 문제가 틀렸다는 점을 강조합니다. 편견에 사로잡혀 있음을 알려줍니다. 그것은 당신이 잘못된 판단을
-      내리고 있으며 그 결과로 당신이 슬퍼하게 될 것임을 알려줍니다. Inverted Owl + Turan이 합치면 무례하고 무례하며
-      교양없는 사람을 의미합니다. (투란을 예시로 들었습니다. 그 자리에 우르미아나 사아가 있을 수도 있습니다. 제가 언급한 예시처럼 두
-      카드를 섞어서 의미를 표현한 것입니다.)
+    general: 지혜, 밤에 오는 소식 또는 주위를 관찰할 시간.
+    upright: Bilgelik , akıl ,tecrübe,yeni fikirler için ilham söz konusu.Olgunluğun
+      sembolü , doğa , sanat , bilim , edebiyat ile iç içe olma.Yeni uğraşlar
+      edinme.Yaşanılan herşey ama iyi ama kötü kişiyi tecrübeli ve bilge
+      kılacaktır.Kişi inandığı doğrular ne ise , hepsini doğrular.Baykuş ,
+      bilginin doğru öğrenilmesini ve doğru yönde telafuz edilmesini ifade eder.
+    reversed: Bildiğinizi sandığınız konuların yanlış olduğunu vurgular.Ön yargılı
+      olmayı anlatır.Yanlış bir yargı içinde olduğunuzu ve bunun sonucunda
+      üzüntü yaşayacağınızı söyler.Ters Baykuş + Turan yan yana gelirse , kaba ,
+      saba , kültürsüz bir kişi demektir.(Turan örnek olarak verilmiştir.onun
+      yerinde Urmia veya Saah ta olabilir; Anlam iki kart harmanlanarak
+      belirtiğim örnekteki gibi ifade edilir.)
   mezar:
     name: 무덤
-    general: 무덤은 죽음을 의미합니다. 그것은 실제 죽음이나 비유적인 죽음의 의미를 담고 있습니다. 또한 나쁜 운명의 끝이나 환자의 사망에
-      대한 정보도 제공합니다.
-    upright: "모든 일이 끝나게 될 것을 의미합니다. 무덤 카드와 나머지 4장의 카드가 음수이면(예:
-      Valide+Yatağan+Reverse Road) 이는 수명이 끝났음을 의미합니다. 그것은 육체의 크기가 변하고 영혼이 육체를 떠날
-      것이라고 말합니다. 동시에, 무덤은 우리가 겪고 있는 문제가 있으면 그 문제에 직면하는 것을 두려워하고 용기가 없다는 것을
-      의미합니다."
-    reversed: 아픈 사람의 거꾸로 된 무덤은 죽음을 의미합니다. 이별을 겪고 있는 고객의 거꾸로 된 무덤은 이별을 받아들일 수 없음을
-      나타냅니다. 그 사람은 여전히 ​​그 관계에 있고 혁신을 거부합니다.
+    general: 종말, 큰 변화, 한 시대의 끝과 새로운 시대의 시작.
+    upright: Herşeyin sonunun geleceğini ifade eder.Mezar kartı ile diğer dört
+      kartta olumsuz ise örneğin , valide+yatağan+ters yol yaşamın sona erişini
+      ifade eder.Bedenin boyut değiştireceğine , ruhun bedeni terk edeceğini
+      anlatır.Aynı zamanda Mezar , yaşadığımız bir sorun bir problem var ise , o
+      sorundan yüzleşmekte korktuğumuzu cesaretimizin olmadığını da ifade eder.
+    reversed: Hasta bir kişide gelen ters mezar ölümüne işaret eder.Ayrılık yaşayan
+      danışanda gelen ters mezar , ayrılığın kabullenemediğini anlatır.Kişi hala
+      o ilişkidedir.Ve yenilikleri red eder haldedir.
   yelkenli:
-    name: 요트
-    general: 범선은 계획된 여행이나 계획되지 않은 여행의 선구자입니다.
-    upright: 이는 우리의 삶에 영향을 미치는 새로운 경험, 새로운 생활 공간, 아름다움을 나타냅니다. 성공을 가져다주는 행운과 기회를
-      나타냅니다. 이는 또한 한 곳에서 다른 곳으로의 여행의 전조이기도 합니다.
-    reversed: 활동이 없고 정체된 생활이 사람에게 부정적인 영향을 미친다는 것을 표현한 것이다. 기대했던 계획은 실현되지 않을 것임을
-      강조한다. 그 사람이 여행을 가려고 하면 한동안 여행을 할 수 없을 것이라고 말합니다. 또한 불운, 나쁜 시도 및 실망을 나타냅니다.
+    name: 범선
+    general: 여정, 흐름을 타는 것, 멀리서 온 소식.
+    upright: Yeni tecrübeler , yeni yaşam alanı ,güzelliklerin hayatımızı etkisi
+      altına almasını ifade eder.İyi şansa ve başarı getiren fırsatlara işaret
+      eder.Bir yerden bir yere yapılacak olan yolculuğun da habercisidir.
+    reversed: Hareketsizlik ve durgun giden bir hayatın kişiyi olumsuz etkilediğini
+      ifade eder.Beklenilen planların gerçekleşmeyeceğini vurgular.Kişi bir
+      yolculuk yapma niyetindeyse bir süre daha bu yolculuğu yapamayacağını
+      söyler.Kötü şans , kötü girişimler , hayal kırıklıklarını da temsil eder.
   nil_nehri:
     name: 나일강
-    general: 설명이 없습니다.
-    upright: 과거부터 현재까지 행한 일은 결실을 맺었고 그 사람은 반드시 그에 대한 보상을 받을 것입니다. 지금 목표로 삼는 것이 무엇이든
-      미래에는 반드시 그 열매를 거둘 것입니다. 그 사람은 직업, 사랑, 새로운 시작 측면에서 자신의 목표를 달성할 것입니다. 실제로
-      나일강이 사랑 확장의 상대와 함께 온다면, 그 사람은 사랑에 빠진 부유하고 성공한 사람을 만나 결혼하거나, 또는 이러한 특성을 가진
-      사람과 진지한 관계의 문을 열게 될 것입니다.
-    reversed: 이는 자신의 직업생활을 매우 중시하고 일 중독적인 성격을 갖고 있음을 나타냅니다. 나일강의 반대 방향은 사랑, 사업, 직업
-      생활에서 성공하지 못하는 상황이 있음을 나타냅니다. 그 사람은 모든 면에서 실망하게 될 것이며 자신의 노력에 대한 보상을 받을 수
-      없게 될 것입니다.
+    general: 풍요, 흐름, 길고 생산적인 과정을 나타냅니다.
+    upright: Emek çaba sarf edilen bir konuda emeklerin karşılığı
+      alınacaktır.Geçmişten bugüne dair yapılan çalışmalar verimli olmuştur ve
+      kişi bunun karşılığını elbette alacaktır.Şuanda hedeflenen ne ise ,
+      gelecekte mutlaka meyvelerini alacaktır.Kariyer , aşk , yeni başlangıçlar
+      hususunda kişi emellerine ulaşacaktır.Hatta Nil nehri aşk açılımında bir
+      partner yanında gelmişse şayet , kişi aşkta zengin , başarılı bir kişi ile
+      tanışma ve veya evlenme , veya bu özelliklerdeki bir kişi ile ciddi bir
+      beraberliğin kapısını da aralayacaktır.
+    reversed: Kişinin , kariyer yaşantısına çok önem verdiğini ,iş kolik bir
+      yapısının olduğunu ifade eder.Ters gelen nil nehri , aşk , iş ,kariyer
+      yaşantısında başarısız durumlar yaşanılacağını ifade eder.Kişi her yönü
+      ile hayal kırıklığı yaşayacaktır ve çabalarının karşılığını alamayacaktır.
   afyon:
     name: 아편
-    general: 설명이 없습니다.
-    upright: 온갖 심한 고통과 슬픔이 잊혀지게 될 것을 의미합니다. 그 사람은 오늘에 이르기까지 많은 고통과 슬픔을 겪었습니다. 하지만 그는
-      이 모든 것을 극복하고 좋은 발전을 경험하게 될 것이다. 그는 평화로운 날들에 인사할 것입니다. 시간이 만물의 약이라는 아편은 모든
-      어려움이 극복되고 슬픔이 사라지며 사람을 행복하게 해준다는 뜻입니다. 아편이 파트너를 나타내는 카드와 함께 제공되면 이 사람이 우연
-      게임, 알코올 및 중독성 물질에 중독되어 있음을 나타냅니다. 마음과 아편이 함께 오면 사랑이 강하고 어떤 힘도 사랑에 파괴를 일으키지
-      않는다는 뜻입니다.
-    reversed: 과거부터 현재까지 계속되는 고통은 그 사람의 마음과 마음에서 지워지지 않을 것입니다. 아무리 과거를 잊으려고 애쓰더라도
-      트라우마는 사라지지 않습니다. 그는 새로운 관계를 용납하지 못할 것입니다. 또는 관계에서 그는 자신의 과거를 직시해야 하므로 관계에
-      문제가 발생할 것입니다. 연애 중이 아닌 내담자에게서 보이는 아피온은 과거에 겪었던 사랑의 고통을 묘사한다. 이러한 이유로 그 사람은
-      새로운 과정에 대한 준비가 되어 있지 않다고 느낍니다. 인물을 나타내는 카드 옆에 있는 거꾸로 된 아편은 그 사람이 유해한 물질에
-      대한 경향이 있기 때문에 스스로 올바른 길을 찾을 수 없음을 나타냅니다. 그를 지도하는 경향은 결코 만들어져서는 안 된다. 그 사람이
-      당신의 제안에 따라 행동할 것이라고 기대할 수는 없습니다. 현재 관찰되는 상황에 대해 명상이 권장될 수 있습니다.
+    general: 중독, 눈을 멀게 하는 환상, 해로운 관계.
+    upright: Her türlü kötü acının kederin unutulacağına işaret eder.Kişi bugünlere
+      gelmek için çok fazla eziyet , keder yaşamıştır.Ama tüm bunların
+      üstesinden gelecek , güzel gelişmeler yaşayacaktır.Huzur dolu günlere
+      merhaba diyecektir.Zaman herşeyin ilacıdır ifadesini belirten afyon tüm
+      zorlukların aşılacağını , üzüntülerin geride kalarak , kişiyi mutlu
+      kılacağını belirtir.Afyon partneri temsil eden kartla birlikte gelirse ,
+      bu kişinin , şans oyunları , alkol , bağımlılık yaratan maddelerle ilgili
+      kullanımı olduğunu ifade eder.kalp ve afyon beraberinde gelirse , aşkın
+      güçlü olduğu ve hiçbir kuvvetin aşkta yıkıma yol açmayacağını ifade eder.
+    reversed: Geçmişten bugüne dair devam eden acılar , kişinin zihninden ve
+      kalbinden silinmeyecektir.Geçmişi unutmak adına ne kadar mücadele etse de
+      kişi , trawmalarından kurtulamayacaktır.Karşısına çıkan yeni ilişkilere
+      sıcak bakamayacaktır .Veya yaşanılan bir birliktelikte , geçmişi ile
+      yüzleşmek zorunda kalacak , bu nedenle ilişkide sorunlar
+      yaşanılacaktır.İlişkisi olmayan danışanda görülen Afyon , geçmişte
+      yaşanmış bir aşk acısını anlatmaktadır ; kişi bu nedenle yeni süreçlere
+      kendisini hazır hissetmemektedir.Kişiyi temsil eden kartın yanında gelen
+      Ters Afyon , kişinin zararlı maddelere eğilimi olduğundan kendisi için ,
+      doğru yolu bulamayacağını belirtir.Asla onu yönlendirecek eğilimlerde
+      bulunulmamalıdır; kişinin sizin önerilerineze uygun hareket etmesini
+      bekleyemezsiniz .Mevcut gözlemlenen duruma yönelik , meditasyon 
+      önerilebilir.
   kizCocugu:
-    name: 여자아이
-    general: 설명이 없습니다.
-    upright: 이는 그 사람 주변에 새로운 팬이 있다는 것을 나타냅니다. 연애 중인 의뢰인에게 있어서는 현재 연애 중인 사람이 장래 배우자
-      후보가 될 수도 있음을 나타냅니다. 결혼한 고객에게는 아이가 생길 징조입니다. 또한 그 사람은 자신이 사랑하고 소중히 여기는 사람을
-      보호한다는 것을 알려줍니다. 그 사람은 아이일 수도 있고 그가 소중히 여기는 다른 사람일 수도 있습니다. 그 사람이 카드를 가지고
-      오면 그 사람이 결혼했고 행복하다는 것을 나타냅니다. 의뢰인을 대표하여 집에 들어오면 자비롭고 성실함을 상징합니다.
-    reversed: 주변 사람들이 그 사람을 좋아하지 않거나 평가하지 않는다는 것을 나타냅니다. 결혼한 내담자에게 보이는 거꾸로 된 소녀는
-      예상되는 임신으로 인해 한동안 아이를 가질 수 없음을 나타냅니다. 자신이 사랑하고 아끼던 사람들에게 실망을 안겨줄 것을 상징합니다.
+    name: 어린 소녀
+    general: 순수함, 새로운 시작 또는 젊은 에너지.
+    upright: Kişinin etrafında yeni hayranlarının olduğuna işaret eder.İlişkisi olan
+      danışanda beraberlik yaşadığı kişinin gelecekte de eş adayı olabileceğini
+      temsil eder.Evli olan danışanda ise , bir çocuk sahibi olmayı
+      müjdeler.Ayrıca kişinin etrafında sevip değer verdiği bir kişiyi
+      koruduğunu da anlatır.Bu bir çocuğu olabilir veya değer verdiği başka bir
+      kişi de olabilir.Kişi kartları ile beraberinde gelirse kız çocuğu ozamanda
+      kişinin evli , mutlu olduğunu gösterir.Danışanı temsil eden hanede gelirse
+      , merhametli oluşu ve vicdanlı oluşu temsil eder.
+    reversed: Kişinin çevresi tarafından beğenilmediğini , takdir görmediğini ifade
+      eder.Evli danışanda görülen Ters Kız çocuğu , bir süre daha beklenen
+      gebeliğe ilişkin , çocuk sahibi olamayacağını anlatır.Sevip değer verdiği
+      kişilerle ilgili hayal kırıklığı yaşanılacağını sembolize eder.
   fareler:
     name: 쥐
-    general: 설명이 없습니다.
-    upright: 이는 귀하가 문제로 인해 부당한 대우를 받았으며 해당 상황에 대한 정당한 보상을 받을 수 없음을 나타냅니다. 그 사람의 손실은
-      그가 생각하는 것 이상입니다. 이러한 손실은 물질적인 손실일 수도 있고 영적인 손실과 관련될 수도 있습니다. 고객을 대표하는 두 번째
-      또는 세 번째 집에 쥐가 나타나면 그 사람은 손실을 보상합니다. 또한 자신의 비밀을 신뢰하는 사람에게 누설해서는 안 되며, 물질적
-      가치가 있는 자신의 소지품을 보호해야 한다는 경고도 제공합니다.
-    reversed: 어떤 문제로 인해 부당한 대우를 받은 사람은 그에 따른 정당한 처벌을 받게 됩니다. 그것은 그 사람의 물질적, 도덕적 손실이
-      그가 생각하는 것만큼 그를 흔들지 않을 것임을 나타냅니다. 가까운 친구나 애인이 있다면 그 사람에 대한 무조건적인 신뢰를 나타냅니다.
-      그러나 생쥐 + 뱀 + 다스타와 같은 카드가 함께 제공되면 신뢰해서는 안된다는 것을 나타냅니다. 더욱이 쥐는 무조건적인 정의 표현의
-      선구자입니다.
+    general: 손실, 내면을 갉아먹는 불안 및 스트레스.
+    upright: Yaşanılan bir konu neticesinde haksızlığa uğranıldığını , durumla
+      ilgili hakkını alamadığını işaret eder.Kişinin kaybı düşündüğünden
+      fazladır ; bu kayıp maddi olabileceği gibi , manevi bir kayıpla da ilgili
+      olabilir.Fareler danışanı temsil eden ikinci veya üçüncü hanede çıkmış ise
+      , ozaman da kişi kaybını telafi edecektir.Kişinin güvendiği bir kişiye
+      sırrını anlatmamasına maddi değeri olan eşyalarını , koruma altına
+      almasına dair de uyarılar vermektedir.
+    reversed: Yaşanılan bir konu neticesinde haksızlığa uğrayan kişi hakkını
+      alacaktır.Kişinin maddi ve manevi kayıplarının düşündüğü kadar kendisini
+      sarsmayacağını belirtir.Kişinin yakın bir dostu veya sevgilisi varsa şayet
+      ona koşulsuz güveni temsil eder.Ancak fareler + yılan + dastar gibi
+      kartlarla etkileşimli gelirse ozaman güvenmemenizi ifade eder.Ayrıca
+      fareler Adaletin koşulsuz bir şekilde tecelli edeceğinin de habercisidir.
   kapi:
     name: 문
-    general: 설명이 없습니다.
-    upright: "존경과 명성을 얻게 될 것을 의미합니다. 그 사람은 자신이 애쓰는 분야에서 성공을 거둘 것이다. 또한 사랑, 재정, 돈과
-      관련된 문제 유형(예: 문 + 시간)에 따라 문 카드는 사람이 예상되는 도움을 제공할 것임을 나타냅니다. 연애를 기다리고 있는
-      사람에게는 좋은 기회가 찾아올 징조입니다."
-    reversed: 사람은 인생에서 다양한 문제와 문제에 직면하게 될 것이지만 절망해서는 안됩니다. 어렵더라도 그는 여전히 존경과 명성을 얻을
-      것이기 때문입니다. Reverse Door + Yatağan 등과 같은 부정적인 카드가 함께 제공되면 운이 부정적인 방향으로 움직이고
-      그 사람은 자신의 기대를 달성할 수 없게 됩니다.
+    general: 기회, 열리는 새로운 길 또는 내려야 할 결정.
+    upright: Saygı görmeye , itibar kazanmaya işaret eder.Kişi mücadele ettiği bir
+      alanda başarı elde edecektir.Ayrıca kapı + saah örneğine yönelik , aşk ile
+      ilgili , finans , para sorunun çeşidine göre , kapı kartı , beklenilen
+      yardımın bir kişi tarafından sunulacağına işaret eder.Aşk ilişkisi
+      bekleyenler , güzel bir fırsat ile tanışacaklarına işaret eder.
+    reversed: Kişi hayatında çeşitli sorunlarla , problemlerle yüzleşecektir , ancak
+      yine de umutsuzluğa kapılmamalıdır.Çünkü zor da olsa , yine saygınlık ,
+      itibar kazanacaktır.Ters Kapı + Yatağan v.b olumsuz kartlarla beraberinde
+      gelirse ozaman şans olumsuz yönde ilerleyecek , kişi beklentilerine erişim
+      sağlayamayacaktır.
   kale:
-    name: 케일
-    general: 설명이 없습니다.
-    upright: 케일은 이별을 경험한 내담자와의 화해를 의미한다. 기혼 고객의 경우 이는 결혼 생활이 확고한 기반을 갖추고 있음을 나타냅니다.
-      관계가 없는 내담자에게는 강력하고 견고한 관계로 들어서게 될 것임을 나타냅니다. 성은 인생이 순조롭게, 평화롭고 평온하게 지나가고
-      장수할 것임을 나타냅니다.
-    reversed: 케일은 별거를 경험한 내담자에게 평화가 없다는 것을 의미합니다. 결혼한 내담자의 경우 이는 결혼 생활이 탄탄하지 않다는 것을
-      나타냅니다. 관계가 없는 고객의 경우 한동안 관계가 없음을 나타냅니다. Inverted Castle은 삶이 문제가 많고 불안하며
-      논쟁으로 가득 차고 건강이 악화되고 재정 문제가 약화됨을 나타냅니다.
+    name: 성
+    general: 안전, 견고한 구조, 외부 요인으로부터 보호됨.
+    upright: Kale , Ayrılık yaşamış bir danışanda , barışmaya ; Evli olan danışanda
+      , evliliğinin sağlam zemin üzerinde olduğuna işaret eder.Hiç ilişkisi
+      olmayan danışanda , güçlü sağlam bir beraberliğe adım atacağına işaret
+      eder.Kale , hayatın sorunsuz , huzur ve sükunet içerisinde geçmesine ve
+      uzun bir ömür sahibi olmaya işaret eder.
+    reversed: Kale , Ayrılık yaşamış bir danışanda , barışın olmamasına ; Evli olan
+      danışanda , evliliğinin sağlam zemin üzerinde olmadığına işaret eder.Hiç
+      ilişkisi olmayan danışanda , bir süre daha ilişkisinin olmayacağına işaret
+      eder.Ters Kale , hayatın sorunlu , huzursuz ve tartışmalar  içerisinde
+      geçmesine ve sağlıkta bozulmalara , parasal konularda zayıflaşmaya işaret
+      eder.
   samyeli:
-    name: 사미엘리
-    general: 설명이 없습니다.
-    upright: 삼미엘리는 만남을 이마에 기록한 사람들이 미래에는 함께 모일 것이라고 표현합니다. 또한 우리가 사랑하는 사람, 우리의 운명이
-      누구인지 소식을 듣고 길을 떠나게 될 것임을 의미합니다. 그 사람은 예상치 못한 순간에 보고 싶은 사람을 만나게 된다. 다른 도시에
-      정착할 생각을 갖고 있는 사람들은 이런 생각을 깨닫게 될 것이다. 하지만; 삼미엘리+로드가 함께 나온다면 확실한 움직임을 의미한다.
-      삼미엘리+에메랄드나 다이아몬드가 함께 나오면 상속 등의 문제가 전면에 나타나 뜻밖의 재산이나 금전을 얻게 될 징조입니다.
-    reversed: 거꾸로 된 삼멜리는 운명적인 분리와 분열을 표현합니다. 또한 우리가 만족하지 못할 만남을 묘사하기도 합니다. 이사를 생각하는
-      사람은 편안함이 파괴되는 나쁜 환경으로 이사하게 될 것을 말합니다. 상속을 기다리는 사람들에게는 예상되는 프로세스가 한동안 발전하지
-      않을 것임을 나타냅니다.
+    name: 열풍
+    general: 예기치 않은 사건, 갑작스러운 변화 또는 지나가는 바람.
+    upright: Samyeli , gelecekte karşılaşmaları , alınlarına yazılmış kişilerin bir
+      araya geleceğini ifade eder.Ayrıca çok sevdiğimiz kaderimiz olan kişi ile
+      ilgili bir haber alarak yollara düşeceğimizi de belirtir.Kişi görmek
+      istediği kişi ile ummadığı bir anda karşılaşma yaşayacaktır.Farklı bir
+      şehire yerleşme düşüncesi olan kişiler , bu düşüncelerini
+      gerçekleştirecektir.Ancak ; Samyeli + yol beraberinde gelirse kesin bir
+      taşınmanın habercisidir.Samyeli+zümrüt veya elmas ile beraberinde gelirse
+      , miras gibi konuların gündeme geleceğini , kişinin beklemediği bir mala ,
+      paraya kavuşacağına işaret eder.
+    reversed: Ters samyeli , kadersel ayrılıkları , bölünmeleri ifade eder.Ayrıca
+      hiç memnun olmayacağımız bir karşılaşmayı anlatır.Taşınma düşüncesi olan
+      kişiler , rahatlığının , konforunun bozulacağı kötü bir ortama
+      taşınacaklarını anlatır.Miras bekleyen kişilerde , bir süre daha beklenen
+      süreçlerin gelişmeyeceğini ifade eder.
   kopek:
     name: 개
-    general: 설명이 없습니다.
-    upright: 개는 인간의 가장 친한 친구이다. 충성스럽고 진정한 친구입니다. 친구의 도움과 지원을 받는 것을 나타냅니다. 사람에 대한 정보가
-      학습될 것이라고 경고합니다. 동시에 오랫동안 알고 지낸 사람의 도움을 거절하지 말라고 조언한다.
-    reversed: Inverted Dog는 불성실한 친구입니다. 친구나 연인의 불충실함을 경험한다는 것을 나타냅니다. 동시에 매력적으로 보이는
-      기회를 받아들이지 말라고 조언합니다. 친구처럼 보이는 사람들로 인해 사람들이 피해를 입을 것이라고 경고합니다.
+    general: 충성, 정직한 우정 또는 신뢰할 수 있는 지원.
+    upright: Köpek , insanın en iyi arkadaşıdır.Sadıktır , gerçek bir dosttur .Bir
+      arkadaşın yardımını desteğini almaya işaret eder.Bir kişi hakkında bilgi
+      öğrenileceğine dair uyarı verir.Aynı zamanda , uzun zamandan beri tanınmış
+      bir kişiden gelecek olan herhangi bir yardımı geri çevirmemenizi öğütler.
+    reversed: Ters Köpek , sadakatsiz bir arkadaştır.Bir dostun veya bir sevgilinin
+      sadakatsizliğini yaşamaya işaret eder.Aynı zamanda kişiyr cazip gibi
+      görünen fırsatları kabul etmemesi gerektiğini öğütler.Dost gibi görünen
+      kişilerden zarar görüleceğine dair uyarılar verir.
   ev:
-    name: 에브
-    general: 설명이 없습니다.
-    upright: 집, 행운, 돈, 부와 같은 이득을 나타냅니다. 가족의 행복에 대해 이야기합니다. 깨진 결혼과 관계의 회복에 대해 이야기합니다.
-      가족 문제에 대한 모든 노력이 결실을 맺게 될 것임을 나타냅니다. 그 사람에게 새롭고 상서로운 기회가 생길 것이라는 좋은 소식을
-      전합니다. 좋은 이웃을 의미하기도 합니다. 십자가는 고문, 괴로움, 고통스러운 슬픔을 의미합니다. 육체적, 정신적 고통을 겪게 됨을
-      의미합니다. 자신의 자신감이 흔들리게 될 징조입니다. 본의 아니게 실수를 하고 실수에 직면하는 것을 의미합니다. 사랑에 있어서 불안한
-      상황에 직면하게 됨을 의미합니다. 십자가, 투란 등과 같은 인물 카드가 함께 제공되는 경우; 나타나는 사람을 존경하지도, 싫어하지도
-      않는다는 뜻이다.
-    reversed: 거꾸로 된 집은 불운, 돈 부족, 상속 재산 상실과 같은 상황을 나타냅니다. 가족 내에서 겪는 불행을 묘사합니다. 연애나
-      결혼이 끝날 것임을 강조합니다. 가족 문제로 논쟁이 벌어지고 가족을 위해 노력한 데 대한 보상을 받지 못할 것임을 나타냅니다. 또한
-      나쁜 이웃을 나타냅니다. 6.31) Cross Reverse Cross는 가능한 슬픈 사건이 배경에 남아 있을 것임을 강조합니다. 그
-      사람이 실수를 예측하고 바로잡을 것임을 알려줍니다.
+    name: 집
+    general: 평화, 안전, 가정 생활, 뿌리가 있는 곳.
+    upright: Ev , iyi şans ,para , servet, gibi kazanımları ifade eder.Ailevi
+      mutluluğu anlatır.Dağılmış olan evliliklerin , ilişkilerin toparlanmasını
+      anlatır.Ailesel konularla ilgili tüm çabaların meyvesini alacağına işaret
+      eder.Kişinin karşısına yeni , hayırlı fırsatlar çıkacağına dair müjdeler
+      verir.İyi komşuya da işaret eder. Haç , işkence , azap , acı veren bir
+      üzüntüyü ifade eder.Fiziksel ve psikolojik acı ile perçinlenmeyi
+      anlatır.Kişinin kendine olan güveninin sarsılacağına işaret eder.Hiç
+      istemeden hatalar yapmaya , hatalarla yüzleşmeye.Aşkta güvensizliklerle
+      karşılaşmayı anlatır.Haç , turan v.b kişi kartları ile beraberinde
+      gelirse; görünen kişinin , saygı duymama , hazetmeme anlamlarını taşır.
+    reversed: Ters ev , kötü şans , parasızlık , miras kaybı gibi durumları ifade
+      eder.Aile içerisinde yaşanılan mutsuzlukları anlatır.Bir ilişkinin veya
+      evliliğin sona ereceğini vurgular.Ailesel konularda tartışmaların
+      yaşanılacağını , kişinin ailesi için yaptığı tüm çabaların karşılığını
+      göremeyeceğini anlatır.Kötü komşuya da işaret eder. 6.31 )Haç Ters Haç ,
+      yaşanması muhtemel üzüntülü bir olayın geri planda kalacağını
+      vurgular.Kişinin bir hatasını önceden görüp düzelteceğni anlatır.
   bulutlar:
     name: 구름
-    general: 설명이 없습니다.
-    upright: 구름은 그 사람에게 유익한 발전을 나타냅니다. 흰 구름은 순수하고 진실하며 순수한 사랑의 존재를 표현합니다. 그들은 모든 나쁜
-      트라우마가 배경에 남아 문제를 뒤로 할 것이라는 정보를 제공합니다.
-    reversed: 거꾸로 된 구름은 불행한 사건이 발생했음을 나타냅니다. 자신이 생각하는 상대로부터 사랑을 받지 못하고 있다는 뜻이다. 그것은
-      사랑에 불안감과 불운을 가져옵니다. 이는 사건의 트라우마를 극복할 수 없음을 나타냅니다.
+    general: 혼란, 불확실성 또는 일시적인 문제.
+    upright: Bulutlar , kişi için hayırlı olacak gelişmelere işaret eder.Beyaz
+      bulutlar , saf gerçek masum bir sevginin varlığını anlatır.Sorunları geri
+      planda bırakmaya tüm kötü trawmaların geri planda kalacağına dair bilgiler
+      sunar.
+    reversed: Ters Bulutlar , hayırsız bir olay yaşamaya işaret eder.Kişi düşündüğü
+      partner tarafından sevilmiyor anlamına gelir.Aşkta güvensizlikler , kötü
+      şans getirir.Yaşanılan bir olayın travmalarını atlatamamaya işaret eder.
   ay:
-    name: 오
-    general: 설명이 없습니다.
-    upright: 달은 영적 붕괴를 의미합니다. 이는 눈물, 두려움, 불안이 사람을 불안하게 만들거나 만들 것임을 나타냅니다. 과정이 잘못되고
-      소원이 이루어지지 않으면 그 사람은 극도로 불안하고 불행해질 것입니다. Ay+Ariman, Atart 등의 긍정적인 카드가 함께 오면
-      그 사람은 이런 상황에서 해방될 것이다.
-    reversed: 달은 영적 붕괴를 의미합니다. 눈물은 두려움과 불안이 그 사람을 불안하게 만들거나 만들 것이라는 것을 나타냅니다. 과정이
-      잘못되고 소원이 이루어지지 않으면 그 사람은 극도로 불안하고 불행해질 것입니다. 문+에 아리만, 아타르트 등 긍정적인 카드가 함께
-      나오면 그 사람은 이런 상황에서 해방될 것이다. 직선 전개와 역 전개의 의미는 동일합니다.
+    name: 달
+    general: 직관, 로맨스, 우울함 및 변화하는 기분.
+    upright: Ay , ruhsal bir çöküntüyü ifade eder.Göz yaşı dökme , korku ve
+      endişerin kişiyi huzursuz ettiğini / edeceğini anlatır.Kötü giden bir
+      süreç isteklerin gerçekleşmemiş olması , kişiyi son derece huzursuz ve
+      mutsuz edecektir. Ay + ariman ve atart gibi olumlu kartlarla gelirse ,
+      kişi bu durumdan feraha çıkacaktır.
+    reversed: Ay , ruhsal bir çöküntüyü ifade eder.Göz yaşı dökme , korku ve
+      endişerin kişiyi huzursuz ettiğini / edeceğini anlatır.Kötü giden bir
+      süreç isteklerin gerçekleşmemiş olması , kişiyi son derece huzursuz ve
+      mutsuz edecektir.. Ay + ariman ve atart gibi olumlu kartlarla gelirse ,
+      kişi bu durumdan feraha çıkacaktır düz ve ters açılımda anlamları aynıdır.
   yilan:
     name: 뱀
-    general: 설명이 없습니다.
-    upright: 그 사람은 속임수와 배신의 개념에 직면하게 될 것입니다. 그 사람에게 닥친 이 상황은 친구일 수도 있고, 연인일 수도 있고,
-      가족일 수도 있습니다. 뱀 사람이 카드를 가지고 오면 이 사람을 묘사할 수 있습니다. 예를 들어 스네이크+감하트가 뭉치면 믿을 수
-      없는 파트너에게 배신당했다는 정보가 나온다.
-    reversed: 가까운 친구나 연인이 본의 아니게 배신하거나 속였다는 메시지를 줍니다. 뱀이 거꾸로 있으면 용서를 의미합니다. 그러나 뱀이
-      거꾸로+가로로 서 있으면 용서가 없다는 뜻이다.
+    general: 배신, 숨겨진 적대감, 질투 또는 교활함.
+    upright: Kişi aldatma , ihanet kavramlarıyla yüzleşecektir.Kendisine yapılan bu
+      durum bir dostu veya sevgilisi veya ailesinden birisi de olabilir.Yılan
+      kişi kartları ile beraberinde gelirse , bu kişi tasvir edilebilir.Örneğin
+      , Yılan + Gamhat beraber gelirse , güvenilmez bir partner tarafından
+      ihanete uğrama şeklinde bilgi verilir.
+    reversed: Kişinin yakın arkadaşı veya sevgilisi , istemeden ihanet etmiş ,
+      aldatmış mesajını vermektedir.Yılan ters geldiğinde affedici oluşu ifade
+      eder.Ancak Yılan ters + yatağan düz geldiğinde affedilmeyeceğini ifade
+      eder.
   supurge:
-    name: 대걸레
-    general: 설명이 없습니다.
-    upright: 빗자루는 논쟁, 싸움, 상처를 주는 말을 나타냅니다. 또한 외부 환경이 사람을 본다는 점을 강조합니다. 가족 내에서의 복잡한
-      과정, 사랑 관계의 이별과 불행, 의심으로 인해 흔들리는 관계를 나타냅니다.
-    reversed: 빗자루는 단기적인 논쟁, 싸움, 상처를 주는 말을 나타냅니다. 또한 그 사람은 외부 환경의 시선을 받지만 이 사람들은 그
-      사람에게 관심을 두지 않는다는 점을 강조합니다. 가족의 단기적인 복잡한 과정, 사랑 관계의 단기적인 이별과 불행, 의심으로 흔들리는
-      관계를 나타냅니다.
+    name: 빗자루
+    general: 정화, 논쟁, 삶에서 무언가를 제거해야 할 필요성.
+    upright: Süpürge , tartışma , kavgalar , yaralayan sözlere işaret eder.Ayrıca
+      kişinin dış çevresi tarafından nazara geldiğini vurgular.Aile içerisinde
+      karmaşık süreçlerin yaşanmasına , aşk ilişkilerinde ayrılığa mutsuzluklara
+      , ilişkinin şüpheler yüzünden sarsılmasına işaret eder.
+    reversed: Süpürge , kısa süreli  tartışma , kavgalar , yaralayan sözlere işaret
+      eder.Ayrıca kişinin dış çevresi tarafından nazara geldiğini , ancak bu
+      kişilerin ona nazarları değmeyeceğini vurgular.Aile içerisinde kısa süreli
+      karmaşık süreçlerin yaşanmasına , aşk ilişkilerinde kısa süreki ayrılığa
+      mutsuzluklara , ilişkinin şüpheler yüzünden sarsılmasına işaret eder.
   balik:
     name: 물고기
-    general: 설명이 없습니다.
-    upright: 물고기자리는 선택에 있어 우유부단함과 어려움을 나타냅니다. 결정해야 할 문제와 상관없이 더 이상 기다리지 않고 결정을 내리는
-      조급한 입장을 나타냅니다. 그 사람은 자신이 사는 삶에서 패배하고 싶지 않습니다. 그는 스스로 논리적인 결정을 내리고 싶어하지만,
-      이는 그가 큰 우유부단함을 겪고 있기 때문에 탈출구를 찾을 수 없음을 나타냅니다.
-    reversed: 물고기자리는 우유부단함과 선택이 내려질 것임을 나타냅니다. 참을성 있는 입장은 결정해야 할 문제가 무엇이든 더 이상 기다리지
-      않고 결정이 마무리될 것임을 나타냅니다. 그 사람은 인생에서 패배하지 않을 것입니다. 그는 스스로 논리적인 결정을 내릴 것입니다. 이
-      결정은 그의 희망을 강화하고 삶을 보다 긍정적인 방식으로 바라볼 수 있게 해줄 것입니다. 7. 마글라 마법사의 영혼
+    general: 물질적 이득, 풍요, 행운을 상징.
+    upright: Balık , kararsızlıkları , seçim yapmakta zorlanmayı işaret
+      eder.Sabırsız bir duruşu , karar verilmesi gereken husus ne ise , daha
+      fazla bekletilmeden karar verilmesini işaret eder.Kişi yaşadığı hayatta
+      mağlup olmak istememektedir.Kendisi için mantıklı kararı vermek
+      istemektedir ama büyük bir kararsızlık yaşadığı için çıkış noktası
+      bulamamasını işaret eder.
+    reversed: Balık , kararsızlıkların , seçimlerin yapılacağını işaret eder.Sabırlı
+      bir duruşu , karar verilmesi gereken husus ne ise , daha fazla bekletmeden
+      kararın kesinleşeceğine işaret eder.Kişi yaşadığı hayatta mağlup
+      olmayacaktırKendisi için mantıklı kararı  verecektir.Bu karar , ümitlerini
+      güçlendirecek , hayata daha pozitif bir şekilde bakmasına olanak
+      sağlayacaktır. 7. Maglar Büyücülerin Ruhu
   atart:
-    name: 아타르
-    general: 설명이 없습니다.
-    upright: 그것은 선함과 선함의 정신을 나타냅니다. 우주의 보호를 받는 모습을 묘사하고 있습니다. 결혼을 기다리고 있는 사람에게는 결혼이
-      성사될 징조입니다. 헤어진 커플에게는 이별이 끝날 징조이고, 관계를 기다리는 사람들에게는 큰 기쁨을 가져다 줄 강하고 행복한 결합을
-      의미합니다.
-    reversed: 선함과 선함의 정신을 표현합니다. 우주의 보호를 받는 모습을 묘사하고 있습니다. 결혼을 기다리고 있는 사람에게는 결혼이 성사될
-      징조입니다. 헤어진 커플에게는 이별이 끝날 징조이고, 관계를 기다리는 이들에게는 강하고 행복한 결합이 되어 큰 기쁨을 선사할
-      징조입니다. 역/순방향 확장에서도 그 의미는 동일하며 변경되지 않습니다.
+    name: Atart
+    general: Açıklama bulunamadı.
+    upright: İyinin , iyiliğin ruhunu ifade eder.Evren tarafından koruma altına
+      alınmışlığı anlatır.Evlilik bekleyen kişiler için , evliliğin olacağını ,
+      işaret eder.Ayrılmış olan çiftler için , ayrılığın sona ereceğini , ilişki
+      bekleyen kişiler için güzel büyük sevinç yaşanılacak güçlü , mutlu bir
+      beraberliği işaret eder.
+    reversed: İyinin , iyiliğin ruhunu ifade eder.Evren tarafından koruma altına
+      alınmışlığı anlatır.Evlilik bekleyen kişiler için , evliliğin olacağına ,
+      işaret eder.Ayrılmış olan çiftler için , ayrılığın sona ereceğini , ilişki
+      bekleyen kişiler için güzel, büyük sevinç yaşanılacak güçlü , mutlu bir
+      beraberliğe kavuşmayı işaret eder. Ters / düz açılımda anlamı aynıdır
+      değişmez.
   valide:
-    name: 유효한
-    general: 설명이 없습니다.
-    upright: Valide는 불운, 불행, 불운이 나빠지는 것을 의미합니다. 기대가 긍정적인 방향으로 진행되지 않고 여성이 부정적인 에너지에
-      노출된다는 것은 사랑에 대한 큰 슬픔과 고통을 경험한다는 것을 의미합니다.
-    reversed: Valide는 불운, 불행, 불운이 나빠지는 것을 의미합니다. 기대가 긍정적인 방향으로 진행되지 않고 여성이 부정적인 에너지에
-      노출된다는 것은 사랑에 대한 큰 슬픔과 고통을 경험한다는 것을 의미합니다.
+    name: Valide
+    general: Açıklama bulunamadı.
+    upright: Valide , kötü şans , mutsuzluk , şansın kötüye dönmesi.Beklentilerin
+      olumlu yönde ilerlememesi , bir kadın tarafından olumsuz enerjilere maruz
+      kalma , bu nedenle aşkta büyük hüzün acı keder yaşanıldığını ifade eder.
+    reversed: Valide , kötü şans , mutsuzluk , şansın kötüye dönmesi.Beklentilerin
+      olumlu yönde ilerlememesi , bir kadın tarafından olumsuz enerjilere maruz
+      kalma , bu nedenle aşkta büyük hüzün acı keder yaşanıldığını ifade eder.
+  dervis:
+    name: 수도승
+    general: 지혜, 고독, 인내 및 영적 인도.
+  hac:
+    name: 십자가
+    general: 운명의 장난, 의무 또는 고통스럽지만 필요한 경험.
+  kitap:
+    name: 책
+    general: 비밀, 교육, 알게 될 놀라운 진실.
+  mektup:
+    name: 편지
+    general: 소식, 예상된 메시지 또는 중요한 의사 소통.
+  yatagan:
+    name: 검
+    general: 예리한 결정, 힘, 방어 또는 다가오는 위험.

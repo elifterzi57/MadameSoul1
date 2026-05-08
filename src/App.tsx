@@ -14,9 +14,43 @@ import { Sparkles, Moon, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLe
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-import katinaDeckInfo from './data/deck_info.json';
-
-const KATINA_DECK = katinaDeckInfo;
+const KATINA_DECK = [
+  { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
+  { id: "Ağaç", locKey: "agac", name: "Ağaç", desc: "Köklenme, sağlık, büyüme, aile soyu ve uzun ömür." },
+  { id: "Alyans", locKey: "alyans", name: "Alyans", desc: "Bağlılık, evlilik, ortaklık, ciddi bir tamamlanma." },
+  { id: "Anahtar", locKey: "anahtar", name: "Anahtar", desc: "Çözüm ve yeni başlangıçlar. Sırların açığa çıkması." },
+  { id: "Ay", locKey: "ay", name: "Ay", desc: "Sezgiler, romantizm, melankoli ve değişken ruh halleri." },
+  { id: "Bahçeler", locKey: "bahceler", name: "Bahçeler", desc: "Sosyalleşme, çevre, kalabalıklar ve toplum içindeki yeriniz." },
+  { id: "Balık", locKey: "balik", name: "Balık", desc: "Maddi kazanç, bolluk ve şansın simgesidir." },
+  { id: "Baykuş", locKey: "baykus", name: "Baykuş", desc: "Bilgelik, gece gelen haberler veya etrafı gözlemleme zamanı." },
+  { id: "Bulutlar", locKey: "bulutlar", name: "Bulutlar", desc: "Kafa karışıklığı, belirsizlik veya geçici sıkıntılar." },
+  { id: "Çapa", locKey: "Capa", name: "Çapa", desc: "Güven, sadakat, bir yere veya kişiye bağlılık, umut." },
+  { id: "Çiçekler", locKey: "Cicekler", name: "Çiçekler", desc: "Mutluluk, güzellik, armağanlar ve hoş sürprizler." },
+  { id: "Dağ", locKey: "dag", name: "Dağ", desc: "Engeller, aşılması zor durumlar, gecikmeler ve sınanmalar." },
+  { id: "Derviş", locKey: "dervis", name: "Derviş", desc: "Bilgelik, yalnızlık, sabır ve manevi rehberlik." },
+  { id: "Deve", locKey: "deve", name: "Deve", desc: "Finansal konularda sabır, inatçılık veya uzun bir yolculuk." },
+  { id: "Ev", locKey: "ev", name: "Ev", desc: "Huzur, güvenlik, aile yaşantısı ve köklerin olduğu yer." },
+  { id: "Fareler", locKey: "fareler", name: "Fareler", desc: "Kayıplar, içten içe kemiren endişe ve stres." },
+  { id: "Güneş", locKey: "gunes", name: "Güneş", desc: "Büyük şans, mutluluk, aydınlanma ve başarı." },
+  { id: "Haç", locKey: "hac", name: "Haç", desc: "Kaderin bir cilvesi, zorunluluklar veya acı ama gerekli tecrübeler." },
+  { id: "Kale", locKey: "kale", name: "Kale", desc: "Güvenlik, sağlam yapı, dış etkenlere karşı korunaklı olma." },
+  { id: "Kalp", locKey: "kalp", name: "Kalp", desc: "Büyük aşk, sevgi, şefkat ve duygusal mutluluk." },
+  { id: "Kapı", locKey: "kapi", name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
+  { id: "Kitap", locKey: "kitap", name: "Kitap", desc: "Sırlar, eğitim, öğrenilmesi gereken şaşırtıcı bir gerçek." },
+  { id: "Köpek", locKey: "kopek", name: "Köpek", desc: "Sadakat, dürüst bir dostluk veya güvenilir destek." },
+  { id: "KızÇocuğu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir enerji." },
+  { id: "Mektup", locKey: "mektup", name: "Mektup", desc: "Haberler, beklenen bir mesaj veya önemli bir iletişim." },
+  { id: "Mezar", locKey: "mezar", name: "Mezar", desc: "Bitişler, büyük değişim, bir devrin kapanıp yenisinin başlaması." },
+  { id: "NilNehri", locKey: "nil_nehri", name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
+  { id: "Samyeli", locKey: "samyeli", name: "Samyeli", desc: "Beklenmedik olaylar, ani değişimler veya geçici rüzgarlar." },
+  { id: "Süpürge", locKey: "supurge", name: "Süpürge", desc: "Temizlenme, kavga, hayatından bir şeyleri çıkarma gerekliliği." },
+  { id: "Tilki", locKey: "tilki", name: "Tilki", desc: "Kurnazlık, dikkatli olunması gereken bir fırsatçılık." },
+  { id: "Yatağan", locKey: "yatagan", name: "Yatağan", desc: "Keskin kararlar, güç, savunma veya yaklaşan bir tehlike." },
+  { id: "Yelkenli", locKey: "yelkenli", name: "Yelkenli", desc: "Yolculuklar, akışta kalmak veya uzaktan gelecek bir haber." },
+  { id: "Yol", locKey: "yol", name: "Yol", desc: "Seçimler, ayrılıklar ya da yeni bir hayata doğru atılan adım." },
+  { id: "Yılan", locKey: "yilan", name: "Yılan", desc: "İhanet, gizli düşmanlık, kıskançlık veya sinsilik." },
+  { id: "Yıldızlar", locKey: "yildizlar", name: "Yıldızlar", desc: "Umut, ilham, hayallerin gerçekleşmesi, ruhsal rehberlik." }
+];
 
 type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
 
@@ -28,7 +62,7 @@ type UserInfo = {
   language: Language;
 };
 
-type Card = { id: string; name: string; desc: string };
+type Card = { id: string; locKey: string; name: string; desc: string };
 
 const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
 
@@ -91,10 +125,10 @@ Person's Information:
 - Place of Birth: ${userInfo.birthplace}
 - Relationship Status: ${statusText}
 
-Selected Katina Cards:
-1. Past (Roots of the Past): ${t.cards?.[cards[0].id]?.name || cards[0].name} - ${t.cards?.[cards[0].id]?.general || cards[0].desc}
-2. Present (Current Energy): ${t.cards?.[cards[1].id]?.name || cards[1].name} - ${t.cards?.[cards[1].id]?.general || cards[1].desc}
-3. Future (Probable Path): ${t.cards?.[cards[2].id]?.name || cards[2].name} - ${t.cards?.[cards[2].id]?.general || cards[2].desc}
+Selected Katina Cards (Original Turkish names):
+1. Past (Roots of the Past): ${cards[0].name} - ${cards[0].desc}
+2. Present (Current Energy): ${cards[1].name} - ${cards[1].desc}
+3. Future (Probable Path): ${cards[2].name} - ${cards[2].desc}
 
 Please blend the energy of these 3 cards with the person's birth details and life situation to write a mystical and epic reading.
 Present your reading under 3 main headings:
@@ -502,27 +536,31 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.2, duration: 0.8, type: "spring" }}
-                    className="relative group perspective"
+                    className="relative group perspective h-full"
                   >
-                    <div className="w-full aspect-[2/3] bg-gradient-to-br from-[#1e1332] to-[#0a0512] rounded-2xl border border-[#ecd8a6]/30 shadow-[0_0_30px_rgba(236,216,166,0.05)] flex flex-col items-center justify-center p-6 text-center transform transition-transform duration-500 group-hover:scale-105 group-hover:border-[#ecd8a6]/60 relative overflow-hidden">
+                    <div className="w-full h-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] rounded-2xl border border-[#ecd8a6]/30 shadow-[0_0_30px_rgba(236,216,166,0.05)] flex flex-col items-center justify-between p-6 text-center transform transition-transform duration-500 group-hover:scale-105 group-hover:border-[#ecd8a6]/60 relative overflow-hidden">
                       <div className="absolute inset-0 bg-transparent border-[4px] border-double border-[#ecd8a6]/10 m-2 rounded-xl pointer-events-none" />
-                      <div className="absolute top-6 left-1/2 -translate-x-1/2 text-xs font-serif tracking-widest text-[#ecd8a6]/70 uppercase">
-                        {label}
-                      </div>
-
-                      <div className="absolute top-[3.5rem] w-8 h-px bg-[#ecd8a6]/30" />
                       
-                      <div className="flex-1 flex w-full items-center justify-center mt-4 mb-4 relative min-h-[160px] group/img">
+                      {/* Top Label */}
+                      <div className="relative z-10 w-full flex flex-col items-center justify-start mt-2">
+                        <div className="text-xs font-serif tracking-widest text-[#ecd8a6]/70 uppercase mb-4">
+                          {label}
+                        </div>
+                        <div className="w-8 h-px bg-[#ecd8a6]/30 mb-4" />
+                      </div>
+                      
+                      {/* Image Area */}
+                      <div className="flex w-full items-center justify-center my-4 relative group/img">
                         {!imageError[drawnCards[index]?.id] ? (
                           <motion.div 
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
-                            className="relative w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md overflow-hidden border border-[#ecd8a6]/30 shadow-[0_5px_15px_rgba(0,0,0,0.5)] group-hover/img:shadow-[0_0_35px_rgba(236,216,166,0.25)] group-hover/img:border-[#ecd8a6]/60 transition-all duration-500 ease-out"
+                            className="relative w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] mx-auto rounded-md overflow-hidden border border-[#ecd8a6]/30 shadow-[0_5px_15px_rgba(0,0,0,0.5)] group-hover/img:shadow-[0_0_35px_rgba(236,216,166,0.25)] group-hover/img:border-[#ecd8a6]/60 transition-all duration-500 ease-out"
                           >
                             <img 
                               src={`/cards/${drawnCards[index]?.id}.jpg`} 
-                              alt={t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}
+                              alt={locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}
                               onError={() => setImageError(prev => ({...prev, [drawnCards[index]?.id]: true}))}
                               className="w-full h-full object-cover transition-transform duration-700 ease-out"
                             />
@@ -530,16 +568,17 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover/img:translate-x-full transition-transform duration-1000 ease-in-out z-20 pointer-events-none" />
                           </motion.div>
                         ) : (
-                          <div className="flex flex-col items-center justify-center w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md border border-dashed border-[#ecd8a6]/20 bg-[#ecd8a6]/5 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
+                          <div className="flex flex-col mx-auto items-center justify-center w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md border border-dashed border-[#ecd8a6]/20 bg-[#ecd8a6]/5 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                             <Sparkles className="w-8 h-8 text-[#ecd8a6]/30 mb-2 animate-pulse" />
-                            <span className="text-[10px] text-[#ecd8a6]/40 uppercase tracking-widest font-serif">{t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}</span>
+                            <span className="text-[10px] text-[#ecd8a6]/40 uppercase tracking-widest font-serif">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</span>
                           </div>
                         )}
                       </div>
 
-                      <div className="w-full relative z-10 mb-4">
-                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{t.cards?.[drawnCards[index]?.id]?.name || drawnCards[index]?.name}</h3>
-                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-3 px-2">{t.cards?.[drawnCards[index]?.id]?.general || t.cards?.[drawnCards[index]?.id]?.desc || drawnCards[index]?.desc}</p>
+                      {/* Text Area */}
+                      <div className="w-full relative z-10 mt-auto min-h-[96px] flex flex-col justify-center">
+                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</h3>
+                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-4 px-2">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.general || drawnCards[index]?.desc}</p>
                       </div>
                     </div>
                   </motion.div>
