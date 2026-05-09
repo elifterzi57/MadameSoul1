@@ -1,0 +1,59 @@
+{
+  "entities": {
+    "Message": {
+      "title": "Contact Message",
+      "description": "A message submitted via the Contact Us form.",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "User's full name"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User's email"
+        },
+        "subject": {
+          "type": "string",
+          "description": "Subject or topic of the message"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message itself"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "description": "When the message was submitted"
+        }
+      },
+      "required": ["fullName", "email", "subject", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/messages_en/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in English"
+    },
+    "/messages_tr/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in Turkish"
+    },
+    "/messages_es/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in Spanish"
+    },
+    "/messages_fr/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in French"
+    },
+    "/messages_zh/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in Chinese"
+    },
+    "/messages_ko/{messageId}": {
+      "schema": { "$ref": "Message" },
+      "description": "Stores contact us messages from users in Korean"
+    }
+  }
+}

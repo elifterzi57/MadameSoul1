@@ -1035,3 +1035,14 @@ cards:
   yatagan:
     name: Yatağan
     general: Keskin kararlar, güç, savunma veya yaklaşan bir tehlike.
+contact:
+  title: Bize Ulaşın
+  subtitle: Bizimle iletişime geçmek için aşağıdaki formu doldurabilirsiniz.
+  successTitle: Mesajınız Alındı
+  successSubtitle: En kısa sürede size dönüş yapacağız.
+  fullName: Ad Soyad
+  email: E-posta
+  subject: Konu
+  message: Mesaj
+  send: Gönder
+  footerText: Bize Ulaşın

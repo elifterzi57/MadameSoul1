@@ -1158,3 +1158,14 @@ cards:
   yatagan:
     name: Épée
     general: Décisions tranchantes, pouvoir, défense ou un danger imminent.
+contact:
+  title: Nous Contacter
+  subtitle: Vous pouvez remplir le formulaire ci-dessous pour nous contacter.
+  successTitle: Message Reçu
+  successSubtitle: Nous vous répondrons dans les plus brefs délais.
+  fullName: Nom Complet
+  email: E-mail
+  subject: Sujet
+  message: Message
+  send: Envoyer
+  footerText: Nous Contacter

@@ -1098,3 +1098,14 @@ cards:
   yatagan:
     name: Espada
     general: Decisiones drásticas, poder, defensa o un peligro que se acerca.
+contact:
+  title: Contáctenos
+  subtitle: Puede completar el formulario a continuación para contactarnos.
+  successTitle: Mensaje Recibido
+  successSubtitle: Nos pondremos en contacto con usted lo antes posible.
+  fullName: Nombre Completo
+  email: Correo Electrónico
+  subject: Asunto
+  message: Mensaje
+  send: Enviar
+  footerText: Contáctenos

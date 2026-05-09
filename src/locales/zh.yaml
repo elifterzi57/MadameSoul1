@@ -381,3 +381,14 @@ cards:
   yatagan:
     name: 剣
     general: 決断力、パワー、防御、または迫りくる危険。
+contact:
+  title: 联系我们
+  subtitle: 您可以填写下表联系我们。
+  successTitle: 收到消息
+  successSubtitle: 我们将尽快回复您。
+  fullName: 全名
+  email: 电子邮件
+  subject: 主题
+  message: 消息
+  send: 发送
+  footerText: 联系我们

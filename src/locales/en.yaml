@@ -652,12 +652,12 @@ cards:
     reversed: It indicates that we will experience a great collapse and that our
       work and initiatives will fail.It emphasizes experiencing unhappiness to
       the fullest.Major disasters and ruins will negatively affect us
-      spiritually, and our dreams will disappear.6.07 )Yataghan Yataghan ;It tells
-      about a danger that we may face at any time.However, it also means that it
-      can solve problems that are not going well.If Yataghan + sun come together,
-      it evokes this meaning. It warns us to be careful with people we don't
-      know.If it comes with a positive card, it tells us that this stranger
-      cannot harm us. At the same time, if it comes next to the card
+      spiritually, and our dreams will disappear.6.07 )Yataghan Yataghan ;It
+      tells about a danger that we may face at any time.However, it also means
+      that it can solve problems that are not going well.If Yataghan + sun come
+      together, it evokes this meaning. It warns us to be careful with people we
+      don't know.If it comes with a positive card, it tells us that this
+      stranger cannot harm us. At the same time, if it comes next to the card
       representing a member of the family, it indicates disagreements with
       people such as father, uncle, aunt, brother, etc. We will encounter
       problems that need to be solved in our lives, but we will be able to leave
@@ -1100,3 +1100,14 @@ cards:
   yatagan:
     name: Yataghan (Sword)
     general: Sharp decisions, power, defense, or an approaching danger.
+contact:
+  title: Contact Us
+  subtitle: You can fill out the form below to contact us.
+  successTitle: Message Received
+  successSubtitle: We will get back to you as soon as possible.
+  fullName: Full Name
+  email: Email
+  subject: Subject
+  message: Message
+  send: Send
+  footerText: Contact Us

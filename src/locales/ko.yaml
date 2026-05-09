@@ -653,3 +653,14 @@ cards:
   yatagan:
     name: 검
     general: 예리한 결정, 힘, 방어 또는 다가오는 위험.
+contact:
+  title: 문의하기
+  subtitle: 아래 양식을 작성하여 문의하실 수 있습니다.
+  successTitle: 메시지 수신됨
+  successSubtitle: 가능한 한 빨리 답변해 드리겠습니다.
+  fullName: 성명
+  email: 이메일
+  subject: 주제
+  message: 메시지
+  send: 보내기
+  footerText: 문의하기

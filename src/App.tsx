@@ -4,6 +4,8 @@ import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './lib/firebase';
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
 import es from './locales/es.yaml';
@@ -118,7 +120,22 @@ function App() {
     return saved ? parseInt(saved, 10) : 0;
   });
   const [isStoreOpen, setIsStoreOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({ fullName: '', email: '', subject: '', message: '' });
+  const [isContactSubmitting, setIsContactSubmitting] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
+
+  // Firestore Error Handler
+  const handleFirestoreError = (error: unknown, operationType: string, path: string | null) => {
+    const errInfo = {
+      error: error instanceof Error ? error.message : String(error),
+      operationType,
+      path
+    };
+    console.error('Firestore Error: ', JSON.stringify(errInfo));
+    throw new Error(JSON.stringify(errInfo));
+  };
 
   useEffect(() => {
     localStorage.setItem('madame_soul_moons', moonsCount.toString());
@@ -412,7 +429,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative"
+              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[90vh] overflow-y-auto"
             >
               <div className="absolute top-4 right-4 z-10">
                 <button onClick={() => setIsStoreOpen(false)} className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">
@@ -466,6 +483,119 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     </div>
                   </div>
                 ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Contact Modal */}
+      <AnimatePresence>
+        {isContactOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[90vh] overflow-y-auto"
+            >
+              <div className="absolute top-4 right-4 z-10">
+                <button onClick={() => { setIsContactOpen(false); setContactSuccess(false); }} className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-8 pb-4 border-b border-[#ecd8a6]/10 relative overflow-hidden">
+                <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase mb-2">{locales[userInfo.language].contact?.title || 'Bize Ulaşın'}</h2>
+                <p className="text-[#ecd8a6]/70 text-sm">{locales[userInfo.language].contact?.subtitle || 'Bizimle iletişime geçmek için aşağıdaki formu doldurabilirsiniz.'}</p>
+              </div>
+              
+              <div className="p-6">
+                {contactSuccess ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center mx-auto mb-4 text-[#ecd8a6]">
+                      <Check className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-serif text-[#ecd8a6] mb-2 uppercase tracking-wide">{locales[userInfo.language].contact?.successTitle || 'Mesajınız Alındı'}</h3>
+                    <p className="text-[#ecd8a6]/70">{locales[userInfo.language].contact?.successSubtitle || 'En kısa sürede size dönüş yapacağız.'}</p>
+                  </div>
+                ) : (
+                  <form className="flex flex-col gap-4" onSubmit={async (e) => {
+                    e.preventDefault();
+                    setIsContactSubmitting(true);
+                    try {
+                      await addDoc(collection(db, `messages_${userInfo.language}`), {
+                        ...contactForm,
+                        createdAt: serverTimestamp()
+                      });
+                      setContactSuccess(true);
+                      setContactForm({ fullName: '', email: '', subject: '', message: '' });
+                    } catch (error) {
+                      handleFirestoreError(error, 'create', `messages_${userInfo.language}`);
+                    } finally {
+                      setIsContactSubmitting(false);
+                    }
+                  }}>
+                    <div>
+                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.fullName || 'Ad Soyad'}</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={contactForm.fullName}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, fullName: e.target.value }))}
+                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.email || 'E-posta'}</label>
+                      <input 
+                        type="email" 
+                        required
+                        value={contactForm.email}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.subject || 'Konu'}</label>
+                      <input 
+                        type="text" 
+                        required
+                        value={contactForm.subject}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.message || 'Mesaj'}</label>
+                      <textarea 
+                        required
+                        rows={4}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors resize-none"
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      disabled={isContactSubmitting}
+                      className="w-full mt-2 bg-gradient-to-br from-[#1e1332] to-[#05000a] text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-xl border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] transition-all flex justify-center items-center gap-2 group disabled:opacity-50"
+                    >
+                      {isContactSubmitting ? (
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <>
+                          <span className="font-bold">{locales[userInfo.language].contact?.send || 'Gönder'}</span>
+                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
               </div>
             </motion.div>
           </motion.div>
@@ -555,10 +685,10 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 </h1>
               </div>
               
-              <div className="flex items-center gap-4 mb-4 relative z-10">
-                <div className="h-px w-12 bg-[#ecd8a6]/40" />
-                <p className="text-[#ecd8a6]/80 text-sm md:text-base tracking-[0.4em] uppercase font-serif">Katina Readings</p>
-                <div className="h-px w-12 bg-[#ecd8a6]/40" />
+              <div className="flex items-center justify-center w-full max-w-md gap-3 sm:gap-4 mb-4 relative z-10">
+                <div className="hidden sm:block h-px w-12 bg-[#ecd8a6]/40 flex-1" />
+                <p className="text-[#ecd8a6]/80 text-xs sm:text-sm md:text-base tracking-[0.3em] sm:tracking-[0.4em] uppercase font-serif text-center w-full sm:w-auto">Katina Readings</p>
+                <div className="hidden sm:block h-px w-12 bg-[#ecd8a6]/40 flex-1" />
               </div>
 
               <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-8 sm:mb-12 text-center max-w-md relative z-10 mt-4 sm:mt-6 px-4">
@@ -607,11 +737,11 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
 
                 <button
                   onClick={() => setStep('FORM')}
-                  className="group w-full sm:w-auto justify-center relative px-8 sm:px-10 py-4 flex items-center gap-3 bg-transparent overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_20px_rgba(236,216,166,0.1)] hover:shadow-[0_0_30px_rgba(236,216,166,0.3)] transition-all duration-300"
+                  className="group w-[90%] sm:w-auto max-w-[320px] sm:max-w-none text-sm sm:text-base justify-center relative px-6 sm:px-12 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-wider sm:tracking-widest uppercase rounded-full shadow-[0_0_20px_rgba(236,216,166,0.1)] hover:shadow-[0_0_40px_rgba(236,216,166,0.4)] hover:border-[#ecd8a6]/80 transition-all duration-500"
                 >
-                  <div className="absolute inset-0 bg-[#ecd8a6]/5 group-hover:bg-[#ecd8a6]/10 transition-colors" />
-                  <Sparkles className="w-5 h-5 group-hover:animate-pulse relative z-10" />
-                  <span className="relative z-10">{t.startButton[userInfo.language]}</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                  <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-[#ecd8a6] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 relative z-10 drop-shadow-[0_0_10px_rgba(236,216,166,0.8)]" />
+                  <span className="relative z-10 font-bold">{t.startButton[userInfo.language]}</span>
                 </button>
 
                 {/* Ad Banner */}
@@ -620,7 +750,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     {bannerTranslations.sponsored[userInfo.language]}
                   </div>
                   <div className="p-4 flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col md:flex-row items-center gap-3 text-center md:text-left">
                       <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-black/50 border border-[#ecd8a6]/10 flex items-center justify-center">
                          <img src="/cards/Kalp.png" alt="Katina" className="w-full h-full object-cover opacity-80 mix-blend-luminosity" />
                       </div>
@@ -878,6 +1008,17 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
           )}
         </AnimatePresence>
       </main>
+
+      <footer className="w-full relative z-10 border-t border-[#ecd8a6]/10 py-6 mt-auto">
+        <div className="max-w-4xl mx-auto px-4 flex justify-center">
+          <button
+            onClick={() => setIsContactOpen(true)}
+            className="text-[#ecd8a6] hover:text-[#fff] text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
+          >
+            {locales[userInfo.language].contact?.footerText || 'Bize Ulaşın'}
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
