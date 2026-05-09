@@ -664,3 +664,10 @@ contact:
   message: 메시지
   send: 보내기
   footerText: 문의하기
+promo:
+  live:
+    liveReadingTitle: ✦ 실시간 점술 ✦
+    liveReadingText: |-
+      선명하고 생생한 실시간 점술 경험을 위해
+      Etsy 상점을 방문해 보세요.
+    shopOnEtsy: Etsy에서 쇼핑하기

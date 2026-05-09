@@ -1109,3 +1109,10 @@ contact:
   message: Mensaje
   send: Enviar
   footerText: Contáctenos
+promo:
+  live:
+    liveReadingTitle: ✦ Lectura en Vivo ✦
+    liveReadingText: |-
+      Visite nuestra tienda de Etsy para una
+      experiencia de adivinación en vivo.
+    shopOnEtsy: Comprar en Etsy

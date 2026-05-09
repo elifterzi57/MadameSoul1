@@ -744,24 +744,21 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                   <span className="relative z-10 font-bold">{t.startButton[userInfo.language]}</span>
                 </button>
 
-                {/* Ad Banner */}
+                {/* Ad Banner 1: Amazon */}
                 <div className="w-full max-w-sm md:max-w-md mt-4 relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors">
                   <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
                     {bannerTranslations.sponsored[userInfo.language]}
                   </div>
-                  <div className="p-4 flex flex-col gap-3">
-                    <div className="flex flex-col md:flex-row items-center gap-3 text-center md:text-left">
-                      <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-black/50 border border-[#ecd8a6]/10 flex items-center justify-center">
-                         <img src="/cards/Kalp.png" alt="Katina" className="w-full h-full object-cover opacity-80 mix-blend-luminosity" />
-                      </div>
-                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-tight">
+                  <div className="p-5 flex flex-col gap-4">
+                    <div className="text-center md:text-left">
+                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
                         {bannerTranslations.promoText[userInfo.language]}
                       </p>
                     </div>
-                    <div className="bg-black/40 rounded-xl p-2.5 flex items-center justify-between border border-[#ecd8a6]/10">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[#ecd8a6]/60 text-xs font-serif uppercase tracking-wider">{bannerTranslations.promoCode[userInfo.language]}</span>
-                        <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-widest">KATINA20</span>
+                    <div className="bg-black/40 rounded-xl p-3 flex items-center justify-between border border-[#ecd8a6]/10">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest">{bannerTranslations.promoCode[userInfo.language]}</span>
+                        <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-[0.2em]">KATINA20</span>
                       </div>
                       <button 
                         onClick={(e) => {
@@ -773,17 +770,54 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                         className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
                         title={bannerTranslations.copyCode[userInfo.language]}
                       >
-                        {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                        {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
                       </button>
                     </div>
                     <a 
                       href="https://www.amazon.com/s?k=katina+tarot" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-2.5 rounded-xl text-sm font-serif uppercase tracking-widest transition-colors font-medium border border-[#ecd8a6]/10"
+                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-3 rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
                     >
-                      <ShoppingBag className="w-4 h-4" />
                       {bannerTranslations.shopNow[userInfo.language]}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Ad Banner 2: Etsy Live Reading */}
+                <div className="w-full max-w-sm md:max-w-md mt-4 relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors">
+                  <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                    {bannerTranslations.sponsored[userInfo.language]}
+                  </div>
+                  <div className="p-5 flex flex-col gap-4">
+                    <div className="text-center md:text-left">
+                      <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
+                        {locales[userInfo.language]?.promo?.live?.liveReadingTitle || "Live Session"}
+                      </p>
+                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
+                        {locales[userInfo.language]?.promo?.live?.liveReadingText || 'Visit our Etsy shop for live readings.'}
+                      </p>
+                    </div>
+
+                    {/* Video Demo */}
+                    <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
+                      <video 
+                        src="/ads/Govde.mp4" 
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline
+                        className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                      />
+                    </div>
+
+                    <a 
+                      href="https://www.etsy.com/shop/MadameSoulStudio"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-3 rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
+                    >
+                      {locales[userInfo.language]?.promo?.live?.shopOnEtsy || 'Shop on Etsy'}
                     </a>
                   </div>
                 </div>

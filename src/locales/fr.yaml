@@ -1169,3 +1169,10 @@ contact:
   message: Message
   send: Envoyer
   footerText: Nous Contacter
+promo:
+  live:
+    liveReadingTitle: ✦ Lecture en Direct ✦
+    liveReadingText: |-
+      Visitez notre boutique Etsy pour une
+      expérience de voyance en direct.
+    shopOnEtsy: Acheter sur Etsy

@@ -1111,3 +1111,10 @@ contact:
   message: Message
   send: Send
   footerText: Contact Us
+promo:
+  live:
+    liveReadingTitle: ✦ Live Reading ✦
+    liveReadingText: |-
+      Visit our Etsy shop for a personalized,
+      live fortune telling experience.
+    shopOnEtsy: Shop on Etsy

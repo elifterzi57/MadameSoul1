@@ -1046,3 +1046,10 @@ contact:
   message: Mesaj
   send: Gönder
   footerText: Bize Ulaşın
+promo:
+  live:
+    liveReadingTitle: ✦ Canlı Fal ✦
+    liveReadingText: |-
+      Kişiye özel, canlı fal deneyimi için
+      Etsy mağazamızı ziyaret edebilirsiniz.
+    shopOnEtsy: Etsy'den Sipariş Ver

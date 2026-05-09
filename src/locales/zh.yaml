@@ -392,3 +392,8 @@ contact:
   message: 消息
   send: 发送
   footerText: 联系我们
+promo:
+  live:
+    liveReadingTitle: ✦ 直播占卜 ✦
+    liveReadingText: 访问我们的 Etsy 商店，获得个性化的现场占卜体验。
+    shopOnEtsy: 在 Etsy 上购买
