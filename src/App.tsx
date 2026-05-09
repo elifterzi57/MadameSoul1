@@ -198,16 +198,91 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
       
       const dateStr = new Date().toLocaleDateString(userInfo.language === 'en' ? 'en-US' : userInfo.language === 'tr' ? 'tr-TR' : undefined);
       
-      // Clean up markdown
-      const cleanReading = reading.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/###/g, '<br/><br/>').replace(/##/g, '<br/><br/>').replace(/#/g, '');
+      const formatReading = (text: string) => {
+        let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        formatted = formatted.replace(/^### (.*$)/gim, '<h3 style="margin: 20px 0 10px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h3>');
+        formatted = formatted.replace(/^## (.*$)/gim, '<h2 style="margin: 25px 0 12px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h2>');
+        formatted = formatted.replace(/^# (.*$)/gim, '<h1 style="margin: 30px 0 15px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h1>');
+        
+        let paragraphs = formatted.split(/\n\s*\n/);
+        return paragraphs.map(p => {
+          if (p.trim().startsWith('<h')) return p;
+          
+          let pFormatted = p.split('\n').map(l => {
+             if (l.trim().startsWith('- ') || l.trim().startsWith('* ')) {
+                 return `<div style="margin-left: 20px; display: block;">&bull; ${l.trim().substring(2)}</div>`;
+             }
+             return l;
+          }).join(' '); // Join single newlines with space to prevent broken lines
+          
+          return `<p style="margin: 0 0 15px 0; line-height: 1.6;">${pFormatted}</p>`;
+        }).join('');
+      };
+      
+      const cleanReading = formatReading(reading);
+
+      const cardsHtml = `
+        <div style="display: flex; justify-content: center; gap: 40px; margin: 50px 0 60px 0; position: relative;">
+          ${drawnCards.map(c => `
+            <div style="text-align: center; width: 160px; position: relative; z-index: 2;">
+              <div style="border-radius: 12px; overflow: hidden; border: 2px solid rgba(236,216,166,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(236,216,166,0.15); background-color: #1a1025; height: 240px; display: flex; align-items: center; justify-content: center;">
+                 <img src="${window.location.origin}/cards/${c.id}.png" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
+              </div>
+              <div style="margin-top: 16px; font-family: 'Playfair Display', serif; font-size: 16px; color: #ecd8a6; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                ${locales[userInfo.language].cards?.[c.locKey]?.name || c.name}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      const bannerHtml = `
+        <div style="margin-top: 80px; padding: 40px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(236,216,166,0.3); background: linear-gradient(135deg, rgba(236,216,166,0.05) 0%, rgba(10,5,18,0.8) 100%);">
+           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${bannerTranslations.sponsored[userInfo.language]} ✦</h3>
+           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${bannerTranslations.promoText[userInfo.language]}</p>
+           
+           <div style="display: inline-block; background-color: #05000a; padding: 16px 32px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: bold; color: #ecd8a6; border: 1px dashed rgba(236,216,166,0.5); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+             KATINA20
+           </div>
+           <br/>
+           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${bannerTranslations.shopNow[userInfo.language]} on Amazon</div>
+        </div>
+      `;
 
       container.innerHTML = `
-        <div style="padding: 60px; background-color: #05000a; color: #ecd8a6; font-family: 'Playfair Display', serif; min-height: 1000px;">
-          <div style="text-align: right; font-family: sans-serif; font-size: 14px; opacity: 0.8; margin-bottom: 20px;">${dateStr}</div>
-          <h1 style="text-align: center; font-size: 36px; letter-spacing: 2px; margin-bottom: 15px; color: #ecd8a6;">MADAME SOUL</h1>
-          <h2 style="text-align: center; font-size: 16px; letter-spacing: 4px; opacity: 0.7; margin-bottom: 50px; text-transform: uppercase;">Katina Reading</h2>
-          
-          <div style="font-size: 16px; line-height: 2; white-space: pre-wrap; font-family: sans-serif; color: rgba(236, 216, 166, 0.9); padding-bottom: 20px;">${cleanReading}</div>
+        <div style="padding: 20px; background-color: #05000a; min-height: 1000px; box-sizing: border-box;">
+          <div style="border: 1px solid rgba(236,216,166,0.2); border-radius: 24px; padding: 60px 80px; background: radial-gradient(circle at top center, rgba(30,19,50,0.4) 0%, rgba(5,0,10,1) 50%); position: relative; overflow: hidden;">
+            
+            <!-- Corner Decorations -->
+            <div style="position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
+            <div style="position: absolute; top: 30px; right: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
+            <div style="position: absolute; bottom: 30px; left: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
+            <div style="position: absolute; bottom: 30px; right: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
+
+            <div style="text-align: center; margin-bottom: 50px;">
+              <h1 style="font-size: 48px; letter-spacing: 4px; margin: 0 0 10px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; font-weight: bold; text-shadow: 0 4px 20px rgba(236,216,166,0.2);">MADAME SOUL</h1>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                <div style="height: 1px; width: 60px; background: linear-gradient(90deg, transparent, rgba(236,216,166,0.5));"></div>
+                <h2 style="font-size: 14px; letter-spacing: 6px; margin: 0; color: rgba(236,216,166,0.8); text-transform: uppercase; font-family: 'Playfair Display', serif;">Destiny Reading</h2>
+                <div style="height: 1px; width: 60px; background: linear-gradient(-90deg, transparent, rgba(236,216,166,0.5));"></div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(236,216,166,0.2); border-top: 1px solid rgba(236,216,166,0.2); padding: 15px 0; margin-bottom: 30px; color: rgba(236,216,166,0.7); font-family: sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+              <div>Prepared For: <strong style="color: #ecd8a6;">${userInfo.name}</strong></div>
+              <div>Date: <strong style="color: #ecd8a6;">${dateStr}</strong></div>
+            </div>
+            
+            ${cardsHtml}
+
+            <div style="font-size: 18px; line-height: 1.9; font-family: sans-serif; color: rgba(236, 216, 166, 0.95); padding: 0 20px; text-align: justify;">
+              ${cleanReading}
+            </div>
+
+            ${bannerHtml}
+            
+            <div style="margin-top: 100px;"></div>
+          </div>
         </div>
       `;
       document.body.appendChild(container);
@@ -215,66 +290,44 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
       const canvas = await html2canvas(container, {
         scale: 2,
         backgroundColor: '#05000a',
-        useCORS: true
+        useCORS: true,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // ensure the cloned doc has fonts loaded or wait a bit? 
+          // usually fine
+        }
       });
       
       document.body.removeChild(container);
       
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
-        format: 'a4'
+        format: [canvas.width, canvas.height]
       });
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 0;
-      
       pdf.setFillColor('#05000a');
-      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-      
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.setFillColor('#05000a');
-        pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-      }
-      
-      let finalY = (imgHeight % pdfHeight === 0 ? pdfHeight : imgHeight % pdfHeight);
-      if (finalY + 80 > pdfHeight) {
-        pdf.addPage();
-        pdf.setFillColor('#05000a');
-        pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
-        finalY = 0;
-      }
+      pdf.rect(0, 0, canvas.width, canvas.height, 'F');
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
 
       pdf.setDrawColor(236, 216, 166);
-      pdf.setLineWidth(0.5);
-      pdf.line(pdfWidth / 2 - 100, finalY + 30, pdfWidth / 2 + 100, finalY + 30);
+      pdf.setLineWidth(1);
+      pdf.line(canvas.width / 2 - 200, canvas.height - 150, canvas.width / 2 + 200, canvas.height - 150);
       
-      pdf.setFontSize(10);
+      pdf.setFontSize(20);
       pdf.setTextColor(236, 216, 166);
       
       const t1 = "Instagram: @madamesoulstudio";
       const w1 = pdf.getTextWidth(t1);
-      pdf.text(t1, (pdfWidth - w1) / 2, finalY + 50);
-      pdf.link((pdfWidth - w1) / 2, finalY + 50 - 10, w1, 12, { url: 'https://www.instagram.com/madamesoulstudio/' });
+      pdf.text(t1, (canvas.width - w1) / 2, canvas.height - 100);
+      pdf.link((canvas.width - w1) / 2, canvas.height - 120, w1, 24, { url: 'https://www.instagram.com/madamesoulstudio/' });
 
       const t2 = "Etsy: madamesoulstudio";
       const w2 = pdf.getTextWidth(t2);
-      pdf.text(t2, (pdfWidth - w2) / 2, finalY + 65);
-      pdf.link((pdfWidth - w2) / 2, finalY + 65 - 10, w2, 12, { url: 'https://www.etsy.com/shop/MadameSoulStudio?ref=sh-carousel-1' });
+      pdf.text(t2, (canvas.width - w2) / 2, canvas.height - 70);
+      pdf.link((canvas.width - w2) / 2, canvas.height - 90, w2, 24, { url: 'https://www.etsy.com/shop/MadameSoulStudio?ref=sh-carousel-1' });
 
       pdf.save(`Katina_Reading_${userInfo.name.replace(/\s+/g, '_')}.pdf`);
     } catch (err) {
@@ -779,7 +832,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
-                    className="prose prose-invert prose-amber max-w-none font-serif leading-[2] tracking-wide"
+                    className="prose prose-invert prose-amber max-w-none font-sans leading-[2] tracking-wide"
                   >
                     <div className="markdown-body text-[#ecd8a6]/90">
                       <Markdown>{reading || ""}</Markdown>
