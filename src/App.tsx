@@ -10,46 +10,46 @@ import es from './locales/es.yaml';
 import fr from './locales/fr.yaml';
 import zh from './locales/zh.yaml';
 import ko from './locales/ko.yaml';
-import { Sparkles, Moon, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2 } from 'lucide-react';
+import { Sparkles, Moon, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag } from 'lucide-react';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
-  { id: "Ağaç", locKey: "agac", name: "Ağaç", desc: "Köklenme, sağlık, büyüme, aile soyu ve uzun ömür." },
+  { id: "Agac", locKey: "agac", name: "Ağaç", desc: "Köklenme, sağlık, büyüme, aile soyu ve uzun ömür." },
   { id: "Alyans", locKey: "alyans", name: "Alyans", desc: "Bağlılık, evlilik, ortaklık, ciddi bir tamamlanma." },
   { id: "Anahtar", locKey: "anahtar", name: "Anahtar", desc: "Çözüm ve yeni başlangıçlar. Sırların açığa çıkması." },
   { id: "Ay", locKey: "ay", name: "Ay", desc: "Sezgiler, romantizm, melankoli ve değişken ruh halleri." },
-  { id: "Bahçeler", locKey: "bahceler", name: "Bahçeler", desc: "Sosyalleşme, çevre, kalabalıklar ve toplum içindeki yeriniz." },
-  { id: "Balık", locKey: "balik", name: "Balık", desc: "Maddi kazanç, bolluk ve şansın simgesidir." },
-  { id: "Baykuş", locKey: "baykus", name: "Baykuş", desc: "Bilgelik, gece gelen haberler veya etrafı gözlemleme zamanı." },
+  { id: "Bahceler", locKey: "bahceler", name: "Bahçeler", desc: "Sosyalleşme, çevre, kalabalıklar ve toplum içindeki yeriniz." },
+  { id: "Balik", locKey: "balik", name: "Balık", desc: "Maddi kazanç, bolluk ve şansın simgesidir." },
+  { id: "Baykus", locKey: "baykus", name: "Baykuş", desc: "Bilgelik, gece gelen haberler veya etrafı gözlemleme zamanı." },
   { id: "Bulutlar", locKey: "bulutlar", name: "Bulutlar", desc: "Kafa karışıklığı, belirsizlik veya geçici sıkıntılar." },
-  { id: "Çapa", locKey: "Capa", name: "Çapa", desc: "Güven, sadakat, bir yere veya kişiye bağlılık, umut." },
-  { id: "Çiçekler", locKey: "Cicekler", name: "Çiçekler", desc: "Mutluluk, güzellik, armağanlar ve hoş sürprizler." },
-  { id: "Dağ", locKey: "dag", name: "Dağ", desc: "Engeller, aşılması zor durumlar, gecikmeler ve sınanmalar." },
-  { id: "Derviş", locKey: "dervis", name: "Derviş", desc: "Bilgelik, yalnızlık, sabır ve manevi rehberlik." },
+  { id: "Capa", locKey: "Capa", name: "Çapa", desc: "Güven, sadakat, bir yere veya kişiye bağlılık, umut." },
+  { id: "Cicekler", locKey: "Cicekler", name: "Çiçekler", desc: "Mutluluk, güzellik, armağanlar ve hoş sürprizler." },
+  { id: "Dag", locKey: "dag", name: "Dağ", desc: "Engeller, aşılması zor durumlar, gecikmeler ve sınanmalar." },
+  { id: "Dervis", locKey: "dervis", name: "Derviş", desc: "Bilgelik, yalnızlık, sabır ve manevi rehberlik." },
   { id: "Deve", locKey: "deve", name: "Deve", desc: "Finansal konularda sabır, inatçılık veya uzun bir yolculuk." },
   { id: "Ev", locKey: "ev", name: "Ev", desc: "Huzur, güvenlik, aile yaşantısı ve köklerin olduğu yer." },
   { id: "Fareler", locKey: "fareler", name: "Fareler", desc: "Kayıplar, içten içe kemiren endişe ve stres." },
-  { id: "Güneş", locKey: "gunes", name: "Güneş", desc: "Büyük şans, mutluluk, aydınlanma ve başarı." },
-  { id: "Haç", locKey: "hac", name: "Haç", desc: "Kaderin bir cilvesi, zorunluluklar veya acı ama gerekli tecrübeler." },
+  { id: "Gunes", locKey: "gunes", name: "Güneş", desc: "Büyük şans, mutluluk, aydınlanma ve başarı." },
+  { id: "Hac", locKey: "hac", name: "Haç", desc: "Kaderin bir cilvesi, zorunluluklar veya acı ama gerekli tecrübeler." },
   { id: "Kale", locKey: "kale", name: "Kale", desc: "Güvenlik, sağlam yapı, dış etkenlere karşı korunaklı olma." },
   { id: "Kalp", locKey: "kalp", name: "Kalp", desc: "Büyük aşk, sevgi, şefkat ve duygusal mutluluk." },
-  { id: "Kapı", locKey: "kapi", name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
+  { id: "Kapi", locKey: "kapi", name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
   { id: "Kitap", locKey: "kitap", name: "Kitap", desc: "Sırlar, eğitim, öğrenilmesi gereken şaşırtıcı bir gerçek." },
-  { id: "Köpek", locKey: "kopek", name: "Köpek", desc: "Sadakat, dürüst bir dostluk veya güvenilir destek." },
-  { id: "KızÇocuğu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir enerji." },
+  { id: "Kopek", locKey: "kopek", name: "Köpek", desc: "Sadakat, dürüst bir dostluk veya güvenilir destek." },
+  { id: "KizCocugu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir enerji." },
   { id: "Mektup", locKey: "mektup", name: "Mektup", desc: "Haberler, beklenen bir mesaj veya önemli bir iletişim." },
   { id: "Mezar", locKey: "mezar", name: "Mezar", desc: "Bitişler, büyük değişim, bir devrin kapanıp yenisinin başlaması." },
-  { id: "NilNehri", locKey: "nil_nehri", name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
+  { id: "Nil Nehri", locKey: "nil_nehri", name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
   { id: "Samyeli", locKey: "samyeli", name: "Samyeli", desc: "Beklenmedik olaylar, ani değişimler veya geçici rüzgarlar." },
-  { id: "Süpürge", locKey: "supurge", name: "Süpürge", desc: "Temizlenme, kavga, hayatından bir şeyleri çıkarma gerekliliği." },
+  { id: "Supurge", locKey: "supurge", name: "Süpürge", desc: "Temizlenme, kavga, hayatından bir şeyleri çıkarma gerekliliği." },
   { id: "Tilki", locKey: "tilki", name: "Tilki", desc: "Kurnazlık, dikkatli olunması gereken bir fırsatçılık." },
-  { id: "Yatağan", locKey: "yatagan", name: "Yatağan", desc: "Keskin kararlar, güç, savunma veya yaklaşan bir tehlike." },
+  { id: "Yatagan", locKey: "yatagan", name: "Yatağan", desc: "Keskin kararlar, güç, savunma veya yaklaşan bir tehlike." },
   { id: "Yelkenli", locKey: "yelkenli", name: "Yelkenli", desc: "Yolculuklar, akışta kalmak veya uzaktan gelecek bir haber." },
   { id: "Yol", locKey: "yol", name: "Yol", desc: "Seçimler, ayrılıklar ya da yeni bir hayata doğru atılan adım." },
-  { id: "Yılan", locKey: "yilan", name: "Yılan", desc: "İhanet, gizli düşmanlık, kıskançlık veya sinsilik." },
-  { id: "Yıldızlar", locKey: "yildizlar", name: "Yıldızlar", desc: "Umut, ilham, hayallerin gerçekleşmesi, ruhsal rehberlik." }
+  { id: "Yilan", locKey: "yilan", name: "Yılan", desc: "İhanet, gizli düşmanlık, kıskançlık veya sinsilik." },
+  { id: "Yildizlar", locKey: "yildizlar", name: "Yıldızlar", desc: "Umut, ilham, hayallerin gerçekleşmesi, ruhsal rehberlik." }
 ];
 
 type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
@@ -78,6 +78,24 @@ const t: Record<string, Record<Language, string>> = new Proxy({} as any, {
 
 const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
 
+const storeTranslations: Record<string, Record<Language, string>> = {
+  storeTitle: { en: "Madame's Store", tr: "Madam'ın Mağazası", es: "La Tienda", fr: "La Boutique", zh: "商店", ko: "마담의 상점" },
+  buyMoons: { en: "Buy Moons", tr: "Ay Satın Al", es: "Comprar Lunas", fr: "Acheter des Lunes", zh: "购买月亮", ko: "달 구매하기" },
+  moons: { en: "Moons", tr: "Ay", es: "Lunas", fr: "Lunes", zh: "个月亮", ko: "달" },
+  popular: { en: "POPULAR", tr: "POPÜLER", es: "POPULAR", fr: "POPULAIRE", zh: "热门", ko: "인기" },
+  buy: { en: "Buy", tr: "Satın Al", es: "Comprar", fr: "Acheter", zh: "购买", ko: "구매" },
+  paymentPending: { en: "Payment integration coming soon...", tr: "Ödeme sistemi entegrasyonu yakında...", es: "Pronto el sistema de pago...", fr: "Le système de paiement arrivera bientôt...", zh: "支付系统即将推出...", ko: "결제 시스템 준비 중..." },
+};
+
+const bannerTranslations: Record<string, Record<Language, string>> = {
+  sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
+  promoText: { en: "Get 20% off Katina Tarot Cards on Amazon!", tr: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!", es: "¡Obtenga un 20% de descuento en Cartas de Tarot Katina en Amazon!", fr: "Obtenez 20 % de réduction sur les cartes de tarot Katina sur Amazon !", zh: "在亚马逊上购买 Katina 塔罗牌可享受 20% 折扣！", ko: "아마존에서 카티나 타로 카드를 20% 할인 받으세요!" },
+  promoCode: { en: "Use Code:", tr: "Kod:", es: "Código:", fr: "Code :", zh: "代码：", ko: "코드:" },
+  copyCode: { en: "Copy", tr: "Kopyala", es: "Copiar", fr: "Copier", zh: "复制", ko: "복사" },
+  copied: { en: "Copied!", tr: "Kopyalandı!", es: "¡Copiado!", fr: "Copié !", zh: "已复制！", ko: "복사됨!" },
+  shopNow: { en: "Shop Now", tr: "Hemen Al", es: "Comprar ahora", fr: "Acheter maintenant", zh: "立即购买", ko: "지금 쇼핑" }
+};
+
 const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS_KEYS.map(key => {
   const opt: any = { value: key };
   Object.keys(locales).forEach(l => {
@@ -93,6 +111,18 @@ function App() {
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
+  
+  // Moons / Payment State
+  const [moonsCount, setMoonsCount] = useState<number>(() => {
+    const saved = localStorage.getItem('madame_soul_moons');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [isStoreOpen, setIsStoreOpen] = useState(false);
+  const [bannerCopied, setBannerCopied] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('madame_soul_moons', moonsCount.toString());
+  }, [moonsCount]);
 
   const drawRancomCards = () => {
     const deck = [...KATINA_DECK];
@@ -296,6 +326,99 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
         <div className="absolute inset-0 z-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at center, #ecd8a6 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
+      {/* Top Header - Moons / Store */}
+      {step === 'SPLASH' && (
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end z-[40]"
+        >
+          <div 
+            onClick={() => setIsStoreOpen(true)}
+            className="flex items-center gap-2 bg-[#0a0512]/80 backdrop-blur-md px-4 py-2 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+          >
+            <Moon className="w-4 h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+            <span className="font-serif tracking-widest text-[#ecd8a6] font-semibold">{moonsCount}</span>
+            <div className="w-4 h-4 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center ml-1 group-hover:bg-[#ecd8a6]/20 transition-colors">
+              <Plus className="w-3 h-3 text-[#ecd8a6]" />
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Store Modal */}
+      <AnimatePresence>
+        {isStoreOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative"
+            >
+              <div className="absolute top-4 right-4 z-10">
+                <button onClick={() => setIsStoreOpen(false)} className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-8 text-center pb-6 border-b border-[#ecd8a6]/10 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#ecd8a6]/10 to-transparent" />
+                <Moon className="w-12 h-12 text-[#ecd8a6] mx-auto mb-4 drop-shadow-[0_0_15px_rgba(236,216,166,0.5)]" />
+                <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase">{storeTranslations.storeTitle[userInfo.language] || "Madame's Store"}</h2>
+              </div>
+              
+              <div className="p-6 flex flex-col gap-4">
+                {[
+                  { amount: 3, price: "$2.99", bonus: null },
+                  { amount: 10, price: "$8.99", bonus: "1 Free Moon", popular: true },
+                  { amount: 25, price: "$19.99", bonus: "5 Free Moons" }
+                ].map((pack) => (
+                  <div key={pack.amount} className={`relative flex items-center justify-between p-4 rounded-xl border ${pack.popular ? 'border-[#ecd8a6] bg-[#ecd8a6]/5' : 'border-[#ecd8a6]/20 bg-[#ffffff]/5'} hover:bg-[#ecd8a6]/10 transition-colors cursor-pointer group`} onClick={() => {
+                        // Demo mode logic
+                        alert(storeTranslations.paymentPending[userInfo.language]);
+                        setMoonsCount(prev => prev + pack.amount);
+                        setIsStoreOpen(false);
+                      }}>
+                    
+                    {pack.popular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#ecd8a6] text-[#0a0512] text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
+                        {storeTranslations.popular[userInfo.language]}
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#0a0512] border border-[#ecd8a6]/30 flex items-center justify-center group-hover:border-[#ecd8a6] transition-colors">
+                        <Moon className="w-5 h-5 text-[#ecd8a6]" />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[#ecd8a6] font-serif flex items-baseline gap-1">
+                          <span className="text-xl font-bold">{pack.amount}</span>
+                          <span className="text-sm opacity-80">{storeTranslations.moons[userInfo.language]}</span>
+                        </div>
+                        {pack.bonus && (
+                          <div className="text-xs text-amber-500/90 font-medium">✨ {pack.bonus}</div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <div className="text-[#ecd8a6] font-medium tracking-wide bg-[#0a0512] px-4 py-1.5 rounded-lg border border-[#ecd8a6]/20">
+                        {pack.price}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {step !== 'SPLASH' && step !== 'FORM' && (
           <motion.button
@@ -419,7 +542,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     onClick={() => setUserInfo(prev => ({...prev, language: 'zh'}))}
                     className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'zh' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
                   >
-                    中文
+                    日本語
                   </button>
                   <button
                     onClick={() => setUserInfo(prev => ({...prev, language: 'ko'}))}
@@ -437,6 +560,51 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                   <Sparkles className="w-5 h-5 group-hover:animate-pulse relative z-10" />
                   <span className="relative z-10">{t.startButton[userInfo.language]}</span>
                 </button>
+
+                {/* Ad Banner */}
+                <div className="w-full max-w-sm md:max-w-md mt-4 relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors">
+                  <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                    {bannerTranslations.sponsored[userInfo.language]}
+                  </div>
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-black/50 border border-[#ecd8a6]/10 flex items-center justify-center">
+                         <img src="/cards/Kalp.png" alt="Katina" className="w-full h-full object-cover opacity-80 mix-blend-luminosity" />
+                      </div>
+                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-tight">
+                        {bannerTranslations.promoText[userInfo.language]}
+                      </p>
+                    </div>
+                    <div className="bg-black/40 rounded-xl p-2.5 flex items-center justify-between border border-[#ecd8a6]/10">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[#ecd8a6]/60 text-xs font-serif uppercase tracking-wider">{bannerTranslations.promoCode[userInfo.language]}</span>
+                        <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-widest">KATINA20</span>
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          navigator.clipboard.writeText('KATINA20');
+                          setBannerCopied(true);
+                          setTimeout(() => setBannerCopied(false), 2000);
+                        }}
+                        className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
+                        title={bannerTranslations.copyCode[userInfo.language]}
+                      >
+                        {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <a 
+                      href="https://www.amazon.com/s?k=katina+tarot" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-2.5 rounded-xl text-sm font-serif uppercase tracking-widest transition-colors font-medium border border-[#ecd8a6]/10"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      {bannerTranslations.shopNow[userInfo.language]}
+                    </a>
+                  </div>
+                </div>
+
               </div>
             </motion.div>
           )}
@@ -559,7 +727,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                             className="relative w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] mx-auto rounded-md overflow-hidden border border-[#ecd8a6]/30 shadow-[0_5px_15px_rgba(0,0,0,0.5)] group-hover/img:shadow-[0_0_35px_rgba(236,216,166,0.25)] group-hover/img:border-[#ecd8a6]/60 transition-all duration-500 ease-out"
                           >
                             <img 
-                              src={`/cards/${drawnCards[index]?.id}.jpg`} 
+                              src={`/cards/${drawnCards[index]?.id}.png`} 
                               alt={locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}
                               onError={() => setImageError(prev => ({...prev, [drawnCards[index]?.id]: true}))}
                               className="w-full h-full object-cover transition-transform duration-700 ease-out"
