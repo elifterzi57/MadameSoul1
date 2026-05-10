@@ -119,6 +119,7 @@ function App() {
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   
   // Moons / Payment State
@@ -133,13 +134,9 @@ function App() {
 
   // Firestore Error Handler
   const handleFirestoreError = (error: unknown, operationType: string, path: string | null) => {
-    const errInfo = {
-      error: error instanceof Error ? error.message : String(error),
-      operationType,
-      path
-    };
-    console.error('Firestore Error: ', JSON.stringify(errInfo));
-    throw new Error(JSON.stringify(errInfo));
+    const errMessage = error instanceof Error ? error.message : String(error);
+    console.error('Firestore Error: ', { error: errMessage, operationType, path });
+    // setGlobalError(`${operationType} error on ${path}: ${errMessage}`);
   };
 
   useEffect(() => {
@@ -158,20 +155,36 @@ function App() {
             setMoonsCount(docSnap.data().balance || 0);
           } else {
             // New user seed
+            const welcomeDesc = (locales['en'].welcomeBonus || "Welcome Bonus");
             setDoc(moonRef, {
               userId: u.uid,
               balance: 5,
               updatedAt: serverTimestamp()
+            });
+            addDoc(collection(db, 'moon_transactions'), {
+              userId: u.uid,
+              amount: 5,
+              type: 'buy',
+              description: welcomeDesc,
+              pdfDownloaded: 0,
+              userLanguage: userInfo.language,
+              userName: "",
+              userDob: "",
+              userBirthplace: "",
+              userRelationship: "",
+              selectedCards: [],
+              createdAt: serverTimestamp()
             });
             setMoonsCount(5);
           }
           setIsMoonsLoading(false);
         }, (error) => {
           handleFirestoreError(error, 'get', `user_moons/${u.uid}`);
+          setIsMoonsLoading(false);
         });
       } else {
         setMoonsCount(0);
-        setIsMoonsLoading(true);
+        setIsMoonsLoading(false);
         if (unsubscribeMoons) unsubscribeMoons();
       }
     });
@@ -242,13 +255,24 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
         updatedAt: serverTimestamp()
       });
 
-      await addDoc(collection(db, 'moon_transactions'), {
+      const cardNamesEn = cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name).join(', ');
+      const txDesc = (locales['en'].transactionDesc || "Reading with cards: {cards}").replace('{cards}', cardNamesEn);
+
+      const txRef = await addDoc(collection(db, 'moon_transactions'), {
         userId: user.uid,
         amount: -1,
         type: 'spend',
-        description: `Reading with cards: ${cards.map(c => c.name).join(', ')}`,
+        description: txDesc,
+        pdfDownloaded: 0,
+        userLanguage: userInfo.language,
+        userName: userInfo.name,
+        userDob: userInfo.dob,
+        userBirthplace: userInfo.birthplace,
+        userRelationship: userInfo.relationship,
+        selectedCards: cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name),
         createdAt: serverTimestamp()
       });
+      setCurrentTransactionId(txRef.id);
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -411,6 +435,17 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
       pdf.link((canvas.width - w2) / 2, canvas.height - 90, w2, 24, { url: 'https://www.etsy.com/shop/MadameSoulStudio?ref=sh-carousel-1' });
 
       pdf.save(`Katina_Reading_${userInfo.name.replace(/\s+/g, '_')}.pdf`);
+
+      // Mark PDF as downloaded in the transaction record
+      if (currentTransactionId) {
+        try {
+          await updateDoc(doc(db, 'moon_transactions', currentTransactionId), {
+            pdfDownloaded: 1
+          });
+        } catch (error) {
+          handleFirestoreError(error, 'update', `moon_transactions/${currentTransactionId}`);
+        }
+      }
     } catch (err) {
       console.error('PDF Export Error:', err);
     } finally {
@@ -562,7 +597,14 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                               userId: user.uid,
                               amount: pack.amount,
                               type: 'buy',
-                              description: `Demo purchase of ${pack.amount} Katina Moons`,
+                              description: (locales['en'].transactionBuy || "Demo purchase of {amount} Katina Moons").replace('{amount}', pack.amount.toString()),
+                              pdfDownloaded: 0,
+                              userLanguage: userInfo.language,
+                              userName: "",
+                              userDob: "",
+                              userBirthplace: "",
+                              userRelationship: "",
+                              selectedCards: [],
                               createdAt: serverTimestamp()
                             });
                           } catch (error) {

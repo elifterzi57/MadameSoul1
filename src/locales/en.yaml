@@ -1,3 +1,6 @@
+transactionDesc: "Reading with cards: {cards}"
+transactionBuy: "Demo purchase of {amount} Katina Moons"
+welcomeBonus: "Welcome Bonus"
 returnToStart: Return to Start
 subtitle: Mirror of the past, fire of the present, and compass of the future...
   What does the Katina deck whisper to you?

@@ -285,7 +285,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       await saveUserToFirestore(result.user);
       onLogin();
     } catch (err: any) {
-      setError(t.error);
+      console.error("Email auth error:", err);
+      // Show more specific error message if available
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+        setError(language === 'tr' ? "Giriş bilgileri hatalı veya kullanıcı bulunamadı." : "Invalid credentials or user not found.");
+      } else if (err.code === 'auth/wrong-password') {
+        setError(language === 'tr' ? "Hatalı şifre." : "Wrong password.");
+      } else if (err.code === 'auth/email-already-in-use') {
+        setError(language === 'tr' ? "Bu e-posta adresi zaten kullanımda." : "Email already in use.");
+      } else if (err.code === 'auth/weak-password') {
+        setError(language === 'tr' ? "Şifre çok zayıf (en az 6 karakter olmalı)." : "Password is too weak.");
+      } else {
+        setError(err.message || t.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -311,11 +323,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       console.error("Phone auth error:", err);
       // Specifically handle the region error to inform the user
       if (err.code === 'auth/operation-not-allowed') {
-        setError("SMS servisi bu bölge için aktif edilmemiş. Lütfen Google Cloud/Firebase panelini kontrol edin.");
+        setError("SMS servisi bu bölge için aktif edilmemiş. Lütfen Google Cloud/Firebase panelini kontrol edin (Authentication > Settings > Sign-in method).");
       } else if (err.code === 'auth/billing-not-enabled') {
         setError("SMS gönderimi için Firebase projesinde faturalandırmanın (Blaze Plan) aktif olması veya test numarası eklenmesi gerekiyor. Test için Firebase panelinden test numarası tanımlayabilirsiniz.");
+      } else if (err.code === 'auth/invalid-phone-number') {
+        setError(language === 'tr' ? "Geçersiz telefon numarası." : "Invalid phone number.");
       } else {
-        setError(t.error);
+        setError(err.message || t.error);
       }
     } finally {
       setLoading(false);
@@ -333,7 +347,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         onLogin();
       }
     } catch (err: any) {
-      setError(t.error);
+      console.error("Code verify error:", err);
+      if (err.code === 'auth/invalid-verification-code') {
+        setError(language === 'tr' ? "Geçersiz doğrulama kodu." : "Invalid verification code.");
+      } else {
+        setError(err.message || t.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -348,7 +367,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       await saveUserToFirestore(result.user);
       onLogin();
     } catch (err: any) {
-      setError(t.error);
+      console.error("Google login error:", err);
+      if (err.code === 'auth/popup-blocked') {
+        setError(language === 'tr' ? "Giriş penceresi engellendi. Lütfen pop-uplara izin verin." : "Popup blocked. Please allow popups.");
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError(language === 'tr' ? "Giriş penceresi kapatıldı." : "Login window closed.");
+      } else {
+        setError(err.message || t.error);
+      }
     } finally {
       setLoading(false);
     }

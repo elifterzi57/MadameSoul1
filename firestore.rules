@@ -17,22 +17,27 @@ service cloud.firestore {
 
     function isValidUser(data) {
       return data.userId == request.auth.uid &&
-             data.keys().hasAll(['userId', 'lastLogin', 'updatedAt']) &&
-             data.lastLogin == request.time &&
-             data.updatedAt == request.time;
+             data.keys().hasAll(['userId', 'lastLogin']);
     }
 
     function isValidUserMoon(data) {
       return data.userId == request.auth.uid &&
-             data.balance is int &&
-             data.updatedAt == request.time;
+             data.balance is int;
     }
 
     function isValidMoonTransaction(data) {
       return data.userId == request.auth.uid &&
              data.amount is int &&
              data.type in ['spend', 'buy', 'bonus'] &&
-             data.createdAt == request.time;
+             data.description is string &&
+             data.pdfDownloaded is int &&
+             data.pdfDownloaded in [0, 1] &&
+             (!('userName' in data) || (data.userName is string && data.userName.size() < 500)) &&
+             (!('userDob' in data) || (data.userDob is string && data.userDob.size() < 100)) &&
+             (!('userBirthplace' in data) || (data.userBirthplace is string && data.userBirthplace.size() < 200)) &&
+             (!('userRelationship' in data) || (data.userRelationship is string && data.userRelationship.size() < 100)) &&
+             (!('userLanguage' in data) || (data.userLanguage is string && data.userLanguage.size() < 10)) &&
+             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10));
     }
 
     match /users/{userId} {
@@ -48,6 +53,7 @@ service cloud.firestore {
     match /moon_transactions/{transactionId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid && isValidMoonTransaction(request.resource.data);
     }
 
     match /messages_en/{messageId} {

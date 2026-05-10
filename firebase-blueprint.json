@@ -65,6 +65,13 @@
         "amount": { "type": "integer" },
         "type": { "type": "string", "enum": ["spend", "buy", "bonus"] },
         "description": { "type": "string" },
+        "pdfDownloaded": { "type": "integer", "description": "1 if PDF was downloaded, 0 otherwise" },
+        "userName": { "type": "string" },
+        "userDob": { "type": "string" },
+        "userBirthplace": { "type": "string" },
+        "userRelationship": { "type": "string" },
+        "userLanguage": { "type": "string", "description": "The language selected by the user" },
+        "selectedCards": { "type": "array", "items": { "type": "string" } },
         "createdAt": { "type": "timestamp" }
       },
       "required": ["userId", "amount", "type", "createdAt"]
