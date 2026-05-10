@@ -15,6 +15,41 @@ service cloud.firestore {
              data.createdAt == request.time;
     }
 
+    function isValidUser(data) {
+      return data.userId == request.auth.uid &&
+             data.keys().hasAll(['userId', 'lastLogin', 'updatedAt']) &&
+             data.lastLogin == request.time &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidUserMoon(data) {
+      return data.userId == request.auth.uid &&
+             data.balance is int &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidMoonTransaction(data) {
+      return data.userId == request.auth.uid &&
+             data.amount is int &&
+             data.type in ['spend', 'buy', 'bonus'] &&
+             data.createdAt == request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(request.resource.data);
+    }
+
+    match /user_moons/{userId} {
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUserMoon(request.resource.data);
+    }
+
+    match /moon_transactions/{transactionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
+    }
+
     match /messages_en/{messageId} {
       allow create: if isValidMessage(request.resource.data);
       allow read, update, delete: if false;

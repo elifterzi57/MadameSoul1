@@ -4,15 +4,18 @@ import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './lib/firebase';
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { db, auth } from './lib/firebase';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { Login } from './components/Login';
+import { KatinaMoon } from './components/KatinaMoon';
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
 import es from './locales/es.yaml';
 import fr from './locales/fr.yaml';
 import zh from './locales/zh.yaml';
 import ko from './locales/ko.yaml';
-import { Sparkles, Moon, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag } from 'lucide-react';
+import { Sparkles, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag, LogOut, Loader2 } from 'lucide-react';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -82,11 +85,13 @@ const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicate
 
 const storeTranslations: Record<string, Record<Language, string>> = {
   storeTitle: { en: "Madame's Store", tr: "Madam'ın Mağazası", es: "La Tienda", fr: "La Boutique", zh: "商店", ko: "마담의 상점" },
-  buyMoons: { en: "Buy Moons", tr: "Ay Satın Al", es: "Comprar Lunas", fr: "Acheter des Lunes", zh: "购买月亮", ko: "달 구매하기" },
-  moons: { en: "Moons", tr: "Ay", es: "Lunas", fr: "Lunes", zh: "个月亮", ko: "달" },
+  buyMoons: { en: "Buy Katina Moons", tr: "Katina Moon Satın Al", es: "Comprar Lunas Katina", fr: "Acheter des Lunes Katina", zh: "购买 Katina 月亮", ko: "카티나 문 구매하기" },
+  moons: { en: "Katina Moon", tr: "Katina Moon", es: "Katina Luna", fr: "Katina Lune", zh: "Katina 月亮", ko: "카티나 문" },
   popular: { en: "POPULAR", tr: "POPÜLER", es: "POPULAR", fr: "POPULAIRE", zh: "热门", ko: "인기" },
   buy: { en: "Buy", tr: "Satın Al", es: "Comprar", fr: "Acheter", zh: "购买", ko: "구매" },
   paymentPending: { en: "Payment integration coming soon...", tr: "Ödeme sistemi entegrasyonu yakında...", es: "Pronto el sistema de pago...", fr: "Le système de paiement arrivera bientôt...", zh: "支付系统即将推出...", ko: "결제 시스템 준비 중..." },
+  logout: { en: "Log Out", tr: "Çıkış", es: "Salir", fr: "Sortir", zh: "登出", ko: "로그아웃" },
+  noMoons: { en: "Not enough Katina Moons!", tr: "Yeterli Katina Moon'unuz yok!", es: "¡No hay suficientes lunas!", fr: "Pas assez de lunes !", zh: "Katina 月亮不足！", ko: "카티나 문이 부족합니다!" }
 };
 
 const bannerTranslations: Record<string, Record<Language, string>> = {
@@ -107,18 +112,18 @@ const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS
 });
 
 function App() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
-  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', dob: '', birthplace: '', relationship: 'single', language: 'en' });
+  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', dob: '', birthplace: '', relationship: 'single', language: 'tr' });
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   
   // Moons / Payment State
-  const [moonsCount, setMoonsCount] = useState<number>(() => {
-    const saved = localStorage.getItem('madame_soul_moons');
-    return saved ? parseInt(saved, 10) : 0;
-  });
+  const [moonsCount, setMoonsCount] = useState<number>(0);
+  const [isMoonsLoading, setIsMoonsLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', subject: '', message: '' });
@@ -138,10 +143,52 @@ function App() {
   };
 
   useEffect(() => {
-    localStorage.setItem('madame_soul_moons', moonsCount.toString());
-  }, [moonsCount]);
+    let unsubscribeMoons: (() => void) | undefined;
 
-  const drawRancomCards = () => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      setIsAuthLoading(false);
+
+      if (u) {
+        // Sync moons from Firestore
+        const moonRef = doc(db, 'user_moons', u.uid);
+        
+        unsubscribeMoons = onSnapshot(moonRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setMoonsCount(docSnap.data().balance || 0);
+          } else {
+            // New user seed
+            setDoc(moonRef, {
+              userId: u.uid,
+              balance: 5,
+              updatedAt: serverTimestamp()
+            });
+            setMoonsCount(5);
+          }
+          setIsMoonsLoading(false);
+        }, (error) => {
+          handleFirestoreError(error, 'get', `user_moons/${u.uid}`);
+        });
+      } else {
+        setMoonsCount(0);
+        setIsMoonsLoading(true);
+        if (unsubscribeMoons) unsubscribeMoons();
+      }
+    });
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeMoons) unsubscribeMoons();
+    };
+  }, []);
+
+  const drawRancomCards = async () => {
+    if (moonsCount <= 0) {
+      alert(storeTranslations.noMoons[userInfo.language]);
+      setIsStoreOpen(true);
+      return;
+    }
+
     const deck = [...KATINA_DECK];
     const drawn: Card[] = [];
     for (let i = 0; i < 3; i++) {
@@ -186,6 +233,23 @@ Please produce a wonderful reading purely as text (Markdown supported).
 CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.language]}. Do not use any other language!`;
 
     try {
+      if (!user) return;
+
+      // Deduct Moon and Log
+      const moonRef = doc(db, 'user_moons', user.uid);
+      await updateDoc(moonRef, {
+        balance: increment(-1),
+        updatedAt: serverTimestamp()
+      });
+
+      await addDoc(collection(db, 'moon_transactions'), {
+        userId: user.uid,
+        amount: -1,
+        type: 'spend',
+        description: `Reading with cards: ${cards.map(c => c.name).join(', ')}`,
+        createdAt: serverTimestamp()
+      });
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: promptText,
@@ -385,6 +449,32 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
     setReading(null);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
+  };
+
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#05000a] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#ecd8a6] animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Login 
+        onLogin={() => {}} 
+        language={userInfo.language} 
+        onLanguageChange={(lang) => setUserInfo(prev => ({ ...prev, language: lang }))}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#05000a] text-[#ecd8a6] font-sans selection:bg-purple-900/50 overflow-x-hidden relative">
       {/* Background decoration - Deep velvet space vibe */}
@@ -401,18 +491,29 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end z-[40]"
+          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40]"
         >
           <div 
             onClick={() => setIsStoreOpen(true)}
-            className="flex items-center gap-2 bg-[#0a0512]/80 backdrop-blur-md px-4 py-2 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
           >
-            <Moon className="w-4 h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
-            <span className="font-serif tracking-widest text-[#ecd8a6] font-semibold">{moonsCount}</span>
-            <div className="w-4 h-4 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center ml-1 group-hover:bg-[#ecd8a6]/20 transition-colors">
-              <Plus className="w-3 h-3 text-[#ecd8a6]" />
+            <KatinaMoon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+            <span className="font-serif tracking-widest text-[#ecd8a6] text-xs sm:text-base font-semibold">{moonsCount}</span>
+            <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center ml-0.5 sm:ml-1 group-hover:bg-[#ecd8a6]/20 transition-colors">
+              <Plus className="w-2.5 h-2.5 sm:w-3 h-3 text-[#ecd8a6]" />
             </div>
           </div>
+
+          <button 
+            onClick={handleSignOut}
+            className="flex items-center gap-1.5 sm:gap-2 pl-3 pr-2.5 py-1.5 sm:py-2 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group"
+            title="Sign Out"
+          >
+            <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
+              {storeTranslations.logout[userInfo.language]}
+            </span>
+            <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
         </motion.div>
       )}
 
@@ -438,20 +539,36 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               </div>
               <div className="p-8 text-center pb-6 border-b border-[#ecd8a6]/10 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-[#ecd8a6]/10 to-transparent" />
-                <Moon className="w-12 h-12 text-[#ecd8a6] mx-auto mb-4 drop-shadow-[0_0_15px_rgba(236,216,166,0.5)]" />
+                <KatinaMoon className="w-12 h-12 text-[#ecd8a6] mx-auto mb-4" />
                 <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase">{storeTranslations.storeTitle[userInfo.language] || "Madame's Store"}</h2>
               </div>
               
               <div className="p-6 flex flex-col gap-4">
                 {[
                   { amount: 3, price: "$2.99", bonus: null },
-                  { amount: 10, price: "$8.99", bonus: "1 Free Moon", popular: true },
-                  { amount: 25, price: "$19.99", bonus: "5 Free Moons" }
+                  { amount: 10, price: "$8.99", bonus: "1 Free Katina Moon", popular: true },
+                  { amount: 25, price: "$19.99", bonus: "5 Free Katina Moons" }
                 ].map((pack) => (
-                  <div key={pack.amount} className={`relative flex items-center justify-between p-4 rounded-xl border ${pack.popular ? 'border-[#ecd8a6] bg-[#ecd8a6]/5' : 'border-[#ecd8a6]/20 bg-[#ffffff]/5'} hover:bg-[#ecd8a6]/10 transition-colors cursor-pointer group`} onClick={() => {
-                        // Demo mode logic
+                  <div key={pack.amount} className={`relative flex items-center justify-between p-4 rounded-xl border ${pack.popular ? 'border-[#ecd8a6] bg-[#ecd8a6]/5' : 'border-[#ecd8a6]/20 bg-[#ffffff]/5'} hover:bg-[#ecd8a6]/10 transition-colors cursor-pointer group`} onClick={async () => {
                         alert(storeTranslations.paymentPending[userInfo.language]);
-                        setMoonsCount(prev => prev + pack.amount);
+                        if (user) {
+                          try {
+                            const moonRef = doc(db, 'user_moons', user.uid);
+                            await updateDoc(moonRef, {
+                              balance: increment(pack.amount),
+                              updatedAt: serverTimestamp()
+                            });
+                            await addDoc(collection(db, 'moon_transactions'), {
+                              userId: user.uid,
+                              amount: pack.amount,
+                              type: 'buy',
+                              description: `Demo purchase of ${pack.amount} Katina Moons`,
+                              createdAt: serverTimestamp()
+                            });
+                          } catch (error) {
+                            handleFirestoreError(error, 'update', `user_moons/${user.uid}`);
+                          }
+                        }
                         setIsStoreOpen(false);
                       }}>
                     
@@ -463,7 +580,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[#0a0512] border border-[#ecd8a6]/30 flex items-center justify-center group-hover:border-[#ecd8a6] transition-colors">
-                        <Moon className="w-5 h-5 text-[#ecd8a6]" />
+                        <KatinaMoon className="w-5 h-5 text-[#ecd8a6]" />
                       </div>
                       <div className="text-left">
                         <div className="text-[#ecd8a6] font-serif flex items-baseline gap-1">
@@ -476,7 +593,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                       </div>
                     </div>
                     
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end">
                       <div className="text-[#ecd8a6] font-medium tracking-wide bg-[#0a0512] px-4 py-1.5 rounded-lg border border-[#ecd8a6]/20">
                         {pack.price}
                       </div>
@@ -628,9 +745,13 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12 flex flex-col items-center"
           >
-            <div className="flex items-center justify-center mb-2 mt-8 sm:mt-0 relative">
+            <div className="flex items-center justify-center mb-2 mt-16 sm:mt-0 relative">
               <div className="absolute inset-0 bg-[#ecd8a6]/10 blur-xl rounded-full" />
-              <h1 className="text-4xl md:text-5xl font-serif tracking-widest text-[#ecd8a6] uppercase drop-shadow-md z-10 font-bold" style={{ textShadow: "0 2px 10px rgba(236, 216, 166, 0.3)" }}>
+              <h1 
+                onClick={() => setStep('SPLASH')}
+                className="text-4xl md:text-5xl font-serif tracking-widest text-[#ecd8a6] uppercase drop-shadow-md z-10 font-bold cursor-pointer hover:opacity-80 transition-opacity" 
+                style={{ textShadow: "0 2px 10px rgba(236, 216, 166, 0.3)" }}
+              >
                 MADAME SOUL
               </h1>
             </div>
@@ -653,7 +774,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-              className="w-full flex-1 flex flex-col items-center justify-center min-h-[70vh] relative pt-10"
+              className="w-full flex-1 flex flex-col items-center justify-center min-h-[70vh] relative pt-20 sm:pt-10"
             >
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
                 {/* Intricate glowing astrolabe/tarot circle effect */}
@@ -675,7 +796,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 className="relative flex items-center justify-center mb-8"
               >
                 <div className="absolute inset-0 bg-[#ecd8a6]/10 blur-[60px] rounded-full" />
-                <Moon className="w-16 h-16 md:w-20 md:h-20 text-[#ecd8a6] relative z-10 drop-shadow-[0_0_15px_rgba(236,216,166,0.6)]" />
+                <KatinaMoon className="w-16 h-16 md:w-20 md:h-20 text-[#ecd8a6] relative z-10" />
               </motion.div>
 
               <div className="text-center relative z-10 mb-2">
@@ -691,57 +812,18 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 <div className="hidden sm:block h-px w-12 bg-[#ecd8a6]/40 flex-1" />
               </div>
 
-              <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-8 sm:mb-12 text-center max-w-md relative z-10 mt-4 sm:mt-6 px-4">
+              <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-10 text-center max-w-md relative z-10 mt-6 px-4">
                 {t.splashText[userInfo.language]}
               </p>
 
-              <div className="flex flex-col items-center gap-8 relative z-10 w-full px-4">
-                <div className="grid grid-cols-3 md:flex md:flex-wrap justify-center items-center gap-2 bg-[#120a1c]/80 backdrop-blur-sm p-2 rounded-2xl md:rounded-full border border-[#ecd8a6]/20 w-full max-w-sm md:max-w-fit">
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'en'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'en' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    English
-                  </button>
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'tr'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'tr' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    Türkçe
-                  </button>
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'es'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'es' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    Español
-                  </button>
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'fr'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'fr' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    Français
-                  </button>
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'zh'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'zh' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    日本語
-                  </button>
-                  <button
-                    onClick={() => setUserInfo(prev => ({...prev, language: 'ko'}))}
-                    className={`px-2 sm:px-6 py-2.5 rounded-xl md:rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center whitespace-nowrap ${userInfo.language === 'ko' ? 'bg-[#ecd8a6]/15 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/30' : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6]/80 border border-transparent'}`}
-                  >
-                    한국어
-                  </button>
-                </div>
-
+              <div className="flex flex-col items-center gap-6 relative z-10 w-full px-4">
                 <button
                   onClick={() => setStep('FORM')}
-                  className="group w-[90%] sm:w-auto max-w-[320px] sm:max-w-none text-sm sm:text-base justify-center relative px-6 sm:px-12 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-wider sm:tracking-widest uppercase rounded-full shadow-[0_0_20px_rgba(236,216,166,0.1)] hover:shadow-[0_0_40px_rgba(236,216,166,0.4)] hover:border-[#ecd8a6]/80 transition-all duration-500"
+                  className="group w-full sm:w-auto max-w-[320px] sm:max-w-none justify-center relative px-10 sm:px-14 py-4 sm:py-5 flex items-center gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:border-[#ecd8a6]/80 transition-all duration-500 scale-105 hover:scale-110 active:scale-95"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-                  <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-[#ecd8a6] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 relative z-10 drop-shadow-[0_0_10px_rgba(236,216,166,0.8)]" />
-                  <span className="relative z-10 font-bold">{t.startButton[userInfo.language]}</span>
+                  <KatinaMoon className="w-6 h-6 text-[#ecd8a6] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 relative z-10" />
+                  <span className="relative z-10 text-base sm:text-lg font-bold">{t.startButton[userInfo.language]}</span>
                 </button>
 
                 {/* Ad Banner 1: Amazon */}
@@ -897,9 +979,8 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 <div className="pt-4">
                   <button 
                     type="submit"
-                    className="w-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center gap-3 transition-all duration-300"
+                    className="w-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300"
                   >
-                    <Sparkles className="w-5 h-5 text-[#ecd8a6]/70" />
                     {t.submitButton[userInfo.language]}
                   </button>
                 </div>

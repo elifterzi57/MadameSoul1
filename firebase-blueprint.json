@@ -28,9 +28,61 @@
         }
       },
       "required": ["fullName", "email", "subject", "message", "createdAt"]
+    },
+    "User": {
+      "title": "User Profile",
+      "description": "User profile data stored upon first login.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phoneNumber": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "providerId": { "type": "string" },
+        "lastLogin": { "type": "timestamp" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["userId", "lastLogin"]
+    },
+    "UserMoon": {
+      "title": "User Katina Moon Balance",
+      "description": "Stores current balance of Katina Moons for a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "balance": { "type": "integer" },
+        "updatedAt": { "type": "timestamp" }
+      },
+      "required": ["userId", "balance", "updatedAt"]
+    },
+    "MoonTransaction": {
+      "title": "Katina Moon Transaction",
+      "description": "Logs when a user spends or receives Katina Moons.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "amount": { "type": "integer" },
+        "type": { "type": "string", "enum": ["spend", "buy", "bonus"] },
+        "description": { "type": "string" },
+        "createdAt": { "type": "timestamp" }
+      },
+      "required": ["userId", "amount", "type", "createdAt"]
     }
   },
   "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "Stores user profile information"
+    },
+    "/user_moons/{userId}": {
+      "schema": { "$ref": "UserMoon" },
+      "description": "Stores user moon balance"
+    },
+    "/moon_transactions/{transactionId}": {
+      "schema": { "$ref": "MoonTransaction" },
+      "description": "Logs moon transactions"
+    },
     "/messages_en/{messageId}": {
       "schema": { "$ref": "Message" },
       "description": "Stores contact us messages from users in English"
