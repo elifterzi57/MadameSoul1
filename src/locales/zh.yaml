@@ -1,4 +1,17 @@
 transactionDesc: "カードを使ったリーディング：{cards}"
+onboarding:
+  skip: 跳過
+  next: 下一步
+  start: 開始探索
+  slides:
+    - title: "歡迎來到 MadameSoul"
+      description: "你準備好聽聽靈魂的低語了嗎？在 MadameSoul 的神秘宇宙中，古老的卡緹娜卡片為你照亮黑暗。"
+    - title: "過去之鏡"
+      description: "你走出的每一步都有其意義。卡緹娜牌幫助你解開過去的結，讓你更好地了解現在。"
+    - title: "未來指南針"
+      description: "在愛情、工作和生活的旅程中，探索星星對你說了什麼。每個農曆相位都有新的洞察等著你。"
+    - title: "神秘的體驗"
+      description: "使用 Katina Moons 開啟預言。如果你準備好了，旅程就開始了！"
 returnToStart: 最初に戻る
 subtitle: 過去の鏡、現在の炎、未来の羅針盤…カティナデッキはあなたに何をささやきますか？
 splashText: 予言はあなたに向けて展開されています...
@@ -382,6 +395,9 @@ cards:
   yatagan:
     name: 剣
     general: 決断力、パワー、防御、または迫りくる危険。
+legal:
+  title: "用户协议与隐私政策"
+  button: "隐私政策"
 contact:
   title: 联系我们
   subtitle: 您可以填写下表联系我们。

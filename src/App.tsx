@@ -8,7 +8,9 @@ import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, in
 import { db, auth } from './lib/firebase';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
+import { Onboarding } from './components/Onboarding';
 import { KatinaMoon } from './components/KatinaMoon';
+import { LEGAL_CONTENT } from './data/legal';
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
 import es from './locales/es.yaml';
@@ -71,16 +73,6 @@ type Card = { id: string; locKey: string; name: string; desc: string };
 
 const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
 
-const t: Record<string, Record<Language, string>> = new Proxy({} as any, {
-  get: (_, key: string) => {
-    return new Proxy({} as any, {
-      get: (_, lang: string) => {
-        return locales[lang as Language]?.[key];
-      }
-    });
-  }
-});
-
 const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
 
 const storeTranslations: Record<string, Record<Language, string>> = {
@@ -114,8 +106,14 @@ const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return localStorage.getItem('onboarding_seen') !== 'true';
+  });
   const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
-  const [userInfo, setUserInfo] = useState<UserInfo>({ name: '', dob: '', birthplace: '', relationship: 'single', language: 'tr' });
+  const [userInfo, setUserInfo] = useState<UserInfo>(() => {
+    const savedLang = localStorage.getItem('user_language') as Language || 'en';
+    return { name: '', dob: '', birthplace: '', relationship: 'single', language: savedLang };
+  });
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -127,6 +125,7 @@ function App() {
   const [isMoonsLoading, setIsMoonsLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', subject: '', message: '' });
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
@@ -195,6 +194,29 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('user_language', userInfo.language);
+  }, [userInfo.language]);
+
+  const t = (key: string, params: Record<string, any> = {}) => {
+    const currentLocale = locales[userInfo.language] || locales.en;
+    let value = key.split('.').reduce((obj, k) => obj?.[k], currentLocale);
+    
+    if (value === undefined || value === null) return key;
+    
+    // If it's an object or array, we shouldn't try to render it as a string in JSX
+    if (typeof value !== 'string') {
+      console.warn(`Translation key "${key}" resulted in a non-string value:`, value);
+      return key; 
+    }
+    
+    Object.entries(params).forEach(([k, v]) => {
+      value = (value as string).replace(`{${k}}`, String(v));
+    });
+    
+    return value as string;
+  };
+
   const drawRancomCards = async () => {
     if (moonsCount <= 0) {
       alert(storeTranslations.noMoons[userInfo.language]);
@@ -239,11 +261,11 @@ Selected Katina Cards (Original Turkish names):
 
 Please blend the energy of these 3 cards with the person's birth details and life situation to write a mystical and epic reading.
 Present your reading under 3 main headings:
-${t.headings[userInfo.language]}
+${t('headings')}
 
 End with a Guidance/Advice section giving them invaluable advice. 
 Please produce a wonderful reading purely as text (Markdown supported).
-CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.language]}. Do not use any other language!`;
+CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use any other language!`;
 
     try {
       if (!user) return;
@@ -278,10 +300,10 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
         model: "gemini-3-flash-preview",
         contents: promptText,
       });
-      setReading(response.text || t.errorSilent[userInfo.language]);
+      setReading(response.text || t('errorSilent'));
     } catch (error) {
       console.error("Reading generation error:", error);
-      setReading(t.errorInterrupted[userInfo.language]);
+      setReading(t('errorInterrupted'));
     } finally {
       setIsGenerating(false);
     }
@@ -471,7 +493,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
     } else {
       try {
         await navigator.clipboard.writeText(reading);
-        alert(t.copiedMsg[userInfo.language]);
+        alert(t('copiedMsg'));
       } catch (err) {
         console.error('Failed to copy text: ', err);
       }
@@ -500,12 +522,26 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
     );
   }
 
+  if (showOnboarding) {
+    return (
+      <Onboarding 
+        language={userInfo.language} 
+        t={t}
+        onComplete={() => {
+          setShowOnboarding(false);
+          localStorage.setItem('onboarding_seen', 'true');
+        }} 
+      />
+    );
+  }
+
   if (!user) {
     return (
       <Login 
         onLogin={() => {}} 
         language={userInfo.language} 
         onLanguageChange={(lang) => setUserInfo(prev => ({ ...prev, language: lang }))}
+        onShowOnboarding={() => setShowOnboarding(true)}
       />
     );
   }
@@ -648,6 +684,40 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
         )}
       </AnimatePresence>
 
+      {/* Legal Modal */}
+      <AnimatePresence>
+        {isLegalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-2xl bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[85vh] flex flex-col"
+            >
+              <div className="p-6 border-b border-[#ecd8a6]/10 flex items-center justify-between bg-[#130b21]">
+                <h2 className="text-xl font-serif text-[#ecd8a6]">{t('legal.title')}</h2>
+                <button 
+                  onClick={() => setIsLegalOpen(false)} 
+                  className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 sm:p-10 overflow-y-auto custom-scrollbar flex-1">
+                <div className="legal-content prose prose-invert prose-amber max-w-none text-[#ecd8a6]/80 text-sm leading-relaxed">
+                  <Markdown>{LEGAL_CONTENT[userInfo.language] || LEGAL_CONTENT['en']}</Markdown>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Contact Modal */}
       <AnimatePresence>
         {isContactOpen && (
@@ -772,7 +842,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium hidden sm:inline">
-              {t.returnToStart[userInfo.language]}
+              {t('returnToStart')}
             </span>
           </motion.button>
         )}
@@ -803,7 +873,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               <Sparkles className="w-4 h-4 text-[#ecd8a6]/60" />
             </div>
             <p className="text-[#ecd8a6]/70 max-w-lg mx-auto font-sans italic">
-              {t.subtitle[userInfo.language]}
+              {t('subtitle')}
             </p>
           </motion.div>
         )}
@@ -855,7 +925,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               </div>
 
               <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-10 text-center max-w-md relative z-10 mt-6 px-4">
-                {t.splashText[userInfo.language]}
+                {t('splashText')}
               </p>
 
               <div className="flex flex-col items-center gap-6 relative z-10 w-full px-4">
@@ -865,7 +935,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
                   <KatinaMoon className="w-6 h-6 text-[#ecd8a6] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 relative z-10" />
-                  <span className="relative z-10 text-base sm:text-lg font-bold">{t.startButton[userInfo.language]}</span>
+                  <span className="relative z-10 text-base sm:text-lg font-bold">{t('startButton')}</span>
                 </button>
 
                 {/* Ad Banner 1: Amazon */}
@@ -964,19 +1034,19 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 className="space-y-6 relative z-10"
               >
                 <div>
-                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t.nameLabel[userInfo.language]}</label>
+                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('nameLabel')}</label>
                   <input 
                     required
                     type="text"
                     value={userInfo.name}
                     onChange={e => setUserInfo(prev => ({...prev, name: e.target.value}))}
                     className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
-                    placeholder={t.namePlaceholder[userInfo.language]}
+                    placeholder={t('namePlaceholder')}
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t.dobLabel[userInfo.language]}</label>
+                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('dobLabel')}</label>
                   <input 
                     required
                     type="date"
@@ -992,19 +1062,19 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                 </div>
 
                 <div>
-                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t.pobLabel[userInfo.language]}</label>
+                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('pobLabel')}</label>
                   <input 
                     required
                     type="text"
                     value={userInfo.birthplace}
                     onChange={e => setUserInfo(prev => ({...prev, birthplace: e.target.value}))}
                     className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
-                    placeholder={t.pobPlaceholder[userInfo.language]}
+                    placeholder={t('pobPlaceholder')}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t.statusLabel[userInfo.language]}</label>
+                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('statusLabel')}</label>
                   <select 
                     value={userInfo.relationship}
                     onChange={e => setUserInfo(prev => ({...prev, relationship: e.target.value}))}
@@ -1023,7 +1093,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     type="submit"
                     className="w-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300"
                   >
-                    {t.submitButton[userInfo.language]}
+                    {t('submitButton')}
                   </button>
                 </div>
               </form>
@@ -1038,7 +1108,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
               className="w-full"
             >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                {[t.past[userInfo.language], t.present[userInfo.language], t.future[userInfo.language]].map((label, index) => (
+                {[t('past'), t('present'), t('future')].map((label, index) => (
                   <motion.div 
                     key={index}
                     initial={{ opacity: 0, y: 50 }}
@@ -1111,7 +1181,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                       <RefreshCw className="w-10 h-10 text-[#ecd8a6] relative z-10" />
                     </motion.div>
                     <p className="text-[#ecd8a6]/80 font-serif animate-pulse text-lg tracking-widest uppercase text-center">
-                      {t.loading[userInfo.language]}
+                      {t('loading')}
                     </p>
                   </div>
                 ) : (
@@ -1141,7 +1211,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t.downloadBtn[userInfo.language]}</span>
+                    <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
                   </button>
 
                   <button 
@@ -1149,7 +1219,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
                   >
                     <Share2 className="w-4 h-4" />
-                    <span className="font-serif tracking-widest text-xs uppercase">{t.shareBtn[userInfo.language]}</span>
+                    <span className="font-serif tracking-widest text-xs uppercase">{t('shareBtn')}</span>
                   </button>
 
                   <button 
@@ -1157,7 +1227,7 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
                     className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    <span className="font-serif tracking-widest text-xs uppercase">{t.restartBtn[userInfo.language]}</span>
+                    <span className="font-serif tracking-widest text-xs uppercase">{t('restartBtn')}</span>
                   </button>
                 </motion.div>
               )}
@@ -1167,12 +1237,19 @@ CRITICAL: The entire reading MUST be written in ${t.languageName[userInfo.langua
       </main>
 
       <footer className="w-full relative z-10 border-t border-[#ecd8a6]/10 py-6 mt-auto">
-        <div className="max-w-4xl mx-auto px-4 flex justify-center">
+        <div className="max-w-4xl mx-auto px-4 flex justify-center gap-6 sm:gap-12">
+          <button
+            onClick={() => setIsLegalOpen(true)}
+            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
+          >
+            {t('legal.button')}
+          </button>
+          
           <button
             onClick={() => setIsContactOpen(true)}
-            className="text-[#ecd8a6] hover:text-[#fff] text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
+            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
           >
-            {locales[userInfo.language].contact?.footerText || 'Bize Ulaşın'}
+            {t('contact.footerText')}
           </button>
         </div>
       </footer>

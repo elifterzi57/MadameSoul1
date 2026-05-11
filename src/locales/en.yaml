@@ -1,6 +1,19 @@
 transactionDesc: "Reading with cards: {cards}"
 transactionBuy: "Demo purchase of {amount} Katina Moons"
 welcomeBonus: "Welcome Bonus"
+onboarding:
+  skip: Skip
+  next: Next
+  start: Start Exploring
+  slides:
+    - title: "Welcome to MadameSoul"
+      description: "Are you ready to hear the whispers of your soul? In the mystic universe of MadameSoul, ancient Katina cards illuminate the darkness for you."
+    - title: "Mirror of the Past"
+      description: "Every step you take has meaning. Katina cards help you understand the present better by untying the knots of the past."
+    - title: "Compass of the Future"
+      description: "Discover what the stars are telling you in your journey of love, work, and life. A new insight awaits you in every lunar phase."
+    - title: "A Mystic Experience"
+      description: "Unlock the prophecies with Katina Moons. If you're ready, the journey begins!"
 returnToStart: Return to Start
 subtitle: Mirror of the past, fire of the present, and compass of the future...
   What does the Katina deck whisper to you?
@@ -1103,6 +1116,9 @@ cards:
   yatagan:
     name: Yataghan (Sword)
     general: Sharp decisions, power, defense, or an approaching danger.
+legal:
+  title: "User Agreement & Privacy Policy"
+  button: "Privacy Policy"
 contact:
   title: Contact Us
   subtitle: You can fill out the form below to contact us.

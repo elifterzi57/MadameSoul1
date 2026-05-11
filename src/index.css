@@ -26,28 +26,42 @@
   letter-spacing: 0.02em;
 }
 
-/* Custom Scrollbar for a more magical/elegant feel */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Custom Scrollbar for a more magical/elegant feel - Hidden on Mobile */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(10, 5, 18, 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(236, 216, 166, 0.3);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(236, 216, 166, 0.5);
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(236, 216, 166, 0.3) rgba(10, 5, 18, 0.5);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(10, 5, 18, 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(236, 216, 166, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(236, 216, 166, 0.5);
-}
-
-/* For Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(236, 216, 166, 0.3) rgba(10, 5, 18, 0.5);
+/* Hide scrollbars globally on mobile */
+@media (max-width: 767px) {
+  ::-webkit-scrollbar {
+    display: none;
+    width: 0 !important;
+  }
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }

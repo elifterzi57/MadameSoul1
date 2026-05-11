@@ -1,4 +1,17 @@
 transactionDesc: "Lecture avec cartes : {cards}"
+onboarding:
+  skip: Passer
+  next: Suivant
+  start: Commencer à Explorer
+  slides:
+    - title: "Bienvenue sur MadameSoul"
+      description: "Êtes-vous prêt à entendre les murmures de votre âme ? Dans l'univers mystique de MadameSoul, les anciennes cartes Katina éclairent les ténèbres pour vous."
+    - title: "Miroir du Passé"
+      description: "Chaque pas que vous faites a un sens. Les cartes Katina vous aident à mieux comprendre le présent en dénouant les nœuds du passé."
+    - title: "Boussole du Futur"
+      description: "Découvrez ce que les étoiles vous disent dans votre voyage d'amour, de travail et de vie. Un nouvel aperçu vous attend à chaque phase lunaire."
+    - title: "Une Expérience Mystique"
+      description: "Déverrouillez les prophéties avec Katina Moons. Si vous êtes prêt, le voyage commence !"
 returnToStart: Retour au Début
 subtitle: Miroir du passé, feu du présent, et boussole du futur... Que vous
   murmure le jeu Katina ?
@@ -1159,6 +1172,9 @@ cards:
   yatagan:
     name: Épée
     general: Décisions tranchantes, pouvoir, défense ou un danger imminent.
+legal:
+  title: "Contrat d'utilisation et politique de confidentialité"
+  button: "Politique de confidentialité"
 contact:
   title: Nous Contacter
   subtitle: Vous pouvez remplir le formulaire ci-dessous pour nous contacter.

@@ -31,13 +31,14 @@ interface LoginProps {
   onLogin: () => void;
   language: 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
   onLanguageChange: (lang: 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko') => void;
+  onShowOnboarding: () => void;
 }
 
 const translations = {
   tr: {
-    signInTitle: "Mistik Yolculuğa Başla",
-    signInSubtitle: "Ruhsal rehberlik için giriş yapın",
-    signUpTitle: "Mistik Bir Rehbeye Sahip Ol",
+    signInTitle: "MadameSoul'a Hoş Geldin",
+    signInSubtitle: "Ruhsal rehberlik ve mistik sırlar için giriş yapın",
+    signUpTitle: "MadameSoul Evrenine Katıl",
     signUpSubtitle: "Aramıza katılmak için bilgilerinizi girin",
     email: "E-posta Adresi",
     phone: "Telefon Numarası",
@@ -53,12 +54,13 @@ const translations = {
     hasAccount: "Zaten bir hesabınız var mı? Giriş yapın",
     noAccount: "Henüz bir hesabınız yok mu? Kaydolun",
     error: "Bir hata oluştu, lütfen bilgileri kontrol edin.",
-    loading: "Yükleniyor..."
+    loading: "Yükleniyor...",
+    showIntro: "Uygulama Tanıtımını Gör"
   },
   en: {
-    signInTitle: "Mystic Journey Awaits",
-    signInSubtitle: "Enter the realm for spiritual guidance",
-    signUpTitle: "Embrace the Divine",
+    signInTitle: "Welcome to MadameSoul",
+    signInSubtitle: "Enter the realm for spiritual guidance and mystic secrets",
+    signUpTitle: "Join the MadameSoul Circle",
     signUpSubtitle: "Join our spiritual circle to begin",
     email: "Email Address",
     phone: "Phone Number",
@@ -74,12 +76,13 @@ const translations = {
     hasAccount: "Already have an account? Sign In",
     noAccount: "Don't have an account? Sign Up",
     error: "An error occurred. Please check your details.",
-    loading: "Loading..."
+    loading: "Loading...",
+    showIntro: "Watch App Intro"
   },
   es: {
-    signInTitle: "Viaje Místico",
-    signInSubtitle: "Ingresa para recibir guía espiritual",
-    signUpTitle: "Abraza lo Divino",
+    signInTitle: "Bienvenido a MadameSoul",
+    signInSubtitle: "Ingresa para recibir guía espiritual y secretos místicos",
+    signUpTitle: "Únete al Círculo de MadameSoul",
     signUpSubtitle: "Únete a nuestro círculo espiritual",
     email: "Correo Electrónico",
     phone: "Número de Teléfono",
@@ -95,12 +98,13 @@ const translations = {
     hasAccount: "¿Ya tienes cuenta? Inicia sesión",
     noAccount: "¿No tienes cuenta? Regístrate",
     error: "Ocurrió un error. Verifica tus datos.",
-    loading: "Cargando..."
+    loading: "Cargando...",
+    showIntro: "Ver Introducción"
   },
   fr: {
-    signInTitle: "Voyage Mystique",
-    signInSubtitle: "Entrez pour des conseils spirituels",
-    signUpTitle: "Embrassez le Divin",
+    signInTitle: "Bienvenue sur MadameSoul",
+    signInSubtitle: "Entrez pour des conseils spirituels et des secrets mystiques",
+    signUpTitle: "Rejoignez le Cercle MadameSoul",
     signUpSubtitle: "Rejoignez notre cercle spirituel",
     email: "Adresse E-mail",
     phone: "Numéro de Téléphone",
@@ -116,12 +120,13 @@ const translations = {
     hasAccount: "Déjà un compte ? Connexion",
     noAccount: "Pas de compte ? S'inscrire",
     error: "Une erreur est survenue. Vérifiez vos infos.",
-    loading: "Chargement..."
+    loading: "Chargement...",
+    showIntro: "Voir l'Introduction"
   },
   zh: {
-    signInTitle: "神祕探險",
-    signInSubtitle: "进入该领域寻求精神指导",
-    signUpTitle: "擁抱神聖",
+    signInTitle: "歡迎來到 MadameSoul",
+    signInSubtitle: "進入精神指導和神秘秘密的領域",
+    signUpTitle: "加入 MadameSoul 圈子",
     signUpSubtitle: "加入我們的屬靈圈子開始吧",
     email: "電子郵件地址",
     phone: "電話號碼",
@@ -137,12 +142,13 @@ const translations = {
     hasAccount: "已有賬號？登入",
     noAccount: "沒有賬號？註冊",
     error: "發生錯誤。請檢查您的詳細信息。",
-    loading: "載入中..."
+    loading: "載入中...",
+    showIntro: "查看介紹"
   },
   ko: {
-    signInTitle: "신비로운 여행",
-    signInSubtitle: "영적 안내를 위해 입장하세요",
-    signUpTitle: "성스러움을 받아들이세요",
+    signInTitle: "MadameSoul에 오신 것을 환영합니다",
+    signInSubtitle: "영적 안내와 신비로운 비밀을 위해 입장하세요",
+    signUpTitle: "MadameSoul 서클에 가입하세요",
     signUpSubtitle: "영적 서클에 가입하여 시작하세요",
     email: "이메일 주소",
     phone: "전화번호",
@@ -158,7 +164,8 @@ const translations = {
     hasAccount: "이미 계정이 있으신가요? 로그인",
     noAccount: "계정이 없으신가요? 회원가입",
     error: "오류가 발생했습니다. 정보를 확인하세요.",
-    loading: "로딩 중..."
+    loading: "로딩 중...",
+    showIntro: "소개 보기"
   }
 };
 
@@ -194,7 +201,7 @@ const countryCodes = [
   { code: '+43', name: 'AT', flag: '🇦🇹' },
 ] as const;
 
-export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChange }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChange, onShowOnboarding }) => {
   const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email');
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -514,6 +521,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
               <div className="space-y-3 pt-6 border-t border-[#ecd8a6]/10">
                 <button 
                   type="button"
+                  onClick={onShowOnboarding}
+                  className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
+                >
+                  <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                  <span>{t.showIntro}</span>
+                </button>
+
+                <button 
+                  type="button"
                   onClick={handleGoogleLogin}
                   disabled={loading}
                   className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
@@ -645,6 +661,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
               )}
 
               <div className="space-y-3 pt-6 border-t border-[#ecd8a6]/10">
+                <button 
+                  type="button"
+                  onClick={onShowOnboarding}
+                  className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
+                >
+                  <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                  <span>{t.showIntro}</span>
+                </button>
+
                 <button 
                   type="button"
                   onClick={handleGoogleLogin}
