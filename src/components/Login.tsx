@@ -8,9 +8,11 @@ import {
   ConfirmationResult,
   GoogleAuthProvider,
   signInWithPopup,
-  User
+  User,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { gatherUserMetadata } from '../lib/metadata';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Mail, 
@@ -55,7 +57,8 @@ const translations = {
     noAccount: "Henüz bir hesabınız yok mu? Kaydolun",
     error: "Bir hata oluştu, lütfen bilgileri kontrol edin.",
     loading: "Yükleniyor...",
-    showIntro: "Uygulama Tanıtımını Gör"
+    showIntro: "Uygulama Tanıtımını Gör",
+    forgotPasswordLabel: "Şifremi Unuttum"
   },
   en: {
     signInTitle: "Welcome to MadameSoul",
@@ -77,7 +80,8 @@ const translations = {
     noAccount: "Don't have an account? Sign Up",
     error: "An error occurred. Please check your details.",
     loading: "Loading...",
-    showIntro: "Watch App Intro"
+    showIntro: "Watch App Intro",
+    forgotPasswordLabel: "Forgot Password?"
   },
   es: {
     signInTitle: "Bienvenido a MadameSoul",
@@ -99,7 +103,8 @@ const translations = {
     noAccount: "¿No tienes cuenta? Regístrate",
     error: "Ocurrió un error. Verifica tus datos.",
     loading: "Cargando...",
-    showIntro: "Ver Introducción"
+    showIntro: "Ver Introducción",
+    forgotPasswordLabel: "¿Olvidaste tu contraseña?"
   },
   fr: {
     signInTitle: "Bienvenue sur MadameSoul",
@@ -121,7 +126,8 @@ const translations = {
     noAccount: "Pas de compte ? S'inscrire",
     error: "Une erreur est survenue. Vérifiez vos infos.",
     loading: "Chargement...",
-    showIntro: "Voir l'Introduction"
+    showIntro: "Voir l'Introduction",
+    forgotPasswordLabel: "Mot de passe oublié ?"
   },
   zh: {
     signInTitle: "歡迎來到 MadameSoul",
@@ -143,7 +149,8 @@ const translations = {
     noAccount: "沒有賬號？註冊",
     error: "發生錯誤。請檢查您的詳細信息。",
     loading: "載入中...",
-    showIntro: "查看介紹"
+    showIntro: "查看介紹",
+    forgotPasswordLabel: "忘記密碼？"
   },
   ko: {
     signInTitle: "MadameSoul에 오신 것을 환영합니다",
@@ -165,7 +172,8 @@ const translations = {
     noAccount: "계정이 없으신가요? 회원가입",
     error: "오류가 발생했습니다. 정보를 확인하세요.",
     loading: "로딩 중...",
-    showIntro: "소개 보기"
+    showIntro: "소개 보기",
+    forgotPasswordLabel: "비밀번호를 잊으셨나요?"
   }
 };
 
@@ -219,6 +227,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
   const saveUserToFirestore = async (user: User) => {
     try {
+      const metadata = await gatherUserMetadata();
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         userId: user.uid,
@@ -227,7 +236,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         displayName: user.displayName || null,
         photoURL: user.photoURL || null,
         lastLogin: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        metadata: {
+          device: metadata.device,
+          os: metadata.os,
+          browser: metadata.browser,
+          ip: metadata.ip,
+          location: metadata.location
+        }
       }, { merge: true });
     } catch (err) {
       console.error("Firestore sync failed:", err);
@@ -387,6 +403,24 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError(language === 'tr' ? "Lütfen e-posta adresinizi girin." : "Please enter your email address.");
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setError(language === 'tr' ? "Şifre sıfırlama e-postası gönderildi. Lütfen e-postanızı kontrol edin." : "Password reset email sent. Please check your inbox.");
+    } catch (err: any) {
+      console.error("Password reset error:", err);
+      setError(err.message || t.error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-[#0a0512] overflow-y-auto pt-20 pb-12 px-4 flex justify-center items-start sm:items-center">
       {/* Background Decor */}
@@ -516,6 +550,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                   <span>{isSignUp ? t.signInLabel : t.signUpLabel}</span>
                   <RefreshCw className="w-3.5 h-3.5 opacity-50" />
                 </button>
+
+                {!isSignUp && (
+                  <button 
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="w-full text-[#ecd8a6]/60 hover:text-[#ecd8a6] py-1 text-[10px] sm:text-xs font-serif uppercase tracking-widest transition-all"
+                  >
+                    {t.forgotPasswordLabel}
+                  </button>
+                )}
               </div>
 
               <div className="space-y-3 pt-6 border-t border-[#ecd8a6]/10">

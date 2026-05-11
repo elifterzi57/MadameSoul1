@@ -40,8 +40,21 @@
         "displayName": { "type": "string" },
         "photoURL": { "type": "string" },
         "providerId": { "type": "string" },
+        "hasAcceptedLegal": { "type": "integer", "description": "1 if legal terms accepted, 0 otherwise" },
+        "legalAcceptedAt": { "type": "timestamp", "description": "When the legal terms were accepted" },
         "lastLogin": { "type": "timestamp" },
-        "createdAt": { "type": "timestamp" }
+        "updatedAt": { "type": "timestamp" },
+        "createdAt": { "type": "timestamp" },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "device": { "type": "string" },
+            "os": { "type": "string" },
+            "browser": { "type": "string" },
+            "ip": { "type": "string" },
+            "location": { "type": "string" }
+          }
+        }
       },
       "required": ["userId", "lastLogin"]
     },
@@ -72,15 +85,34 @@
         "userRelationship": { "type": "string" },
         "userLanguage": { "type": "string", "description": "The language selected by the user" },
         "selectedCards": { "type": "array", "items": { "type": "string" } },
+        "cardIds": { "type": "array", "items": { "type": "string" } },
+        "readingText": { "type": "string", "description": "The generated reading text" },
         "createdAt": { "type": "timestamp" }
       },
       "required": ["userId", "amount", "type", "createdAt"]
+    },
+    "UserEvent": {
+      "title": "User Event",
+      "description": "Logs in-app usage and performance events.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "eventType": { "type": "string" },
+        "eventData": { "type": "object" },
+        "performance": { "type": "object" },
+        "timestamp": { "type": "timestamp" }
+      },
+      "required": ["userId", "eventType", "timestamp"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "User" },
       "description": "Stores user profile information"
+    },
+    "/user_events/{eventId}": {
+      "schema": { "$ref": "UserEvent" },
+      "description": "Logs user-specific events and performance"
     },
     "/user_moons/{userId}": {
       "schema": { "$ref": "UserMoon" },

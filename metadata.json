@@ -1,6 +1,5 @@
 {
   "name": "MadameSoul",
   "description": "MadameSoul: İzmir'in kadim Katina destesi ile geçmiş, şimdi ve gelecek üzerine mistik bir fal yolculuğu.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
+  "requestFramePermissions": []
 }

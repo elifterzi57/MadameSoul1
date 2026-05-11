@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -10,6 +9,8 @@ import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
 import { Onboarding } from './components/Onboarding';
 import { KatinaMoon } from './components/KatinaMoon';
+import { Profile } from './components/Profile';
+import { gatherUserMetadata, logUserEvent } from './lib/metadata';
 import { LEGAL_CONTENT } from './data/legal';
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
@@ -17,9 +18,7 @@ import es from './locales/es.yaml';
 import fr from './locales/fr.yaml';
 import zh from './locales/zh.yaml';
 import ko from './locales/ko.yaml';
-import { Sparkles, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag, LogOut, Loader2 } from 'lucide-react';
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import { Sparkles, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag, LogOut, Loader2, User as UserIcon } from 'lucide-react';
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
@@ -126,6 +125,56 @@ function App() {
   const [isStoreOpen, setIsStoreOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const handleLegalOpen = async () => {
+    setIsLegalOpen(true);
+    if (user) {
+      try {
+        const metadata = await gatherUserMetadata();
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          hasAcceptedLegal: 1,
+          legalAcceptedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          metadata: {
+            device: metadata.device,
+            os: metadata.os,
+            browser: metadata.browser,
+            ip: metadata.ip,
+            location: metadata.location
+          }
+        });
+      } catch (error) {
+        // If document doesn't exist, we might need setDoc with merge,
+        // but Login.tsx should have created it.
+        // Fallback to setDoc just in case.
+        try {
+          const metadata = await gatherUserMetadata();
+          const userRef = doc(db, 'users', user.uid);
+          await setDoc(userRef, {
+            userId: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            hasAcceptedLegal: 1,
+            legalAcceptedAt: serverTimestamp(),
+            lastLogin: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            metadata: {
+              device: metadata.device,
+              os: metadata.os,
+              browser: metadata.browser,
+              ip: metadata.ip,
+              location: metadata.location
+            }
+          }, { merge: true });
+        } catch (innerError) {
+          handleFirestoreError(innerError, 'write', `users/${user.uid}`);
+        }
+      }
+    }
+  };
+
   const [contactForm, setContactForm] = useState({ fullName: '', email: '', subject: '', message: '' });
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
@@ -224,6 +273,10 @@ function App() {
       return;
     }
 
+    if (user) {
+      logUserEvent(user.uid, 'DRAW_CARDS_START');
+    }
+
     const deck = [...KATINA_DECK];
     const drawn: Card[] = [];
     for (let i = 0; i < 3; i++) {
@@ -243,6 +296,10 @@ function App() {
   const generateReading = async (cards: Card[]) => {
     setIsGenerating(true);
     setStep('RESULT');
+
+    if (user) {
+      logUserEvent(user.uid, 'READING_GEN_START', { cards: cards.map(c => c.id) });
+    }
 
     const statusText = STATUS_OPTIONS.find(o => o.value === userInfo.relationship)?.[userInfo.language as keyof typeof STATUS_OPTIONS[0]] || userInfo.relationship;
 
@@ -292,15 +349,35 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         userBirthplace: userInfo.birthplace,
         userRelationship: userInfo.relationship,
         selectedCards: cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name),
+        cardIds: cards.map(c => c.id),
         createdAt: serverTimestamp()
       });
       setCurrentTransactionId(txRef.id);
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: promptText,
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
       });
-      setReading(response.text || t('errorSilent'));
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const generatedText = data.text || t('errorSilent');
+      setReading(generatedText);
+
+      // Update transaction with the reading text
+      if (txRef.id && data.text) {
+        try {
+          await updateDoc(doc(db, 'moon_transactions', txRef.id), {
+            readingText: generatedText
+          });
+        } catch (error) {
+          handleFirestoreError(error, 'update', `moon_transactions/${txRef.id}`);
+        }
+      }
     } catch (error) {
       console.error("Reading generation error:", error);
       setReading(t('errorInterrupted'));
@@ -576,6 +653,17 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
           </div>
 
           <button 
+            onClick={() => setIsProfileOpen(true)}
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 text-[#ecd8a6]/70 hover:text-[#ecd8a6] hover:border-[#ecd8a6]/60 transition-all group"
+            title="Profile"
+          >
+            <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase hidden sm:inline-block">
+              {userInfo.language === 'tr' ? 'Profil' : 'Profile'}
+            </span>
+          </button>
+
+          <button 
             onClick={handleSignOut}
             className="flex items-center gap-1.5 sm:gap-2 pl-3 pr-2.5 py-1.5 sm:py-2 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group"
             title="Sign Out"
@@ -715,6 +803,18 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {isProfileOpen && user && (
+          <Profile 
+            user={user} 
+            onClose={() => setIsProfileOpen(false)} 
+            language={userInfo.language}
+            locales={locales}
+          />
         )}
       </AnimatePresence>
 
@@ -1239,7 +1339,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       <footer className="w-full relative z-10 border-t border-[#ecd8a6]/10 py-6 mt-auto">
         <div className="max-w-4xl mx-auto px-4 flex justify-center gap-6 sm:gap-12">
           <button
-            onClick={() => setIsLegalOpen(true)}
+            onClick={handleLegalOpen}
             className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
           >
             {t('legal.button')}

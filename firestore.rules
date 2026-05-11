@@ -17,7 +17,10 @@ service cloud.firestore {
 
     function isValidUser(data) {
       return data.userId == request.auth.uid &&
-             data.keys().hasAll(['userId', 'lastLogin']);
+             data.keys().hasAll(['userId', 'lastLogin']) &&
+             (!('hasAcceptedLegal' in data) || (data.hasAcceptedLegal is int && data.hasAcceptedLegal in [0, 1])) &&
+             (!('legalAcceptedAt' in data) || data.legalAcceptedAt is timestamp) &&
+             (!('metadata' in data) || data.metadata is map);
     }
 
     function isValidUserMoon(data) {
@@ -37,7 +40,15 @@ service cloud.firestore {
              (!('userBirthplace' in data) || (data.userBirthplace is string && data.userBirthplace.size() < 200)) &&
              (!('userRelationship' in data) || (data.userRelationship is string && data.userRelationship.size() < 100)) &&
              (!('userLanguage' in data) || (data.userLanguage is string && data.userLanguage.size() < 10)) &&
-             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10));
+             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10)) &&
+             (!('cardIds' in data) || (data.cardIds is list && data.cardIds.size() <= 10)) &&
+             (!('readingText' in data) || (data.readingText is string && data.readingText.size() < 10000));
+    }
+
+    function isValidUserEvent(data) {
+      return data.userId == request.auth.uid &&
+             data.eventType is string &&
+             data.timestamp == request.time;
     }
 
     match /users/{userId} {
@@ -54,6 +65,11 @@ service cloud.firestore {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
       allow update: if request.auth != null && resource.data.userId == request.auth.uid && isValidMoonTransaction(request.resource.data);
+    }
+
+    match /user_events/{eventId} {
+      allow create: if request.auth != null && isValidUserEvent(request.resource.data);
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     match /messages_en/{messageId} {
