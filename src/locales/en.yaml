@@ -1137,3 +1137,28 @@ promo:
       Visit our Etsy shop for a personalized,
       live fortune telling experience.
     shopOnEtsy: Shop on Etsy
+profile:
+  title: "Mystic Profile"
+  userInfo: "Your Information"
+  readingHistory: "Past Readings"
+  noHistory: "No readings yet."
+  moons: "Mystic Balance"
+  status: "Relationship Status"
+  birthplace: "Birthplace"
+  dob: "Date of Birth"
+  name: "Name"
+  tabs:
+    overview: "Overview"
+    settings: "Settings"
+  settings:
+    email: "Email Address"
+    password: "Password"
+    newPassword: "New Password"
+    updateEmail: "Update Email"
+    updatePassword: "Change Password"
+    successEmail: "Email updated successfully."
+    successPassword: "Password updated successfully."
+    reauthRequired: "For security, please log in again."
+  history:
+    downloadPdf: "Download PDF"
+    viewReading: "View Reading"

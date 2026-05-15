@@ -7,14 +7,15 @@ import {
   signInWithPhoneNumber,
   ConfirmationResult,
   GoogleAuthProvider,
+  OAuthProvider,
   signInWithPopup,
-  User,
-  sendPasswordResetEmail
+  User
 } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { gatherUserMetadata } from '../lib/metadata';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
+  Apple,
   Mail, 
   Phone, 
   Lock, 
@@ -48,6 +49,7 @@ const translations = {
     signInLabel: "Giriş Yap",
     signUpLabel: "Kaydol",
     googleSignIn: "Google ile Giriş Yap",
+    appleSignIn: "Apple ile Giriş Yap",
     switchToPhone: "Telefon ile devam et",
     switchToEmail: "E-posta ile devam et",
     sendCode: "Kod Gönder",
@@ -57,8 +59,7 @@ const translations = {
     noAccount: "Henüz bir hesabınız yok mu? Kaydolun",
     error: "Bir hata oluştu, lütfen bilgileri kontrol edin.",
     loading: "Yükleniyor...",
-    showIntro: "Uygulama Tanıtımını Gör",
-    forgotPasswordLabel: "Şifremi Unuttum"
+    showIntro: "Uygulama Tanıtımını Gör"
   },
   en: {
     signInTitle: "Welcome to MadameSoul",
@@ -71,6 +72,7 @@ const translations = {
     signInLabel: "Sign In",
     signUpLabel: "Sign Up",
     googleSignIn: "Continue with Google",
+    appleSignIn: "Continue with Apple",
     switchToPhone: "Continue with Phone",
     switchToEmail: "Continue with Email",
     sendCode: "Send Code",
@@ -80,8 +82,7 @@ const translations = {
     noAccount: "Don't have an account? Sign Up",
     error: "An error occurred. Please check your details.",
     loading: "Loading...",
-    showIntro: "Watch App Intro",
-    forgotPasswordLabel: "Forgot Password?"
+    showIntro: "Watch App Intro"
   },
   es: {
     signInTitle: "Bienvenido a MadameSoul",
@@ -94,6 +95,7 @@ const translations = {
     signInLabel: "Iniciar Sesión",
     signUpLabel: "Registrarse",
     googleSignIn: "Continuar con Google",
+    appleSignIn: "Continuar con Apple",
     switchToPhone: "Continuar con Teléfono",
     switchToEmail: "Continuar con Correo",
     sendCode: "Enviar Código",
@@ -103,8 +105,7 @@ const translations = {
     noAccount: "¿No tienes cuenta? Regístrate",
     error: "Ocurrió un error. Verifica tus datos.",
     loading: "Cargando...",
-    showIntro: "Ver Introducción",
-    forgotPasswordLabel: "¿Olvidaste tu contraseña?"
+    showIntro: "Ver Introducción"
   },
   fr: {
     signInTitle: "Bienvenue sur MadameSoul",
@@ -117,6 +118,7 @@ const translations = {
     signInLabel: "Se Connecter",
     signUpLabel: "S'inscrire",
     googleSignIn: "Continuer avec Google",
+    appleSignIn: "Continuer avec Apple",
     switchToPhone: "Continuer par Téléphone",
     switchToEmail: "Continuer par E-mail",
     sendCode: "Envoyer le Code",
@@ -126,8 +128,7 @@ const translations = {
     noAccount: "Pas de compte ? S'inscrire",
     error: "Une erreur est survenue. Vérifiez vos infos.",
     loading: "Chargement...",
-    showIntro: "Voir l'Introduction",
-    forgotPasswordLabel: "Mot de passe oublié ?"
+    showIntro: "Voir l'Introduction"
   },
   zh: {
     signInTitle: "歡迎來到 MadameSoul",
@@ -140,6 +141,7 @@ const translations = {
     signInLabel: "登入",
     signUpLabel: "註冊",
     googleSignIn: "繼續使用 Google",
+    appleSignIn: "繼續使用 Apple",
     switchToPhone: "繼續使用電話",
     switchToEmail: "繼續使用電子郵件",
     sendCode: "發送代碼",
@@ -149,8 +151,7 @@ const translations = {
     noAccount: "沒有賬號？註冊",
     error: "發生錯誤。請檢查您的詳細信息。",
     loading: "載入中...",
-    showIntro: "查看介紹",
-    forgotPasswordLabel: "忘記密碼？"
+    showIntro: "查看介紹"
   },
   ko: {
     signInTitle: "MadameSoul에 오신 것을 환영합니다",
@@ -163,6 +164,7 @@ const translations = {
     signInLabel: "로그인",
     signUpLabel: "회원가입",
     googleSignIn: "Google로 계속하기",
+    appleSignIn: "Apple로 계속하기",
     switchToPhone: "전화번호로 계속하기",
     switchToEmail: "이메일로 계속하기",
     sendCode: "코드 전송",
@@ -172,8 +174,7 @@ const translations = {
     noAccount: "계정이 없으신가요? 회원가입",
     error: "오류가 발생했습니다. 정보를 확인하세요.",
     loading: "로딩 중...",
-    showIntro: "소개 보기",
-    forgotPasswordLabel: "비밀번호를 잊으셨나요?"
+    showIntro: "소개 보기"
   }
 };
 
@@ -395,6 +396,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         setError(language === 'tr' ? "Giriş penceresi engellendi. Lütfen pop-uplara izin verin." : "Popup blocked. Please allow popups.");
       } else if (err.code === 'auth/popup-closed-by-user') {
         setError(language === 'tr' ? "Giriş penceresi kapatıldı." : "Login window closed.");
+      } else if (err.code === 'auth/configuration-not-found') {
+        setError(language === 'tr' ? "Firebase Yapılandırma Hatası: Lütfen Firebase Console üzerinden Authentication > Sign-in method sekmesinden Google'ı aktif edin ve projeniz için bir destek e-postası seçin." : "Firebase Configuration Error: Please enable Google sign-in in the Firebase Console (Authentication > Sign-in method) and select a support email for your project.");
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(language === 'tr' ? "Yetkisiz Alan Adı: Bu alan adının Firebase Console > Authentication > Settings > Authorized Domains listesine eklenmesi gerekiyor." : "Unauthorized Domain: This domain needs to be added to the Authorized Domains list in the Firebase Console (Authentication > Settings).");
       } else {
         setError(err.message || t.error);
       }
@@ -403,19 +408,30 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError(language === 'tr' ? "Lütfen e-posta adresinizi girin." : "Please enter your email address.");
-      return;
-    }
+  const handleAppleLogin = async () => {
     setLoading(true);
     setError('');
     try {
-      await sendPasswordResetEmail(auth, email);
-      setError(language === 'tr' ? "Şifre sıfırlama e-postası gönderildi. Lütfen e-postanızı kontrol edin." : "Password reset email sent. Please check your inbox.");
+      const provider = new OAuthProvider('apple.com');
+      provider.addScope('email');
+      provider.addScope('name');
+      
+      const result = await signInWithPopup(auth, provider);
+      await saveUserToFirestore(result.user);
+      onLogin();
     } catch (err: any) {
-      console.error("Password reset error:", err);
-      setError(err.message || t.error);
+      console.error("Apple login error:", err);
+      if (err.code === 'auth/popup-blocked') {
+        setError(language === 'tr' ? "Giriş penceresi engellendi. Lütfen pop-uplara izin verin." : "Popup blocked. Please allow popups.");
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        setError(language === 'tr' ? "Giriş penceresi kapatıldı." : "Login window closed.");
+      } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
+        setError(language === 'tr' ? "Firebase Yapılandırma Hatası: Lütfen Firebase Console üzerinden Apple giriş yönteminin tam olarak yapılandırıldığından emin olun (Service ID, Team ID, Key ID ve Private Key)." : "Firebase Configuration Error: Please ensure Apple sign-in is fully configured in the Firebase Console (Service ID, Team ID, Key ID, and Private Key).");
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError(language === 'tr' ? "Yetkisiz Alan Adı: Bu alan adının Firebase Console > Authentication > Settings > Authorized Domains listesine eklenmesi gerekiyor." : "Unauthorized Domain: This domain needs to be added to the Authorized Domains list in the Firebase Console (Authentication > Settings).");
+      } else {
+        setError(err.message || t.error);
+      }
     } finally {
       setLoading(false);
     }
@@ -467,283 +483,331 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-sm bg-[#160c24]/90 backdrop-blur-2xl border border-[#ecd8a6]/15 rounded-[2rem] p-6 sm:p-10 shadow-2xl relative mb-8"
+        className="w-full max-w-sm md:max-w-4xl bg-[#160c24]/90 backdrop-blur-2xl border border-[#ecd8a6]/15 rounded-[2rem] shadow-2xl relative mb-8 overflow-hidden"
       >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#ecd8a6]/30 to-transparent" />
         
-        {/* Logo/Icon Area */}
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#ecd8a6]/10 blur-xl rounded-full scale-125" />
-            <div className="w-16 h-16 bg-[#1a1025] border border-[#ecd8a6]/25 rounded-full flex items-center justify-center relative z-10">
-              <KatinaMoon className="w-8 h-8" />
+        <div className="flex flex-col md:flex-row h-full">
+          {/* Left Side: Visual (Desktop Only) */}
+          <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#1a1025] to-[#0a0512] flex-col items-center justify-center p-12 relative overflow-hidden border-r border-[#ecd8a6]/10">
+            <div className="absolute inset-0 opacity-20 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#ecd8a6]/10 via-transparent to-transparent" />
+            </div>
+            
+            <motion.div
+              animate={{ 
+                rotate: [0, 5, -5, 0],
+                scale: [1, 1.05, 0.95, 1]
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              className="relative z-10 mb-8"
+            >
+              <div className="absolute inset-0 bg-[#ecd8a6]/20 blur-3xl rounded-full scale-150" />
+              <KatinaMoon className="w-48 h-48 text-[#ecd8a6]" />
+            </motion.div>
+            
+            <div className="text-center relative z-10">
+              <h1 className="text-3xl font-serif text-[#ecd8a6] mb-4 tracking-widest uppercase">MadameSoul</h1>
+              <div className="w-12 h-px bg-[#ecd8a6]/40 mx-auto mb-6" />
+              <p className="text-[#ecd8a6]/60 font-serif italic text-lg leading-relaxed max-w-xs">
+                {language === 'tr' ? '"Yıldızların fısıltısını ve ruhunuzun derinliklerini keşfedin."' : '"Discover the whispers of the stars and the depths of your soul."'}
+              </p>
+            </div>
+            
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 opacity-30">
+              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
+              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
+              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
             </div>
           </div>
-        </div>
 
-        {/* Dynamic Titles */}
-        <div className="text-center mb-8 w-full flex flex-col items-center">
-          <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-tight mb-2 text-center">
-            {isSignUp ? t.signUpTitle : t.signInTitle}
-          </h2>
-          <p className="text-[#ecd8a6]/50 text-xs sm:text-sm text-center max-w-[280px]">
-            {isSignUp ? t.signUpSubtitle : t.signInSubtitle}
-          </p>
-        </div>
-
-        <AnimatePresence mode="wait">
-          {authMethod === 'email' ? (
-            <motion.form 
-              key="email-form"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              onSubmit={handleEmailAuth}
-              className="space-y-4"
-            >
-              <div className="space-y-3">
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
-                  <input 
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t.email}
-                    required
-                    className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
-                  />
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
-                  <input 
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t.password}
-                    required
-                    className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
-                  />
+          {/* Right Side: Form */}
+          <div className="flex-1 p-6 sm:p-10 md:p-12">
+            {/* Logo/Icon Area (Mobile Only) */}
+            <div className="flex justify-center mb-6 md:hidden">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#ecd8a6]/10 blur-xl rounded-full scale-125" />
+                <div className="w-16 h-16 bg-[#1a1025] border border-[#ecd8a6]/25 rounded-full flex items-center justify-center relative z-10">
+                  <KatinaMoon className="w-8 h-8" />
                 </div>
               </div>
+            </div>
 
-              {error && <p className="text-red-400 text-[10px] sm:text-xs text-center bg-red-400/5 py-2 rounded-lg border border-red-400/10">{error}</p>}
+            {/* Dynamic Titles */}
+            <div className="text-center md:text-left mb-8 w-full flex flex-col items-center md:items-start">
+              <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-tight mb-2">
+                {isSignUp ? t.signUpTitle : t.signInTitle}
+              </h2>
+              <p className="text-[#ecd8a6]/50 text-xs sm:text-sm max-w-[280px] md:max-w-none">
+                {isSignUp ? t.signUpSubtitle : t.signInSubtitle}
+              </p>
+            </div>
 
-              <div className="flex flex-col gap-3 pt-2">
-                <button 
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[#ecd8a6] text-[#0a0512] py-3.5 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#f2e1b8] active:scale-[0.98] transition-all shadow-lg"
+            <AnimatePresence mode="wait">
+              {authMethod === 'email' ? (
+                <motion.form 
+                  key="email-form"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  onSubmit={handleEmailAuth}
+                  className="space-y-4"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                    <>
-                      <span>{isSignUp ? t.signUpLabel : t.signInLabel}</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
-                  className="w-full bg-white/5 text-[#ecd8a6] py-3.5 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 hover:bg-white/10 transition-all"
-                >
-                  <span>{isSignUp ? t.signInLabel : t.signUpLabel}</span>
-                  <RefreshCw className="w-3.5 h-3.5 opacity-50" />
-                </button>
-
-                {!isSignUp && (
-                  <button 
-                    type="button"
-                    onClick={handleForgotPassword}
-                    className="w-full text-[#ecd8a6]/60 hover:text-[#ecd8a6] py-1 text-[10px] sm:text-xs font-serif uppercase tracking-widest transition-all"
-                  >
-                    {t.forgotPasswordLabel}
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-3 pt-6 border-t border-[#ecd8a6]/10">
-                <button 
-                  type="button"
-                  onClick={onShowOnboarding}
-                  className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
-                >
-                  <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                  <span>{t.showIntro}</span>
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={loading}
-                  className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                  </svg>
-                  {t.googleSignIn}
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={() => setAuthMethod('phone')}
-                  className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
-                >
-                  <Phone className="w-3.5 h-3.5 opacity-70" />
-                  {t.switchToPhone}
-                </button>
-              </div>
-            </motion.form>
-          ) : (
-            <motion.div 
-              key="phone-form"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-4"
-            >
-              {!confirmationResult ? (
-                <form onSubmit={handlePhoneSubmit} className="space-y-4">
-                  <div className="relative flex gap-2">
+                  <div className="space-y-3">
                     <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setShowCountrySelect(!showCountrySelect)}
-                        className="h-full px-3 bg-black/40 border border-[#ecd8a6]/10 rounded-xl text-[#ecd8a6] text-sm flex items-center gap-1 hover:border-[#ecd8a6]/30 transition-all min-w-[70px]"
-                      >
-                        <span>{countryCodes.find(c => c.code === selectedCountry)?.flag}</span>
-                        <span>{selectedCountry}</span>
-                      </button>
-                      
-                      <AnimatePresence>
-                        {showCountrySelect && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute bottom-full mb-2 left-0 w-48 max-h-60 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-xl overflow-y-auto shadow-2xl z-[150] p-1 custom-scrollbar"
-                          >
-                            {countryCodes.map((c) => (
-                              <button
-                                key={c.code}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedCountry(c.code);
-                                  setShowCountrySelect(false);
-                                }}
-                                className="w-full px-3 py-2 text-left hover:bg-[#ecd8a6] hover:text-[#0a0512] text-[#ecd8a6] rounded-lg transition-colors flex items-center justify-between text-xs"
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span>{c.flag}</span>
-                                  <span>{c.name}</span>
-                                </span>
-                                <span className="opacity-60">{c.code}</span>
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                    <div className="relative flex-1">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
                       <input 
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        placeholder={t.phone}
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t.email}
                         required
-                        className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
+                        className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
+                      <input 
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder={t.password}
+                        required
+                        className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
                       />
                     </div>
                   </div>
-                  <div id="recaptcha-container" className="hidden"></div>
-                  {error && <p className="text-red-400 text-xs text-center">{error}</p>}
-                  <button 
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-[#ecd8a6] text-[#0a0512] py-3.5 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                      <>
-                        <span>{t.sendCode}</span>
-                        <MessageSquare className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleCodeVerify} className="space-y-4">
-                  <div className="relative">
-                    <MailCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
-                    <input 
-                      type="text"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      placeholder={t.enterCode}
-                      required
-                      className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3 pl-11 pr-4 text-[#ecd8a6] focus:border-[#ecd8a6]/40 outline-none transition-all text-center tracking-[0.5em] text-lg font-bold"
-                    />
+
+                  {error && <p className="text-red-400 text-[10px] sm:text-xs text-center bg-red-400/5 py-2 rounded-lg border border-red-400/10">{error}</p>}
+
+                  <div className="flex flex-col gap-3 pt-2">
+                    <button 
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#f2e1b8] active:scale-[0.98] transition-all shadow-lg"
+                    >
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                        <>
+                          <span>{isSignUp ? t.signUpLabel : t.signInLabel}</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => setIsSignUp(!isSignUp)}
+                      className="w-full bg-white/5 text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 hover:bg-white/10 transition-all"
+                    >
+                      <span>{isSignUp ? t.signInLabel : t.signUpLabel}</span>
+                      <RefreshCw className="w-3.5 h-3.5 opacity-50" />
+                    </button>
                   </div>
-                  {error && <p className="text-red-400 text-xs text-center">{error}</p>}
-                  <button 
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-[#ecd8a6] text-[#0a0512] py-3.5 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3"
-                  >
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                      <>
-                        <span>{t.verifyCode}</span>
-                        <ShieldCheck className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
-                </form>
+
+                  <div className="flex flex-col gap-3 pt-6 border-t border-[#ecd8a6]/10">
+                    <button 
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={loading}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      {t.googleSignIn}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={handleAppleLogin}
+                      disabled={loading}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Apple className="w-4 h-4" />
+                      {t.appleSignIn}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => setAuthMethod('phone')}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Phone className="w-3.5 h-3.5 opacity-70" />
+                      {t.switchToPhone}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={onShowOnboarding}
+                      className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                    >
+                      <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                      <span>{t.showIntro}</span>
+                    </button>
+                  </div>
+                </motion.form>
+              ) : (
+                <motion.div 
+                  key="phone-form"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-4"
+                >
+                  {!confirmationResult ? (
+                    <form onSubmit={handlePhoneSubmit} className="space-y-4">
+                      <div className="relative flex gap-2">
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowCountrySelect(!showCountrySelect)}
+                            className="h-full px-3 bg-black/40 border border-[#ecd8a6]/10 rounded-xl text-[#ecd8a6] text-sm flex items-center gap-1 hover:border-[#ecd8a6]/30 transition-all min-w-[70px]"
+                          >
+                            <span>{countryCodes.find(c => c.code === selectedCountry)?.flag}</span>
+                            <span>{selectedCountry}</span>
+                          </button>
+                          
+                          <AnimatePresence>
+                            {showCountrySelect && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                className="absolute bottom-full mb-2 left-0 w-48 max-h-60 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-xl overflow-y-auto shadow-2xl z-[150] p-1 custom-scrollbar"
+                              >
+                                {countryCodes.map((c) => (
+                                  <button
+                                    key={c.code}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedCountry(c.code);
+                                      setShowCountrySelect(false);
+                                    }}
+                                    className="w-full px-3 py-2 text-left hover:bg-[#ecd8a6] hover:text-[#0a0512] text-[#ecd8a6] rounded-lg transition-colors flex items-center justify-between text-xs"
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      <span>{c.flag}</span>
+                                      <span>{c.name}</span>
+                                    </span>
+                                    <span className="opacity-60">{c.code}</span>
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        <div className="relative flex-1">
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
+                          <input 
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                            placeholder={t.phone}
+                            required
+                            className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div id="recaptcha-container" className="hidden"></div>
+                      {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                      <button 
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg"
+                      >
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                          <>
+                            <span>{t.sendCode}</span>
+                            <MessageSquare className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleCodeVerify} className="space-y-4">
+                      <div className="relative">
+                        <MailCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
+                        <input 
+                          type="text"
+                          value={code}
+                          onChange={(e) => setCode(e.target.value)}
+                          placeholder={t.enterCode}
+                          required
+                          className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-4 pl-11 pr-4 text-[#ecd8a6] focus:border-[#ecd8a6]/40 outline-none transition-all text-center tracking-[0.5em] text-lg font-bold"
+                        />
+                      </div>
+                      {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                      <button 
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg"
+                      >
+                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                          <>
+                            <span>{t.verifyCode}</span>
+                            <ShieldCheck className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  <div className="flex flex-col gap-3 pt-6 border-t border-[#ecd8a6]/10">
+                    <button 
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={loading}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
+                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      {t.googleSignIn}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={handleAppleLogin}
+                      disabled={loading}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Apple className="w-4 h-4" />
+                      {t.appleSignIn}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        setAuthMethod('email');
+                        setConfirmationResult(null);
+                      }}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                    >
+                      <Mail className="w-3.5 h-3.5 opacity-70" />
+                      {t.switchToEmail}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={onShowOnboarding}
+                      className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                    >
+                      <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                      <span>{t.showIntro}</span>
+                    </button>
+                  </div>
+                </motion.div>
               )}
-
-              <div className="space-y-3 pt-6 border-t border-[#ecd8a6]/10">
-                <button 
-                  type="button"
-                  onClick={onShowOnboarding}
-                  className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group"
-                >
-                  <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                  <span>{t.showIntro}</span>
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={loading}
-                  className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3 rounded-xl text-[10px] font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
-                    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                  </svg>
-                  {t.googleSignIn}
-                </button>
-
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setAuthMethod('email');
-                    setConfirmationResult(null);
-                  }}
-                  className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3 rounded-xl text-[10px] font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
-                >
-                  <Mail className="w-3.5 h-3.5 opacity-70" />
-                  {t.switchToEmail}
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </AnimatePresence>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

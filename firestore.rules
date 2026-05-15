@@ -40,13 +40,13 @@ service cloud.firestore {
              (!('userBirthplace' in data) || (data.userBirthplace is string && data.userBirthplace.size() < 200)) &&
              (!('userRelationship' in data) || (data.userRelationship is string && data.userRelationship.size() < 100)) &&
              (!('userLanguage' in data) || (data.userLanguage is string && data.userLanguage.size() < 10)) &&
-             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10)) &&
-             (!('cardIds' in data) || (data.cardIds is list && data.cardIds.size() <= 10)) &&
-             (!('readingText' in data) || (data.readingText is string && data.readingText.size() < 10000));
+             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10));
     }
 
     function isValidUserEvent(data) {
       return data.userId == request.auth.uid &&
+             data.keys().hasAll(['userId', 'eventType', 'timestamp']) &&
+             data.keys().size() <= 4 && // userId, eventType, timestamp, eventData (optional)
              data.eventType is string &&
              data.timestamp == request.time;
     }

@@ -4,7 +4,7 @@ import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
-import { db, auth } from './lib/firebase';
+import { db, auth, initAnalytics } from './lib/firebase';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
 import { Onboarding } from './components/Onboarding';
@@ -18,7 +18,29 @@ import es from './locales/es.yaml';
 import fr from './locales/fr.yaml';
 import zh from './locales/zh.yaml';
 import ko from './locales/ko.yaml';
-import { Sparkles, Star, RefreshCw, ChevronRight, Download, Globe, ArrowLeft, Share2, X, Plus, Copy, Check, ShoppingBag, LogOut, Loader2, User as UserIcon } from 'lucide-react';
+import { 
+  Sparkles, 
+  Star, 
+  RefreshCw, 
+  ChevronRight, 
+  Download, 
+  Globe, 
+  ArrowLeft, 
+  Share2, 
+  X, 
+  Plus, 
+  Copy, 
+  Check, 
+  ShoppingBag, 
+  LogOut, 
+  Loader2,
+  User as UserIcon,
+  Settings,
+  History,
+  Calendar,
+  MapPin,
+  Heart
+} from 'lucide-react';
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
@@ -123,9 +145,9 @@ function App() {
   const [moonsCount, setMoonsCount] = useState<number>(0);
   const [isMoonsLoading, setIsMoonsLoading] = useState(true);
   const [isStoreOpen, setIsStoreOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLegalOpen = async () => {
     setIsLegalOpen(true);
@@ -179,6 +201,10 @@ function App() {
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
+
+  useEffect(() => {
+    initAnalytics();
+  }, []);
 
   // Firestore Error Handler
   const handleFirestoreError = (error: unknown, operationType: string, path: string | null) => {
@@ -348,8 +374,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         userDob: userInfo.dob,
         userBirthplace: userInfo.birthplace,
         userRelationship: userInfo.relationship,
-        selectedCards: cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name),
-        cardIds: cards.map(c => c.id),
+        cards: cards.map(c => ({ id: c.id, locKey: c.locKey, name: c.name })),
         createdAt: serverTimestamp()
       });
       setCurrentTransactionId(txRef.id);
@@ -357,26 +382,24 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText })
+        body: JSON.stringify({ prompt: promptText }),
       });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const generatedText = data.text || t('errorSilent');
-      setReading(generatedText);
 
-      // Update transaction with the reading text
-      if (txRef.id && data.text) {
-        try {
-          await updateDoc(doc(db, 'moon_transactions', txRef.id), {
-            readingText: generatedText
-          });
-        } catch (error) {
-          handleFirestoreError(error, 'update', `moon_transactions/${txRef.id}`);
-        }
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+
+      const data = await response.json();
+      const finalReading = data.text || t('errorSilent');
+      setReading(finalReading);
+
+      // Save reading text to the transaction for history download
+      try {
+        await updateDoc(doc(db, 'moon_transactions', txRef.id), {
+          readingText: finalReading
+        });
+      } catch (e) {
+        console.error("Error saving reading text:", e);
       }
     } catch (error) {
       console.error("Reading generation error:", error);
@@ -388,8 +411,17 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
-  const handleDownload = async () => {
-    if (!reading || isExportingPDF) return;
+  const handleDownload = async (pastReading?: any) => {
+    const readingToUse = pastReading ? pastReading.readingText : reading;
+    const userInfoToUse = pastReading ? {
+      name: pastReading.userName,
+      dob: pastReading.userDob,
+      birthplace: pastReading.userBirthplace,
+      relationship: pastReading.userRelationship,
+      language: (pastReading.userLanguage as keyof typeof locales) || userInfo.language
+    } : userInfo;
+
+    if (!readingToUse || isExportingPDF) return;
     setIsExportingPDF(true);
 
     try {
@@ -400,7 +432,9 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       container.style.width = '800px';
       container.style.zIndex = '-9999';
       
-      const dateStr = new Date().toLocaleDateString(userInfo.language === 'en' ? 'en-US' : userInfo.language === 'tr' ? 'tr-TR' : undefined);
+      const dateStr = pastReading 
+        ? pastReading.createdAt?.toDate().toLocaleDateString(userInfoToUse.language === 'en' ? 'en-US' : userInfoToUse.language === 'tr' ? 'tr-TR' : undefined)
+        : new Date().toLocaleDateString(userInfo.language === 'en' ? 'en-US' : userInfo.language === 'tr' ? 'tr-TR' : undefined);
       
       const formatReading = (text: string) => {
         let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -417,13 +451,13 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                  return `<div style="margin-left: 20px; display: block;">&bull; ${l.trim().substring(2)}</div>`;
              }
              return l;
-          }).join(' '); // Join single newlines with space to prevent broken lines
+          }).join(' '); 
           
           return `<p style="margin: 0 0 15px 0; line-height: 1.6;">${pFormatted}</p>`;
         }).join('');
       };
       
-      const cleanReading = formatReading(reading);
+      const cleanReading = formatReading(readingToUse);
 
       const cardsHtml = `
         <div style="display: flex; justify-content: center; gap: 40px; margin: 50px 0 60px 0; position: relative;">
@@ -433,7 +467,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                  <img src="${window.location.origin}/cards/${c.id}.png" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
               </div>
               <div style="margin-top: 16px; font-family: 'Playfair Display', serif; font-size: 16px; color: #ecd8a6; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
-                ${locales[userInfo.language].cards?.[c.locKey]?.name || c.name}
+                ${locales[userInfoToUse.language].cards?.[c.locKey]?.name || c.name}
               </div>
             </div>
           `).join('')}
@@ -442,14 +476,14 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
       const bannerHtml = `
         <div style="margin-top: 80px; padding: 40px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(236,216,166,0.3); background: linear-gradient(135deg, rgba(236,216,166,0.05) 0%, rgba(10,5,18,0.8) 100%);">
-           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${bannerTranslations.sponsored[userInfo.language]} ✦</h3>
-           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${bannerTranslations.promoText[userInfo.language]}</p>
+           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${bannerTranslations.sponsored[userInfoToUse.language]} ✦</h3>
+           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${bannerTranslations.promoText[userInfoToUse.language]}</p>
            
            <div style="display: inline-block; background-color: #05000a; padding: 16px 32px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: bold; color: #ecd8a6; border: 1px dashed rgba(236,216,166,0.5); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
              KATINA20
            </div>
            <br/>
-           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${bannerTranslations.shopNow[userInfo.language]} on Amazon</div>
+           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${bannerTranslations.shopNow[userInfoToUse.language]} on Amazon</div>
         </div>
       `;
 
@@ -457,7 +491,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         <div style="padding: 20px; background-color: #05000a; min-height: 1000px; box-sizing: border-box;">
           <div style="border: 1px solid rgba(236,216,166,0.2); border-radius: 24px; padding: 60px 80px; background: radial-gradient(circle at top center, rgba(30,19,50,0.4) 0%, rgba(5,0,10,1) 50%); position: relative; overflow: hidden;">
             
-            <!-- Corner Decorations -->
             <div style="position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
             <div style="position: absolute; top: 30px; right: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
             <div style="position: absolute; bottom: 30px; left: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
@@ -473,7 +506,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
             </div>
 
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(236,216,166,0.2); border-top: 1px solid rgba(236,216,166,0.2); padding: 15px 0; margin-bottom: 30px; color: rgba(236,216,166,0.7); font-family: sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-              <div>Prepared For: <strong style="color: #ecd8a6;">${userInfo.name}</strong></div>
+              <div>Prepared For: <strong style="color: #ecd8a6;">${userInfoToUse.name}</strong></div>
               <div>Date: <strong style="color: #ecd8a6;">${dateStr}</strong></div>
             </div>
             
@@ -495,11 +528,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         scale: 2,
         backgroundColor: '#05000a',
         useCORS: true,
-        logging: false,
-        onclone: (clonedDoc) => {
-          // ensure the cloned doc has fonts loaded or wait a bit? 
-          // usually fine
-        }
+        logging: false
       });
       
       document.body.removeChild(container);
@@ -533,16 +562,17 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       pdf.text(t2, (canvas.width - w2) / 2, canvas.height - 70);
       pdf.link((canvas.width - w2) / 2, canvas.height - 90, w2, 24, { url: 'https://www.etsy.com/shop/MadameSoulStudio?ref=sh-carousel-1' });
 
-      pdf.save(`Katina_Reading_${userInfo.name.replace(/\s+/g, '_')}.pdf`);
+      pdf.save(`Katina_Reading_${userInfoToUse.name.replace(/\s+/g, '_')}.pdf`);
 
       // Mark PDF as downloaded in the transaction record
-      if (currentTransactionId) {
+      const activeTxId = pastReading ? pastReading.id : currentTransactionId;
+      if (activeTxId) {
         try {
-          await updateDoc(doc(db, 'moon_transactions', currentTransactionId), {
+          await updateDoc(doc(db, 'moon_transactions', activeTxId), {
             pdfDownloaded: 1
           });
         } catch (error) {
-          handleFirestoreError(error, 'update', `moon_transactions/${currentTransactionId}`);
+          console.error("PDF download update error:", error);
         }
       }
     } catch (err) {
@@ -635,15 +665,23 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       </div>
 
       {/* Top Header - Moons / Store */}
-      {step === 'SPLASH' && (
+      {step !== 'DRAWING' && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40]"
         >
           <div 
+            onClick={() => setIsProfileOpen(true)}
+            className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+            title="Profile"
+          >
+            <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+          </div>
+
+          <div 
             onClick={() => setIsStoreOpen(true)}
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
           >
             <KatinaMoon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
             <span className="font-serif tracking-widest text-[#ecd8a6] text-xs sm:text-base font-semibold">{moonsCount}</span>
@@ -653,19 +691,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
           </div>
 
           <button 
-            onClick={() => setIsProfileOpen(true)}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 text-[#ecd8a6]/70 hover:text-[#ecd8a6] hover:border-[#ecd8a6]/60 transition-all group"
-            title="Profile"
-          >
-            <UserIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
-            <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase hidden sm:inline-block">
-              {userInfo.language === 'tr' ? 'Profil' : 'Profile'}
-            </span>
-          </button>
-
-          <button 
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 sm:gap-2 pl-3 pr-2.5 py-1.5 sm:py-2 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group"
+            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group"
             title="Sign Out"
           >
             <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
@@ -772,6 +799,21 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         )}
       </AnimatePresence>
 
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {isProfileOpen && (
+          <Profile
+            user={user}
+            userInfo={userInfo}
+            moonsCount={moonsCount}
+            onClose={() => setIsProfileOpen(false)}
+            onUpdateUserInfo={(info) => setUserInfo(prev => ({ ...prev, ...info }))}
+            onDownloadPastReading={handleDownload}
+            translations={locales[userInfo.language]}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Legal Modal */}
       <AnimatePresence>
         {isLegalOpen && (
@@ -803,18 +845,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Profile Modal */}
-      <AnimatePresence>
-        {isProfileOpen && user && (
-          <Profile 
-            user={user} 
-            onClose={() => setIsProfileOpen(false)} 
-            language={userInfo.language}
-            locales={locales}
-          />
         )}
       </AnimatePresence>
 
@@ -948,7 +978,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         )}
       </AnimatePresence>
 
-      <main className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-20 flex flex-col items-center">
+      <main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16 flex flex-col items-center">
         
         {/* Header */}
         {step !== 'SPLASH' && (
@@ -957,7 +987,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12 flex flex-col items-center"
           >
-            <div className="flex items-center justify-center mb-2 mt-16 sm:mt-0 relative">
+            <div className="flex items-center justify-center mb-2 mt-24 sm:mt-24 relative">
               <div className="absolute inset-0 bg-[#ecd8a6]/10 blur-xl rounded-full" />
               <h1 
                 onClick={() => setStep('SPLASH')}
@@ -986,7 +1016,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-              className="w-full flex-1 flex flex-col items-center justify-center min-h-[70vh] relative pt-20 sm:pt-10"
+              className="w-full flex-1 flex flex-col items-center justify-center min-h-[70vh] relative pt-12 sm:pt-20"
             >
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
                 {/* Intricate glowing astrolabe/tarot circle effect */}
@@ -1018,104 +1048,104 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                 </h1>
               </div>
               
-              <div className="flex items-center justify-center w-full max-w-md gap-3 sm:gap-4 mb-4 relative z-10">
+              <div className="flex items-center justify-center w-full max-w-2xl gap-3 sm:gap-4 mb-4 relative z-10">
                 <div className="hidden sm:block h-px w-12 bg-[#ecd8a6]/40 flex-1" />
                 <p className="text-[#ecd8a6]/80 text-xs sm:text-sm md:text-base tracking-[0.3em] sm:tracking-[0.4em] uppercase font-serif text-center w-full sm:w-auto">Katina Readings</p>
                 <div className="hidden sm:block h-px w-12 bg-[#ecd8a6]/40 flex-1" />
               </div>
 
-              <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-10 text-center max-w-md relative z-10 mt-6 px-4">
+              <p className="text-[#ecd8a6]/70 text-base md:text-xl font-sans italic mb-10 text-center max-w-3xl relative z-10 mt-6 px-4">
                 {t('splashText')}
               </p>
 
-              <div className="flex flex-col items-center gap-6 relative z-10 w-full px-4">
+              <div className="flex flex-col items-center gap-8 relative z-10 w-full">
                 <button
                   onClick={() => setStep('FORM')}
-                  className="group w-full sm:w-auto max-w-[320px] sm:max-w-none justify-center relative px-10 sm:px-14 py-4 sm:py-5 flex items-center gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:border-[#ecd8a6]/80 transition-all duration-500 scale-105 hover:scale-110 active:scale-95"
+                  className="group w-full max-w-[320px] h-[58px] justify-center relative flex items-center gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:border-[#ecd8a6]/80 transition-all duration-500 scale-105 hover:scale-110 active:scale-95"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
                   <KatinaMoon className="w-6 h-6 text-[#ecd8a6] group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500 relative z-10" />
                   <span className="relative z-10 text-base sm:text-lg font-bold">{t('startButton')}</span>
                 </button>
 
-                {/* Ad Banner 1: Amazon */}
-                <div className="w-full max-w-sm md:max-w-md mt-4 relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors">
-                  <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
-                    {bannerTranslations.sponsored[userInfo.language]}
-                  </div>
-                  <div className="p-5 flex flex-col gap-4">
-                    <div className="text-center md:text-left">
-                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
-                        {bannerTranslations.promoText[userInfo.language]}
-                      </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
+                  {/* Ad Banner 1: Amazon */}
+                  <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
+                    <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                      {bannerTranslations.sponsored[userInfo.language]}
                     </div>
-                    <div className="bg-black/40 rounded-xl p-3 flex items-center justify-between border border-[#ecd8a6]/10">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest">{bannerTranslations.promoCode[userInfo.language]}</span>
-                        <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-[0.2em]">KATINA20</span>
+                    <div className="p-5 flex flex-col gap-4 flex-1">
+                      <div className="text-center md:text-left flex-1">
+                        <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
+                          {bannerTranslations.promoText[userInfo.language]}
+                        </p>
                       </div>
-                      <button 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          navigator.clipboard.writeText('KATINA20');
-                          setBannerCopied(true);
-                          setTimeout(() => setBannerCopied(false), 2000);
-                        }}
-                        className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
-                        title={bannerTranslations.copyCode[userInfo.language]}
+                      <div className="bg-black/40 rounded-xl p-3 flex items-center justify-between border border-[#ecd8a6]/10">
+                        <div className="flex items-center gap-3">
+                          <span className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest">{bannerTranslations.promoCode[userInfo.language]}</span>
+                          <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-[0.2em]">KATINA20</span>
+                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navigator.clipboard.writeText('KATINA20');
+                            setBannerCopied(true);
+                            setTimeout(() => setBannerCopied(false), 2000);
+                          }}
+                          className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
+                          title={bannerTranslations.copyCode[userInfo.language]}
+                        >
+                          {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
+                        </button>
+                      </div>
+                      <a 
+                        href="https://www.amazon.com/s?k=katina+tarot" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
                       >
-                        {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
-                      </button>
+                        {bannerTranslations.shopNow[userInfo.language]}
+                      </a>
                     </div>
-                    <a 
-                      href="https://www.amazon.com/s?k=katina+tarot" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-3 rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
-                    >
-                      {bannerTranslations.shopNow[userInfo.language]}
-                    </a>
+                  </div>
+
+                  {/* Ad Banner 2: Etsy Live Reading */}
+                  <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
+                    <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                      {bannerTranslations.sponsored[userInfo.language]}
+                    </div>
+                    <div className="p-5 flex flex-col gap-4 flex-1">
+                      <div className="text-center md:text-left">
+                        <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
+                          {locales[userInfo.language]?.promo?.live?.liveReadingTitle || "Live Session"}
+                        </p>
+                        <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
+                          {locales[userInfo.language]?.promo?.live?.liveReadingText || 'Visit our Etsy shop for live readings.'}
+                        </p>
+                      </div>
+
+                      <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
+                        <video 
+                          src="/ads/Govde.mp4" 
+                          autoPlay 
+                          muted 
+                          loop 
+                          playsInline
+                          className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                        />
+                      </div>
+
+                      <a 
+                        href="https://www.etsy.com/shop/MadameSoulStudio"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20 mt-auto"
+                      >
+                        {locales[userInfo.language]?.promo?.live?.shopOnEtsy || 'Shop on Etsy'}
+                      </a>
+                    </div>
                   </div>
                 </div>
-
-                {/* Ad Banner 2: Etsy Live Reading */}
-                <div className="w-full max-w-sm md:max-w-md mt-4 relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors">
-                  <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
-                    {bannerTranslations.sponsored[userInfo.language]}
-                  </div>
-                  <div className="p-5 flex flex-col gap-4">
-                    <div className="text-center md:text-left">
-                      <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
-                        {locales[userInfo.language]?.promo?.live?.liveReadingTitle || "Live Session"}
-                      </p>
-                      <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
-                        {locales[userInfo.language]?.promo?.live?.liveReadingText || 'Visit our Etsy shop for live readings.'}
-                      </p>
-                    </div>
-
-                    {/* Video Demo */}
-                    <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
-                      <video 
-                        src="/ads/Govde.mp4" 
-                        autoPlay 
-                        muted 
-                        loop 
-                        playsInline
-                        className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
-                      />
-                    </div>
-
-                    <a 
-                      href="https://www.etsy.com/shop/MadameSoulStudio"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] py-3 rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
-                    >
-                      {locales[userInfo.language]?.promo?.live?.shopOnEtsy || 'Shop on Etsy'}
-                    </a>
-                  </div>
-                </div>
-
               </div>
             </motion.div>
           )}
@@ -1126,12 +1156,12 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95, filter: 'blur(4px)' }}
-              className="w-full max-w-md bg-[#0a0512]/60 backdrop-blur-xl rounded-2xl border border-[#ecd8a6]/20 p-6 sm:p-8 shadow-[0_0_40px_rgba(236,216,166,0.05)] relative mx-4"
+              className="w-full max-w-4xl bg-[#0a0512]/60 backdrop-blur-xl rounded-2xl border border-[#ecd8a6]/20 p-6 sm:p-8 md:p-12 shadow-[0_0_40px_rgba(236,216,166,0.05)] relative mx-4"
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#ecd8a6]/50 to-transparent" />
               <form 
                 onSubmit={(e) => { e.preventDefault(); drawRancomCards(); }}
-                className="space-y-6 relative z-10"
+                className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 relative z-10"
               >
                 <div>
                   <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('nameLabel')}</label>
@@ -1175,23 +1205,28 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
                 <div>
                   <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">{t('statusLabel')}</label>
-                  <select 
-                    value={userInfo.relationship}
-                    onChange={e => setUserInfo(prev => ({...prev, relationship: e.target.value}))}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
-                  >
-                    {STATUS_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
-                        {opt[userInfo.language as keyof typeof opt]}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select 
+                      value={userInfo.relationship}
+                      onChange={e => setUserInfo(prev => ({...prev, relationship: e.target.value}))}
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
+                    >
+                      {STATUS_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
+                          {opt[userInfo.language as keyof typeof opt]}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="md:col-span-2 pt-4">
                   <button 
                     type="submit"
-                    className="w-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300"
+                    className="w-full h-[58px] bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300 font-bold"
                   >
                     {t('submitButton')}
                   </button>
@@ -1263,7 +1298,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                 ))}
               </div>
 
-              <div className="w-full max-w-3xl mx-auto bg-[#0a0512]/80 backdrop-blur-xl rounded-2xl border border-[#ecd8a6]/20 p-6 sm:p-8 md:p-12 shadow-[0_0_50px_rgba(236,216,166,0.05)] relative overflow-hidden">
+              <div className="w-full max-w-5xl mx-auto bg-[#0a0512]/80 backdrop-blur-xl rounded-2xl border border-[#ecd8a6]/20 p-6 sm:p-8 md:p-12 shadow-[0_0_50px_rgba(236,216,166,0.05)] relative overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#ecd8a6]/40 to-transparent"></div>
                 <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#ecd8a6]/40"></div>
                 <div className="absolute top-4 right-4 w-4 h-4 border-t border-r border-[#ecd8a6]/40"></div>
@@ -1308,7 +1343,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   <button 
                     onClick={handleDownload}
                     disabled={isExportingPDF}
-                    className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
@@ -1316,7 +1351,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
                   <button 
                     onClick={handleShare}
-                    className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
                   >
                     <Share2 className="w-4 h-4" />
                     <span className="font-serif tracking-widest text-xs uppercase">{t('shareBtn')}</span>
@@ -1324,7 +1359,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
                   <button 
                     onClick={handleStartOver}
-                    className="w-full sm:w-auto text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 py-4 sm:py-3 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span className="font-serif tracking-widest text-xs uppercase">{t('restartBtn')}</span>

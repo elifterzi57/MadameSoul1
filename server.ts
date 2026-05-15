@@ -1,33 +1,19 @@
 import express from "express";
 import path from "path";
-import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import * as dotenv from "dotenv";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
 async function startServer() {
+  console.log("Starting server implementation...");
   const app = express();
   const PORT = 3000;
 
-  // Use JSON middleware for API calls
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-  // Initialize Gemini AI only on the server
-  let genAI: GoogleGenAI | null = null;
-  const getGenAI = () => {
-    if (!genAI) {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is not defined in the environment");
-      }
-      genAI = new GoogleGenAI({ apiKey });
-    }
-    return genAI;
-  };
-
-  // API Route for AI Generation
+  // API Route for Gemini
   app.post("/api/generate", async (req, res) => {
     try {
       const { prompt } = req.body;
@@ -35,43 +21,80 @@ async function startServer() {
         return res.status(400).json({ error: "Prompt is required" });
       }
 
-      const client = getGenAI();
-      const response = await client.models.generateContent({ 
-        model: "gemini-3-flash-preview",
-        contents: prompt 
-      });
-      const text = response.text;
+      const apiKey = process.env.GEMINI_API_KEY;
       
-      res.json({ text });
+      if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
+        console.error("GEMINI_API_KEY is not set correctly in the environment (value: " + (apiKey ? "masked" : "undefined") + ")");
+        return res.status(500).json({ error: "Gemini API key is not configured. Please set it in the Secrets panel." });
+      }
+
+      // Safe debug log: only length and presence
+      console.log(`Gemini API Key detected. Length: ${apiKey.length}`);
+
+      const genAI = new GoogleGenAI({
+        apiKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          }
+        }
+      });
+
+      // Using gemini-flash-latest as per recent updates and user's curl example
+      const response = await genAI.models.generateContent({
+        model: "gemini-flash-latest",
+        contents: prompt,
+      });
+
+      if (!response.text) {
+        console.error("Gemini API returned an empty response", response);
+        throw new Error("Empty response from AI model");
+      }
+
+      res.json({ text: response.text });
     } catch (error: any) {
-      console.error("AI Generation Error:", error);
+      console.error("Gemini API Error Detail:", {
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        details: error.details
+      });
       res.status(500).json({ error: error.message || "Failed to generate content" });
     }
   });
 
-  // API Check
+  // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "production") {
+    // In production, server.cjs is likely inside dist/
+    // We try to find dist/ relative to cwd first, then fallback to __dirname
+    let distPath = path.join(process.cwd(), "dist");
+    
+    // Check if we are running FROM the dist folder
+    if (distPath.endsWith("dist/dist")) {
+        distPath = process.cwd();
+    }
+    
+    console.log(`Production mode: serving static files from ${distPath}`);
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  } else {
+    console.log("Development mode: loading Vite middleware...");
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    // Serve index.html for all other routes (SPA)
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 

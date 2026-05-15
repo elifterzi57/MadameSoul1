@@ -1072,3 +1072,28 @@ promo:
       Kişiye özel, canlı fal deneyimi için
       Etsy mağazamızı ziyaret edebilirsiniz.
     shopOnEtsy: Etsy'den Sipariş Ver
+profile:
+  title: "Mistik Profil"
+  userInfo: "Senin Bilgilerin"
+  readingHistory: "Geçmiş Kehanetler"
+  noHistory: "Henüz bir fal bakılmamış."
+  moons: "Mistik Bakiye"
+  status: "Gönül Durumu"
+  birthplace: "Doğduğun Yer"
+  dob: "Doğum Tarihin"
+  name: "Adın"
+  tabs:
+    overview: "Genel Bakış"
+    settings: "Ayarlar"
+  settings:
+    email: "E-posta Adresi"
+    password: "Şifre"
+    newPassword: "Yeni Şifre"
+    updateEmail: "E-posta Güncelle"
+    updatePassword: "Şifre Değiştir"
+    successEmail: "E-posta başarıyla güncellendi."
+    successPassword: "Şifre başarıyla güncellendi."
+    reauthRequired: "Güvenlik nedeniyle lütfen tekrar giriş yapın."
+  history:
+    downloadPdf: "PDF İndir"
+    viewReading: "Falı Görüntüle"

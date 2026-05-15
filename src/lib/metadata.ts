@@ -42,19 +42,10 @@ export async function gatherUserMetadata(): Promise<UserMetadata> {
 
 export async function logUserEvent(userId: string, eventType: string, eventData: any = {}) {
   try {
-    const performanceData = {
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-      navigationStart: performance.now(),
-      // Adding simple performance metric if available
-      loadTime: window.performance.timing?.loadEventEnd - window.performance.timing?.navigationStart || null
-    };
-
     await addDoc(collection(db, 'user_events'), {
       userId,
       eventType,
       eventData,
-      performance: performanceData,
       timestamp: serverTimestamp()
     });
   } catch (error) {
