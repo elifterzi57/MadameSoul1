@@ -1133,3 +1133,28 @@ promo:
       Visite nuestra tienda de Etsy para una
       experiencia de adivinación en vivo.
     shopOnEtsy: Comprar en Etsy
+  profile:
+    title: Perfil
+    userInfo: Información del Usuario
+    readingHistory: Mis Lecturas
+    noHistory: Aún no has realizado ninguna lectura.
+    moons: Saldo de Lunas Katina
+    status: Estado Civil
+    birthplace: Lugar de Nacimiento
+    dob: Fecha de Nacimiento
+    name: Nombre
+    tabs:
+      overview: General
+      settings: Ajustes
+    settings:
+      email: Correo electrónico
+      password: Contraseña
+      newPassword: Nueva contraseña
+      updateEmail: Actualizar
+      updatePassword: Cambiar
+      successEmail: Actualizado
+      successPassword: Cambiada
+      reauthRequired: Es necesario volver a iniciar sesión.
+    history:
+      downloadPdf: Descargar PDF
+      viewReading: Ver Lectura

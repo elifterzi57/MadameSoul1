@@ -41,14 +41,6 @@ export async function gatherUserMetadata(): Promise<UserMetadata> {
 }
 
 export async function logUserEvent(userId: string, eventType: string, eventData: any = {}) {
-  try {
-    await addDoc(collection(db, 'user_events'), {
-      userId,
-      eventType,
-      eventData,
-      timestamp: serverTimestamp()
-    });
-  } catch (error) {
-    console.error('Failed to log user event:', error);
-  }
+  // Event logging disabled as per user request
+  return;
 }

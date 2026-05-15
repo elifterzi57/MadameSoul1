@@ -688,3 +688,28 @@ promo:
       선명하고 생생한 실시간 점술 경험을 위해
       Etsy 상점을 방문해 보세요.
     shopOnEtsy: Etsy에서 쇼핑하기
+  profile:
+    title: 프로필
+    userInfo: 사용자 정보
+    readingHistory: 나의 점술 기록
+    noHistory: 아직 점술 기록이 없습니다.
+    moons: 카티나 문 잔액
+    status: 관계 상태
+    birthplace: 출생지
+    dob: 생년월일
+    name: 이름
+    tabs:
+      overview: 개요
+      settings: 설정
+    settings:
+      email: 이메일
+      password: 비밀번호
+      newPassword: 새 비밀번호
+      updateEmail: 업데이트
+      updatePassword: 변경
+      successEmail: 업데이트됨
+      successPassword: 변경됨
+      reauthRequired: 다시 인증이 필요합니다.
+    history:
+      downloadPdf: PDF 다운로드
+      viewReading: 결과 보기

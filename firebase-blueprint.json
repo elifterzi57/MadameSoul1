@@ -88,28 +88,12 @@
         "createdAt": { "type": "timestamp" }
       },
       "required": ["userId", "amount", "type", "createdAt"]
-    },
-    "UserEvent": {
-      "title": "User Event",
-      "description": "Logs in-app usage events.",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string" },
-        "eventType": { "type": "string" },
-        "eventData": { "type": "object" },
-        "timestamp": { "type": "timestamp" }
-      },
-      "required": ["userId", "eventType", "timestamp"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "User" },
       "description": "Stores user profile information"
-    },
-    "/user_events/{eventId}": {
-      "schema": { "$ref": "UserEvent" },
-      "description": "Logs user-specific events"
     },
     "/user_moons/{userId}": {
       "schema": { "$ref": "UserMoon" },

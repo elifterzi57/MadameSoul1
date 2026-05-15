@@ -43,14 +43,6 @@ service cloud.firestore {
              (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10));
     }
 
-    function isValidUserEvent(data) {
-      return data.userId == request.auth.uid &&
-             data.keys().hasAll(['userId', 'eventType', 'timestamp']) &&
-             data.keys().size() <= 4 && // userId, eventType, timestamp, eventData (optional)
-             data.eventType is string &&
-             data.timestamp == request.time;
-    }
-
     match /users/{userId} {
       allow get: if request.auth != null && request.auth.uid == userId;
       allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(request.resource.data);
@@ -65,11 +57,6 @@ service cloud.firestore {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
       allow update: if request.auth != null && resource.data.userId == request.auth.uid && isValidMoonTransaction(request.resource.data);
-    }
-
-    match /user_events/{eventId} {
-      allow create: if request.auth != null && isValidUserEvent(request.resource.data);
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     match /messages_en/{messageId} {

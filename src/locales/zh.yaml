@@ -414,3 +414,28 @@ promo:
     liveReadingTitle: ✦ 直播占卜 ✦
     liveReadingText: 访问我们的 Etsy 商店，获得个性化的现场占卜体验。
     shopOnEtsy: 在 Etsy 上购买
+  profile:
+    title: 个人资料
+    userInfo: 用户信息
+    readingHistory: 占卜记录
+    noHistory: 暂无占卜记录。
+    moons: Katina 月亮余额
+    status: 情感状态
+    birthplace: 出生地点
+    dob: 出生日期
+    name: 姓名
+    tabs:
+      overview: 概览
+      settings: 设置
+    settings:
+      email: 电子邮件
+      password: 密码
+      newPassword: 新密码
+      updateEmail: 更新
+      updatePassword: 更改
+      successEmail: 已更新
+      successPassword: 已更改
+      reauthRequired: 需要重新身份验证。
+    history:
+      downloadPdf: 下载 PDF
+      viewReading: 查看结果

@@ -1193,3 +1193,28 @@ promo:
       Visitez notre boutique Etsy pour une
       expérience de voyance en direct.
     shopOnEtsy: Acheter sur Etsy
+  profile:
+    title: Profil
+    userInfo: Informations de l'Utilisateur
+    readingHistory: Mon Historique
+    noHistory: Aucune lecture n'a été effectuée pour le moment.
+    moons: Solde de Lunes Katina
+    status: Situation Amoureuse
+    birthplace: Lieu de Naissance
+    dob: Date de Naissance
+    name: Nom
+    tabs:
+      overview: Vue d'ensemble
+      settings: Paramètres
+    settings:
+      email: E-mail
+      password: Mot de passe
+      newPassword: Nouveau Mot de passe
+      updateEmail: Mettre à jour
+      updatePassword: Changer
+      successEmail: Mis à jour
+      successPassword: Changé
+      reauthRequired: Réauthentification requise.
+    history:
+      downloadPdf: Télécharger PDF
+      viewReading: Voir la Lecture

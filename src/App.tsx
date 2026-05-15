@@ -138,6 +138,7 @@ function App() {
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   
@@ -219,6 +220,25 @@ function App() {
     const unsubscribeAuth = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setIsAuthLoading(false);
+
+      // Reset application state on auth change to ensure a clean slate
+      // This prevents the previous person's reading from appearing for a new login
+      setStep('SPLASH');
+      setDrawnCards([]);
+      setReading(null);
+      setCurrentTransactionId(null);
+      setImageError({});
+      setIsStoreOpen(false);
+      setIsProfileOpen(false);
+      setIsContactOpen(false);
+      setIsLegalOpen(false);
+      setUserInfo(prev => ({
+        ...prev,
+        name: '',
+        dob: '',
+        birthplace: '',
+        relationship: 'single'
+      }));
 
       if (u) {
         // Sync moons from Firestore
@@ -412,13 +432,19 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
   const [isExportingPDF, setIsExportingPDF] = useState(false);
 
   const handleDownload = async (pastReading?: any) => {
-    const readingToUse = pastReading ? pastReading.readingText : reading;
-    const userInfoToUse = pastReading ? {
-      name: pastReading.userName,
-      dob: pastReading.userDob,
-      birthplace: pastReading.userBirthplace,
-      relationship: pastReading.userRelationship,
-      language: (pastReading.userLanguage as keyof typeof locales) || userInfo.language
+    // If pastReading is a React Event, ignore it
+    const isEvent = pastReading && pastReading.nativeEvent;
+    const actualPastReading = isEvent ? undefined : pastReading;
+
+    const readingToUse = actualPastReading ? actualPastReading.readingText : reading;
+    const cardsToUse = actualPastReading?.cards || drawnCards;
+    
+    const userInfoToUse = actualPastReading ? {
+      name: actualPastReading.userName,
+      dob: actualPastReading.userDob,
+      birthplace: actualPastReading.userBirthplace,
+      relationship: actualPastReading.userRelationship,
+      language: (actualPastReading.userLanguage as keyof typeof locales) || userInfo.language
     } : userInfo;
 
     if (!readingToUse || isExportingPDF) return;
@@ -432,8 +458,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       container.style.width = '800px';
       container.style.zIndex = '-9999';
       
-      const dateStr = pastReading 
-        ? pastReading.createdAt?.toDate().toLocaleDateString(userInfoToUse.language === 'en' ? 'en-US' : userInfoToUse.language === 'tr' ? 'tr-TR' : undefined)
+      const dateStr = actualPastReading 
+        ? actualPastReading.createdAt?.toDate().toLocaleDateString(userInfoToUse.language === 'en' ? 'en-US' : userInfoToUse.language === 'tr' ? 'tr-TR' : undefined)
         : new Date().toLocaleDateString(userInfo.language === 'en' ? 'en-US' : userInfo.language === 'tr' ? 'tr-TR' : undefined);
       
       const formatReading = (text: string) => {
@@ -461,7 +487,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
       const cardsHtml = `
         <div style="display: flex; justify-content: center; gap: 40px; margin: 50px 0 60px 0; position: relative;">
-          ${drawnCards.map(c => `
+          ${cardsToUse.map((c: any) => `
             <div style="text-align: center; width: 160px; position: relative; z-index: 2;">
               <div style="border-radius: 12px; overflow: hidden; border: 2px solid rgba(236,216,166,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(236,216,166,0.15); background-color: #1a1025; height: 240px; display: flex; align-items: center; justify-content: center;">
                  <img src="${window.location.origin}/cards/${c.id}.png" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
@@ -524,6 +550,16 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       `;
       document.body.appendChild(container);
       
+      // Wait for images to load
+      const images = Array.from(container.querySelectorAll('img'));
+      await Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      }));
+
       const canvas = await html2canvas(container, {
         scale: 2,
         backgroundColor: '#05000a',
@@ -565,7 +601,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       pdf.save(`Katina_Reading_${userInfoToUse.name.replace(/\s+/g, '_')}.pdf`);
 
       // Mark PDF as downloaded in the transaction record
-      const activeTxId = pastReading ? pastReading.id : currentTransactionId;
+      const activeTxId = actualPastReading ? actualPastReading.id : currentTransactionId;
       if (activeTxId) {
         try {
           await updateDoc(doc(db, 'moon_transactions', activeTxId), {
@@ -583,7 +619,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
   };
 
   const handleShare = async () => {
-    if (!reading) return;
+    if (!reading || isSharing) return;
+    setIsSharing(true);
     
     if (navigator.share) {
       try {
@@ -596,6 +633,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         if ((error as Error).name !== 'AbortError') {
           console.error('Error sharing:', error);
         }
+      } finally {
+        setIsSharing(false);
       }
     } else {
       try {
@@ -603,6 +642,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         alert(t('copiedMsg'));
       } catch (err) {
         console.error('Failed to copy text: ', err);
+      } finally {
+        setIsSharing(false);
       }
     }
   };
@@ -669,11 +710,11 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40]"
+          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40] pointer-events-none"
         >
           <div 
             onClick={() => setIsProfileOpen(true)}
-            className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+            className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
             title="Profile"
           >
             <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
@@ -681,7 +722,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
           <div 
             onClick={() => setIsStoreOpen(true)}
-            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group"
+            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
           >
             <KatinaMoon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
             <span className="font-serif tracking-widest text-[#ecd8a6] text-xs sm:text-base font-semibold">{moonsCount}</span>
@@ -692,7 +733,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
           <button 
             onClick={handleSignOut}
-            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group"
+            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto"
             title="Sign Out"
           >
             <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
@@ -1341,7 +1382,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   className="mt-8 sm:mt-16 flex flex-col w-full sm:flex-row justify-center items-center gap-4 sm:gap-6 flex-wrap relative z-20"
                 >
                   <button 
-                    onClick={handleDownload}
+                    onClick={() => handleDownload()}
                     disabled={isExportingPDF}
                     className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >

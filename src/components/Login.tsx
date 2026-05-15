@@ -26,7 +26,8 @@ import {
   MailCheck, 
   Globe, 
   RefreshCw,
-  LogOut
+  LogOut,
+  ChevronRight
 } from 'lucide-react';
 import { KatinaMoon } from './KatinaMoon';
 
@@ -534,11 +535,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
             </div>
 
             {/* Dynamic Titles */}
-            <div className="text-center md:text-left mb-8 w-full flex flex-col items-center md:items-start">
-              <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-tight mb-2">
+            <div className="text-center mb-8 w-full flex flex-col items-center">
+              <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-tight mb-2 uppercase">
                 {isSignUp ? t.signUpTitle : t.signInTitle}
               </h2>
-              <p className="text-[#ecd8a6]/50 text-xs sm:text-sm max-w-[280px] md:max-w-none">
+              <p className="text-[#ecd8a6]/50 text-xs sm:text-sm max-w-[280px] md:max-w-none italic">
                 {isSignUp ? t.signUpSubtitle : t.signInSubtitle}
               </p>
             </div>
@@ -584,7 +585,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#f2e1b8] active:scale-[0.98] transition-all shadow-lg"
+                      className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#fff] active:scale-[0.98] transition-all shadow-lg"
                     >
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                         <>
@@ -597,14 +598,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={() => setIsSignUp(!isSignUp)}
-                      className="w-full bg-white/5 text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 hover:bg-white/10 transition-all"
+                      className="w-full text-[#ecd8a6]/60 hover:text-[#ecd8a6] text-[10px] sm:text-xs font-serif uppercase tracking-widest transition-all py-2"
                     >
-                      <span>{isSignUp ? t.signInLabel : t.signUpLabel}</span>
-                      <RefreshCw className="w-3.5 h-3.5 opacity-50" />
+                      {isSignUp ? t.hasAccount : t.noAccount}
                     </button>
                   </div>
 
-                  <div className="flex flex-col gap-3 pt-6 border-t border-[#ecd8a6]/10">
+                  <div className="flex flex-col gap-4 pt-6 border-t border-[#ecd8a6]/10">
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
@@ -632,21 +632,23 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
                     <button 
                       type="button"
-                      onClick={() => setAuthMethod('phone')}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      onClick={() => setAuthMethod(authMethod === 'email' ? 'phone' : 'email')}
+                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 transition-all"
                     >
-                      <Phone className="w-3.5 h-3.5 opacity-70" />
-                      {t.switchToPhone}
+                      {authMethod === 'email' ? <Phone className="w-3.5 h-3.5 opacity-50" /> : <Mail className="w-3.5 h-3.5 opacity-50" />}
+                      <span>{authMethod === 'email' ? t.switchToPhone : t.switchToEmail}</span>
                     </button>
 
-                    <button 
-                      type="button"
-                      onClick={onShowOnboarding}
-                      className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
-                    >
-                      <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                      <span>{t.showIntro}</span>
-                    </button>
+                    <div className="pt-2">
+                      <button 
+                        type="button"
+                        onClick={onShowOnboarding}
+                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                      >
+                        <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                        <span>{t.showIntro}</span>
+                      </button>
+                    </div>
                   </div>
                 </motion.form>
               ) : (
@@ -756,7 +758,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     </form>
                   )}
 
-                  <div className="flex flex-col gap-3 pt-6 border-t border-[#ecd8a6]/10">
+                  <div className="flex flex-col gap-4 pt-6 border-t border-[#ecd8a6]/10">
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
@@ -794,14 +796,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {t.switchToEmail}
                     </button>
 
-                    <button 
-                      type="button"
-                      onClick={onShowOnboarding}
-                      className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
-                    >
-                      <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                      <span>{t.showIntro}</span>
-                    </button>
+                    <div className="pt-2">
+                      <button 
+                        type="button"
+                        onClick={onShowOnboarding}
+                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                      >
+                        <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
+                        <span>{t.showIntro}</span>
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               )}
