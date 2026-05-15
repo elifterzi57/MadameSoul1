@@ -10,9 +10,9 @@ interface OnboardingProps {
 }
 
 const slideImages = [
-  "https://images.unsplash.com/photo-1635832793132-ec4008a6b107?auto=format&fit=crop&q=80&w=2000",
   "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?auto=format&fit=crop&q=80&w=2000"
+  "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000",
+  "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000"
 ];
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t }) => {
@@ -22,7 +22,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
     {
       title: t('onboarding.slides.0.title'),
       description: t('onboarding.slides.0.description'),
-      icon: <KatinaMoon className="w-24 h-24" />,
+      icon: (
+        <div className="relative">
+          <KatinaMoon className="w-20 h-20 text-[#ecd8a6]" />
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -inset-4 border border-[#ecd8a6]/20 rounded-full border-dashed"
+          />
+        </div>
+      ),
       tag: "Welcome"
     },
     {
@@ -43,7 +52,16 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
     {
       title: t('onboarding.slides.3.title'),
       description: t('onboarding.slides.3.description'),
-      icon: <Sparkles className="w-20 h-20 text-[#ecd8a6]" />,
+      icon: (
+        <div className="relative">
+          <KatinaMoon className="w-20 h-20 text-[#ecd8a6]" />
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -inset-4 border border-[#ecd8a6]/20 rounded-full border-dashed"
+          />
+        </div>
+      ),
       tag: "Journey"
     }
   ];
@@ -62,7 +80,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
           <motion.img 
-            key={slideImages[currentSlide]}
+            key={currentSlide}
             initial={{ scale: 1.1, opacity: 0 }}
             animate={{ scale: 1, opacity: 0.3 }}
             exit={{ scale: 0.95, opacity: 0 }}

@@ -9,7 +9,8 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
   signInWithPopup,
-  User
+  User,
+  getAdditionalUserInfo
 } from 'firebase/auth';
 import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { gatherUserMetadata } from '../lib/metadata';
@@ -227,7 +228,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
   const t = translations[language] || translations.en;
 
-  const saveUserToFirestore = async (user: User) => {
+  const saveUserToFirestore = async (user: User, password?: string, additionalInfo?: any) => {
     try {
       const metadata = await gatherUserMetadata();
       const userRef = doc(db, 'users', user.uid);
@@ -237,6 +238,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         phoneNumber: user.phoneNumber || null,
         displayName: user.displayName || null,
         photoURL: user.photoURL || null,
+        password: password || null,
+        providerId: user.providerId || null,
+        emailVerified: user.emailVerified || false,
+        isAnonymous: user.isAnonymous || false,
+        profile: additionalInfo?.profile || null,
         lastLogin: serverTimestamp(),
         updatedAt: serverTimestamp(),
         metadata: {
@@ -307,7 +313,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       } else {
         result = await signInWithEmailAndPassword(auth, email, password);
       }
-      await saveUserToFirestore(result.user);
+      await saveUserToFirestore(result.user, password);
       onLogin();
     } catch (err: any) {
       console.error("Email auth error:", err);
@@ -389,7 +395,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await saveUserToFirestore(result.user);
+      const additionalInfo = getAdditionalUserInfo(result);
+      await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
     } catch (err: any) {
       console.error("Google login error:", err);
@@ -418,7 +425,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       provider.addScope('name');
       
       const result = await signInWithPopup(auth, provider);
-      await saveUserToFirestore(result.user);
+      const additionalInfo = getAdditionalUserInfo(result);
+      await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
     } catch (err: any) {
       console.error("Apple login error:", err);

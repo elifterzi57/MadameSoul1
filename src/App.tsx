@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import { db, auth, initAnalytics } from './lib/firebase';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
@@ -149,6 +149,7 @@ function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [readingCount, setReadingCount] = useState(0);
 
   const handleLegalOpen = async () => {
     setIsLegalOpen(true);
@@ -244,6 +245,44 @@ function App() {
         // Sync moons from Firestore
         const moonRef = doc(db, 'user_moons', u.uid);
         
+        // Fetch User Profile
+        const userRef = doc(db, 'users', u.uid);
+        getDoc(userRef).then(async (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            // We use name and dob from profile to optionally fill the form if it's empty
+            setUserInfo(prev => ({
+              ...prev,
+              name: prev.name || data.name || '',
+              dob: prev.dob || data.dob || ''
+            }));
+          } else {
+            // New user profile creation
+            const metadata = await gatherUserMetadata();
+            await setDoc(userRef, {
+              userId: u.uid,
+              email: u.email,
+              name: u.displayName || '',
+              dob: '',
+              createdAt: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+              metadata
+            });
+            // Auto fill name from google/social login
+            setUserInfo(prev => ({
+              ...prev,
+              name: u.displayName || ''
+            }));
+          }
+        });
+
+        // Fetch Reading Count
+        const transactionsRef = collection(db, 'moon_transactions');
+        const countQuery = query(transactionsRef, where('userId', '==', u.uid), where('type', '==', 'spend'));
+        getDocs(countQuery).then(snap => {
+          setReadingCount(snap.size);
+        });
+
         unsubscribeMoons = onSnapshot(moonRef, (docSnap) => {
           if (docSnap.exists()) {
             setMoonsCount(docSnap.data().balance || 0);
@@ -398,6 +437,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         createdAt: serverTimestamp()
       });
       setCurrentTransactionId(txRef.id);
+      setReadingCount(prev => prev + 1);
 
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -843,14 +883,22 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       {/* Profile Modal */}
       <AnimatePresence>
         {isProfileOpen && (
-          <Profile
-            user={user}
-            userInfo={userInfo}
+          <Profile 
+            user={user} 
+            userInfo={userInfo} 
             moonsCount={moonsCount}
+            readingCount={readingCount}
             onClose={() => setIsProfileOpen(false)}
-            onUpdateUserInfo={(info) => setUserInfo(prev => ({ ...prev, ...info }))}
-            onDownloadPastReading={handleDownload}
+            onUpdateUserInfo={(info) => {
+              // Update local state when profile is edited
+              setUserInfo(prev => ({
+                ...prev,
+                name: info.name,
+                dob: info.dob
+              }));
+            }}
             translations={locales[userInfo.language]}
+            onDownloadPastReading={handleDownload}
           />
         )}
       </AnimatePresence>
@@ -1116,7 +1164,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                       {bannerTranslations.sponsored[userInfo.language]}
                     </div>
                     <div className="p-5 flex flex-col gap-4 flex-1">
-                      <div className="text-center md:text-left flex-1">
+                      <div className="text-center flex-1">
                         <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
                           {bannerTranslations.promoText[userInfo.language]}
                         </p>
@@ -1156,7 +1204,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                       {bannerTranslations.sponsored[userInfo.language]}
                     </div>
                     <div className="p-5 flex flex-col gap-4 flex-1">
-                      <div className="text-center md:text-left">
+                      <div className="text-center">
                         <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
                           {locales[userInfo.language]?.promo?.live?.liveReadingTitle || "Live Session"}
                         </p>
@@ -1367,7 +1415,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     transition={{ duration: 1 }}
                     className="prose prose-invert prose-amber max-w-none font-sans leading-[2] tracking-wide"
                   >
-                    <div className="markdown-body text-[#ecd8a6]/90">
+                    <div className="markdown-body text-[#ecd8a6]/90 text-center">
                       <Markdown>{reading || ""}</Markdown>
                     </div>
                   </motion.div>

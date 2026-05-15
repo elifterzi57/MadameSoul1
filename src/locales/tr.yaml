@@ -19,8 +19,8 @@ subtitle: Geçmişin aynası, bugünün ateşi ve geleceğin pusulası... Katina
   sana ne fısıldıyor?
 splashText: Kehanetler senin için aralanıyor...
 startButton: Falına Başla
-nameLabel: İsmin
-namePlaceholder: Adın nedir?
+nameLabel: Ad Soyad
+namePlaceholder: Ad Soyad
 dobLabel: Doğum Tarihin
 pobLabel: Doğum Yerin
 pobPlaceholder: Şehir, Ülke
@@ -1079,9 +1079,16 @@ profile:
   noHistory: "Henüz bir fal bakılmamış."
   moons: "Mistik Bakiye"
   status: "Gönül Durumu"
-  birthplace: "Doğduğun Yer"
-  dob: "Doğum Tarihin"
-  name: "Adın"
+  name: "Ad Soyad"
+  readingCount: "Fal Sayısı"
+  mysticRank: "Mistik Seviye"
+  rankNames:
+    novice: "Çaylak"
+    apprentice: "Çırak"
+    traveler: "Gezgin"
+    sage: "Bilge"
+    lord: "Mistik Efendi"
+  save: "Kaydet"
   tabs:
     overview: "Genel Bakış"
     settings: "Ayarlar"

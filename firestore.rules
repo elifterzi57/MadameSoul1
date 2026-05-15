@@ -18,9 +18,14 @@ service cloud.firestore {
     function isValidUser(data) {
       return data.userId == request.auth.uid &&
              data.keys().hasAll(['userId', 'lastLogin']) &&
+             (!('password' in data) || (data.password is string && data.password.size() <= 256)) &&
              (!('hasAcceptedLegal' in data) || (data.hasAcceptedLegal is int && data.hasAcceptedLegal in [0, 1])) &&
              (!('legalAcceptedAt' in data) || data.legalAcceptedAt is timestamp) &&
-             (!('metadata' in data) || data.metadata is map);
+             (!('metadata' in data) || data.metadata is map) &&
+             (!('providerId' in data) || (data.providerId == null || data.providerId is string)) &&
+             (!('emailVerified' in data) || data.emailVerified is bool) &&
+             (!('isAnonymous' in data) || data.isAnonymous is bool) &&
+             (!('profile' in data) || (data.profile == null || data.profile is map));
     }
 
     function isValidUserMoon(data) {

@@ -22,7 +22,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
-import { collection, query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, limit, Timestamp, doc, updateDoc } from 'firebase/firestore';
 import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 interface ProfileProps {
@@ -35,6 +35,7 @@ interface ProfileProps {
     language: string;
   };
   moonsCount: number;
+  readingCount: number;
   onClose: () => void;
   onUpdateUserInfo: (info: any) => void;
   translations: any;
@@ -45,13 +46,24 @@ export const Profile: React.FC<ProfileProps> = ({
   user, 
   userInfo, 
   moonsCount, 
+  readingCount,
   onClose, 
+  onUpdateUserInfo,
   translations,
   onDownloadPastReading
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
   const [history, setHistory] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+
+  // Profile edit state
+  const [editName, setEditName] = useState(userInfo.name);
+  const [editDob, setEditDob] = useState(userInfo.dob);
+
+  useEffect(() => {
+    setEditName(userInfo.name);
+    setEditDob(userInfo.dob);
+  }, [userInfo.name, userInfo.dob]);
 
   // Settings state
   const [email, setEmail] = useState(user?.email || '');
@@ -119,6 +131,14 @@ export const Profile: React.FC<ProfileProps> = ({
     setSettingsStatus(null);
     try {
       await updatePassword(user, newPassword);
+      
+      // Update password in Firestore
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        password: newPassword,
+        updatedAt: Timestamp.now()
+      });
+
       setNewPassword('');
       setSettingsStatus({ type: 'success', message: profileT.settings.successPassword });
     } catch (error: any) {
@@ -132,30 +152,78 @@ export const Profile: React.FC<ProfileProps> = ({
     }
   };
 
-  const profileT = translations.profile || {
-    title: "Profil",
-    userInfo: "Kullanıcı Bilgileri",
-    readingHistory: "Geçmiş Fallarım",
-    noHistory: "Henüz bir fal bakılmamış.",
-    moons: "Katina Moon Bakiyesi",
-    status: "İlişki Durumu",
-    birthplace: "Doğum Yeri",
-    dob: "Doğum Tarihi",
-    name: "İsim",
-    tabs: { overview: "Genel Bakış", settings: "Ayarlar" },
+  const handleUpdateProfile = async () => {
+    if (!user) return;
+    setIsUpdating(true);
+    setSettingsStatus(null);
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        name: editName,
+        dob: editDob,
+        updatedAt: Timestamp.now()
+      });
+      onUpdateUserInfo({ ...userInfo, name: editName, dob: editDob });
+      setSettingsStatus({ type: 'success', message: profileT.settings.successEmail });
+    } catch (error: any) {
+      setSettingsStatus({ type: 'error', message: error.message });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const getMysticRank = (count: number) => {
+    const ranks = profileT.rankNames || {
+      novice: "Novice",
+      apprentice: "Apprentice",
+      traveler: "Traveler",
+      sage: "Sage",
+      lord: "Lord"
+    };
+    if (count >= 100) return ranks.lord;
+    if (count >= 50) return ranks.sage;
+    if (count >= 25) return ranks.traveler;
+    if (count >= 10) return ranks.apprentice;
+    return ranks.novice;
+  };
+
+  const profileT = {
+    title: translations?.profile?.title || "Profil",
+    userInfo: translations?.profile?.userInfo || "Kullanıcı Bilgileri",
+    readingHistory: translations?.profile?.readingHistory || "Geçmiş Kehanetler",
+    noHistory: translations?.profile?.noHistory || "Henüz bir fal bakılmamış.",
+    moons: translations?.profile?.moons || "Katina Moon Bakiyesi",
+    status: translations?.profile?.status || "İlişki Durumu",
+    birthplace: translations?.profile?.birthplace || "Doğum Yeri",
+    dob: translations?.profile?.dob || "Doğum Tarihi",
+    name: translations?.profile?.name || "Ad Soyad",
+    readingCount: translations?.profile?.readingCount || "Fal Sayısı",
+    mysticRank: translations?.profile?.mysticRank || "Mistik Seviye",
+    save: translations?.profile?.save || "Kaydet",
+    rankNames: {
+      novice: translations?.profile?.rankNames?.novice || "Novice",
+      apprentice: translations?.profile?.rankNames?.apprentice || "Apprentice",
+      traveler: translations?.profile?.rankNames?.traveler || "Traveler",
+      sage: translations?.profile?.rankNames?.sage || "Sage",
+      lord: translations?.profile?.rankNames?.lord || "Lord"
+    },
+    tabs: { 
+      overview: translations?.profile?.tabs?.overview || "Overview", 
+      settings: translations?.profile?.tabs?.settings || "Settings" 
+    },
     settings: {
-      email: "E-posta",
-      password: "Şifre",
-      newPassword: "Yeni Şifre",
-      updateEmail: "Güncelle",
-      updatePassword: "Değiştir",
-      successEmail: "Güncellendi",
-      successPassword: "Değiştirildi",
-      reauthRequired: "Tekrar giriş yapın"
+      email: translations?.profile?.settings?.email || "E-posta",
+      password: translations?.profile?.settings?.password || "Şifre",
+      newPassword: translations?.profile?.settings?.newPassword || "Yeni Şifre",
+      updateEmail: translations?.profile?.settings?.updateEmail || "Güncelle",
+      updatePassword: translations?.profile?.settings?.updatePassword || "Değiştir",
+      successEmail: translations?.profile?.settings?.successEmail || "Güncellendi",
+      successPassword: translations?.profile?.settings?.successPassword || "Değiştirildi",
+      reauthRequired: translations?.profile?.settings?.reauthRequired || "Tekrar giriş yapın"
     },
     history: {
-      downloadPdf: "PDF İndir",
-      viewReading: "Görüntüle"
+      downloadPdf: translations?.profile?.history?.downloadPdf || "PDF İndir",
+      viewReading: translations?.profile?.history?.viewReading || "Görüntüle"
     }
   };
 
@@ -221,11 +289,46 @@ export const Profile: React.FC<ProfileProps> = ({
                     {profileT.userInfo}
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <InfoCard icon={<UserIcon className="w-4 h-4" />} label={profileT.name} value={userInfo.name || '---'} />
-                    <InfoCard icon={<Calendar className="w-4 h-4" />} label={profileT.dob} value={userInfo.dob || '---'} />
-                    <InfoCard icon={<MapPin className="w-4 h-4" />} label={profileT.birthplace} value={userInfo.birthplace || '---'} />
-                    <InfoCard icon={<Heart className="w-4 h-4" />} label={profileT.status} value={translations.statusOptions?.[userInfo.relationship] || userInfo.relationship || '---'} />
+                    <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
+                        <UserIcon className="w-4 h-4" />
+                        {profileT.name}
+                      </div>
+                      <input 
+                        type="text" 
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1"
+                        placeholder="Ad Soyad"
+                      />
+                    </div>
+                    <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
+                        <Calendar className="w-4 h-4" />
+                        {profileT.dob}
+                      </div>
+                      <input 
+                        type="date" 
+                        value={editDob}
+                        onChange={(e) => setEditDob(e.target.value)}
+                        className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1 [color-scheme:dark]"
+                      />
+                    </div>
+                    <InfoCard icon={<History className="w-4 h-4" />} label={profileT.readingCount} value={readingCount.toString()} />
+                    <InfoCard icon={<Star className="w-4 h-4" />} label={profileT.mysticRank} value={getMysticRank(readingCount)} />
                   </div>
+                  {(editName !== userInfo.name || editDob !== userInfo.dob) && (
+                    <div className="mt-4 flex justify-end">
+                      <button 
+                        onClick={handleUpdateProfile}
+                        disabled={isUpdating}
+                        className="px-6 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all flex items-center gap-2"
+                      >
+                        {isUpdating && <Loader2 className="w-3 h-3 animate-spin" />}
+                        {profileT.save || 'Kaydet'}
+                      </button>
+                    </div>
+                  )}
                 </section>
 
                 {/* Reading History */}
@@ -301,7 +404,7 @@ export const Profile: React.FC<ProfileProps> = ({
                     <Mail className="w-3 h-3" />
                     {profileT.settings.email}
                   </h3>
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 items-stretch">
                     <input 
                       type="email" 
                       value={email}
@@ -311,7 +414,7 @@ export const Profile: React.FC<ProfileProps> = ({
                     <button 
                       onClick={handleUpdateEmail}
                       disabled={isUpdating || email === user?.email}
-                      className="whitespace-nowrap px-6 py-3 bg-[#ecd8a6] text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase hover:bg-[#fff] transition-all disabled:opacity-50 flex items-center justify-center min-h-[44px]"
+                      className="sm:w-40 whitespace-nowrap px-6 py-3 bg-[#ecd8a6] text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center font-bold"
                     >
                       {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : profileT.settings.updateEmail}
                     </button>
@@ -323,14 +426,14 @@ export const Profile: React.FC<ProfileProps> = ({
                     <Lock className="w-3 h-3" />
                     {profileT.settings.password}
                   </h3>
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col sm:flex-row gap-3 items-stretch">
                     <div className="flex-1 relative">
                       <input 
                         type={showPassword ? "text" : "password"} 
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder={profileT.settings.newPassword}
-                        className="w-full bg-[#1a1025] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 pr-10 text-[#ecd8a6] text-sm focus:outline-none focus:border-[#ecd8a6]/50 transition-all font-serif min-w-0"
+                        className="w-full h-full bg-[#1a1025] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 pr-10 text-[#ecd8a6] text-sm focus:outline-none focus:border-[#ecd8a6]/50 transition-all font-serif min-w-0"
                       />
                       <button 
                         onClick={() => setShowPassword(!showPassword)}
@@ -342,22 +445,10 @@ export const Profile: React.FC<ProfileProps> = ({
                     <button 
                       onClick={handleUpdatePassword}
                       disabled={isUpdating || !newPassword}
-                      className="whitespace-nowrap px-6 py-3 bg-[#ecd8a6] text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase hover:bg-[#fff] transition-all disabled:opacity-50 flex items-center justify-center min-h-[44px]"
+                      className="sm:w-40 whitespace-nowrap px-6 py-3 bg-[#ecd8a6] text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center font-bold"
                     >
                       {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : profileT.settings.updatePassword}
                     </button>
-                  </div>
-                </section>
-
-                <section className="pt-4">
-                  <div className="p-4 rounded-xl bg-[#ecd8a6]/5 border border-[#ecd8a6]/10">
-                    <div className="flex items-center gap-3 text-[#ecd8a6]/60">
-                      <ShoppingBag className="w-5 h-5" />
-                      <div className="flex-1">
-                        <div className="text-[10px] font-serif tracking-widest uppercase mb-1">{profileT.moons}</div>
-                        <div className="text-[#ecd8a6] font-serif text-lg">{moonsCount} Moons</div>
-                      </div>
-                    </div>
                   </div>
                 </section>
               </motion.div>
@@ -370,11 +461,11 @@ export const Profile: React.FC<ProfileProps> = ({
 };
 
 const InfoCard = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
-  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-1">
+  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-2">
     <div className="flex items-center gap-2 text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
       {icon}
       {label}
     </div>
-    <div className="text-[#ecd8a6] font-medium truncate">{value}</div>
+    <div className="text-[#ecd8a6] font-medium truncate h-[26px] flex items-center">{value}</div>
   </div>
 );

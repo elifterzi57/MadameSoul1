@@ -1,17 +1,21 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { GoogleGenAI } from "@google/genai";
-import * as dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 async function startServer() {
-  console.log("Starting server implementation...");
+  console.log("[Server] Starting MadameSoul server...");
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // Health check - MUST be early
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok" });
+  });
 
   // API Route for Gemini
   app.post("/api/generate", async (req, res) => {
@@ -24,14 +28,11 @@ async function startServer() {
       const apiKey = process.env.GEMINI_API_KEY;
       
       if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-        console.error("GEMINI_API_KEY is not set correctly in the environment (value: " + (apiKey ? "masked" : "undefined") + ")");
+        console.error("[Server] GEMINI_API_KEY is not configured");
         return res.status(500).json({ error: "Gemini API key is not configured. Please set it in the Secrets panel." });
       }
 
-      // Safe debug log: only length and presence
-      console.log(`Gemini API Key detected. Length: ${apiKey.length}`);
-
-      const genAI = new GoogleGenAI({
+      const ai = new GoogleGenAI({
         apiKey,
         httpOptions: {
           headers: {
@@ -40,51 +41,44 @@ async function startServer() {
         }
       });
 
-      // Using gemini-flash-latest as per recent updates and user's curl example
-      const response = await genAI.models.generateContent({
-        model: "gemini-flash-latest",
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
         contents: prompt,
       });
 
       if (!response.text) {
-        console.error("Gemini API returned an empty response", response);
         throw new Error("Empty response from AI model");
       }
 
       res.json({ text: response.text });
     } catch (error: any) {
-      console.error("Gemini API Error Detail:", {
-        message: error.message,
-        status: error.status,
-        code: error.code,
-        details: error.details
-      });
+      console.error("[Server] Gemini API Error:", error.message);
       res.status(500).json({ error: error.message || "Failed to generate content" });
     }
   });
 
-  // Health check
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
-  });
-
+  // Serve static files
   if (process.env.NODE_ENV === "production") {
-    // In production, server.cjs is likely inside dist/
-    // We try to find dist/ relative to cwd first, then fallback to __dirname
-    let distPath = path.join(process.cwd(), "dist");
+    const distPath = path.resolve(process.cwd(), "dist");
+    console.log(`[Server] Production mode: serving from ${distPath}`);
     
-    // Check if we are running FROM the dist folder
-    if (distPath.endsWith("dist/dist")) {
-        distPath = process.cwd();
+    // Safety check for index.html
+    const indexPath = path.join(distPath, "index.html");
+    if (!fs.existsSync(indexPath)) {
+       console.warn(`[Server] WARNING: index.html not found at ${indexPath}`);
     }
-    
-    console.log(`Production mode: serving static files from ${distPath}`);
+
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error(`[Server] Error sending index.html:`, err);
+          res.status(500).send("Error loading application");
+        }
+      });
     });
   } else {
-    console.log("Development mode: loading Vite middleware...");
+    console.log("[Server] Development mode: loading Vite...");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -94,11 +88,11 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`[Server] MadameSoul running at http://0.0.0.0:${PORT}`);
   });
 }
 
 startServer().catch((err) => {
-  console.error("Failed to start server:", err);
+  console.error("[Server] CRITICAL: Failed to start server:", err);
   process.exit(1);
 });

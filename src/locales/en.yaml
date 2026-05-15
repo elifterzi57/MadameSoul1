@@ -19,8 +19,8 @@ subtitle: Mirror of the past, fire of the present, and compass of the future...
   What does the Katina deck whisper to you?
 splashText: The prophecies are unwrapping for you...
 startButton: Start Your Reading
-nameLabel: Name
-namePlaceholder: What is your name?
+nameLabel: Full Name
+namePlaceholder: Full Name
 dobLabel: Date of Birth
 pobLabel: Place of Birth
 pobPlaceholder: City, Country
@@ -1144,9 +1144,16 @@ profile:
   noHistory: "No readings yet."
   moons: "Mystic Balance"
   status: "Relationship Status"
-  birthplace: "Birthplace"
-  dob: "Date of Birth"
-  name: "Name"
+  name: "Full Name"
+  readingCount: "Readings"
+  mysticRank: "Mystic Rank"
+  rankNames:
+    novice: "Novice"
+    apprentice: "Apprentice"
+    traveler: "Traveler"
+    sage: "Sage"
+    lord: "Lord"
+  save: "Save"
   tabs:
     overview: "Overview"
     settings: "Settings"
