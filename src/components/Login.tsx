@@ -454,46 +454,46 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Language Toggle */}
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[120]">
-        <button 
-          onClick={() => setShowLangs(!showLangs)}
-          className="flex items-center gap-2 bg-[#1a1025]/90 backdrop-blur-md border border-[#ecd8a6]/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[#ecd8a6] hover:border-[#ecd8a6]/50 transition-all shadow-lg"
-        >
-          <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">{language}</span>
-        </button>
-        <AnimatePresence>
-          {showLangs && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute top-full mt-2 right-0 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[130]"
-            >
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    onLanguageChange(lang.code);
-                    setShowLangs(false);
-                  }}
-                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
-                >
-                  {lang.name}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Main Container */}
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-sm md:max-w-4xl bg-[#160c24]/90 backdrop-blur-2xl border border-[#ecd8a6]/15 rounded-[2rem] shadow-2xl relative mb-8 overflow-hidden"
       >
+        {/* Language Toggle Inside Card for Scrolling */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-[120]">
+          <button 
+            onClick={() => setShowLangs(!showLangs)}
+            className="flex items-center gap-2 bg-[#1a1025]/90 backdrop-blur-md border border-[#ecd8a6]/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[#ecd8a6] hover:border-[#ecd8a6]/50 transition-all shadow-lg"
+          >
+            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">{language}</span>
+          </button>
+          <AnimatePresence>
+            {showLangs && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                className="absolute top-full mt-2 right-0 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[130]"
+              >
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      onLanguageChange(lang.code);
+                      setShowLangs(false);
+                    }}
+                    className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
+                  >
+                    {lang.name}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#ecd8a6]/30 to-transparent" />
         
         <div className="flex flex-col md:flex-row h-full">

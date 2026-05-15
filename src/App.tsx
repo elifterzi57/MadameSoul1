@@ -26,7 +26,6 @@ import {
   Download, 
   Globe, 
   ArrowLeft, 
-  Share2, 
   X, 
   Plus, 
   Copy, 
@@ -127,9 +126,7 @@ const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    return localStorage.getItem('onboarding_seen') !== 'true';
-  });
+  const [showOnboarding, setShowOnboarding] = useState(true);
   const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
   const [userInfo, setUserInfo] = useState<UserInfo>(() => {
     const savedLang = localStorage.getItem('user_language') as Language || 'en';
@@ -138,7 +135,6 @@ function App() {
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   
@@ -658,36 +654,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
     }
   };
 
-  const handleShare = async () => {
-    if (!reading || isSharing) return;
-    setIsSharing(true);
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `MadameSoul - ${userInfo.name}`,
-          text: reading,
-          url: window.location.href,
-        });
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
-          console.error('Error sharing:', error);
-        }
-      } finally {
-        setIsSharing(false);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(reading);
-        alert(t('copiedMsg'));
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
-      } finally {
-        setIsSharing(false);
-      }
-    }
-  };
-
   const handleStartOver = () => {
     setStep('SPLASH');
     setDrawnCards([]);
@@ -697,6 +663,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setShowOnboarding(true);
     } catch (err) {
       console.error("Sign out error:", err);
     }
@@ -717,7 +684,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         t={t}
         onComplete={() => {
           setShowOnboarding(false);
-          localStorage.setItem('onboarding_seen', 'true');
+          // Removing localStorage persistence to show on next reload
         }} 
       />
     );
@@ -1436,14 +1403,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   >
                     {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
-                  </button>
-
-                  <button 
-                    onClick={handleShare}
-                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    <span className="font-serif tracking-widest text-xs uppercase">{t('shareBtn')}</span>
                   </button>
 
                   <button 
