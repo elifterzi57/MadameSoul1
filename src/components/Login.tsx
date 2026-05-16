@@ -514,11 +514,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
               </p>
             </div>
             
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 opacity-30">
-              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
-              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
-              <div className="w-2 h-2 rounded-full bg-[#ecd8a6]" />
-            </div>
+
           </div>
 
           {/* Right Side: Form */}
