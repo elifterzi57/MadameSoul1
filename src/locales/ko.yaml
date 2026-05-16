@@ -6,12 +6,10 @@ onboarding:
   slides:
     - title: "MadameSoul에 오신 것을 환영합니다"
       description: "당신의 영혼의 속삭임을 들을 준비가 되셨나요? MadameSoul의 신비로운 우주에서, 고대 카티나 카드가 당신을 위해 어둠을 밝혀줍니다."
-    - title: "과거의 거울"
-      description: "당신이 내딛는 모든 발걸음에는 의미가 있습니다. 카티나 카드는 과거의 매듭을 풀어 현재를 더 잘 이해하도록 도와줍니다."
     - title: "카티나 문 발견하기"
-      description: "사랑, 일, 삶의 여정에서 매일 1개의 카티나 문이 계정에 지급됩니다. 더 많은 통찰력을 위해 더 많은 카티나 문을 획득할 수 있습니다."
+      description: "사랑, 일, 삶의 여정에서 매일 1개의 카티나 문이 계정에 지급됩니다. 더 깊은 통찰력을 위해 더 많은 카티나 문을 획득할 수 있습니다."
     - title: "신비로운 경험"
-      description: "카티나 문즈와 함께 예언을 잠금 해제하세요. 준비가 되었다면 여행이 시작됩니다!"
+      description: "카티나 문과 함께 예언의 문을 여세요. 준비가 되었다면 여행이 시작됩니다!"
 returnToStart: 시작으로 돌아가기
 subtitle: 과거의 거울, 현재의 불꽃, 미래의 나침반... 카티나 덱이 당신에게 무엇을 속삭이나요?
 splashText: 예언이 당신을 위해 펼쳐지고 있습니다...
@@ -26,8 +24,8 @@ submitButton: 카드 선택 및 운세 보기
 past: 과거
 present: 현재
 future: 미래
-loading: 영혼들이 속삭이고 있습니다... 카드의 에너지를 읽는 중...
-downloadBtn: 운세 다운로드 (PDF)
+loading: 영혼들이 속삭이고 있습니다... 신비로운 예언을 준비 중...
+downloadBtn: 예언 다운로드 (PDF)
 shareBtn: 공유
 restartBtn: 새로운 여정 시작
 errorSilent: 영혼들이 지금은 침묵하고 있습니다. 나중에 다시 시도해주세요.
@@ -41,9 +39,9 @@ statusOptions:
   complicated: 복잡함
   breakup: 이별 중
 headings: |-
-  **과거의 메아리** (과거 카드 분석)
-  **현재의 바람** (현재 카드 분석)
-  **미래의 속삭임** (미래 카드 분석)
+  **과거의 메아리**
+  **현재의 바람**
+  **미래의 속삭임**
 languageName: Korean
 cards:
   selana:

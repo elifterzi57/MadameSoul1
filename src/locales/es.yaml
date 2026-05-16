@@ -6,12 +6,10 @@ onboarding:
   slides:
     - title: "Bienvenido a MadameSoul"
       description: "¿Estás listo para escuchar los susurros de tu alma? En el universo místico de MadameSoul, las antiguas cartas Katina iluminan la oscuridad para ti."
-    - title: "Espejo del Pasado"
-      description: "Cada paso que das tiene un significado. Las cartas Katina te ayudan a comprender mejor el presente desatando los nudos del pasado."
     - title: "Descubre las Lunas de Katina"
-      description: "En tu viaje de amor, trabajo y vida, se añadirá 1 Luna de Katina a tu cuenta cada día. Puedes obtener más Lunas de Katina para más lecturas."
+      description: "En tu viaje de amor, trabajo y vida, se otorga 1 Luna de Katina a tu cuenta cada día. Puedes obtener más Lunas de Katina para obtener visiones más profundas."
     - title: "Una Experiencia Mística"
-      description: "Desbloquea las profecías con Katina Moons. ¡Si estás listo, el viaje comienza!"
+      description: "Abre la puerta de las profecías con las Lunas de Katina. ¡Si estás listo, el viaje comienza!"
 returnToStart: Volver al Inicio
 subtitle: Espejo del pasado, fuego del presente, y brújula del futuro... ¿Qué te
   susurra la baraja Katina?
@@ -27,8 +25,8 @@ submitButton: Seleccionar Cartas y Leer mi Fortuna
 past: Pasado
 present: Presente
 future: Futuro
-loading: Los espíritus susurran... Leyendo la energía de las cartas...
-downloadBtn: Descargar Lectura (PDF)
+loading: Los espíritus susurran... Preparando tu profecía mística...
+downloadBtn: Descargar Profecía (PDF)
 shareBtn: Compartir
 restartBtn: Comenzar un Nuevo Viaje
 errorSilent: Los espíritus están en silencio en este momento, por favor
@@ -43,9 +41,9 @@ statusOptions:
   complicated: Es Complicado
   breakup: Pasando por una Ruptura
 headings: |-
-  **Ecos del Pasado** (análisis de la carta del pasado)
-  **Vientos del Presente** (análisis de la carta del presente)
-  **Susurros del Futuro** (análisis de la carta del futuro)
+  **Ecos del Pasado**
+  **Vientos del Presente**
+  **Susurros del Futuro**
 languageName: Spanish
 cards:
   selana:

@@ -8,12 +8,10 @@ onboarding:
   slides:
     - title: "Welcome to MadameSoul"
       description: "Are you ready to hear the whispers of your soul? In the mystic universe of MadameSoul, ancient Katina cards illuminate the darkness for you."
-    - title: "Mirror of the Past"
-      description: "Every step you take has meaning. Katina cards help you understand the present better by untying the knots of the past."
     - title: "Discover Katina Moons"
-      description: "In your journey of love, work, and life, 1 Katina Moon will be added to your account every day. You can get more Katina Moons for more insights."
+      description: "In your journey of love, work, and life, 1 Katina Moon is granted to your account every day. You can get more Katina Moons for deeper insights."
     - title: "A Mystic Experience"
-      description: "Unlock the prophecies with Katina Moons. If you're ready, the journey begins!"
+      description: "Unlock the gate of prophecies with Katina Moons. If you're ready, the journey begins!"
 returnToStart: Return to Start
 subtitle: Mirror of the past, fire of the present, and compass of the future...
   What does the Katina deck whisper to you?
@@ -29,8 +27,8 @@ submitButton: Select Cards & Read My Fortune
 past: Past
 present: Present
 future: Future
-loading: The spirits are whispering... Reading the cards' energy...
-downloadBtn: Download Reading (PDF)
+loading: The spirits are whispering... Preparing your mystical prophecy...
+downloadBtn: Download Prophecy (PDF)
 shareBtn: Share
 restartBtn: Start a New Journey
 errorSilent: The spirits are silent right now, please try again later.
@@ -44,9 +42,9 @@ statusOptions:
   complicated: It's Complicated
   breakup: Going through a Breakup
 headings: |-
-  **Echoes of the Past** (analysis of the past card)
-  **Winds of the Present** (analysis of the present card)
-  **Whispers of the Future** (analysis of the future card)
+  **Echoes of the Past**
+  **Winds of the Present**
+  **Whispers of the Future**
 languageName: English
 cards:
   selana:

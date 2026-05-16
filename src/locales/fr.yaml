@@ -6,12 +6,10 @@ onboarding:
   slides:
     - title: "Bienvenue sur MadameSoul"
       description: "Êtes-vous prêt à entendre les murmures de votre âme ? Dans l'univers mystique de MadameSoul, les anciennes cartes Katina éclairent les ténèbres pour vous."
-    - title: "Miroir du Passé"
-      description: "Chaque pas que vous faites a un sens. Les cartes Katina vous aident à mieux comprendre le présent en dénouant les nœuds du passé."
     - title: "Découvrez les Lunes de Katina"
-      description: "Dans votre voyage d'amour, de travail et de vie, 1 Lune de Katina sera ajoutée à votre compte chaque jour. Vous pouvez obtenir plus de Lunes de Katina pour plus de prédictions."
+      description: "Dans votre voyage d'amour, de travail et de vie, 1 Lune de Katina est ajoutée à votre compte chaque jour. Vous pouvez obtenir plus de Lunes de Katina pour des visions plus profondes."
     - title: "Une Expérience Mystique"
-      description: "Déverrouillez les prophéties avec Katina Moons. Si vous êtes prêt, le voyage commence !"
+      description: "Ouvrez la porte des prophéties avec les Lunes de Katina. Si vous êtes prêt, le voyage commence !"
 returnToStart: Retour au Début
 subtitle: Miroir du passé, feu du présent, et boussole du futur... Que vous
   murmure le jeu Katina ?
@@ -27,8 +25,8 @@ submitButton: Sélectionner des Cartes et Lire ma Fortune
 past: Passé
 present: Présent
 future: Futur
-loading: Les esprits murmurent... Lecture de l'énergie des cartes...
-downloadBtn: Télécharger la Lecture (PDF)
+loading: Les esprits murmurent... Préparation de votre prophétie mystique...
+downloadBtn: Télécharger la Prophétie (PDF)
 shareBtn: Partager
 restartBtn: Commencer un Nouveau Voyage
 errorSilent: Les esprits sont silencieux pour le moment, veuillez réessayer plus tard.
@@ -42,9 +40,9 @@ statusOptions:
   complicated: C'est Compliqué
   breakup: En Pleine Rupture
 headings: |-
-  **Échos du Passé** (analyse de la carte du passé)
-  **Vents du Présent** (analyse de la carte du présent)
-  **Murmures du Futur** (analyse de la carte du futur)
+  **Échos du Passé**
+  **Vents du Présent**
+  **Murmures du Futur**
 languageName: French
 cards:
   selana:

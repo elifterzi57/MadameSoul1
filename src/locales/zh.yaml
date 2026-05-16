@@ -1,37 +1,35 @@
 transactionDesc: "カードを使ったリーディング：{cards}"
 onboarding:
-  skip: 跳過
+  skip: 跳过
   next: 下一步
-  start: 開始探索
+  start: 开始探索
   slides:
-    - title: "歡迎來到 MadameSoul"
-      description: "你準備好聽聽靈魂的低語了嗎？在 MadameSoul 的神秘宇宙中，古老的卡緹娜卡片為你照亮黑暗。"
-    - title: "過去之鏡"
-      description: "你走出的每一步都有其意義。卡緹娜牌幫助你解開過去的結，讓你更好地了解現在。"
-    - title: "探索卡蒂娜之月 (Katina Moons)"
-      description: "在爱情、工作和生活的旅程中，每天将有 1 个卡蒂娜之月添加到您的账户。您可以获取更多卡蒂娜之月以获得更多见解。"
-    - title: "神秘的體驗"
-      description: "使用 Katina Moons 開啟預言。如果你準備好了，旅程就開始了！"
-returnToStart: 最初に戻る
-subtitle: 過去の鏡、現在の炎、未来の羅針盤…カティナデッキはあなたに何をささやきますか？
-splashText: 予言はあなたに向けて展開されています...
-startButton: 占いを始める
-nameLabel: 名前
-namePlaceholder: あなたの名前は何ですか？
-dobLabel: 生年月日
-pobLabel: 出生地
-pobPlaceholder: 都市、国
-statusLabel: 関係ステータス
-submitButton: カードを選んで神聖にする
-past: 過去
-present: 今
+    - title: "欢迎来到 MadameSoul"
+      description: "你准备好倾听灵魂的低语了吗？在 MadameSoul 的神秘宇宙中，古老的卡缇娜卡片为你照亮黑暗。"
+    - title: "探索卡缇娜之月"
+      description: "在爱、工作和生活的旅程中，每天将有 1 个卡缇娜之月注入您的账户。您可以获取更多卡缇娜之月以获得更深刻的见解。"
+    - title: "神秘的体验"
+      description: "使用卡缇娜之月开启预言之门。如果你准备好了，旅程就开始了！"
+returnToStart: 返回首页
+subtitle: 过去的镜子，现在的火焰，未来的指南针... 卡缇娜牌组会对你低语什么？
+splashText: 预言正为你展开...
+startButton: 开始占卜
+nameLabel: 姓名
+namePlaceholder: 你的名字是？
+dobLabel: 出生日期
+pobLabel: 出生地点
+pobPlaceholder: 城市，国家
+statusLabel: 感情状态
+submitButton: 选择卡片并开始占卜
+past: 过去
+present: 现在
 future: 未来
-loading: 精霊がささやきます…カードのエネルギーを読み取っています…
-downloadBtn: 占いをダウンロード（PDF）
-shareBtn: 共有
-restartBtn: 新しい旅を始める
-errorSilent: 現在スピリットは沈黙しています。後でもう一度試してください。
-errorInterrupted: 神秘的なエネルギーの流れが遮断される。(エラーが発生しました)
+loading: 灵魂在低语... 正在感应卡片的能量...
+downloadBtn: 下载预言 (PDF)
+shareBtn: 分享
+restartBtn: 开始新的旅程
+errorSilent: 灵魂此刻保持沉默，请稍后再试。
+errorInterrupted: 神秘的能量流中断了。（发生了错误）
 copiedMsg: 占卜内容已复制到剪贴板！
 statusOptions:
   single: 单身
@@ -41,10 +39,10 @@ statusOptions:
   complicated: 关系复杂
   breakup: 正在分手
 headings: |-
-  **过去的余音** (过去卡牌的解析)
-  **现在的风向** (现在卡牌的解析)
-  **未来的低语** (未来卡牌的解析)
-languageName: Japanese
+  **过去的余音**
+  **现在的风向**
+  **未来的低语**
+languageName: Chinese (Simplified)
 cards:
   selana:
     name: ズボン

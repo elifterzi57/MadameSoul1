@@ -8,10 +8,8 @@ onboarding:
   slides:
     - title: "MadameSoul'a Hoş Geldin"
       description: "Ruhunun fısıltılarını duymaya hazır mısın? MadameSoul'un mistik evreninde, kadim Katina kartları senin için karanlığı aydınlatıyor."
-    - title: "Geçmişin Aynası"
-      description: "Attığın her adımın bir anlamı var. Katina kartları, geçmişteki düğümleri çözerek bugünü anlamana yardımcı olur."
     - title: "Katina Moon'larını Keşfet"
-      description: "Aşk, iş ve yaşam yolculuğunda her gün 1 Katina Moon hesabına tanımlanacak. Daha fazlası için daha fazla Katina Moon alabilirsin. "
+      description: "Aşk, iş ve yaşam yolculuğunda her gün 1 Katina Moon hesabına tanımlanır. Daha fazlası için daha fazla Katina Moon alabilirsin. "
     - title: "Mistik Bir Deneyim"
       description: "Katina Moons ile kehanetlerin kapısını arala. Hazırsan yolculuk başlıyor!"
 returnToStart: Giriş Ekranına Dön

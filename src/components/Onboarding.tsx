@@ -10,9 +10,9 @@ interface OnboardingProps {
 }
 
 const slideImages = [
-  "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000",
-  "https://images.unsplash.com/photo-1512411993420-19a9307cedf3?auto=format&fit=crop&q=80&w=2000"
+  "/assets/onboarding/onboarding_1.jpg",
+  "/assets/onboarding/onboarding_1.jpg",
+  "/assets/onboarding/onboarding_1.jpg"
 ];
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t }) => {
@@ -36,7 +36,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
     },
     {
       title: t('onboarding.slides.1.title'),
-      description: t('onboarding.slides.1.description') + " " + t('onboarding.slides.2.description'),
+      description: t('onboarding.slides.1.description'),
       icon: (
         <div className="relative">
           <KatinaMoon className="w-20 h-20 text-[#ecd8a6]" />
@@ -47,11 +47,11 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
           />
         </div>
       ),
-      tag: "Wisdom"
+      tag: "Discovery"
     },
     {
-      title: t('onboarding.slides.3.title'),
-      description: t('onboarding.slides.3.description'),
+      title: t('onboarding.slides.2.title'),
+      description: t('onboarding.slides.2.description'),
       icon: (
         <div className="relative">
           <KatinaMoon className="w-20 h-20 text-[#ecd8a6]" />
@@ -86,7 +86,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
             src={slideImages[currentSlide]} 
-            alt="Atmosphere" 
+            alt="" 
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
