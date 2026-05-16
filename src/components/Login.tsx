@@ -478,39 +478,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-900/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Language Toggle Fixed for Desktop & Mobile Scrolling */}
-      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-[120]">
-        <button 
-          onClick={() => setShowLangs(!showLangs)}
-          className="flex items-center gap-2 bg-[#1a1025]/90 backdrop-blur-md border border-[#ecd8a6]/20 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-[#ecd8a6] hover:border-[#ecd8a6]/50 transition-all shadow-lg"
-        >
-          <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">{language}</span>
-        </button>
-        <AnimatePresence>
-          {showLangs && (
-            <motion.div 
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute top-full mt-2 right-0 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[130]"
-            >
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => {
-                    onLanguageChange(lang.code);
-                    setShowLangs(false);
-                  }}
-                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
-                >
-                  {lang.name}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
       {/* Main Container */}
       <motion.div 
@@ -672,7 +639,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     </button>
 
                     <div className="pt-2">
-                      <button 
+                       <button 
                         type="button"
                         onClick={onShowOnboarding}
                         className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
@@ -680,6 +647,44 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
                         <span>{t.showIntro}</span>
                       </button>
+                    </div>
+
+                    {/* Language Selector Under Button */}
+                    <div className="flex flex-col items-center pt-2">
+                      <div className="relative">
+                        <button 
+                          onClick={() => setShowLangs(!showLangs)}
+                          className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2"
+                        >
+                          <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">
+                            {languages.find(l => l.code === language)?.name}
+                          </span>
+                        </button>
+                        <AnimatePresence>
+                          {showLangs && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
+                            >
+                              {languages.map((lang) => (
+                                <button
+                                  key={lang.code}
+                                  onClick={() => {
+                                    onLanguageChange(lang.code);
+                                    setShowLangs(false);
+                                  }}
+                                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
+                                >
+                                  {lang.name}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 </motion.form>
@@ -837,6 +842,44 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
                         <span>{t.showIntro}</span>
                       </button>
+                    </div>
+
+                    {/* Language Selector Under Button */}
+                    <div className="flex flex-col items-center pt-2">
+                      <div className="relative">
+                        <button 
+                          onClick={() => setShowLangs(!showLangs)}
+                          className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2"
+                        >
+                          <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">
+                            {languages.find(l => l.code === language)?.name}
+                          </span>
+                        </button>
+                        <AnimatePresence>
+                          {showLangs && (
+                            <motion.div 
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
+                            >
+                              {languages.map((lang) => (
+                                <button
+                                  key={lang.code}
+                                  onClick={() => {
+                                    onLanguageChange(lang.code);
+                                    setShowLangs(false);
+                                  }}
+                                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
+                                >
+                                  {lang.name}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

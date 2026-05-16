@@ -129,8 +129,7 @@ function App() {
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
   const [userInfo, setUserInfo] = useState<UserInfo>(() => {
-    const savedLang = localStorage.getItem('user_language') as Language || 'en';
-    return { name: '', dob: '', birthplace: '', relationship: 'single', language: savedLang };
+    return { name: '', dob: '', birthplace: '', relationship: 'single', language: 'en' };
   });
   const [drawnCards, setDrawnCards] = useState<Card[]>([]);
   const [reading, setReading] = useState<string | null>(null);
@@ -324,9 +323,6 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('user_language', userInfo.language);
-  }, [userInfo.language]);
 
   const t = (key: string, params: Record<string, any> = {}) => {
     const currentLocale = locales[userInfo.language] || locales.en;
