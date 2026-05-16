@@ -1077,6 +1077,8 @@ profile:
   noHistory: "Henüz bir fal bakılmamış."
   moons: "Mistik Bakiye"
   status: "Gönül Durumu"
+  dob: "Doğum Tarihi"
+  birthplace: "Doğum Yeri"
   name: "Ad Soyad"
   readingCount: "Fal Sayısı"
   mysticRank: "Mistik Seviye"
@@ -1091,12 +1093,9 @@ profile:
     overview: "Genel Bakış"
     settings: "Ayarlar"
   settings:
-    email: "E-posta Adresi"
     password: "Şifre"
     newPassword: "Yeni Şifre"
-    updateEmail: "E-posta Güncelle"
     updatePassword: "Şifre Değiştir"
-    successEmail: "E-posta başarıyla güncellendi."
     successPassword: "Şifre başarıyla güncellendi."
     reauthRequired: "Güvenlik nedeniyle lütfen tekrar giriş yapın."
   history:

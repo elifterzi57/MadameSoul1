@@ -1142,6 +1142,8 @@ profile:
   noHistory: "No readings yet."
   moons: "Mystic Balance"
   status: "Relationship Status"
+  dob: "Date of Birth"
+  birthplace: "Place of Birth"
   name: "Full Name"
   readingCount: "Readings"
   mysticRank: "Mystic Rank"
@@ -1156,12 +1158,9 @@ profile:
     overview: "Overview"
     settings: "Settings"
   settings:
-    email: "Email Address"
     password: "Password"
     newPassword: "New Password"
-    updateEmail: "Update Email"
     updatePassword: "Change Password"
-    successEmail: "Email updated successfully."
     successPassword: "Password updated successfully."
     reauthRequired: "For security, please log in again."
   history:

@@ -13,7 +13,6 @@ import {
   Loader2,
   CalendarDays,
   Settings,
-  Mail,
   Lock,
   Eye,
   EyeOff,
@@ -23,7 +22,7 @@ import {
 } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit, Timestamp, doc, updateDoc } from 'firebase/firestore';
-import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 interface ProfileProps {
   user: any;
@@ -59,14 +58,17 @@ export const Profile: React.FC<ProfileProps> = ({
   // Profile edit state
   const [editName, setEditName] = useState(userInfo.name);
   const [editDob, setEditDob] = useState(userInfo.dob);
+  const [editBirthplace, setEditBirthplace] = useState(userInfo.birthplace);
+  const [editRelationship, setEditRelationship] = useState(userInfo.relationship);
 
   useEffect(() => {
     setEditName(userInfo.name);
     setEditDob(userInfo.dob);
-  }, [userInfo.name, userInfo.dob]);
+    setEditBirthplace(userInfo.birthplace);
+    setEditRelationship(userInfo.relationship);
+  }, [userInfo.name, userInfo.dob, userInfo.birthplace, userInfo.relationship]);
 
   // Settings state
-  const [email, setEmail] = useState(user?.email || '');
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [settingsStatus, setSettingsStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -107,24 +109,6 @@ export const Profile: React.FC<ProfileProps> = ({
     fetchHistory();
   }, [user]);
 
-  const handleUpdateEmail = async () => {
-    if (!user || !email || email === user.email) return;
-    setIsUpdating(true);
-    setSettingsStatus(null);
-    try {
-      await updateEmail(user, email);
-      setSettingsStatus({ type: 'success', message: profileT.settings.successEmail });
-    } catch (error: any) {
-      if (error.code === 'auth/requires-recent-login') {
-        setSettingsStatus({ type: 'error', message: profileT.settings.reauthRequired });
-      } else {
-        setSettingsStatus({ type: 'error', message: error.message });
-      }
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
   const handleUpdatePassword = async () => {
     if (!user || !newPassword) return;
     setIsUpdating(true);
@@ -142,8 +126,12 @@ export const Profile: React.FC<ProfileProps> = ({
       setNewPassword('');
       setSettingsStatus({ type: 'success', message: profileT.settings.successPassword });
     } catch (error: any) {
-      if (error.code === 'auth/requires-recent-login') {
+      const errorCode = error.code || (error.message?.includes('auth/') ? error.message.match(/auth\/[a-z-]+/)?.[0] : null);
+      
+      if (errorCode === 'auth/requires-recent-login') {
         setSettingsStatus({ type: 'error', message: profileT.settings.reauthRequired });
+      } else if (errorCode === 'auth/weak-password') {
+        setSettingsStatus({ type: 'error', message: userInfo.language === 'tr' ? "Şifre çok zayıf (en az 6 karakter olmalı)." : "Password is too weak." });
       } else {
         setSettingsStatus({ type: 'error', message: error.message });
       }
@@ -161,10 +149,15 @@ export const Profile: React.FC<ProfileProps> = ({
       await updateDoc(userRef, {
         name: editName,
         dob: editDob,
+        birthplace: editBirthplace,
+        relationship: editRelationship,
         updatedAt: Timestamp.now()
       });
-      onUpdateUserInfo({ ...userInfo, name: editName, dob: editDob });
-      setSettingsStatus({ type: 'success', message: profileT.settings.successEmail });
+      onUpdateUserInfo({ ...userInfo, name: editName, dob: editDob, birthplace: editBirthplace, relationship: editRelationship });
+      setSettingsStatus({ 
+        type: 'success', 
+        message: userInfo.language === 'tr' ? "Profil başarıyla güncellendi." : "Profile updated successfully." 
+      });
     } catch (error: any) {
       setSettingsStatus({ type: 'error', message: error.message });
     } finally {
@@ -188,18 +181,18 @@ export const Profile: React.FC<ProfileProps> = ({
   };
 
   const profileT = {
-    title: translations?.profile?.title || "Profil",
-    userInfo: translations?.profile?.userInfo || "Kullanıcı Bilgileri",
-    readingHistory: translations?.profile?.readingHistory || "Geçmiş Kehanetler",
-    noHistory: translations?.profile?.noHistory || "Henüz bir fal bakılmamış.",
-    moons: translations?.profile?.moons || "Katina Moon Bakiyesi",
-    status: translations?.profile?.status || "İlişki Durumu",
-    birthplace: translations?.profile?.birthplace || "Doğum Yeri",
-    dob: translations?.profile?.dob || "Doğum Tarihi",
-    name: translations?.profile?.name || "Ad Soyad",
-    readingCount: translations?.profile?.readingCount || "Fal Sayısı",
-    mysticRank: translations?.profile?.mysticRank || "Mistik Seviye",
-    save: translations?.profile?.save || "Kaydet",
+    title: translations?.profile?.title || "Profile",
+    userInfo: translations?.profile?.userInfo || "User Information",
+    readingHistory: translations?.profile?.readingHistory || "Past Readings",
+    noHistory: translations?.profile?.noHistory || "No readings yet.",
+    moons: translations?.profile?.moons || "Mystic Balance",
+    status: translations?.profile?.status || "Relationship Status",
+    birthplace: translations?.profile?.birthplace || "Birthplace",
+    dob: translations?.profile?.dob || "Date of Birth",
+    name: translations?.profile?.name || "Full Name",
+    readingCount: translations?.profile?.readingCount || "Readings",
+    mysticRank: translations?.profile?.mysticRank || "Mystic Rank",
+    save: translations?.profile?.save || "Save",
     rankNames: {
       novice: translations?.profile?.rankNames?.novice || "Novice",
       apprentice: translations?.profile?.rankNames?.apprentice || "Apprentice",
@@ -212,18 +205,15 @@ export const Profile: React.FC<ProfileProps> = ({
       settings: translations?.profile?.tabs?.settings || "Settings" 
     },
     settings: {
-      email: translations?.profile?.settings?.email || "E-posta",
-      password: translations?.profile?.settings?.password || "Şifre",
-      newPassword: translations?.profile?.settings?.newPassword || "Yeni Şifre",
-      updateEmail: translations?.profile?.settings?.updateEmail || "Güncelle",
-      updatePassword: translations?.profile?.settings?.updatePassword || "Değiştir",
-      successEmail: translations?.profile?.settings?.successEmail || "Güncellendi",
-      successPassword: translations?.profile?.settings?.successPassword || "Değiştirildi",
-      reauthRequired: translations?.profile?.settings?.reauthRequired || "Tekrar giriş yapın"
+      password: translations?.profile?.settings?.password || "Password",
+      newPassword: translations?.profile?.settings?.newPassword || "New Password",
+      updatePassword: translations?.profile?.settings?.updatePassword || "Change",
+      successPassword: translations?.profile?.settings?.successPassword || "Changed",
+      reauthRequired: translations?.profile?.settings?.reauthRequired || "Please login again"
     },
     history: {
-      downloadPdf: translations?.profile?.history?.downloadPdf || "PDF İndir",
-      viewReading: translations?.profile?.history?.viewReading || "Görüntüle"
+      downloadPdf: translations?.profile?.history?.downloadPdf || "Download PDF",
+      viewReading: translations?.profile?.history?.viewReading || "View"
     }
   };
 
@@ -314,10 +304,40 @@ export const Profile: React.FC<ProfileProps> = ({
                         className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1 [color-scheme:dark]"
                       />
                     </div>
+                    <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
+                        <MapPin className="w-4 h-4" />
+                        {profileT.birthplace}
+                      </div>
+                      <input 
+                        type="text" 
+                        value={editBirthplace}
+                        onChange={(e) => setEditBirthplace(e.target.value)}
+                        className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1"
+                        placeholder={profileT.birthplace}
+                      />
+                    </div>
+                    <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
+                        <Heart className="w-4 h-4" />
+                        {profileT.status}
+                      </div>
+                      <select 
+                        value={editRelationship}
+                        onChange={(e) => setEditRelationship(e.target.value)}
+                        className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1 appearance-none"
+                      >
+                        {translations?.statusOptions && Object.keys(translations.statusOptions).map(key => (
+                          <option key={key} value={key} className="bg-[#0a0512]">
+                            {translations.statusOptions[key]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <InfoCard icon={<History className="w-4 h-4" />} label={profileT.readingCount} value={readingCount.toString()} />
                     <InfoCard icon={<Star className="w-4 h-4" />} label={profileT.mysticRank} value={getMysticRank(readingCount)} />
                   </div>
-                  {(editName !== userInfo.name || editDob !== userInfo.dob) && (
+                  {(editName !== userInfo.name || editDob !== userInfo.dob || editBirthplace !== userInfo.birthplace || editRelationship !== userInfo.relationship) && (
                     <div className="mt-4 flex justify-end">
                       <button 
                         onClick={handleUpdateProfile}
@@ -398,28 +418,6 @@ export const Profile: React.FC<ProfileProps> = ({
                     <span className="text-xs font-medium">{settingsStatus.message}</span>
                   </div>
                 )}
-
-                <section className="space-y-4">
-                  <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
-                    <Mail className="w-3 h-3" />
-                    {profileT.settings.email}
-                  </h3>
-                  <div className="flex flex-col sm:flex-row gap-3 items-stretch">
-                    <input 
-                      type="email" 
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="flex-1 bg-[#1a1025] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] text-sm focus:outline-none focus:border-[#ecd8a6]/50 transition-all font-serif min-w-0"
-                    />
-                    <button 
-                      onClick={handleUpdateEmail}
-                      disabled={isUpdating || email === user?.email}
-                      className="sm:w-40 whitespace-nowrap px-6 py-3 bg-[#ecd8a6] text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center font-bold"
-                    >
-                      {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : profileT.settings.updateEmail}
-                    </button>
-                  </div>
-                </section>
 
                 <section className="space-y-4">
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">

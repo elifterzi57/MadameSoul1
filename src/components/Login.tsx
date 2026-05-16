@@ -342,14 +342,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     } catch (err: any) {
       console.error("Email auth error:", err);
       // Show more specific error message if available
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-        setError(language === 'tr' ? "Giriş bilgileri hatalı veya kullanıcı bulunamadı." : "Invalid credentials or user not found.");
-      } else if (err.code === 'auth/wrong-password') {
-        setError(language === 'tr' ? "Hatalı şifre." : "Wrong password.");
-      } else if (err.code === 'auth/email-already-in-use') {
+      // Add more specific error mappings
+      const errorCode = err.code || (err.message?.includes('auth/') ? err.message.match(/auth\/[a-z-]+/)?.[0] : null);
+      
+      if (errorCode === 'auth/user-not-found' || errorCode === 'auth/invalid-credential' || errorCode === 'auth/wrong-password') {
+        setError(language === 'tr' ? "E-posta adresi veya şifre hatalı." : "Invalid email or password.");
+      } else if (errorCode === 'auth/email-already-in-use') {
         setError(language === 'tr' ? "Bu e-posta adresi zaten kullanımda." : "Email already in use.");
-      } else if (err.code === 'auth/weak-password') {
+      } else if (errorCode === 'auth/invalid-email') {
+        setError(language === 'tr' ? "Geçersiz e-posta adresi." : "Invalid email address.");
+      } else if (errorCode === 'auth/weak-password') {
         setError(language === 'tr' ? "Şifre çok zayıf (en az 6 karakter olmalı)." : "Password is too weak.");
+      } else if (errorCode === 'auth/too-many-requests') {
+        setError(language === 'tr' ? "Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin." : "Too many requests. Please try again later.");
       } else {
         setError(err.message || t.error);
       }

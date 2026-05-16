@@ -249,7 +249,9 @@ function App() {
             setUserInfo(prev => ({
               ...prev,
               name: prev.name || data.name || '',
-              dob: prev.dob || data.dob || ''
+              dob: prev.dob || data.dob || '',
+              birthplace: prev.birthplace || data.birthplace || '',
+              relationship: prev.relationship || data.relationship || 'single'
             }));
           } else {
             // New user profile creation
@@ -259,6 +261,8 @@ function App() {
               email: u.email,
               name: u.displayName || '',
               dob: '',
+              birthplace: '',
+              relationship: 'single',
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
               metadata
@@ -352,6 +356,20 @@ function App() {
 
     if (user) {
       logUserEvent(user.uid, 'DRAW_CARDS_START');
+      
+      // Sync user info to Firestore when they submit the form
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          name: userInfo.name,
+          dob: userInfo.dob,
+          birthplace: userInfo.birthplace,
+          relationship: userInfo.relationship,
+          updatedAt: serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Error updating user profile on draw:", error);
+      }
     }
 
     const deck = [...KATINA_DECK];
