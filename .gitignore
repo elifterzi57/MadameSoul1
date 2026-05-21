@@ -12,4 +12,5 @@ coverage/
 .agents/
 .antigravity/
 .vscode/
+_bmad/
 _bmad-output/
