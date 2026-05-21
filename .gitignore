@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Agent and workspace metadata
+.agent/
+.agents/
+.antigravity/
+.vscode/
+_bmad-output/

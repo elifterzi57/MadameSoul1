@@ -1,0 +1,79 @@
+{
+  "ad1": {
+    "enabled": true,
+    "mediaType": "video",
+    "mediaSrc": "/ads/MadameSoapStudio.mp4",
+    "promoCode": "MADAMESOUL10",
+    "link": "https://www.etsy.com/shop/MadameSoapStudio",
+    "sponsored": {
+      "en": "Sponsored",
+      "tr": "Sponsorlu",
+      "es": "Patrocinado",
+      "fr": "Sponsorisé",
+      "zh": "赞助",
+      "ko": "스폰서"
+    },
+    "promoCodeLabel": {
+      "en": "Use Code:",
+      "tr": "Kod:",
+      "es": "Código:",
+      "fr": "Code :",
+      "zh": "代码：",
+      "ko": "코드:"
+    },
+    "text": {
+      "en": "Get 10% off Natural Donkey Milk Soap on Etsy!",
+      "tr": "Etsy'de Doğal Eşek Sütü Sabununda %10 indirim kazanın!",
+      "es": "¡Obtenga un 10% de descuento en jabón natural de leche de burra en Etsy!",
+      "fr": "Obtenez 10 % de réduction sur le savon naturel au lait d'ânesse sur Etsy !",
+      "zh": "在 Etsy 上购买天然驴奶皂可享受 10% 的折扣！",
+      "ko": "Etsy에서 천연 당나귀 우유 비누를 10% 할인 받으세요!"
+    },
+    "buttonText": {
+      "en": "Shop Now",
+      "tr": "Hemen Al",
+      "es": "Comprar ahora",
+      "fr": "Acheter maintenant",
+      "zh": "立即购买",
+      "ko": "지금 쇼핑"
+    }
+  },
+  "ad2": {
+    "enabled": true,
+    "mediaType": "video",
+    "mediaSrc": "/ads/Govde.mp4",
+    "link": "https://www.etsy.com/shop/MadameSoulStudio",
+    "sponsored": {
+      "en": "Sponsored",
+      "tr": "Sponsorlu",
+      "es": "Patrocinado",
+      "fr": "Sponsorisé",
+      "zh": "赞助",
+      "ko": "스폰서"
+    },
+    "title": {
+      "en": "Live Session",
+      "tr": "Canlı Seans",
+      "es": "Sesión en vivo",
+      "fr": "Session en direct",
+      "zh": "实时会话",
+      "ko": "라이브 세션"
+    },
+    "text": {
+      "en": "Visit our Etsy shop for professional live reading sessions and personalized consultations.",
+      "tr": "Profesyonel canlı tarot seansları ve size özel açılımlar için Etsy mağazamızı ziyaret edin.",
+      "es": "Visite nuestra tienda Etsy para sesiones de lectura en vivo profesionales y consultas personalizadas.",
+      "fr": "Visitez notre boutique Etsy pour des séances de lecture en direct professionnelle et des conseils personnalisés.",
+      "zh": "访问我们的 Etsy 商店，获取专业的实时阅读服务和个性化咨询。",
+      "ko": "전문적인 라이브 타로 세션과 맞춤형 상담을 위해 Etsy 상점을 방문하십시오."
+    },
+    "buttonText": {
+      "en": "Shop on Etsy",
+      "tr": "Etsy Mağazası",
+      "es": "Comprar en Etsy",
+      "fr": "Acheter sur Etsy",
+      "zh": "在 Etsy 购买",
+      "ko": "Etsy에서 쇼핑"
+    }
+  }
+}

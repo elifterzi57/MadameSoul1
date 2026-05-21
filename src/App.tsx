@@ -198,9 +198,39 @@ function App() {
   const [isContactSubmitting, setIsContactSubmitting] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
+  const [adsConfig, setAdsConfig] = useState<any>({
+    ad1: {
+      enabled: true,
+      promoCode: "KATINA20",
+      link: "https://www.amazon.com/s?k=katina+tarot",
+      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
+      promoCodeLabel: { en: "Use Code:", tr: "Kod:", es: "Código:", fr: "Code :", zh: "代码：", ko: "코드:" },
+      text: { en: "Get 20% off Katina Tarot Cards on Amazon!", tr: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!" },
+      buttonText: { en: "Shop Now", tr: "Hemen Al" }
+    },
+    ad2: {
+      enabled: true,
+      mediaType: "video",
+      mediaSrc: "/ads/Govde.mp4",
+      link: "https://www.etsy.com/shop/MadameSoulStudio",
+      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
+      title: { en: "Live Session", tr: "Canlı Seans" },
+      text: { en: "Visit our Etsy shop for professional live reading sessions and personalized consultations.", tr: "Profesyonel canlı tarot seansları ve size özel açılımlar için Etsy mağazamızı ziyaret edin." },
+      buttonText: { en: "Shop on Etsy", tr: "Etsy Mağazası" }
+    }
+  });
 
   useEffect(() => {
     initAnalytics();
+    // Fetch external customizable ads configuration
+    fetch('/ads/ads_config.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setAdsConfig(data);
+        }
+      })
+      .catch(err => console.error("Could not load ads config:", err));
   }, []);
 
   // Firestore Error Handler
@@ -552,14 +582,14 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
       const bannerHtml = `
         <div style="margin-top: 80px; padding: 40px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(236,216,166,0.3); background: linear-gradient(135deg, rgba(236,216,166,0.05) 0%, rgba(10,5,18,0.8) 100%);">
-           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${bannerTranslations.sponsored[userInfoToUse.language]} ✦</h3>
-           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${bannerTranslations.promoText[userInfoToUse.language]}</p>
+           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${(adsConfig?.ad1?.sponsored?.[userInfoToUse.language] || adsConfig?.ad1?.sponsored?.en || "Sponsored")} ✦</h3>
+           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${(adsConfig?.ad1?.text?.[userInfoToUse.language] || adsConfig?.ad1?.text?.en || "Get 20% off Katina Tarot Cards on Amazon!")}</p>
            
            <div style="display: inline-block; background-color: #05000a; padding: 16px 32px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: bold; color: #ecd8a6; border: 1px dashed rgba(236,216,166,0.5); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
-             KATINA20
+             ${adsConfig?.ad1?.promoCode || "KATINA20"}
            </div>
            <br/>
-           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${bannerTranslations.shopNow[userInfoToUse.language]} on Amazon</div>
+           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${(adsConfig?.ad1?.buttonText?.[userInfoToUse.language] || adsConfig?.ad1?.buttonText?.en || "Shop Now")}</div>
         </div>
       `;
 
@@ -1140,81 +1170,115 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
                   {/* Ad Banner 1: Amazon */}
-                  <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
-                    <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
-                      {bannerTranslations.sponsored[userInfo.language]}
-                    </div>
-                    <div className="p-5 flex flex-col gap-4 flex-1">
-                      <div className="text-center flex-1">
-                        <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
-                          {bannerTranslations.promoText[userInfo.language]}
-                        </p>
+                  {adsConfig?.ad1?.enabled && (
+                    <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
+                      <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                        {adsConfig?.ad1?.sponsored?.[userInfo.language] || adsConfig?.ad1?.sponsored?.en || "Sponsored"}
                       </div>
-                      <div className="bg-black/40 rounded-xl p-3 flex items-center justify-between border border-[#ecd8a6]/10">
-                        <div className="flex items-center gap-3">
-                          <span className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest">{bannerTranslations.promoCode[userInfo.language]}</span>
-                          <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-[0.2em]">KATINA20</span>
+                      <div className="p-5 flex flex-col gap-4 flex-1">
+                        <div className="text-center">
+                          <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed">
+                            {adsConfig?.ad1?.text?.[userInfo.language] || adsConfig?.ad1?.text?.en || "Get 20% off Katina Tarot Cards on Amazon!"}
+                          </p>
                         </div>
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            navigator.clipboard.writeText('KATINA20');
-                            setBannerCopied(true);
-                            setTimeout(() => setBannerCopied(false), 2000);
-                          }}
-                          className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
-                          title={bannerTranslations.copyCode[userInfo.language]}
+
+                        {adsConfig?.ad1?.mediaSrc && (
+                          <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
+                            {adsConfig?.ad1?.mediaType === 'image' ? (
+                              <img 
+                                src={adsConfig?.ad1?.mediaSrc}
+                                className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <video 
+                                src={adsConfig?.ad1?.mediaSrc} 
+                                autoPlay 
+                                muted 
+                                loop 
+                                playsInline
+                                className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                              />
+                            )}
+                          </div>
+                        )}
+
+                        <div className="bg-black/40 rounded-xl p-3 flex items-center justify-between border border-[#ecd8a6]/10 mt-auto">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest">{adsConfig?.ad1?.promoCodeLabel?.[userInfo.language] || adsConfig?.ad1?.promoCodeLabel?.en || "Use Code:"}</span>
+                            <span className="text-[#ecd8a6] text-sm font-mono font-bold tracking-[0.2em]">{adsConfig?.ad1?.promoCode || "KATINA20"}</span>
+                          </div>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navigator.clipboard.writeText(adsConfig?.ad1?.promoCode || "KATINA20");
+                              setBannerCopied(true);
+                              setTimeout(() => setBannerCopied(false), 2000);
+                            }}
+                            className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
+                            title={bannerTranslations.copyCode[userInfo.language]}
+                          >
+                            {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
+                          </button>
+                        </div>
+                        <a 
+                          href={adsConfig?.ad1?.link || "https://www.amazon.com/s?k=katina+tarot"} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
                         >
-                          {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
-                        </button>
+                          {adsConfig?.ad1?.buttonText?.[userInfo.language] || adsConfig?.ad1?.buttonText?.en || "Shop Now"}
+                        </a>
                       </div>
-                      <a 
-                        href="https://www.amazon.com/s?k=katina+tarot" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20"
-                      >
-                        {bannerTranslations.shopNow[userInfo.language]}
-                      </a>
                     </div>
-                  </div>
+                  )}
 
                   {/* Ad Banner 2: Etsy Live Reading */}
-                  <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
-                    <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
-                      {bannerTranslations.sponsored[userInfo.language]}
-                    </div>
-                    <div className="p-5 flex flex-col gap-4 flex-1">
-                      <div className="text-center">
-                        <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
-                          {locales[userInfo.language]?.promo?.live?.liveReadingTitle || "Live Session"}
-                        </p>
-                        <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
-                          {locales[userInfo.language]?.promo?.live?.liveReadingText || 'Visit our Etsy shop for live readings.'}
-                        </p>
+                  {adsConfig?.ad2?.enabled && (
+                    <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
+                      <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
+                        {adsConfig?.ad2?.sponsored?.[userInfo.language] || adsConfig?.ad2?.sponsored?.en || "Sponsored"}
                       </div>
+                      <div className="p-5 flex flex-col gap-4 flex-1">
+                        <div className="text-center">
+                          <p className="text-[#ecd8a6]/60 text-[10px] font-serif uppercase tracking-widest mb-1">
+                            {adsConfig?.ad2?.title?.[userInfo.language] || adsConfig?.ad2?.title?.en || "Live Session"}
+                          </p>
+                          <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
+                            {adsConfig?.ad2?.text?.[userInfo.language] || adsConfig?.ad2?.text?.en || "Visit our Etsy shop for professional live reading sessions and personalized consultations."}
+                          </p>
+                        </div>
 
-                      <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
-                        <video 
-                          src="/ads/Govde.mp4" 
-                          autoPlay 
-                          muted 
-                          loop 
-                          playsInline
-                          className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
-                        />
+                        <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
+                          {adsConfig?.ad2?.mediaType === 'image' ? (
+                            <img 
+                              src={adsConfig?.ad2?.mediaSrc || "/ads/Govde.mp4"}
+                              className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <video 
+                              src={adsConfig?.ad2?.mediaSrc || "/ads/Govde.mp4"} 
+                              autoPlay 
+                              muted 
+                              loop 
+                              playsInline
+                              className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
+                            />
+                          )}
+                        </div>
+
+                        <a 
+                          href={adsConfig?.ad2?.link || "https://www.etsy.com/shop/MadameSoulStudio"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20 mt-auto"
+                        >
+                          {adsConfig?.ad2?.buttonText?.[userInfo.language] || adsConfig?.ad2?.buttonText?.en || "Shop on Etsy"}
+                        </a>
                       </div>
-
-                      <a 
-                        href="https://www.etsy.com/shop/MadameSoulStudio"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full h-[50px] flex items-center justify-center gap-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 text-[#ecd8a6] rounded-xl text-xs font-serif uppercase tracking-widest transition-all font-medium border border-[#ecd8a6]/20 mt-auto"
-                      >
-                        {locales[userInfo.language]?.promo?.live?.shopOnEtsy || 'Shop on Etsy'}
-                      </a>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </motion.div>
