@@ -477,7 +477,11 @@ cards:
       visible pour les individus qui n’ont pas d’amant.
   Isfahan:
     name: İsfahan
-    general: Aucune description trouvée.
+    general: L'Esprit du Diamant, a une perspective difficile à limiter. Il accorde
+      une grande importance à la liberté. Il ne veut se soumettre au
+      commandement et à la souveraineté de personne. Il a une structure rêveuse.
+      Il préfère regarder le monde d'un œil différent de celui de tout le monde.
+      Et il fait toujours ce qu'il veut.
     upright: S'il y a des problèmes dans la relation que vit le client, il vous
       recommande de ne pas faire de demandes à la personne en pleurant ou en
       pleurnichant. Les problèmes relationnels seront résolus. Cependant, la
@@ -776,9 +780,17 @@ cards:
       cela indique que le choix ne lui sera pas bénéfique.
   gunes:
     name: Soleil
-    general: Grande chance, bonheur, illumination et succès.
-    upright: Aucune explication trouvée.
-    reversed: Aucune explication trouvée.
+    general: "Bonne chance, rupture du mauvais cycle karmique ; si le consultant
+      traverse une période troublée, celle-ci restera complètement dans le
+      passé. Il n'y a aucun changement dans la signification de la carte qu'elle
+      soit à l'endroit ou à l'envers ; dans notre vie réelle, même si nous
+      tournons le Soleil à l'envers, il brille toujours avec la même
+      magnificence. Peu importe à côté de quelle carte du jeu le Soleil se
+      trouve, sa signification ne change jamais, elle représente toujours le
+      bien, le beau et la guérison. Pour exemple, yatağan + soleil : représente
+      la fin de la séparation et la résolution des problèmes existants."
+    upright: Grande chance, bonheur, illumination et succès.
+    reversed: Grande chance, bonheur, illumination et succès.
   deve:
     name: Chameau
     general: Patience dans les finances, entêtement ou un long voyage.
@@ -1136,7 +1148,7 @@ cards:
       décision renforcera ses espoirs et lui permettra d’envisager la vie d’une
       manière plus positive.7. Maglar Esprit des Mages
   atart:
-    name: Atart
+    name: Attart
     general: Aucune description trouvée.
     upright: Il représente l'esprit de bonté et de bonté. Il décrit le fait d'être
       protégé par l'univers. Pour les personnes qui attendent le mariage, cela

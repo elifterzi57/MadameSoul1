@@ -456,7 +456,10 @@ cards:
       verdadero aún no es visible para las personas que no tienen un amante.
   Isfahan:
     name: İsfahan
-    general: No se encontró descripción.
+    general: El Espíritu del Diamante, tiene una perspectiva difícil de limitar. Le
+      da gran importancia a la libertad. No quiere estar bajo el mando ni la
+      soberanía de nadie. Tiene una estructura soñadora. Prefiere mirar al mundo
+      con ojos diferentes a los de los demás. Y siempre hace lo que quiere.
     upright: Si hay problemas en la relación que vive el cliente, recomienda no
       hacer peticiones a la persona llorando o quejándose. Los problemas en la
       relación se solucionarán. Sin embargo, la persona debe dejar de dominar a
@@ -740,9 +743,17 @@ cards:
       indica que la elección no le beneficiará.
   gunes:
     name: Sol
-    general: Gran suerte, felicidad, iluminación y éxito.
-    upright: No se encontró ninguna explicación.
-    reversed: No se encontró ninguna explicación.
+    general: "Buena suerte, ruptura del mal ciclo kármico; si el cliente está
+      pasando por un período problemático, este quedará completamente en el
+      pasado. No hay cambio en el significado de la carta cuando está al derecho
+      o al revés; en nuestra vida real, incluso si ponemos el Sol boca abajo,
+      sigue brillando con la misma magnificencia. No importa con qué carta de la
+      baraja aparezca el Sol al lado, su significado nunca cambia, siempre
+      representa lo bueno, lo bello y la curación. Por ejemplo, yatağan + sol:
+      representa el fin de la separación y la resolución de los problemas
+      existentes."
+    upright: Gran suerte, felicidad, iluminación y éxito.
+    reversed: Gran suerte, felicidad, iluminación y éxito.
   deve:
     name: Camello
     general: Paciencia en finanzas, terquedad o un viaje largo.
@@ -1077,7 +1088,7 @@ cards:
       sus esperanzas y le permitirá mirar la vida de una manera más positiva.7.
       Espíritu Maglar de los Magos
   atart:
-    name: Atart
+    name: Attart
     general: No se encontró descripción.
     upright: Representa el espíritu de bondad y bondad. Describe estar protegido por
       el universo. Para las personas que están esperando el matrimonio, indica

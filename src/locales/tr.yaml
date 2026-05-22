@@ -49,7 +49,7 @@ languageName: Turkish
 cards:
   selana:
     name: Selana
-    general: Açıklama bulunamadı.
+    general: Abonoz Serisindendir.Biçim değiştiren karakteri ifade eder.çift karakterli bir ruhu anlatır.Ne zaman doğru , ne zaman yalan söylediğini anlamak çok mümkün değildir.İnandırıcı ikna edici bir yönü vardır.Cinsel eğilimlere odaklanmıştır.Her zaman hayatın keyifli ve neşeli tarafını yaşamak ister.Tek isteği mutluluğa giden yolda ilerlemektir.
     upright: Geçmişe dair üzüntü hissetmemek , sahip oldukların için şükür etmek ve
       bugünün yarından daha iyi olacağı inancı ile devam etmek.Ruhu temsil eden
       bir kart olduğunu unutmamalıyız , karakter analizi bu kartta yapılmaz
@@ -148,7 +148,7 @@ cards:
       duymakta veya sorduğunuz soruya ilişkin birlikte olan çiftler için burada
       anlam değişir bu yönde bir enerjiden dolayı bir araya gelemediklerine
       işaret eder."
-    reversed: Açıklama bulunamadı.
+    reversed: Birliktelik yaşadığınız kişi , dürüst davranmamakta , yalanlar söylemekte ve ayrıca dini yönden tasvir edilmeyen sihir , kısmet bağlama gibi kötü konulara da eğilim duymakta veya sorduğunuz soruya ilişkin birlikte olan çiftler için burada anlam değişir bu yönde bir enerjiden dolayı bir araya gelemediklerine işaret eder.
   munzur:
     name: Munzur
     general: Saçlarına giyinişine son derece önem verir.Ama en tercih ettiği ziynet
@@ -156,7 +156,7 @@ cards:
       Danışılan kişi erkek ise , sadakatli ve titizdir , aynı zamanda düzene
       önem verir , koyduğu eşyaları yerli yerinde bulmak ister. Erkek olan
       munzur boğazına düşkündür , hayattan keyif almayı sever , güzel yemek
-      yapabilen kadını  her zaman sever. 3)Yakut Serisi Kartların Anlamları
+      yapabilen kadını her zaman sever. 3)Yakut Serisi Kartların Anlamları
     upright: Yaşanılan ilişkide aşırı derecede sabır hakimdir.Ve kişi bu birliktelik
       için dürüst net tutarlıdır.İlişkisini fazla derecede sahiplenen kadın
       munzurun gel gitli tavırlarından yorulacaktır.Ve sürekli tekrar eden
@@ -182,7 +182,7 @@ cards:
       olacağını ifade eder.
   ariman:
     name: Ariman
-    general: Açıklama bulunamadı.
+    general: Yakutun Ruhunu temsil eden ariman , hayatta sahip oldukları ile yetinmeyi bilmez.Her zaman ilginin kendisinde olmasını ister , sevdiğine karşı aşırı derecede kıskançtır.Kendine karşı özgüveni olmadığından dolayı erkeklerin dikkatini çekebilmek için , farklı yöntemler denemekten de geri kalmaz.Literatür bu kısımda çok fazla büyü v.s gibi cümleler kullanmış , ancak burada ifade edilen aslında kişinin kendisi gibi davranmadığıdır.Yani saç  şekli , kıyafetleri veya olmayan ama varmış gibi gösteren meziyetlerini anlatır.Tüm bunları yapmasının tek nedeni " dengeyi istiyorum" dur. Tehlikelidir çünkü her yönü ile güçlüdür , çok yönlü kişiliği ile erkekler kadınları , kadınlar ise erkekleri kendine hayran bırakır.
     upright: Cinsel yönden çekiciliğin olduğunu ifade eder.Partner ile dengelerin
       kurulacağını ve bozulmuş bir istikrar düzen var ise , denge altına
       alacağını anlatır.İlişkisi olmayanlar için , aşktan yana yine dengelerin
@@ -262,7 +262,7 @@ cards:
       gezmeyi , keşif etmeyi , öğrenmeye meraklı olan yapısından ilişkide sıkıcı
       bir tip olmaz .Tek sorunu bir kadının egemenliği altına girmeyi kolay
       kolay kabul edemeyişidir. Kendisinin beğenilmesinden , iltifat
-      edilmesinden hoşlanan birisidir  Tagral.Aşk ilişkilerinde evliliktan yana
+      edilmesinden hoşlanan birisidir Tagral.Aşk ilişkilerinde evliliktan yana
       olmaz ama , sınırsız bir ilişki yaşamak ister tensel birleşmelere eğilimi
       yüksek bir kişidir.
     upright: İlişkisi olanlar için , Tagral ile aşkı devam edecektir.Danışan kişiye
@@ -288,7 +288,7 @@ cards:
       gerekir. Kalif , açık hesaplaşmaları sever.Cesur ve atılganlığı sayesinde
       bağımsız ve özgür hisseder kendisiniAyrıca gününü gün etmeyi de seven bir
       kişidir, günü birlik yaşadığı ilişkerde hep arkasını döner ve gider , asla
-      iz bırakmaz. 4)Zümrüt Serisi Kartların Anlamları
+      iz bırakmaz. 
     upright: Yaşama tutkusu ile hayata sıkı sıkıya bağlanmış , dünyevi zevklere
       zaafları olan kişiyi temsil eder.Kalif , hesaplaşmaların , karşılıklı
       konuşmaların sorulan soru ile ilgili en kalıcı yöntem olduğunu ifade
@@ -303,7 +303,7 @@ cards:
       olmamış danışanda ; aşk yönünde beklentilerin sona ereceğine işaret eder.
   zumrudun_ruhu_bedes:
     name: Zümrüdün Ruhu Bedes
-    general: Zümrüd &#39;ün ruhuna sahip olan kişi , adaletlidir , kinci
+    general: Zümrüd'ün ruhuna sahip olan kişi , adaletlidir , kinci
       değildir.Ancak her zaman kuşkucu bir yapısı vardır , bilinç altında
       olumsuz düşünceleri hep harmanlar , küçük sorunları büyük problem haline
       dönüştürür. Bu nedenle de hep sızlanır , kendisini çıkmazda hisseder.
@@ -329,7 +329,7 @@ cards:
       sorulan soru ne olursa olsun , başarının , kazanmanın kesinliğinin
       habercisidir.
     reversed: Danışılan soru ne olursa olsun , başarısızlığı ifade eder.Suyun
-      hayatın kaynağı olduğunu düşünürsek  , başarının geleceğini ama biraz daha
+      hayatın kaynağı olduğunu düşünürsek , başarının geleceğini ama biraz daha
       çaba sarf etmemiz gerektiğini ifade eder.
   mida:
     name: Mida
@@ -361,7 +361,7 @@ cards:
       temsil olunan mida yani gerçek kadındır.
   parsadra:
     name: Parsadra
-    general: Sahip olduğu  hiçbir şeyden memnun kalmaz. Her konuya bir eleştirisi
+    general: Sahip olduğu hiçbir şeyden memnun kalmaz. Her konuya bir eleştirisi
       vardır.Olayların kadını olan parsadra biraz konuların dışında kalabilmeyi
       tercih etse aslında kimsenin huzuru bozulmayacaktır. Aşk ve evlilik
       ilişkilerinde araya girmeyi çok sever.Herkesin mutluluğuna engel olmak
@@ -374,15 +374,15 @@ cards:
       kişinin söylediği sözlere itibar ederseniz , pişman olacağınız yanlış
       tavırlar sergilemeniz kaçınılmaz olacaktır.
     reversed: Olaylara esnek yaklaşamayan , sabit fikirli , dul bir kadını
-      anlatır.Çok fazla konuşmaları yüzünden aptalca hareketleri  hem kendi
-      başını hemde ilişkisi olanların sorunlar yaşamasına  neden olur.
+      anlatır.Çok fazla konuşmaları yüzünden aptalca hareketleri hem kendi
+      başını hemde ilişkisi olanların sorunlar yaşamasına neden olur.
   aral:
     name: Aral
     general: Paralıdır , aileden kalma miras v.b. haklara sahiptir.Ufku
       açıktır.Eğitime , bilime, sanata önem verir.Zümrüdün Beyi aileden bir
       erkeği temsil eder , baba ,ağabey,erkek kardeş,amca v.b. Tek başına Aral
       belirttiğim anlamlara sahipken; burada dikkat edilmesi gereken husus ,
-      örneğin ARAL + DASTAR+SELÇUKASSA  geldiğinde evli ama yasak ilişki yaşayan
+      örneğin ARAL + DASTAR+SELÇUKASSA  geldiğinde evli ama yasak ilişki yaşayan
       kişiyi de temsil eder.
     upright: Aral hasasiyetle , yoğun duygularla en yakınlarına çözümsel bakış açısı
       sunar.Anlayış gösterir ve kolay kolay ihanet etmez.Güvenilir bir
@@ -419,13 +419,13 @@ cards:
       , gerçek güçlü bir aşkın var olacağını , kişinin yüzünü güldürecek
       gelişmeler yaşayacağını vurgular.
     reversed: Yaşanılan bir ilişkide , dengesiz tutumların , mobing , ağır baskı
-      altında hissetme gibi  sorunları ifade eder.Ayrı olan kişilerde bir müddet
+      altında hissetme gibi sorunları ifade eder.Ayrı olan kişilerde bir müddet
       daha geri dönüş olmayacağını anlatır.Sevgilisi olmayan bireylerde , gerçek
       aşkın henüz görünürde olmadığını vurgular.
   Isfahan:
     name: İsfahan
-    general: Açıklama bulunamadı.
-    upright: Danışanın  yaşadığı  birlikteliktelikte  , sorunlar problemler söz
+    general: Elmasın Ruhu , Sınırlandırılması zor bir bakış anlayışı vardır.Özgürlüğe oldukça önem verir.Hiç kimsenin buyruğu ve egemenliği altına girmek istemez.Hayal perest bir yapısı vardır.Dünyaya herkesten başka bir gözle bakmayı tercih eder.Ve her zaman kendi bildiğini okur.
+    upright: Danışanın yaşadığı birlikteliktelikte , sorunlar problemler söz
       konusu ise , kişiye ağlanarak , sızlanarak ricalarda bulunmamanızı
       önerir.İlişkide sorunlar çözülecektir.Ancak kişi karşısındaki partneri ,
       egemenliği altına almaktan vazgeçmelidir.Fikir ayrılıkları ilişkinin
@@ -447,7 +447,7 @@ cards:
       eder.Ayrıca elmas önemsenmenin kartıdır. Para , zenginlik ve maddi konfora
       ulaşmayı sembolize eder.Kişinin hedefinde parasal bir beklenti var ise ,
       bu durumun mümkün olacağının göstergesidir.
-    upright: Mal  sahibi olmak , altın , para ve zenginlik demektir.
+    upright: Mal sahibi olmak , altın , para ve zenginlik demektir.
     reversed: Yaşanılan bir zorluk veya beklenilen parasal bir menfaat varsa elmas
       ters açıda geldiğinde beklenilenden daha azına sahip olacağımıza işaret
       eder.
@@ -567,7 +567,7 @@ cards:
       önceden tespit eder , ona göre önlemler alır.Tilki + Kitap beraberinde
       gelirse , bu özellikler açığa çıkar ve tilki gücünü kaybeder.
     reversed: Kıskanç , içten pazarlıklı bir kişiyi işaret eder.Sinsi ve hilekar
-      birisinden zarar görmeye   bu nedenle gözlerimizi dört açmamızı
+      birisinden zarar görmeye bu nedenle gözlerimizi dört açmamızı
       öğütler.Tilkinin bizimle ilgili olumsuz planlar yaptığını ve bu hususla
       ilgili dikkatli olmamanız konusunda bizi uyarır.Aşk yönünde ilgi
       duyduğumuz birisi varsa bu kişiye ulaşmakla ilgili değişik akılda olmayan
@@ -602,7 +602,7 @@ cards:
     upright: Mutlu bir beraberliğe , ilişkinin evlilikle taçlanmasına işaret eder.
     reversed: Mutsuz bir beraberliğe , evli çiftlerin yataklarını ayırmasına ,
       boşanma ihtimaline ve ayrıca aldatmaya işaret eder. Alyansla beraber +
-      Dastar  kesin ihaneti , Alyansla beraber + yatağan boşanma ve ilişkinin
+      Dastar kesin ihaneti , Alyansla beraber + yatağan boşanma ve ilişkinin
       bitimini ifade eder.
   dag:
     name: Dağ
@@ -634,15 +634,15 @@ cards:
       olmamız hususunda bizi uyarır.Eğer olumlu bir kart ile beraberinde gelirse
       bu yabancının bize zarar veremeyeceğini söyler. Aynı zamanda aileden bir
       kişiyi temsil eden kartın yanına gelirse , ozamanda baba,amca,teyze ,
-      kardeş v.b kişilerle anlaşmazlığa düşmeyi anlatır. Hayatımızda 
+      kardeş v.b kişilerle anlaşmazlığa düşmeyi anlatır. Hayatımızda
       çözümlenmesi gereken sorunlarla karşılaşacağız ancak , hepsini geri planda
       bırakabilmeyi de başarabileceğiz.Tehlike ve yaşanılacak tartışmalarında
-      farkına  varılacaktır.Beklediğimiz ölçüde büyük meselelerle karşı karışıya
+      farkına varılacaktır.Beklediğimiz ölçüde büyük meselelerle karşı karışıya
       kalmayacağız.Yatağan+ derviş+kitap ile beraberinde gelirse , herşeyin
       yolunda gideceğini vurgular. 6.08 ) Mektup Mektup, yaşantımızda
       beklediğimiz veya beklemediğimiz meselelerle ilgili haberler alacağımıza
       işaret eder. Bu haberler üzüntülü de olabilir üzüntüsüzde bu nedenle
-      yanındaki kartlara bakılarak yorum yapılmalı.Örneğin;  yol + mektup, iş ve
+      yanındaki kartlara bakılarak yorum yapılmalı.Örneğin; yol + mektup, iş ve
       aşk ile ilgili yeni fırsatlar yeni haberler alacaksınız gibi... Mektup
       ters geldiğinde kötü bir haber almayı işaret eder.Ancak bu haberin ne
       çeşit bir haber olduğunu yanındaki karta bakarak yapılmalıdır.örneğin ,
@@ -692,9 +692,9 @@ cards:
       hayır menfaat sağlamayacağına işaret eder.
   gunes:
     name: Güneş
-    general: Büyük şans, mutluluk, aydınlanma ve başarı.
-    upright: Açıklama bulunamadı.
-    reversed: Açıklama bulunamadı.
+    general: "İyi şans , kötü giden kadersel döngünün kırılması , danışan sorunlu bir dönemden geçiyorsa , bu sorunlu dönem tamamen geri planda kalacaktır.Kartın Ters ve Düz anlamında herhangi bir değişiklik söz konusu olmaz , gerçek yaşantımızda , Güneşi baş aşağı çevirsek te yine aynı ihtişamıyla ışıldar.Güneş , hangi deste kartı ile yanyana gelirse gelsin anlamı asla değişmez , her zaman iyiyi güzeli , iyileşmeyi ifade eder.Örneğin , yatağan + güneş : ayrılığın bitişini , mevcut sorunların çözüme ulaşmasını ifade eder."
+    upright: Büyük şans, mutluluk, aydınlanma ve başarı.
+    reversed: Büyük şans, mutluluk, aydınlanma ve başarı.
   deve:
     name: Deve
     general: Finansal konularda sabır, inatçılık veya uzun bir yolculuk.
@@ -725,7 +725,7 @@ cards:
     upright: İlişkisi olmayan danışanda ; bir organizasyon veya bir toplulukta ,
       tesadüfen karşılaşma sağladığınız bir kişi ile aşk ilişkisi kurulmaya
       işaret eder.Uzun vadeli , sadakat ve güven duygusunun yer alacağı bu
-      ilişki ,  kişinin kendisini mutlu hissetmesine neden olacaktır. Yeni
+      ilişki , kişinin kendisini mutlu hissetmesine neden olacaktır. Yeni
       ilişkideki partner bahçeleri tamamlayan kart ile harmanlarak
       yorumlanmalıdır.Kişinin karakteristik yapısına göre bahçeler ile  yorum
       birleştirilmelidir. İlişkisi olan danışanda , Sevdiği değer verdiği kişi
@@ -841,7 +841,7 @@ cards:
       Ters Afyon , kişinin zararlı maddelere eğilimi olduğundan kendisi için ,
       doğru yolu bulamayacağını belirtir.Asla onu yönlendirecek eğilimlerde
       bulunulmamalıdır; kişinin sizin önerilerineze uygun hareket etmesini
-      bekleyemezsiniz .Mevcut gözlemlenen duruma yönelik , meditasyon 
+      bekleyemezsiniz .Mevcut gözlemlenen duruma yönelik , meditasyon
       önerilebilir.
   kizCocugu:
     name: Kız Çocuğu
@@ -991,7 +991,7 @@ cards:
       kişinin dış çevresi tarafından nazara geldiğini vurgular.Aile içerisinde
       karmaşık süreçlerin yaşanmasına , aşk ilişkilerinde ayrılığa mutsuzluklara
       , ilişkinin şüpheler yüzünden sarsılmasına işaret eder.
-    reversed: Süpürge , kısa süreli  tartışma , kavgalar , yaralayan sözlere işaret
+    reversed: Süpürge , kısa süreli tartışma , kavgalar , yaralayan sözlere işaret
       eder.Ayrıca kişinin dış çevresi tarafından nazara geldiğini , ancak bu
       kişilerin ona nazarları değmeyeceğini vurgular.Aile içerisinde kısa süreli
       karmaşık süreçlerin yaşanmasına , aşk ilişkilerinde kısa süreki ayrılığa
@@ -1008,11 +1008,11 @@ cards:
     reversed: Balık , kararsızlıkların , seçimlerin yapılacağını işaret eder.Sabırlı
       bir duruşu , karar verilmesi gereken husus ne ise , daha fazla bekletmeden
       kararın kesinleşeceğine işaret eder.Kişi yaşadığı hayatta mağlup
-      olmayacaktırKendisi için mantıklı kararı  verecektir.Bu karar , ümitlerini
+      olmayacaktırKendisi için mantıklı kararı verecektir.Bu karar , ümitlerini
       güçlendirecek , hayata daha pozitif bir şekilde bakmasına olanak
       sağlayacaktır. 7. Maglar Büyücülerin Ruhu
   atart:
-    name: Atart
+    name: Attart
     general: Açıklama bulunamadı.
     upright: İyinin , iyiliğin ruhunu ifade eder.Evren tarafından koruma altına
       alınmışlığı anlatır.Evlilik bekleyen kişiler için , evliliğin olacağını ,

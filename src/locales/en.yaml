@@ -7,11 +7,16 @@ onboarding:
   start: Start Exploring
   slides:
     - title: "Welcome to MadameSoul"
-      description: "Are you ready to hear the whispers of your soul? In the mystic universe of MadameSoul, ancient Katina cards illuminate the darkness for you."
+      description: "Are you ready to hear the whispers of your soul? In the mystic
+        universe of MadameSoul, ancient Katina cards illuminate the darkness for
+        you."
     - title: "Discover Katina Moons"
-      description: "In your journey of love, work, and life, 1 Katina Moon is granted to your account every day. You can get more Katina Moons for deeper insights."
+      description: "In your journey of love, work, and life, 1 Katina Moon is granted
+        to your account every day. You can get more Katina Moons for deeper
+        insights."
     - title: "A Mystic Experience"
-      description: "Unlock the gate of prophecies with Katina Moons. If you're ready, the journey begins!"
+      description: "Unlock the gate of prophecies with Katina Moons. If you're ready,
+        the journey begins!"
 returnToStart: Return to Start
 subtitle: Mirror of the past, fire of the present, and compass of the future...
   What does the Katina deck whisper to you?
@@ -450,7 +455,11 @@ cards:
       love is not yet visible for individuals who do not have a lover.
   Isfahan:
     name: Isfahan
-    general: No description found.
+    general: The Spirit of the Diamond, it has a perspective that is difficult to
+      limit. It attaches great importance to freedom. It does not want to come
+      under anyone's command and sovereignty. It has a dreamy structure. It
+      prefers to look at the world with a different eye than everyone else. And
+      it always does what it wants.
     upright: If there are problems in the relationship the client is experiencing,
       he recommends that you do not make requests to the person by crying or
       whining. The problems in the relationship will be solved. However, the
@@ -735,9 +744,16 @@ cards:
       the choice will not benefit him or her.
   gunes:
     name: Sun
-    general: Great luck, happiness, enlightenment, and success.
-    upright: No explanation found.
-    reversed: No explanation found.
+    general: "Good luck, breaking of the bad karmic cycle, if the client is going
+      through a troubled period, this troubled period will remain completely in
+      the past. There is no change in the meaning of the card when it is upright
+      or reversed, in our real life, even if we turn the Sun upside down, it
+      still shines with the same magnificence. No matter which deck card the Sun
+      comes next to, its meaning never changes, it always represents the good,
+      the beautiful, and healing. For example, yatağan + sun: represents the end
+      of separation, and the resolution of existing problems."
+    upright: Great luck, happiness, enlightenment, and success.
+    reversed: Great luck, happiness, enlightenment, and success.
   deve:
     name: Camel
     general: Patience in financial matters, stubbornness, or a long journey.
@@ -1073,7 +1089,7 @@ cards:
       decision will strengthen his hopes and allow him to look at life in a more
       positive way.7. Maglar Spirit of Mages
   atart:
-    name: Atart
+    name: Attart
     general: No description found.
     upright: It represents the spirit of goodness and goodness. It describes being
       protected by the universe. For people who are waiting for marriage, it
