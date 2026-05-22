@@ -1,15 +1,22 @@
 transactionDesc: "Lectura con cartas: {cards}"
+transactionBuy: "Compra de {amount} Katina Moon (Demo)"
+welcomeBonus: "Bono de Bienvenida"
 onboarding:
   skip: Omitir
   next: Siguiente
   start: Empezar a Explorar
   slides:
     - title: "Bienvenido a MadameSoul"
-      description: "¿Estás listo para escuchar los susurros de tu alma? En el universo místico de MadameSoul, las antiguas cartas Katina iluminan la oscuridad para ti."
+      description: "¿Estás listo para escuchar los susurros de tu alma? En el universo
+        místico de MadameSoul, las antiguas cartas Katina iluminan la oscuridad
+        para ti."
     - title: "Descubre las Lunas de Katina"
-      description: "En tu viaje de amor, trabajo y vida, se otorga 1 Luna de Katina a tu cuenta cada día. Puedes obtener más Lunas de Katina para obtener visiones más profundas."
+      description: "En tu viaje de amor, trabajo y vida, se otorga 1 Luna de Katina a
+        tu cuenta cada día. Puedes obtener más Lunas de Katina para obtener
+        visiones más profundas."
     - title: "Una Experiencia Mística"
-      description: "Abre la puerta de las profecías con las Lunas de Katina. ¡Si estás listo, el viaje comienza!"
+      description: "Abre la puerta de las profecías con las Lunas de Katina. ¡Si estás
+        listo, el viaje comienza!"
 returnToStart: Volver al Inicio
 subtitle: Espejo del pasado, fuego del presente, y brújula del futuro... ¿Qué te
   susurra la baraja Katina?
@@ -1131,28 +1138,34 @@ promo:
       Visite nuestra tienda de Etsy para una
       experiencia de adivinación en vivo.
     shopOnEtsy: Comprar en Etsy
-  profile:
-    title: Perfil
-    userInfo: Información del Usuario
-    readingHistory: Mis Lecturas
-    noHistory: Aún no has realizado ninguna lectura.
-    moons: Saldo de Lunas Katina
-    status: Estado Civil
-    birthplace: Lugar de Nacimiento
-    dob: Fecha de Nacimiento
-    name: Nombre
-    tabs:
-      overview: General
-      settings: Ajustes
-    settings:
-      email: Correo electrónico
-      password: Contraseña
-      newPassword: Nueva contraseña
-      updateEmail: Actualizar
-      updatePassword: Cambiar
-      successEmail: Actualizado
-      successPassword: Cambiada
-      reauthRequired: Es necesario volver a iniciar sesión.
-    history:
-      downloadPdf: Descargar PDF
-      viewReading: Ver Lectura
+profile:
+  title: Perfil
+  userInfo: Información del Usuario
+  readingHistory: Mis Lecturas
+  noHistory: Aún no has realizado ninguna lectura.
+  moons: Saldo de Lunas Katina
+  status: Estado Civil
+  birthplace: Lugar de Nacimiento
+  dob: Fecha de Nacimiento
+  name: Nombre
+  tabs:
+    overview: General
+    settings: Ajustes
+  settings:
+    password: Contraseña
+    newPassword: Nueva contraseña
+    updatePassword: Cambiar
+    successPassword: Cambiada
+    reauthRequired: Es necesario volver a iniciar sesión.
+  history:
+    downloadPdf: Descargar PDF
+    viewReading: Ver Lectura
+  readingCount: "Lecturas"
+  mysticRank: "Rango Místico"
+  rankNames:
+    novice: "Novato"
+    apprentice: "Aprendiz"
+    traveler: "Viajero"
+    sage: "Sabio"
+    lord: "Señor Místico"
+  save: "Guardar"

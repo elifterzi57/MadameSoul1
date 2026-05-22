@@ -1,15 +1,22 @@
 transactionDesc: "Lecture avec cartes : {cards}"
+transactionBuy: "Achat de {amount} Katina Moon (Démo)"
+welcomeBonus: "Bonus de Bienvenue"
 onboarding:
   skip: Passer
   next: Suivant
   start: Commencer à Explorer
   slides:
     - title: "Bienvenue sur MadameSoul"
-      description: "Êtes-vous prêt à entendre les murmures de votre âme ? Dans l'univers mystique de MadameSoul, les anciennes cartes Katina éclairent les ténèbres pour vous."
+      description: "Êtes-vous prêt à entendre les murmures de votre âme ? Dans
+        l'univers mystique de MadameSoul, les anciennes cartes Katina éclairent
+        les ténèbres pour vous."
     - title: "Découvrez les Lunes de Katina"
-      description: "Dans votre voyage d'amour, de travail et de vie, 1 Lune de Katina est ajoutée à votre compte chaque jour. Vous pouvez obtenir plus de Lunes de Katina pour des visions plus profondes."
+      description: "Dans votre voyage d'amour, de travail et de vie, 1 Lune de Katina
+        est ajoutée à votre compte chaque jour. Vous pouvez obtenir plus de
+        Lunes de Katina pour des visions plus profondes."
     - title: "Une Expérience Mystique"
-      description: "Ouvrez la porte des prophéties avec les Lunes de Katina. Si vous êtes prêt, le voyage commence !"
+      description: "Ouvrez la porte des prophéties avec les Lunes de Katina. Si vous
+        êtes prêt, le voyage commence !"
 returnToStart: Retour au Début
 subtitle: Miroir du passé, feu du présent, et boussole du futur... Que vous
   murmure le jeu Katina ?
@@ -1191,28 +1198,34 @@ promo:
       Visitez notre boutique Etsy pour une
       expérience de voyance en direct.
     shopOnEtsy: Acheter sur Etsy
-  profile:
-    title: Profil
-    userInfo: Informations de l'Utilisateur
-    readingHistory: Mon Historique
-    noHistory: Aucune lecture n'a été effectuée pour le moment.
-    moons: Solde de Lunes Katina
-    status: Situation Amoureuse
-    birthplace: Lieu de Naissance
-    dob: Date de Naissance
-    name: Nom
-    tabs:
-      overview: Vue d'ensemble
-      settings: Paramètres
-    settings:
-      email: E-mail
-      password: Mot de passe
-      newPassword: Nouveau Mot de passe
-      updateEmail: Mettre à jour
-      updatePassword: Changer
-      successEmail: Mis à jour
-      successPassword: Changé
-      reauthRequired: Réauthentification requise.
-    history:
-      downloadPdf: Télécharger PDF
-      viewReading: Voir la Lecture
+profile:
+  title: Profil
+  userInfo: Informations de l'Utilisateur
+  readingHistory: Mon Historique
+  noHistory: Aucune lecture n'a été effectuée pour le moment.
+  moons: Solde de Lunes Katina
+  status: Situation Amoureuse
+  birthplace: Lieu de Naissance
+  dob: Date de Naissance
+  name: Nom
+  tabs:
+    overview: Vue d'ensemble
+    settings: Paramètres
+  settings:
+    password: Mot de passe
+    newPassword: Nouveau Mot de passe
+    updatePassword: Changer
+    successPassword: Changé
+    reauthRequired: Réauthentification requise.
+  history:
+    downloadPdf: Télécharger PDF
+    viewReading: Voir la Lecture
+  readingCount: "Lectures"
+  mysticRank: "Rang Mystique"
+  rankNames:
+    novice: "Novice"
+    apprentice: "Apprenti"
+    traveler: "Voyageur"
+    sage: "Sage"
+    lord: "Seigneur Mystique"
+  save: "Enregistrer"

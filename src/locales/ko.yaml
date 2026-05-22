@@ -1,13 +1,17 @@
 transactionDesc: "카드를 사용한 리딩: {cards}"
+transactionBuy: "{amount} 카티나 문 구매 (데모)"
+welcomeBonus: "웰컴 보너스"
 onboarding:
   skip: 건너뛰기
   next: 다음
   start: 탐색 시작하기
   slides:
     - title: "MadameSoul에 오신 것을 환영합니다"
-      description: "당신의 영혼의 속삭임을 들을 준비가 되셨나요? MadameSoul의 신비로운 우주에서, 고대 카티나 카드가 당신을 위해 어둠을 밝혀줍니다."
+      description: "당신의 영혼의 속삭임을 들을 준비가 되셨나요? MadameSoul의 신비로운 우주에서, 고대 카티나 카드가 당신을 위해
+        어둠을 밝혀줍니다."
     - title: "카티나 문 발견하기"
-      description: "사랑, 일, 삶의 여정에서 매일 1개의 카티나 문이 계정에 지급됩니다. 더 깊은 통찰력을 위해 더 많은 카티나 문을 획득할 수 있습니다."
+      description: "사랑, 일, 삶의 여정에서 매일 1개의 카티나 문이 계정에 지급됩니다. 더 깊은 통찰력을 위해 더 많은 카티나 문을
+        획득할 수 있습니다."
     - title: "신비로운 경험"
       description: "카티나 문과 함께 예언의 문을 여세요. 준비가 되었다면 여행이 시작됩니다!"
 returnToStart: 시작으로 돌아가기
@@ -686,28 +690,34 @@ promo:
       선명하고 생생한 실시간 점술 경험을 위해
       Etsy 상점을 방문해 보세요.
     shopOnEtsy: Etsy에서 쇼핑하기
-  profile:
-    title: 프로필
-    userInfo: 사용자 정보
-    readingHistory: 나의 점술 기록
-    noHistory: 아직 점술 기록이 없습니다.
-    moons: 카티나 문 잔액
-    status: 관계 상태
-    birthplace: 출생지
-    dob: 생년월일
-    name: 이름
-    tabs:
-      overview: 개요
-      settings: 설정
-    settings:
-      email: 이메일
-      password: 비밀번호
-      newPassword: 새 비밀번호
-      updateEmail: 업데이트
-      updatePassword: 변경
-      successEmail: 업데이트됨
-      successPassword: 변경됨
-      reauthRequired: 다시 인증이 필요합니다.
-    history:
-      downloadPdf: PDF 다운로드
-      viewReading: 결과 보기
+profile:
+  title: 프로필
+  userInfo: 사용자 정보
+  readingHistory: 나의 점술 기록
+  noHistory: 아직 점술 기록이 없습니다.
+  moons: 카티나 문 잔액
+  status: 관계 상태
+  birthplace: 출생지
+  dob: 생년월일
+  name: 이름
+  tabs:
+    overview: 개요
+    settings: 설정
+  settings:
+    password: 비밀번호
+    newPassword: 새 비밀번호
+    updatePassword: 변경
+    successPassword: 변경됨
+    reauthRequired: 다시 인증이 필요합니다.
+  history:
+    downloadPdf: PDF 다운로드
+    viewReading: 결과 보기
+  readingCount: "점술 횟수"
+  mysticRank: "신비 등급"
+  rankNames:
+    novice: "초보자"
+    apprentice: "수습생"
+    traveler: "여행자"
+    sage: "현자"
+    lord: "미스틱 로드"
+  save: "저장"
