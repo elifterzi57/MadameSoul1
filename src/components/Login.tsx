@@ -609,7 +609,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       type="button"
                       onClick={handleGoogleLogin}
                       disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -624,7 +624,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       type="button"
                       onClick={handleAppleLogin}
                       disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
                     >
                       <Apple className="w-4 h-4" />
                       {t.appleSignIn}
@@ -633,7 +633,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={() => setAuthMethod(authMethod === 'email' ? 'phone' : 'email')}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 transition-all"
+                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 transition-all"
                     >
                       {authMethod === 'email' ? <Phone className="w-3.5 h-3.5 opacity-50" /> : <Mail className="w-3.5 h-3.5 opacity-50" />}
                       <span>{authMethod === 'email' ? t.switchToPhone : t.switchToEmail}</span>
@@ -757,7 +757,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       <button 
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg"
+                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-[#fff] active:scale-[0.98] transition-all"
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>
@@ -784,7 +784,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       <button 
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg"
+                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-[#fff] active:scale-[0.98] transition-all"
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>

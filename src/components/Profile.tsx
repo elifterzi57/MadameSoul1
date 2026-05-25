@@ -78,26 +78,18 @@ export const Profile: React.FC<ProfileProps> = ({
     const fetchHistory = async () => {
       if (!user) return;
       try {
-        // Fetch last 50 transactions for the user and filter/sort in memory 
-        // to avoid mandatory composite index errors during initial setup
         const q = query(
           collection(db, 'moon_transactions'),
           where('userId', '==', user.uid),
-          limit(50)
+          where('type', '==', 'spend'),
+          orderBy('createdAt', 'desc'),
+          limit(10)
         );
         const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs
-          .map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }))
-          .filter((item: any) => item.type === 'spend')
-          .sort((a: any, b: any) => {
-            const dateA = a.createdAt?.toMillis?.() || 0;
-            const dateB = b.createdAt?.toMillis?.() || 0;
-            return dateB - dateA;
-          })
-          .slice(0, 10);
+        const items = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         setHistory(items);
       } catch (error) {
         console.error('Error fetching history:', error);

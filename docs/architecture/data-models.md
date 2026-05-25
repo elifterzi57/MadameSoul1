@@ -115,3 +115,88 @@ Uygulamadaki iletişim formu üzerinden gönderilen destek veya geri bildirim me
 | `subject` | String | Evet | Mesaj konusu (Maksimum 150 karakter). |
 | `message` | String | Evet | İletişim mesajı (Maksimum 2000 karakter). |
 | `createdAt` | Timestamp | Evet | Mesajın oluşturulma zaman damgası (Sunucu saati ile eşleşmelidir). |
+
+---
+
+## 6. `marketing_consents` Koleksiyonu (Yeni - Monetizasyon & Segmentasyon)
+
+Kullanıcıların e-posta veya SMS yoluyla pazarlama ve kampanya içerikleri alma onay durumunu ve ilgi duydukları mistik alanları saklar. Bu veri, push bildirimleri ve hedefli e-posta kampanyaları göndererek satış dönüşümlerini artırmak (para kazanmak) için kullanılır.
+
+- **Belge ID (Document ID):** Kullanıcının Firebase Auth ID'si (`userId`).
+- **Güvenlik Kuralları:** Sadece oturum açmış kullanıcı kendi belgesine erişebilir ve güncelleyebilir.
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `userId` | String | Evet | Firebase Auth UID ile eşleşmelidir. |
+| `emailConsent` | Boolean | Evet | E-posta pazarlama onay durumu (`true` veya `false`). |
+| `smsConsent` | Boolean | Evet | SMS pazarlama onay durumu (`true` veya `false`). |
+| `interests` | List | Hayır | İlgilendiği fal konuları listesi (örn: `['love', 'career']`). |
+| `lastPromoSentAt` | Timestamp | Hayır | Son pazarlama içeriğinin gönderildiği tarih. |
+| `updatedAt` | Timestamp | Evet | Güncelleme zaman damgası. |
+
+---
+
+## 7. `checkout_attempts` Koleksiyonu (Yeni - Ödeme Hunisi Dönüşümü)
+
+Kullanıcıların ödeme sayfasına (Stripe Checkout) tıkladığı ancak işlemi tamamlamadığı ("cart abandonment" / ödemeden vazgeçme) durumları tespit etmek ve onlara otomatik indirim kodları göndererek satışları kurtarmak amacıyla kullanılır.
+
+- **Belge ID (Document ID):** Stripe Checkout Session ID veya benzersiz işlem ID'si.
+- **Güvenlik Kuralları:** Sadece ilgili kullanıcı ve backend yazabilir/okuyabilir.
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `sessionId` | String | Evet | Stripe ödeme oturum ID'si (Belge ID ile aynı). |
+| `userId` | String | Evet | Satın almaya çalışan kullanıcının UID'si. |
+| `packAmount` | Integer | Evet | Satın alınmaya çalışılan Moon miktarı. |
+| `price` | Double | Evet | Paketin fiyatı (örn: `8.99`). |
+| `status` | String | Evet | Alabileceği değerler: `pending` (beklemede), `completed` (tamamlandı), `abandoned` (yarıda bırakıldı). |
+| `couponOffered` | String / null | Hayır | Terk edilen ödeme sonrası sunulan kurtarma kuponu kodu. |
+| `createdAt` | Timestamp | Evet | İşlemin başladığı zaman damgası. |
+| `updatedAt` | Timestamp | Evet | Durumun güncellendiği zaman damgası. |
+
+---
+
+## 8. `error_logs` Koleksiyonu (Yeni - Sistem Sorun Giderme)
+
+Uygulamanın hem istemci (React) hem de sunucu (Express) tarafında karşılaştığı teknik hataları (Gemini API çökmeleri, veri yazma hataları, Stripe webhook gecikmeleri) merkezi olarak saklar.
+
+- **Belge ID (Document ID):** Rastgele oluşturulan benzersiz hata ID'si.
+- **Güvenlik Kuralları:** İstemciler sadece yazabilir (`create`), okuma ve güncelleme kesinlikle engellenmiştir (`if false`).
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `userId` | String / null | Hayır | Hata anında oturum açmış kullanıcının UID'si. |
+| `source` | String | Evet | Hatanın kaynağı: `client` veya `server`. |
+| `errorCode` | String | Evet | Hata kodu veya hata türü (örn: `auth/popup-blocked`, `gemini/api-timeout`). |
+| `errorMessage` | String | Evet | Hatanın açık mesajı. |
+| `stackTrace` | String | Hayır | Hata yığını (stack trace) detayı. |
+| `deviceMetadata` | Map | Hayır | Kullanıcının tarayıcı, işletim sistemi ve cihaz bilgileri. |
+| `createdAt` | Timestamp | Evet | Hatanın oluştuğu zaman damgası. |
+
+---
+
+## 9. `ai_telemetry` Koleksiyonu (Yeni - Yapay Zeka Performans & Maliyet Takibi)
+
+Gemini API'sine yapılan içerik üretme isteklerinin maliyetlerini kontrol etmek ve performans gecikmelerini izlemek amacıyla kullanılır.
+
+- **Belge ID (Document ID):** Yapılan fal işleminin transaction ID'si ile eşleşen ID.
+- **Güvenlik Kuralları:** Yalnızca backend (sunucu tarafı) yazabilir. İstemciler sadece okuyabilir.
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `transactionId` | String | Evet | Bağlı olduğu bakiye işleminin ID'si. |
+| `userId` | String | Evet | Talebi gönderen kullanıcının UID'si. |
+| `modelName` | String | Evet | Kullanılan model (örn: `gemini-3-flash-preview`). |
+| `promptTokens` | Integer | Evet | Girdi için harcanan token sayısı. |
+| `candidatesTokens` | Integer | Evet | Gemini tarafından üretilen çıktı token sayısı. |
+| `latencyMs` | Integer | Evet | API yanıt süresi (milisaniye cinsinden). |
+| `createdAt` | Timestamp | Evet | Talebin işlendiği tarih. |
+

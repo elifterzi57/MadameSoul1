@@ -27,18 +27,19 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 
 ### Çekirdek Belgeler
 - [Proje Genel Bakışı](./project-overview.md) - Proje amacı, temel özellikleri ve genel yapısı.
-- [Teknik Mimari Dokümanı](./architecture.md) - Teknik mimari detayları, veri akışları ve güvenlik yapılandırması.
-- [Kaynak Kod Yapısı Analizi](./source-tree-analysis.md) - Dizin ağacı, kritik klasörler ve giriş noktaları.
-- [Bileşen Envanteri](./component-inventory.md) - Kullanıcı arayüzünü (UI) oluşturan ana React bileşenleri.
+- [Teknik Mimari Dokümanı](./architecture/architecture.md) - Teknik mimari detayları, veri akışları ve güvenlik yapılandırması.
+- [Kaynak Kod Yapısı Analizi](./architecture/source-tree-analysis.md) - Dizin ağacı, kritik klasörler ve giriş noktaları.
+- [Bileşen Envanteri](./architecture/component-inventory.md) - Kullanıcı arayüzünü (UI) oluşturan ana React bileşenleri.
 - [Geliştirme Kılavuzu](./development-guide.md) - Yerel kurulum adımları, geliştirme ve derleme komutları.
-- [API Sözleşmeleri](./api-contracts.md) - API uç noktaları, istek/yanıt yapıları ve entegrasyonlar.
-- [Veri Modelleri](./data-models.md) - Firestore koleksiyon şemaları ve güvenlik kuralları.
+- [API Sözleşmeleri](./architecture/api-contracts.md) - API uç noktaları, istek/yanıt yapıları ve entegrasyonlar.
+- [Veri Modelleri](./architecture/data-models.md) - Firestore koleksiyon şemaları ve güvenlik kuralları.
 
 ---
 
-## Mevcut Dokümantasyonlar (Existing Documentation)
+## Mevcut Dokümantasyonlar & İş Listeleri (Existing Documentation & Backlog)
 
 - [README.md](../README.md) - Projenin temel geliştirici tanıtımı ve gereksinimleri.
+- [jira_tickets.md](./backlog/jira_tickets.md) - Tespit edilen eksikler, hatalar ve güvenlik biletleri listesi (Jira Backlog).
 
 ---
 
@@ -82,9 +83,9 @@ Bu dokümantasyon, AI ajanlarının kod tabanını hızla anlaması ve güvenli 
 ### Yeni Özellik Planlarken:
 
 - **Sadece UI/Arayüz Değişiklikleri:**  
-  → Referans belgeleri: [architecture.md](./architecture.md) ve [component-inventory.md](./component-inventory.md)
+  → Referans belgeleri: [architecture.md](./architecture/architecture.md) ve [component-inventory.md](./architecture/component-inventory.md)
 - **Sadece API/Backend Değişiklikleri:**  
-  → Referans belgeleri: [architecture.md](./architecture.md), [api-contracts.md](./api-contracts.md) ve [data-models.md](./data-models.md)
+  → Referans belgeleri: [architecture.md](./architecture/architecture.md), [api-contracts.md](./architecture/api-contracts.md) ve [data-models.md](./architecture/data-models.md)
 - **Full-Stack (Uçtan Uca) Değişiklikler:**  
   → Referans belgeleri: Yukarıdaki tüm dokümantasyonlar.
 

@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import { db, auth, initAnalytics } from './lib/firebase';
+import { robotoFontBase64 } from './lib/pdfFont';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
 import { Onboarding } from './components/Onboarding';
@@ -136,6 +137,20 @@ function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
+  const [toast, setToast] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
+
+  const showToast = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
   
   // Moons / Payment State
   const [moonsCount, setMoonsCount] = useState<number>(0);
@@ -312,6 +327,9 @@ function App() {
           setReadingCount(snap.size);
         });
 
+        if (unsubscribeMoons) {
+          unsubscribeMoons();
+        }
         unsubscribeMoons = onSnapshot(moonRef, (docSnap) => {
           if (docSnap.exists()) {
             setMoonsCount(docSnap.data().balance || 0);
@@ -327,6 +345,7 @@ function App() {
               userId: u.uid,
               amount: 5,
               type: 'buy',
+              status: 'success',
               description: welcomeDesc,
               pdfDownloaded: 0,
               userLanguage: userInfo.language,
@@ -347,7 +366,10 @@ function App() {
       } else {
         setMoonsCount(0);
         setIsMoonsLoading(false);
-        if (unsubscribeMoons) unsubscribeMoons();
+        if (unsubscribeMoons) {
+          unsubscribeMoons();
+          unsubscribeMoons = undefined;
+        }
       }
     });
 
@@ -379,7 +401,7 @@ function App() {
 
   const drawRancomCards = async () => {
     if (moonsCount <= 0) {
-      alert(storeTranslations.noMoons[userInfo.language]);
+      showToast(storeTranslations.noMoons[userInfo.language], 'error');
       setIsStoreOpen(true);
       return;
     }
@@ -449,6 +471,8 @@ End with a Guidance/Advice section giving them invaluable advice.
 Please produce a wonderful reading purely as text (Markdown supported).
 CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use any other language!`;
 
+    let txRef: any = null;
+    let deducted = false;
     try {
       if (!user) return;
 
@@ -458,14 +482,16 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         balance: increment(-1),
         updatedAt: serverTimestamp()
       });
+      deducted = true;
 
       const cardNamesEn = cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name).join(', ');
       const txDesc = (locales['en'].transactionDesc || "Reading with cards: {cards}").replace('{cards}', cardNamesEn);
 
-      const txRef = await addDoc(collection(db, 'moon_transactions'), {
+      txRef = await addDoc(collection(db, 'moon_transactions'), {
         userId: user.uid,
         amount: -1,
         type: 'spend',
+        status: 'pending',
         description: txDesc,
         pdfDownloaded: 0,
         userLanguage: userInfo.language,
@@ -496,7 +522,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       // Save reading text to the transaction for history download
       try {
         await updateDoc(doc(db, 'moon_transactions', txRef.id), {
-          readingText: finalReading
+          readingText: finalReading,
+          status: 'success'
         });
       } catch (e) {
         console.error("Error saving reading text:", e);
@@ -504,6 +531,31 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
     } catch (error) {
       console.error("Reading generation error:", error);
       setReading(t('errorInterrupted'));
+      
+      // Rollback moon balance if it was deducted
+      if (user && deducted) {
+        try {
+          const moonRef = doc(db, 'user_moons', user.uid);
+          await updateDoc(moonRef, {
+            balance: increment(1),
+            updatedAt: serverTimestamp()
+          });
+        } catch (refundError) {
+          console.error("Error refunding user moon balance:", refundError);
+        }
+      }
+
+      // Update transaction status to failed
+      if (txRef) {
+        try {
+          await updateDoc(doc(db, 'moon_transactions', txRef.id), {
+            status: 'failed'
+          });
+        } catch (txStatusError) {
+          console.error("Error updating transaction status to failed:", txStatusError);
+        }
+        setReadingCount(prev => Math.max(0, prev - 1));
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -644,6 +696,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         scale: 2,
         backgroundColor: '#05000a',
         useCORS: true,
+        allowTaint: false,
         logging: false
       });
       
@@ -656,6 +709,11 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         unit: 'px',
         format: [canvas.width, canvas.height]
       });
+
+      // Register and set Roboto font for Turkish character support
+      pdf.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
+      pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+      pdf.setFont('Roboto');
       
       pdf.setFillColor('#05000a');
       pdf.rect(0, 0, canvas.width, canvas.height, 'F');
@@ -828,7 +886,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   { amount: 25, price: "$19.99", bonus: "5 Free Katina Moons" }
                 ].map((pack) => (
                   <div key={pack.amount} className={`relative flex items-center justify-between p-4 rounded-xl border ${pack.popular ? 'border-[#ecd8a6] bg-[#ecd8a6]/5' : 'border-[#ecd8a6]/20 bg-[#ffffff]/5'} hover:bg-[#ecd8a6]/10 transition-colors cursor-pointer group`} onClick={async () => {
-                        alert(storeTranslations.paymentPending[userInfo.language]);
+                        showToast(storeTranslations.paymentPending[userInfo.language], 'info');
                         if (user) {
                           try {
                             const moonRef = doc(db, 'user_moons', user.uid);
@@ -840,6 +898,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                               userId: user.uid,
                               amount: pack.amount,
                               type: 'buy',
+                              status: 'success',
                               description: (locales['en'].transactionBuy || "Demo purchase of {amount} Katina Moons").replace('{amount}', pack.amount.toString()),
                               pdfDownloaded: 0,
                               userLanguage: userInfo.language,
@@ -905,7 +964,9 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               setUserInfo(prev => ({
                 ...prev,
                 name: info.name,
-                dob: info.dob
+                dob: info.dob,
+                birthplace: info.birthplace,
+                relationship: info.relationship
               }));
             }}
             translations={locales[userInfo.language]}
@@ -1514,6 +1575,42 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
           </button>
         </div>
       </footer>
+
+      {/* Custom Toast Notification */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 z-50 md:max-w-sm bg-[#160d26] border border-[#ecd8a6] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_20px_rgba(236,216,166,0.15)] overflow-hidden"
+          >
+            <div className="p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-1.5 rounded-full ${
+                  toast.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
+                  toast.type === 'error' ? 'bg-rose-500/10 text-rose-400' :
+                  'bg-[#ecd8a6]/10 text-[#ecd8a6]'
+                }`}>
+                  <Sparkles className="w-4 h-4 animate-pulse" />
+                </div>
+                <p className="text-sm font-sans text-[#ecd8a6]/95 leading-relaxed">{toast.message}</p>
+              </div>
+              <button 
+                onClick={() => setToast(null)}
+                className="text-[#ecd8a6]/50 hover:text-[#ecd8a6] transition-colors p-1"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className={`h-1 w-full bg-gradient-to-r ${
+              toast.type === 'success' ? 'from-emerald-500/50 to-emerald-400' :
+              toast.type === 'error' ? 'from-rose-500/50 to-rose-400' :
+              'from-[#ecd8a6]/50 to-[#ecd8a6]'
+            }`} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

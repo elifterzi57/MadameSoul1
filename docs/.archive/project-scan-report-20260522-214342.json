@@ -1,0 +1,18 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-05-22T17:24:56+03:00",
+    "last_updated": "2026-05-22T17:24:56+03:00"
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "project_root": "/Users/elifterzi/antigravity/MadameSoul",
+  "project_knowledge": "/Users/elifterzi/antigravity/MadameSoul/docs",
+  "completed_steps": [],
+  "current_step": "step_1",
+  "findings": {},
+  "outputs_generated": [
+    "project-scan-report.json"
+  ],
+  "resume_instructions": "Starting from step 1"
+}

@@ -123,7 +123,8 @@
     "architecture.md",
     "project-overview.md",
     "component-inventory.md",
-    "index.md"
+    "index.md",
+    "jira_tickets.md"
   ],
   "resume_instructions": "None. Workflow completed successfully."
 }
