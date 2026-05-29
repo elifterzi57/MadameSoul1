@@ -19,7 +19,6 @@ Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 | [**MS-109**](#-ms-109) | Security | `/api/generate` API Uç Noktasında Rate Limiting Eksikliği | Yüksek | Winston | Amelia | [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts) |
 | [**MS-110**](#-ms-110) | Security | İstemci Tarafında Oluşturulan Promptların Sunucuda Doğrulanmaması | Orta | Winston | Amelia | [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts) |
 | [**MS-111**](#-ms-111) | Code Quality | `src/App.tsx` İçerisindeki Yazım Hatası | Düşük | Winston | Amelia | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
-| [**MS-112**](#-ms-112) | Test | Test Otomasyonu Altyapısının Kurulması | Yüksek | Winston | Amelia | [package.json](file:///Users/elifterzi/antigravity/MadameSoul/package.json) |
 | [**MS-113**](#-ms-113) | Code Quality | Zustand ile Global Durum Yönetimi Standardizasyonu | Orta | Winston | Amelia | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
 | [**MS-114**](#-ms-114) | Code Quality | TanStack Query (React Query) Entegrasyonu | Orta | Winston | Amelia | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
 | [**MS-116**](#-ms-116) | Feature | CI/CD Pipeline (GitHub Actions) Kurulumu | Düşük | Winston | Amelia | [ci.yml](file:///Users/elifterzi/antigravity/MadameSoul/.github/workflows/ci.yml) |
@@ -60,6 +59,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-131**](#-ms-131) | Code Quality | PDF Çıktılarında Türkçe Karakter ve Yazı Tipi Optimizasyonu | Düşük | `App.tsx` içinde jsPDF çıktısında VFS ile Roboto-Regular yazı tipi tanımlanıp setFont yapıldı. | Sally |
 | [**MS-138**](#-ms-138) | UX / UI | PDF Çıktısında Kart Görsellerinin Yüklenme ve CORS Sorunlarının Giderilmesi | Yüksek | `App.tsx` içindeki PDF üretim şablonunda yer alan `img` etik... | Winston |
 | [**MS-139**](#-ms-139) | Security | `firestore.rules` Dosyasında `phones` Koleksiyonu Kurallarının Eksik Olması | Yüksek | `firestore.rules` dosyasına `phones` koleksiyonu kuralları e... | Winston |
+| [**MS-112**](#-ms-112) | Test | Test Otomasyonu Altyapısının Kurulması | Yüksek | Projeye test otomasyonu için Vitest ve E2E testleri için Playwright kuruldu. Örnek testler yazılıp doğrulandı. | Winston |
 
 ---
 
@@ -261,10 +261,10 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ---
 
-### 🔴 MS-112: Test Otomasyonu Altyapısının Kurulması (Test)
+### 🟡 MS-112: Test Otomasyonu Altyapısının Kurulması (Test)
 
 * **Öncelik:** Yüksek (High)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Winston (📐 Architect / `bmad-agent-architect`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Test Altyapısı
@@ -277,9 +277,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
     3. `package.json` dosyasına `test` script'i eklenmeli (`vitest run` veya `vitest watch`).
     4. Örnek/yardımcı bir fonksiyon (örneğin dil çevirileri veya tarih formatlama helper'ı) için en az 1 adet birim testi yazılıp çalıştırılmalı.
 
-#### Teknik Detaylar
-- `npm install -D vitest` komutu çalıştırılmalıdır.
-- `vite.config.ts` dosyası testleri destekleyecek şekilde güncellenmelidir.
+* **Çözüm:** Projeye test otomasyonu için Vitest ve E2E testleri için Playwright kuruldu. Örnek birim testleri `tests/unit/helpers.test.ts` altında ve E2E testleri `tests/e2e/app.spec.ts` altında yazıldı. Testler başarıyla doğrulandı.
 
 ---
 

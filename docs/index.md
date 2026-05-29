@@ -33,6 +33,7 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 - [Geliştirme Kılavuzu](./development-guide.md) - Yerel kurulum adımları, geliştirme ve derleme komutları.
 - [API Sözleşmeleri](./architecture/api-contracts.md) - API uç noktaları, istek/yanıt yapıları ve entegrasyonlar.
 - [Veri Modelleri](./architecture/data-models.md) - Firestore koleksiyon şemaları ve güvenlik kuralları.
+- [Test Rehberi](./testing.md) - Birim ve uçtan uca testlerin çalıştırılması ve izlenmesi.
 
 ---
 
