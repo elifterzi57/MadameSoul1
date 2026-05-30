@@ -1,6 +1,8 @@
 transactionDesc: "Reading with cards: {cards}"
 transactionBuy: "Demo purchase of {amount} Katina Moons"
 welcomeBonus: "Welcome Bonus"
+dailyGift: "Daily Free Gift"
+dailyGiftClaimed: "Your daily free Katina Moon has been claimed!"
 onboarding:
   skip: Skip
   next: Next
@@ -46,6 +48,12 @@ statusOptions:
   engaged: Engaged
   complicated: It's Complicated
   breakup: Going through a Breakup
+focusOptions:
+  general: General Life & Destiny
+  love: Love & Relationships
+  career: Career, Work & Finance
+  health: Health & Well-being
+focusLabel: Reading Focus Area
 headings: |-
   **Echoes of the Past**
   **Winds of the Present**

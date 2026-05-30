@@ -61,7 +61,8 @@ const translations = {
     noAccount: "Henüz bir hesabınız yok mu? Kaydolun",
     error: "Bir hata oluştu, lütfen bilgileri kontrol edin.",
     loading: "Yükleniyor...",
-    showIntro: "Uygulama Tanıtımını Gör"
+    showIntro: "Uygulama Tanıtımını Gör",
+    kvkkConsent: "Kullanıcı Sözleşmesini, Gizlilik Politikasını ve KVKK/GDPR Açık Rıza Metnini okudum, onaylıyorum."
   },
   en: {
     signInTitle: "Welcome to MadameSoul",
@@ -84,7 +85,8 @@ const translations = {
     noAccount: "Don't have an account? Sign Up",
     error: "An error occurred. Please check your details.",
     loading: "Loading...",
-    showIntro: "Watch App Intro"
+    showIntro: "Watch App Intro",
+    kvkkConsent: "I have read and agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."
   },
   es: {
     signInTitle: "Bienvenido a MadameSoul",
@@ -92,7 +94,7 @@ const translations = {
     signUpTitle: "Únete al Círculo de MadameSoul",
     signUpSubtitle: "Únete a nuestro círculo espiritual",
     email: "Correo Electrónico",
-    phone: "Número de Teléfono",
+    phone: "Número de Télefono",
     password: "Contraseña",
     signInLabel: "Iniciar Sesión",
     signUpLabel: "Registrarse",
@@ -107,7 +109,8 @@ const translations = {
     noAccount: "¿No tienes cuenta? Regístrate",
     error: "Ocurrió un error. Verifica tus datos.",
     loading: "Cargando...",
-    showIntro: "Ver Introducción"
+    showIntro: "Ver Introducción",
+    kvkkConsent: "He leído y acepto el Acuerdo de usuario, la Política de privacidad y el Consentimiento explícito de GDPR/KVKK."
   },
   fr: {
     signInTitle: "Bienvenue sur MadameSoul",
@@ -130,7 +133,8 @@ const translations = {
     noAccount: "Pas de compte ? S'inscrire",
     error: "Une erreur est survenue. Vérifiez vos infos.",
     loading: "Chargement...",
-    showIntro: "Voir l'Introduction"
+    showIntro: "Voir l'Introduction",
+    kvkkConsent: "J'ai lu et j'accepte les Conditions d'utilisation, la Politique de confidentialité et le consentement explicite GDPR/KVKK."
   },
   zh: {
     signInTitle: "歡迎來到 MadameSoul",
@@ -153,7 +157,8 @@ const translations = {
     noAccount: "沒有賬號？註冊",
     error: "發生錯誤。請檢查您的詳細信息。",
     loading: "載入中...",
-    showIntro: "查看介紹"
+    showIntro: "查看介紹",
+    kvkkConsent: "我已阅读并同意用户协议、隐私政策以及 GDPR/KVKK 明确同意。"
   },
   ko: {
     signInTitle: "MadameSoul에 오신 것을 환영합니다",
@@ -176,7 +181,8 @@ const translations = {
     noAccount: "계정이 없으신가요? 회원가입",
     error: "오류가 발생했습니다. 정보를 확인하세요.",
     loading: "로딩 중...",
-    showIntro: "소개 보기"
+    showIntro: "소개 보기",
+    kvkkConsent: "사용자 이용약관, 개인정보 처리방침 및 GDPR/KVKK 명시적 동의서에 읽고 동의합니다."
   }
 };
 
@@ -225,6 +231,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showLangs, setShowLangs] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const t = translations[language] || translations.en;
 
@@ -246,6 +253,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         isAnonymous: user.isAnonymous || false,
         lastLogin: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        consentsAcceptedAt: serverTimestamp(),
         metadata: {
           device: metadata.device,
           os: metadata.os,
@@ -581,11 +589,27 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
                   {error && <p className="text-red-400 text-[10px] sm:text-xs text-center bg-red-400/5 py-2 rounded-lg border border-red-400/10">{error}</p>}
 
+                  {/* KVKK / GDPR Consent Checkbox */}
+                  <div className="flex items-start gap-2.5 px-1 py-1">
+                    <input 
+                      type="checkbox"
+                      id="kvkk-consent-email"
+                      checked={consentAccepted}
+                      onChange={(e) => setConsentAccepted(e.target.checked)}
+                      className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
+                    />
+                    <label htmlFor="kvkk-consent-email" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
+                      {t.kvkkConsent}
+                    </label>
+                  </div>
+
                   <div className="flex flex-col gap-3 pt-2">
                     <button 
                       type="submit"
-                      disabled={loading}
-                      className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#fff] active:scale-[0.98] transition-all shadow-lg"
+                      disabled={loading || !consentAccepted}
+                      className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${
+                        loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                      }`}
                     >
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                         <>
@@ -608,8 +632,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      disabled={loading || !consentAccepted}
+                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
+                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                      }`}
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -623,8 +649,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleAppleLogin}
-                      disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      disabled={loading || !consentAccepted}
+                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
+                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                      }`}
                     >
                       <Apple className="w-4 h-4" />
                       {t.appleSignIn}
@@ -754,10 +782,27 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       </div>
                       <div id="recaptcha-container" className="hidden"></div>
                       {error && <p className="text-red-400 text-xs text-center">{error}</p>}
+                      
+                      {/* KVKK / GDPR Consent Checkbox */}
+                      <div className="flex items-start gap-2.5 px-1 py-1">
+                        <input 
+                          type="checkbox"
+                          id="kvkk-consent-phone"
+                          checked={consentAccepted}
+                          onChange={(e) => setConsentAccepted(e.target.checked)}
+                          className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
+                        />
+                        <label htmlFor="kvkk-consent-phone" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
+                          {t.kvkkConsent}
+                        </label>
+                      </div>
+
                       <button 
                         type="submit"
-                        disabled={loading}
-                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-[#fff] active:scale-[0.98] transition-all"
+                        disabled={loading || !consentAccepted}
+                        className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg transition-all ${
+                          loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                        }`}
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>
@@ -783,8 +828,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {error && <p className="text-red-400 text-xs text-center">{error}</p>}
                       <button 
                         type="submit"
-                        disabled={loading}
-                        className="w-full bg-[#ecd8a6] text-[#0a0512] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg hover:bg-[#fff] active:scale-[0.98] transition-all"
+                        disabled={loading || !consentAccepted}
+                        className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg transition-all ${
+                          loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                        }`}
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>
@@ -800,8 +847,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      disabled={loading || !consentAccepted}
+                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
+                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                      }`}
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -815,8 +864,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleAppleLogin}
-                      disabled={loading}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      disabled={loading || !consentAccepted}
+                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
+                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                      }`}
                     >
                       <Apple className="w-4 h-4" />
                       {t.appleSignIn}
@@ -828,7 +879,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         setAuthMethod('email');
                         setConfirmationResult(null);
                       }}
-                      className="w-full bg-white/5 hover:bg-white/10 text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
+                      className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
                     >
                       <Mail className="w-3.5 h-3.5 opacity-70" />
                       {t.switchToEmail}

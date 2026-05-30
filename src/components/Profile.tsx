@@ -21,7 +21,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
-import { collection, query, where, getDocs, orderBy, limit, Timestamp, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, setDoc, orderBy, limit, Timestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 interface ProfileProps {
@@ -39,6 +39,7 @@ interface ProfileProps {
   onUpdateUserInfo: (info: any) => void;
   translations: any;
   onDownloadPastReading?: (reading: any) => void;
+  onShowOnboarding?: () => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({ 
@@ -49,11 +50,19 @@ export const Profile: React.FC<ProfileProps> = ({
   onClose, 
   onUpdateUserInfo,
   translations,
-  onDownloadPastReading
+  onDownloadPastReading,
+  onShowOnboarding
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
   const [history, setHistory] = useState<any[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [purchases, setPurchases] = useState<any[]>([]);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState(true);
+
+  // Marketing consent state
+  const [emailConsent, setEmailConsent] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   // Profile edit state
   const [editName, setEditName] = useState(userInfo.name);
@@ -73,6 +82,92 @@ export const Profile: React.FC<ProfileProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [settingsStatus, setSettingsStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+  // Fetch marketing consents
+  useEffect(() => {
+    if (!user) return;
+    const fetchConsents = async () => {
+      try {
+        const consentRef = doc(db, 'marketing_consents', user.uid);
+        const consentSnap = await getDoc(consentRef);
+        if (consentSnap.exists()) {
+          const data = consentSnap.data();
+          setEmailConsent(data.emailConsent || false);
+          setSmsConsent(data.smsConsent || false);
+          setSelectedInterests(data.interests || []);
+        }
+      } catch (error) {
+        console.error("Error fetching marketing consents:", error);
+      }
+    };
+    fetchConsents();
+  }, [user]);
+
+  const saveConsents = async (email: boolean, sms: boolean, interests: string[]) => {
+    if (!user) return;
+    try {
+      const consentRef = doc(db, 'marketing_consents', user.uid);
+      await setDoc(consentRef, {
+        userId: user.uid,
+        emailConsent: email,
+        smsConsent: sms,
+        interests,
+        updatedAt: Timestamp.now()
+      }, { merge: true });
+    } catch (error) {
+      console.error("Error saving marketing consents:", error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setIsDeletingAccount(true);
+    setSettingsStatus(null);
+    try {
+      // 1. Delete Firestore collections
+      // A. Delete user document from 'users'
+      const userRef = doc(db, 'users', user.uid);
+      await deleteDoc(userRef);
+
+      // B. Delete user moons from 'user_moons'
+      const moonsRef = doc(db, 'user_moons', user.uid);
+      await deleteDoc(moonsRef);
+
+      // C. Delete transactions from 'moon_transactions' where userId == uid
+      const q = query(collection(db, 'moon_transactions'), where('userId', '==', user.uid));
+      const querySnapshot = await getDocs(q);
+      const batch = writeBatch(db);
+      querySnapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
+      // D. Also delete phone mapping if exists
+      if (user.phoneNumber) {
+        const phoneRef = doc(db, 'phones', user.phoneNumber);
+        await deleteDoc(phoneRef);
+      }
+
+      // 2. Delete User from Firebase Auth
+      await user.delete();
+
+      // 3. Trigger close
+      onClose();
+    } catch (error: any) {
+      console.error("Account deletion error:", error);
+      if (error.code === 'auth/requires-recent-login') {
+        const reauthMsg = translations?.profile?.settings?.reauthRequired || (userInfo.language === 'tr' ? "Lütfen tekrar giriş yapın." : "Please login again.");
+        setSettingsStatus({ type: 'error', message: reauthMsg });
+      } else {
+        setSettingsStatus({ type: 'error', message: error.message });
+      }
+      setShowDeleteConfirm(false);
+    } finally {
+      setIsDeletingAccount(false);
+    }
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -98,7 +193,31 @@ export const Profile: React.FC<ProfileProps> = ({
       }
     };
 
+    const fetchPurchases = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'moon_transactions'),
+          where('userId', '==', user.uid),
+          where('type', '==', 'buy'),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+        const querySnapshot = await getDocs(q);
+        const items = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setPurchases(items);
+      } catch (error) {
+        console.error('Error fetching purchases:', error);
+      } finally {
+        setIsLoadingPurchases(false);
+      }
+    };
+
     fetchHistory();
+    fetchPurchases();
   }, [user]);
 
   const handleUpdatePassword = async () => {
@@ -201,7 +320,13 @@ export const Profile: React.FC<ProfileProps> = ({
       newPassword: translations?.profile?.settings?.newPassword || "New Password",
       updatePassword: translations?.profile?.settings?.updatePassword || "Change",
       successPassword: translations?.profile?.settings?.successPassword || "Changed",
-      reauthRequired: translations?.profile?.settings?.reauthRequired || "Please login again"
+      reauthRequired: translations?.profile?.settings?.reauthRequired || "Please login again",
+      deleteAccount: userInfo.language === 'tr' ? "Hesabımı Sil" : "Delete Account",
+      deleteConfirmMessage: userInfo.language === 'tr' 
+        ? "Hesabınızı ve tüm verilerinizi (bakiyeniz ve fal geçmişiniz dahil) kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!" 
+        : "Are you sure you want to permanently delete your account and all associated data (including your balance and reading history)? This action cannot be undone!",
+      deleteConfirmBtn: userInfo.language === 'tr' ? "Evet, Hesabımı Sil" : "Yes, Delete My Account",
+      cancelBtn: userInfo.language === 'tr' ? "Vazgeç" : "Cancel"
     },
     history: {
       downloadPdf: translations?.profile?.history?.downloadPdf || "Download PDF",
@@ -391,6 +516,59 @@ export const Profile: React.FC<ProfileProps> = ({
                     </div>
                   )}
                 </section>
+
+                {/* Purchase History */}
+                <section>
+                  <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-6 flex items-center gap-2">
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    {userInfo.language === 'tr' ? "Satın Alım Geçmişi" : "Purchase History"}
+                  </h3>
+                  
+                  {isLoadingPurchases ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 text-[#ecd8a6]/30 animate-spin" />
+                    </div>
+                  ) : purchases.length > 0 ? (
+                    <div className="space-y-3">
+                      {purchases.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 hover:bg-[#ecd8a6]/5 transition-colors group">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-lg bg-[#0a0512] border border-[#ecd8a6]/20 flex items-center justify-center">
+                              <ShoppingBag className="w-5 h-5 text-[#ecd8a6]/60" />
+                            </div>
+                            <div>
+                              <div className="text-[#ecd8a6] text-sm font-medium">{item.description}</div>
+                              <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
+                                <CalendarDays className="w-3 h-3" />
+                                {item.createdAt?.toDate().toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 font-serif">
+                            {item.stripeReceiptUrl && (
+                              <a 
+                                href={item.stripeReceiptUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"
+                              >
+                                {userInfo.language === 'tr' ? "Makbuz" : "Receipt"}
+                              </a>
+                            )}
+                            <ChevronRight className="w-4 h-4 text-[#ecd8a6]/20 group-hover:text-[#ecd8a6]/60 transition-colors" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 rounded-2xl border border-dashed border-[#ecd8a6]/10 bg-[#ecd8a6]/5">
+                      <p className="text-xs text-[#ecd8a6]/40 font-serif tracking-widest uppercase">
+                        {userInfo.language === 'tr' ? "Henüz satın alım yapılmadı." : "No purchases yet."}
+                      </p>
+                    </div>
+                  )}
+                </section>
               </motion.div>
             ) : (
               <motion.div
@@ -440,6 +618,180 @@ export const Profile: React.FC<ProfileProps> = ({
                       {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : profileT.settings.updatePassword}
                     </button>
                   </div>
+                </section>
+
+                <hr className="border-[#ecd8a6]/10 my-6" />
+
+                <section className="space-y-4">
+                  <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
+                    <History className="w-3.5 h-3.5" />
+                    {userInfo.language === 'tr' ? "Uygulama Tanıtımı" : "App Intro"}
+                  </h3>
+                  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">{userInfo.language === 'tr' ? "Tanıtımı Tekrar İzle" : "Watch App Intro"}</h4>
+                      <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
+                        {userInfo.language === 'tr' 
+                          ? "MadameSoul rehberlik adımlarını ve onboarding slaytlarını baştan izleyin." 
+                          : "Replay the MadameSoul onboarding tour and introductory guide from the beginning."}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (onShowOnboarding) {
+                          onShowOnboarding();
+                        }
+                        onClose();
+                      }}
+                      className="px-5 py-2.5 bg-[#1a1025] hover:bg-white/5 text-[#ecd8a6]/70 hover:text-[#ecd8a6] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all border border-[#ecd8a6]/20 font-bold whitespace-nowrap active:scale-95"
+                    >
+                      {userInfo.language === 'tr' ? "İzlemeye Başla" : "Watch Now"}
+                    </button>
+                  </div>
+                </section>
+
+                <hr className="border-[#ecd8a6]/10 my-6" />
+
+                <section className="space-y-4">
+                  <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
+                    <Settings className="w-3.5 h-3.5" />
+                    {userInfo.language === 'tr' ? "Pazarlama Tercihleri" : "Marketing Preferences"}
+                  </h3>
+                  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
+                          {userInfo.language === 'tr' ? "E-posta Bildirimleri" : "Email Notifications"}
+                        </h4>
+                        <p className="text-xs text-[#ecd8a6]/50 mt-0.5 leading-relaxed">
+                          {userInfo.language === 'tr' ? "Yenilikler ve kampanyalar hakkında e-posta alın." : "Receive emails about updates and special offers."}
+                        </p>
+                      </div>
+                      <input 
+                        type="checkbox"
+                        checked={emailConsent}
+                        onChange={(e) => {
+                          const val = e.target.checked;
+                          setEmailConsent(val);
+                          saveConsents(val, smsConsent, selectedInterests);
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
+                          {userInfo.language === 'tr' ? "SMS Bildirimleri" : "SMS Notifications"}
+                        </h4>
+                        <p className="text-xs text-[#ecd8a6]/50 mt-0.5 leading-relaxed">
+                          {userInfo.language === 'tr' ? "Önemli duyuruları kısa mesajla alın." : "Get important announcements via text message."}
+                        </p>
+                      </div>
+                      <input 
+                        type="checkbox"
+                        checked={smsConsent}
+                        onChange={(e) => {
+                          const val = e.target.checked;
+                          setSmsConsent(val);
+                          saveConsents(emailConsent, val, selectedInterests);
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
+                      />
+                    </div>
+
+                    <div className="pt-2 border-t border-[#ecd8a6]/10">
+                      <h4 className="text-sm font-serif font-bold text-[#ecd8a6] mb-3">
+                        {userInfo.language === 'tr' ? "İlgi Alanları" : "Interests"}
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {[
+                          { id: 'daily_horoscope', labelTr: 'Günlük Burçlar', labelEn: 'Daily Horoscopes' },
+                          { id: 'love_tarot', labelTr: 'Aşk Açılımları', labelEn: 'Love Readings' },
+                          { id: 'career_tarot', labelTr: 'Kariyer ve Para', labelEn: 'Career & Finance' },
+                          { id: 'special_deals', labelTr: 'Özel İndirimler', labelEn: 'Special Deals' },
+                        ].map((interest) => {
+                          const isChecked = selectedInterests.includes(interest.id);
+                          const label = userInfo.language === 'tr' ? interest.labelTr : interest.labelEn;
+                          return (
+                            <label key={interest.id} className="flex items-center gap-3 cursor-pointer">
+                              <input 
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  let newInterests = [...selectedInterests];
+                                  if (e.target.checked) {
+                                    newInterests.push(interest.id);
+                                  } else {
+                                    newInterests = newInterests.filter(id => id !== interest.id);
+                                  }
+                                  setSelectedInterests(newInterests);
+                                  saveConsents(emailConsent, smsConsent, newInterests);
+                                }}
+                                className="w-3.5 h-3.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
+                              />
+                              <span className="text-xs text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">{label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <hr className="border-[#ecd8a6]/10 my-6" />
+
+                <section className="space-y-4">
+                  <h3 className="text-xs font-serif tracking-[0.2em] text-red-400/70 uppercase mb-2 flex items-center gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-red-400" />
+                    {userInfo.language === 'tr' ? "TEHLİKELİ ALAN" : "DANGER ZONE"}
+                  </h3>
+                  
+                  {!showDeleteConfirm ? (
+                    <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h4 className="text-sm font-serif font-bold text-red-400">{profileT.settings.deleteAccount}</h4>
+                        <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
+                          {userInfo.language === 'tr' 
+                            ? "Hesabınızı silmek tüm bakiyenizi, fal geçmişinizi ve kişisel verilerinizi kalıcı olarak temizler." 
+                            : "Deleting your account permanently wipes your balance, history, and personal data."}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="px-5 py-2.5 bg-red-950/30 text-red-400 hover:bg-red-500 hover:text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all duration-300 border border-red-500/20 active:scale-95 font-bold"
+                      >
+                        {profileT.settings.deleteAccount}
+                      </button>
+                    </div>
+                  ) : (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-5 rounded-xl bg-red-950/20 border border-red-500/30 space-y-4 shadow-lg shadow-red-950/10"
+                    >
+                      <p className="text-xs text-red-400/90 leading-relaxed font-sans font-medium">
+                        {profileT.settings.deleteConfirmMessage}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          onClick={handleDeleteAccount}
+                          disabled={isDeletingAccount}
+                          className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {isDeletingAccount ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                          {profileT.settings.deleteConfirmBtn}
+                        </button>
+                        <button
+                          onClick={() => setShowDeleteConfirm(false)}
+                          disabled={isDeletingAccount}
+                          className="px-5 py-2.5 bg-[#1a1025] hover:bg-white/5 text-[#ecd8a6]/70 hover:text-[#ecd8a6] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all border border-[#ecd8a6]/20 font-bold"
+                        >
+                          {profileT.settings.cancelBtn}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </section>
               </motion.div>
             )}

@@ -1,6 +1,8 @@
 transactionDesc: "{cards} kartları ile fal bakımı"
 transactionBuy: "{amount} Katina Moon satın alımı (Demo)"
 welcomeBonus: "Hoş Geldin Bonusu"
+dailyGift: "Günlük Hediye Katina Moon"
+dailyGiftClaimed: "Günlük ücretsiz Katina Moon krediniz tanımlandı!"
 onboarding:
   skip: Atla
   next: İleri
@@ -41,6 +43,12 @@ statusOptions:
   engaged: Nişanlı
   complicated: Karmaşık
   breakup: Ayrılık Sürecinde
+focusOptions:
+  general: Genel Yaşam ve Kader
+  love: Aşk ve İlişkiler
+  career: Kariyer, İş ve Finans
+  health: Sağlık ve Zindelik
+focusLabel: Açılım Odak Noktası
 headings: |-
   **Geçmişin Yankıları** (geçmiş kartının analizi)
   **Şu Anın Rüzgarı** (şimdi kartının analizi)

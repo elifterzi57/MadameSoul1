@@ -3,6 +3,7 @@
     "enabled": true,
     "mediaType": "video",
     "mediaSrc": "/ads/MadameSoapStudio.mp4",
+    "pdfImage": "/ads/soap_banner.png",
     "promoCode": "MADAMESOUL10",
     "link": "https://www.etsy.com/shop/MadameSoapStudio",
     "sponsored": {
@@ -42,6 +43,7 @@
     "enabled": true,
     "mediaType": "video",
     "mediaSrc": "/ads/Govde.mp4",
+    "pdfImage": "/ads/live_banner.png",
     "link": "https://www.etsy.com/shop/MadameSoulStudio",
     "sponsored": {
       "en": "Sponsored",

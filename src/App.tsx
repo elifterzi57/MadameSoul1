@@ -1,27 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Markdown from 'react-markdown';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, increment, onSnapshot, query, where, getDocs } from 'firebase/firestore';
-import { db, auth, initAnalytics } from './lib/firebase';
-import { robotoFontBase64 } from './lib/pdfFont';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, updateDoc, onSnapshot, query, where, getDocs, runTransaction } from 'firebase/firestore';
+import { db, auth, logAnalyticsEvent } from './lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { Login } from './components/Login';
 import { Onboarding } from './components/Onboarding';
 import { KatinaMoon } from './components/KatinaMoon';
 import { Profile } from './components/Profile';
 import { gatherUserMetadata, logUserEvent } from './lib/metadata';
-import { LEGAL_CONTENT } from './data/legal';
+import { useAppStore, Card } from './store/useAppStore';
+import { StoreModal } from './components/StoreModal';
+import { ContactModal } from './components/ContactModal';
+import { LegalModal } from './components/LegalModal';
+import { CookieBanner } from './components/CookieBanner';
+import { generatePDF } from './utils/pdfGenerator';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { useMutation } from '@tanstack/react-query';
+
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
 import es from './locales/es.yaml';
 import fr from './locales/fr.yaml';
 import zh from './locales/zh.yaml';
 import ko from './locales/ko.yaml';
+
 import { 
   Sparkles, 
-  Star, 
   RefreshCw, 
   ChevronRight, 
   Download, 
@@ -31,15 +36,9 @@ import {
   Plus, 
   Copy, 
   Check, 
-  ShoppingBag, 
   LogOut, 
   Loader2,
-  User as UserIcon,
-  Settings,
-  History,
-  Calendar,
-  MapPin,
-  Heart
+  User as UserIcon
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -66,7 +65,7 @@ const KATINA_DECK = [
   { id: "Kapi", locKey: "kapi", name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
   { id: "Kitap", locKey: "kitap", name: "Kitap", desc: "Sırlar, eğitim, öğrenilmesi gereken şaşırtıcı bir gerçek." },
   { id: "Kopek", locKey: "kopek", name: "Köpek", desc: "Sadakat, dürüst bir dostluk veya güvenilir destek." },
-  { id: "KizCocugu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir enerji." },
+  { id: "KizCocugu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir energy." },
   { id: "Mektup", locKey: "mektup", name: "Mektup", desc: "Haberler, beklenen bir mesaj veya önemli bir iletişim." },
   { id: "Mezar", locKey: "mezar", name: "Mezar", desc: "Bitişler, büyük değişim, bir devrin kapanıp yenisinin başlaması." },
   { id: "Nil Nehri", locKey: "nil_nehri", name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
@@ -81,20 +80,10 @@ const KATINA_DECK = [
 ];
 
 type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
-
-type UserInfo = {
-  name: string;
-  dob: string;
-  birthplace: string;
-  relationship: string;
-  language: Language;
-};
-
-type Card = { id: string; locKey: string; name: string; desc: string };
-
 const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
 
 const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
+const FOCUS_KEYS = ['general', 'love', 'career', 'health'] as const;
 
 const storeTranslations: Record<string, Record<Language, string>> = {
   storeTitle: { en: "Madame's Store", tr: "Madam'ın Mağazası", es: "La Tienda", fr: "La Boutique", zh: "商店", ko: "마담의 상점" },
@@ -124,20 +113,70 @@ const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS
   return opt;
 });
 
-function App() {
-  const [user, setUser] = useState<User | null>(null);
+const FOCUS_OPTIONS: Array<{value: string} & Record<Language, string>> = FOCUS_KEYS.map(key => {
+  const opt: any = { value: key };
+  Object.keys(locales).forEach(l => {
+    opt[l as Language] = locales[l as Language]?.focusOptions?.[key];
+  });
+  return opt;
+});
+
+function AppContent() {
+  const {
+    user,
+    userInfo,
+    moonsCount,
+    readingCount,
+    step,
+    setUser,
+    setUserInfo,
+    setMoonsCount,
+    setReadingCount,
+    setStep
+  } = useAppStore();
+
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(true);
-  const [step, setStep] = useState<'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT'>('SPLASH');
-  const [userInfo, setUserInfo] = useState<UserInfo>(() => {
-    return { name: '', dob: '', birthplace: '', relationship: 'single', language: 'en' };
-  });
-  const [drawnCards, setDrawnCards] = useState<Card[]>([]);
+  const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentTransactionId, setCurrentTransactionId] = useState<string | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
+  
+  // Modal states
+  const [isStoreOpen, setIsStoreOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [bannerCopied, setBannerCopied] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+
+  // Refs for tracking transaction status during async TanStack Query mutation
+  const pendingTxId = useRef<string | null>(null);
+  const pendingDeducted = useRef(false);
+  const pendingDeductedFrom = useRef<'daily' | 'purchased' | null>(null);
+
+  const [adsConfig, setAdsConfig] = useState<any>({
+    ad1: {
+      enabled: true,
+      promoCode: "KATINA20",
+      link: "https://www.amazon.com/s?k=katina+tarot",
+      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스pon서" },
+      promoCodeLabel: { en: "Use Code:", tr: "Kod:", es: "Código:", fr: "Code :", zh: "代码：", ko: "코드:" },
+      text: { en: "Get 20% off Katina Tarot Cards on Amazon!", tr: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!" },
+      buttonText: { en: "Shop Now", tr: "Hemen Al" }
+    },
+    ad2: {
+      enabled: true,
+      mediaType: "video",
+      mediaSrc: "/ads/Govde.mp4",
+      link: "https://www.etsy.com/shop/MadameSoulStudio",
+      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스pon서" },
+      title: { en: "Live Session", tr: "Canlı Seans" },
+      text: { en: "Visit our Etsy shop for professional live reading sessions and personalized consultations.", tr: "Profesyonel canlı tarot seansları ve size özel açılımlar için Etsy mağazamızı ziyaret edin." },
+      buttonText: { en: "Shop on Etsy", tr: "Etsy Mağazası" }
+    }
+  });
 
   const showToast = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
     setToast({ message, type });
@@ -151,109 +190,104 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-  
-  // Moons / Payment State
-  const [moonsCount, setMoonsCount] = useState<number>(0);
-  const [isMoonsLoading, setIsMoonsLoading] = useState(true);
-  const [isStoreOpen, setIsStoreOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isContactOpen, setIsContactOpen] = useState(false);
-  const [isLegalOpen, setIsLegalOpen] = useState(false);
-  const [readingCount, setReadingCount] = useState(0);
 
-  const handleLegalOpen = async () => {
-    setIsLegalOpen(true);
-    if (user) {
-      try {
-        const metadata = await gatherUserMetadata();
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          hasAcceptedLegal: 1,
-          legalAcceptedAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          metadata: {
-            device: metadata.device,
-            os: metadata.os,
-            browser: metadata.browser,
-            ip: metadata.ip,
-            location: metadata.location
-          }
-        });
-      } catch (error) {
-        // If document doesn't exist, we might need setDoc with merge,
-        // but Login.tsx should have created it.
-        // Fallback to setDoc just in case.
-        try {
-          const metadata = await gatherUserMetadata();
-          const userRef = doc(db, 'users', user.uid);
-          await setDoc(userRef, {
-            userId: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            hasAcceptedLegal: 1,
-            legalAcceptedAt: serverTimestamp(),
-            lastLogin: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-            metadata: {
-              device: metadata.device,
-              os: metadata.os,
-              browser: metadata.browser,
-              ip: metadata.ip,
-              location: metadata.location
-            }
-          }, { merge: true });
-        } catch (innerError) {
-          handleFirestoreError(innerError, 'write', `users/${user.uid}`);
-        }
-      }
-    }
-  };
-
-  const [contactForm, setContactForm] = useState({ fullName: '', email: '', subject: '', message: '' });
-  const [isContactSubmitting, setIsContactSubmitting] = useState(false);
-  const [contactSuccess, setContactSuccess] = useState(false);
-  const [bannerCopied, setBannerCopied] = useState(false);
-  const [adsConfig, setAdsConfig] = useState<any>({
-    ad1: {
-      enabled: true,
-      promoCode: "KATINA20",
-      link: "https://www.amazon.com/s?k=katina+tarot",
-      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
-      promoCodeLabel: { en: "Use Code:", tr: "Kod:", es: "Código:", fr: "Code :", zh: "代码：", ko: "코드:" },
-      text: { en: "Get 20% off Katina Tarot Cards on Amazon!", tr: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!" },
-      buttonText: { en: "Shop Now", tr: "Hemen Al" }
-    },
-    ad2: {
-      enabled: true,
-      mediaType: "video",
-      mediaSrc: "/ads/Govde.mp4",
-      link: "https://www.etsy.com/shop/MadameSoulStudio",
-      sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
-      title: { en: "Live Session", tr: "Canlı Seans" },
-      text: { en: "Visit our Etsy shop for professional live reading sessions and personalized consultations.", tr: "Profesyonel canlı tarot seansları ve size özel açılımlar için Etsy mağazamızı ziyaret edin." },
-      buttonText: { en: "Shop on Etsy", tr: "Etsy Mağazası" }
-    }
-  });
-
-  useEffect(() => {
-    initAnalytics();
-    // Fetch external customizable ads configuration
-    fetch('/ads/ads_config.json')
-      .then(res => res.json())
-      .then(data => {
-        if (data) {
-          setAdsConfig(data);
-        }
-      })
-      .catch(err => console.error("Could not load ads config:", err));
-  }, []);
-
-  // Firestore Error Handler
   const handleFirestoreError = (error: unknown, operationType: string, path: string | null) => {
     const errMessage = error instanceof Error ? error.message : String(error);
     console.error('Firestore Error: ', { error: errMessage, operationType, path });
-    // setGlobalError(`${operationType} error on ${path}: ${errMessage}`);
+    try {
+      addDoc(collection(db, 'error_logs'), {
+        source: 'client',
+        userId: auth.currentUser?.uid || null,
+        operationType,
+        path,
+        message: errMessage,
+        stack: error instanceof Error ? error.stack || null : null,
+        createdAt: serverTimestamp()
+      });
+    } catch (logErr) {
+      console.error("Failed to log error to Firestore:", logErr);
+    }
   };
+
+  const isClaimingDaily = useRef(false);
+
+  const claimDailyGift = async (userId: string) => {
+    if (isClaimingDaily.current) return;
+    isClaimingDaily.current = true;
+    
+    const moonRef = doc(db, 'user_moons', userId);
+    try {
+      await runTransaction(db, async (transaction) => {
+        const moonDoc = await transaction.get(moonRef);
+        if (!moonDoc.exists()) return;
+        
+        const data = moonDoc.data();
+        const lastClaimed = data.lastDailyClaimedAt;
+        const now = new Date();
+        
+        let canClaim = false;
+        if (!lastClaimed) {
+          canClaim = true;
+        } else {
+          const lastClaimedDate = lastClaimed.toDate();
+          const diffMs = now.getTime() - lastClaimedDate.getTime();
+          const diffHours = diffMs / (1000 * 60 * 60);
+          if (diffHours >= 24) {
+            canClaim = true;
+          }
+        }
+        
+        if (canClaim) {
+          const currentDailyFree = data.dailyFreeBalance || 0;
+          const currentPurchased = data.purchasedBalance || 0;
+          const newDailyFree = 1;
+          const newBalance = newDailyFree + currentPurchased;
+          const claimedMoons = newDailyFree - currentDailyFree;
+          
+          transaction.update(moonRef, {
+            dailyFreeBalance: newDailyFree,
+            balance: newBalance,
+            lastDailyClaimedAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          
+          if (claimedMoons > 0) {
+            const dailyGiftDesc = locales[userInfo.language]?.dailyGift || "Daily Free Gift";
+            const txRef = doc(collection(db, 'moon_transactions'));
+            transaction.set(txRef, {
+              userId,
+              amount: 1,
+              type: 'bonus',
+              status: 'success',
+              description: dailyGiftDesc,
+              pdfDownloaded: 0,
+              userLanguage: userInfo.language,
+              userName: "",
+              userDob: "",
+              userBirthplace: "",
+              userRelationship: "",
+              selectedCards: [],
+              createdAt: serverTimestamp()
+            });
+          }
+        }
+      });
+      showToast(locales[userInfo.language]?.dailyGiftClaimed || "Your daily free Katina Moon has been claimed!", 'success');
+    } catch (e) {
+      console.error("Error claiming daily gift:", e);
+    } finally {
+      isClaimingDaily.current = false;
+    }
+  };
+
+  useEffect(() => {
+    fetch('/ads/ads_config.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data) setAdsConfig(data);
+      })
+      .catch(err => console.error("Could not load ads config:", err));
+  }, []);
 
   useEffect(() => {
     let unsubscribeMoons: (() => void) | undefined;
@@ -262,44 +296,39 @@ function App() {
       setUser(u);
       setIsAuthLoading(false);
 
-      // Reset application state on auth change to ensure a clean slate
-      // This prevents the previous person's reading from appearing for a new login
+      // Clean state on user change
       setStep('SPLASH');
       setDrawnCards([]);
       setReading(null);
-      setCurrentTransactionId(null);
       setImageError({});
       setIsStoreOpen(false);
       setIsProfileOpen(false);
       setIsContactOpen(false);
       setIsLegalOpen(false);
-      setUserInfo(prev => ({
-        ...prev,
+      
+      setUserInfo({
         name: '',
         dob: '',
         birthplace: '',
-        relationship: 'single'
-      }));
+        relationship: 'single',
+        focus: 'general'
+      });
 
       if (u) {
-        // Sync moons from Firestore
         const moonRef = doc(db, 'user_moons', u.uid);
-        
-        // Fetch User Profile
         const userRef = doc(db, 'users', u.uid);
+        
         getDoc(userRef).then(async (docSnap) => {
           if (docSnap.exists()) {
             const data = docSnap.data();
-            // We use name and dob from profile to optionally fill the form if it's empty
-            setUserInfo(prev => ({
-              ...prev,
-              name: prev.name || data.name || '',
-              dob: prev.dob || data.dob || '',
-              birthplace: prev.birthplace || data.birthplace || '',
-              relationship: prev.relationship || data.relationship || 'single'
-            }));
+            setUserInfo({
+              name: userInfo.name || data.name || '',
+              dob: userInfo.dob || data.dob || '',
+              birthplace: userInfo.birthplace || data.birthplace || '',
+              relationship: userInfo.relationship || data.relationship || 'single',
+              focus: userInfo.focus || data.focus || 'general'
+            });
           } else {
-            // New user profile creation
             const metadata = await gatherUserMetadata();
             await setDoc(userRef, {
               userId: u.uid,
@@ -308,43 +337,60 @@ function App() {
               dob: '',
               birthplace: '',
               relationship: 'single',
+              focus: 'general',
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
               metadata
             });
-            // Auto fill name from google/social login
-            setUserInfo(prev => ({
-              ...prev,
-              name: u.displayName || ''
-            }));
+            setUserInfo({ name: u.displayName || '' });
           }
         });
 
-        // Fetch Reading Count
         const transactionsRef = collection(db, 'moon_transactions');
         const countQuery = query(transactionsRef, where('userId', '==', u.uid), where('type', '==', 'spend'));
         getDocs(countQuery).then(snap => {
           setReadingCount(snap.size);
         });
 
-        if (unsubscribeMoons) {
-          unsubscribeMoons();
-        }
+        if (unsubscribeMoons) unsubscribeMoons();
+        
         unsubscribeMoons = onSnapshot(moonRef, (docSnap) => {
           if (docSnap.exists()) {
-            setMoonsCount(docSnap.data().balance || 0);
+            const data = docSnap.data();
+            setMoonsCount(data.balance || 0);
+            
+            const lastClaimed = data.lastDailyClaimedAt;
+            const now = new Date();
+            let shouldClaim = false;
+            
+            if (!lastClaimed) {
+              shouldClaim = true;
+            } else {
+              const lastClaimedDate = lastClaimed.toDate();
+              const diffMs = now.getTime() - lastClaimedDate.getTime();
+              const diffHours = diffMs / (1000 * 60 * 60);
+              if (diffHours >= 24) {
+                shouldClaim = true;
+              }
+            }
+            
+            if (shouldClaim) {
+              claimDailyGift(u.uid);
+            }
           } else {
-            // New user seed
-            const welcomeDesc = (locales['en'].welcomeBonus || "Welcome Bonus");
+            const welcomeDesc = locales['en']?.welcomeBonus || "Welcome Bonus";
             setDoc(moonRef, {
               userId: u.uid,
-              balance: 5,
+              dailyFreeBalance: 0,
+              purchasedBalance: 1,
+              balance: 1,
+              lastDailyClaimedAt: null,
               updatedAt: serverTimestamp()
             });
             addDoc(collection(db, 'moon_transactions'), {
               userId: u.uid,
-              amount: 5,
-              type: 'buy',
+              amount: 1,
+              type: 'bonus',
               status: 'success',
               description: welcomeDesc,
               pdfDownloaded: 0,
@@ -356,16 +402,13 @@ function App() {
               selectedCards: [],
               createdAt: serverTimestamp()
             });
-            setMoonsCount(5);
+            setMoonsCount(1);
           }
-          setIsMoonsLoading(false);
         }, (error) => {
           handleFirestoreError(error, 'get', `user_moons/${u.uid}`);
-          setIsMoonsLoading(false);
         });
       } else {
         setMoonsCount(0);
-        setIsMoonsLoading(false);
         if (unsubscribeMoons) {
           unsubscribeMoons();
           unsubscribeMoons = undefined;
@@ -379,14 +422,60 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const paymentStatus = queryParams.get('payment');
+    const sessionId = queryParams.get('session_id');
+    const isMock = queryParams.get('mock') === 'true';
+    
+    if (paymentStatus === 'success') {
+      // Funnel Analytics: purchase_complete (MS-134)
+      logAnalyticsEvent('purchase_complete', { language: userInfo.language });
 
+      if (isMock && sessionId && user) {
+        const completeMockPayment = async () => {
+          try {
+            const token = await user.getIdToken();
+            const res = await fetch('/api/complete-mock-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ sessionId })
+            });
+            if (res.ok) {
+              showToast(userInfo.language === 'tr' ? "Ödeme başarıyla tamamlandı!" : "Payment completed successfully!", 'success');
+            } else {
+              showToast(userInfo.language === 'tr' ? "Ödeme onaylanırken bir hata oluştu." : "Error validating payment.", 'error');
+            }
+          } catch (err) {
+            console.error("Error completing mock payment:", err);
+            showToast("Mock payment validation failed", 'error');
+          }
+        };
+        completeMockPayment();
+      } else {
+        showToast(userInfo.language === 'tr' ? "Ödeme başarıyla tamamlandı!" : "Payment completed successfully!", 'success');
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (paymentStatus === 'cancel') {
+      showToast(userInfo.language === 'tr' ? "Ödeme iptal edildi." : "Payment cancelled.", 'info');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [user]);
+
+  // MS-118 Fallback translate logic
   const t = (key: string, params: Record<string, any> = {}) => {
     const currentLocale = locales[userInfo.language] || locales.en;
     let value = key.split('.').reduce((obj, k) => obj?.[k], currentLocale);
     
-    if (value === undefined || value === null) return key;
+    if (value === undefined || value === null) {
+      const fallbackLocale = locales.en;
+      value = key.split('.').reduce((obj, k) => obj?.[k], fallbackLocale);
+    }
     
-    // If it's an object or array, we shouldn't try to render it as a string in JSX
+    if (value === undefined || value === null) return key;
     if (typeof value !== 'string') {
       console.warn(`Translation key "${key}" resulted in a non-string value:`, value);
       return key; 
@@ -399,7 +488,179 @@ function App() {
     return value as string;
   };
 
-  const drawRancomCards = async () => {
+  // TanStack Query Mutation for Gemini Generation (MS-114)
+  const generateMutation = useMutation({
+    mutationFn: async (cards: Card[]) => {
+      if (!user) throw new Error("User not signed in");
+
+      const moonRef = doc(db, 'user_moons', user.uid);
+      const cardNamesEn = cards.map(c => locales['en']?.cards?.[c.locKey]?.name || c.name).join(', ');
+      const txDesc = (locales['en']?.transactionDesc || "Reading with cards: {cards}").replace('{cards}', cardNamesEn);
+
+      const txRef = doc(collection(db, 'moon_transactions'));
+      pendingTxId.current = txRef.id;
+
+      let deducted = false;
+      let deductedFrom: 'daily' | 'purchased' | null = null;
+
+      // First run transaction to deduct the moon balance
+      await runTransaction(db, async (transaction) => {
+        const moonDoc = await transaction.get(moonRef);
+        if (!moonDoc.exists()) throw new Error("No moon balance record found.");
+
+        const data = moonDoc.data();
+        const daily = data.dailyFreeBalance || 0;
+        const purchased = data.purchasedBalance || 0;
+        const total = data.balance || 0;
+
+        if (total < 1) throw new Error("Not enough Katina Moons!");
+
+        let newDaily = daily;
+        let newPurchased = purchased;
+
+        if (daily > 0) {
+          newDaily = daily - 1;
+          deductedFrom = 'daily';
+        } else {
+          newPurchased = purchased - 1;
+          deductedFrom = 'purchased';
+        }
+
+        const newBalance = newDaily + newPurchased;
+
+        transaction.update(moonRef, {
+          dailyFreeBalance: newDaily,
+          purchasedBalance: newPurchased,
+          balance: newBalance,
+          updatedAt: serverTimestamp()
+        });
+
+        transaction.set(txRef, {
+          userId: user.uid,
+          amount: -1,
+          type: 'spend',
+          status: 'pending',
+          description: txDesc,
+          pdfDownloaded: 0,
+          userLanguage: userInfo.language,
+          userName: userInfo.name,
+          userDob: userInfo.dob,
+          userBirthplace: userInfo.birthplace,
+          userRelationship: userInfo.relationship,
+          cards: cards.map(c => ({ id: c.id, locKey: c.locKey, name: c.name })),
+          deductedFrom,
+          createdAt: serverTimestamp()
+        });
+      });
+
+      deducted = true;
+      pendingDeducted.current = deducted;
+      pendingDeductedFrom.current = deductedFrom;
+      setReadingCount(prev => prev + 1);
+
+      // Fetch generation from backend (MS-110 prompt validation & MS-121 focus selection)
+      const token = await user.getIdToken();
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          cards: cards.map(c => c.id),
+          userName: userInfo.name,
+          dob: userInfo.dob,
+          birthplace: userInfo.birthplace,
+          relationship: userInfo.relationship,
+          language: userInfo.language,
+          focus: userInfo.focus
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
+      }
+
+      const data = await response.json();
+      return data.text || t('errorSilent');
+    },
+    onMutate: () => {
+      setIsGenerating(true);
+      setStep('RESULT');
+      // Funnel Analytics: reading_requested (MS-134)
+      logAnalyticsEvent('reading_requested', {
+        language: userInfo.language,
+        focus: userInfo.focus
+      });
+    },
+    onSuccess: async (data) => {
+      setReading(data);
+      setIsGenerating(false);
+
+      if (pendingTxId.current) {
+        try {
+          await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
+            readingText: data,
+            status: 'success'
+          });
+        } catch (e) {
+          console.error("Error saving reading text:", e);
+        }
+      }
+    },
+    onError: async (error: any) => {
+      console.error("Reading generation error:", error);
+      setReading(t('errorInterrupted'));
+      setIsGenerating(false);
+      
+      // Rollback balance on failure
+      if (user && pendingDeducted.current && pendingDeductedFrom.current) {
+        try {
+          const moonRef = doc(db, 'user_moons', user.uid);
+          await runTransaction(db, async (transaction) => {
+            const moonDoc = await transaction.get(moonRef);
+            if (!moonDoc.exists()) return;
+            const data = moonDoc.data();
+            const daily = data.dailyFreeBalance || 0;
+            const purchased = data.purchasedBalance || 0;
+
+            if (pendingDeductedFrom.current === 'daily') {
+              const newDaily = daily + 1;
+              transaction.update(moonRef, {
+                dailyFreeBalance: newDaily,
+                balance: newDaily + purchased,
+                updatedAt: serverTimestamp()
+              });
+            } else {
+              const newPurchased = purchased + 1;
+              transaction.update(moonRef, {
+                purchasedBalance: newPurchased,
+                balance: daily + newPurchased,
+                updatedAt: serverTimestamp()
+              });
+            }
+          });
+        } catch (refundError) {
+          console.error("Error refunding user moon balance:", refundError);
+        }
+      }
+
+      if (pendingTxId.current) {
+        try {
+          await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
+            status: 'failed'
+          });
+        } catch (txStatusError) {
+          console.error("Error updating transaction status to failed:", txStatusError);
+        }
+        setReadingCount(prev => Math.max(0, prev - 1));
+      }
+    }
+  });
+
+  // Rename typo drawRancomCards -> drawRandomCards (MS-111)
+  const drawRandomCards = async () => {
     if (moonsCount <= 0) {
       showToast(storeTranslations.noMoons[userInfo.language], 'error');
       setIsStoreOpen(true);
@@ -409,7 +670,9 @@ function App() {
     if (user) {
       logUserEvent(user.uid, 'DRAW_CARDS_START');
       
-      // Sync user info to Firestore when they submit the form
+      // Funnel Analytics: card_draw_started (MS-134)
+      logAnalyticsEvent('card_draw_started', { language: userInfo.language });
+
       try {
         const userRef = doc(db, 'users', user.uid);
         await updateDoc(userRef, {
@@ -417,6 +680,7 @@ function App() {
           dob: userInfo.dob,
           birthplace: userInfo.birthplace,
           relationship: userInfo.relationship,
+          focus: userInfo.focus,
           updatedAt: serverTimestamp()
         });
       } catch (error) {
@@ -425,7 +689,7 @@ function App() {
     }
 
     const deck = [...KATINA_DECK];
-    const drawn: Card[] = [];
+    const drawn: any[] = [];
     for (let i = 0; i < 3; i++) {
       const randomIndex = Math.floor(Math.random() * deck.length);
       drawn.push(deck.splice(randomIndex, 1)[0]);
@@ -436,135 +700,11 @@ function App() {
 
   useEffect(() => {
     if (step === 'DRAWING' && drawnCards.length === 3) {
-      generateReading(drawnCards);
+      generateMutation.mutate(drawnCards);
     }
   }, [step, drawnCards]);
 
-  const generateReading = async (cards: Card[]) => {
-    setIsGenerating(true);
-    setStep('RESULT');
-
-    if (user) {
-      logUserEvent(user.uid, 'READING_GEN_START', { cards: cards.map(c => c.id) });
-    }
-
-    const statusText = STATUS_OPTIONS.find(o => o.value === userInfo.relationship)?.[userInfo.language as keyof typeof STATUS_OPTIONS[0]] || userInfo.relationship;
-
-    const promptText = `You are 'MadameSoul', a mystic, wise Katina tarot expert holding ancient secrets. Speak to the person in front of you with compassion, honesty, and depth (incorporating your own feelings, using second-person "You"). 
-
-Person's Information:
-- Name: ${userInfo.name}
-- Date of Birth: ${userInfo.dob}
-- Place of Birth: ${userInfo.birthplace}
-- Relationship Status: ${statusText}
-
-Selected Katina Cards (Original Turkish names):
-1. Past (Roots of the Past): ${cards[0].name} - ${cards[0].desc}
-2. Present (Current Energy): ${cards[1].name} - ${cards[1].desc}
-3. Future (Probable Path): ${cards[2].name} - ${cards[2].desc}
-
-Please blend the energy of these 3 cards with the person's birth details and life situation to write a mystical and epic reading.
-Present your reading under 3 main headings:
-${t('headings')}
-
-End with a Guidance/Advice section giving them invaluable advice. 
-Please produce a wonderful reading purely as text (Markdown supported).
-CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use any other language!`;
-
-    let txRef: any = null;
-    let deducted = false;
-    try {
-      if (!user) return;
-
-      // Deduct Moon and Log
-      const moonRef = doc(db, 'user_moons', user.uid);
-      await updateDoc(moonRef, {
-        balance: increment(-1),
-        updatedAt: serverTimestamp()
-      });
-      deducted = true;
-
-      const cardNamesEn = cards.map(c => locales['en'].cards?.[c.locKey]?.name || c.name).join(', ');
-      const txDesc = (locales['en'].transactionDesc || "Reading with cards: {cards}").replace('{cards}', cardNamesEn);
-
-      txRef = await addDoc(collection(db, 'moon_transactions'), {
-        userId: user.uid,
-        amount: -1,
-        type: 'spend',
-        status: 'pending',
-        description: txDesc,
-        pdfDownloaded: 0,
-        userLanguage: userInfo.language,
-        userName: userInfo.name,
-        userDob: userInfo.dob,
-        userBirthplace: userInfo.birthplace,
-        userRelationship: userInfo.relationship,
-        cards: cards.map(c => ({ id: c.id, locKey: c.locKey, name: c.name })),
-        createdAt: serverTimestamp()
-      });
-      setCurrentTransactionId(txRef.id);
-      setReadingCount(prev => prev + 1);
-
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText }),
-      });
-
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
-      const data = await response.json();
-      const finalReading = data.text || t('errorSilent');
-      setReading(finalReading);
-
-      // Save reading text to the transaction for history download
-      try {
-        await updateDoc(doc(db, 'moon_transactions', txRef.id), {
-          readingText: finalReading,
-          status: 'success'
-        });
-      } catch (e) {
-        console.error("Error saving reading text:", e);
-      }
-    } catch (error) {
-      console.error("Reading generation error:", error);
-      setReading(t('errorInterrupted'));
-      
-      // Rollback moon balance if it was deducted
-      if (user && deducted) {
-        try {
-          const moonRef = doc(db, 'user_moons', user.uid);
-          await updateDoc(moonRef, {
-            balance: increment(1),
-            updatedAt: serverTimestamp()
-          });
-        } catch (refundError) {
-          console.error("Error refunding user moon balance:", refundError);
-        }
-      }
-
-      // Update transaction status to failed
-      if (txRef) {
-        try {
-          await updateDoc(doc(db, 'moon_transactions', txRef.id), {
-            status: 'failed'
-          });
-        } catch (txStatusError) {
-          console.error("Error updating transaction status to failed:", txStatusError);
-        }
-        setReadingCount(prev => Math.max(0, prev - 1));
-      }
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const [isExportingPDF, setIsExportingPDF] = useState(false);
-
   const handleDownload = async (pastReading?: any) => {
-    // If pastReading is a React Event, ignore it
     const isEvent = pastReading && pastReading.nativeEvent;
     const actualPastReading = isEvent ? undefined : pastReading;
 
@@ -576,184 +716,23 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       dob: actualPastReading.userDob,
       birthplace: actualPastReading.userBirthplace,
       relationship: actualPastReading.userRelationship,
-      language: (actualPastReading.userLanguage as keyof typeof locales) || userInfo.language
+      language: actualPastReading.userLanguage || userInfo.language
     } : userInfo;
 
     if (!readingToUse || isExportingPDF) return;
-    setIsExportingPDF(true);
 
-    try {
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.top = '-9999px';
-      container.style.left = '0';
-      container.style.width = '800px';
-      container.style.zIndex = '-9999';
-      
-      const dateStr = actualPastReading 
-        ? actualPastReading.createdAt?.toDate().toLocaleDateString(userInfoToUse.language === 'en' ? 'en-US' : userInfoToUse.language === 'tr' ? 'tr-TR' : undefined)
-        : new Date().toLocaleDateString(userInfo.language === 'en' ? 'en-US' : userInfo.language === 'tr' ? 'tr-TR' : undefined);
-      
-      const formatReading = (text: string) => {
-        let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        formatted = formatted.replace(/^### (.*$)/gim, '<h3 style="margin: 20px 0 10px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h3>');
-        formatted = formatted.replace(/^## (.*$)/gim, '<h2 style="margin: 25px 0 12px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h2>');
-        formatted = formatted.replace(/^# (.*$)/gim, '<h1 style="margin: 30px 0 15px; color: #ecd8a6; font-family: \'Playfair Display\', serif;">$1</h1>');
-        
-        let paragraphs = formatted.split(/\n\s*\n/);
-        return paragraphs.map(p => {
-          if (p.trim().startsWith('<h')) return p;
-          
-          let pFormatted = p.split('\n').map(l => {
-             if (l.trim().startsWith('- ') || l.trim().startsWith('* ')) {
-                 return `<div style="margin-left: 20px; display: block;">&bull; ${l.trim().substring(2)}</div>`;
-             }
-             return l;
-          }).join(' '); 
-          
-          return `<p style="margin: 0 0 15px 0; line-height: 1.6;">${pFormatted}</p>`;
-        }).join('');
-      };
-      
-      const cleanReading = formatReading(readingToUse);
-
-      const cardsHtml = `
-        <div style="display: flex; justify-content: center; gap: 40px; margin: 50px 0 60px 0; position: relative;">
-          ${cardsToUse.map((c: any) => `
-            <div style="text-align: center; width: 160px; position: relative; z-index: 2;">
-              <div style="border-radius: 12px; overflow: hidden; border: 2px solid rgba(236,216,166,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(236,216,166,0.15); background-color: #1a1025; height: 240px; display: flex; align-items: center; justify-content: center;">
-                 <img src="${window.location.origin}/cards/${c.id}.png" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
-              </div>
-              <div style="margin-top: 16px; font-family: 'Playfair Display', serif; font-size: 16px; color: #ecd8a6; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
-                ${locales[userInfoToUse.language].cards?.[c.locKey]?.name || c.name}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-
-      const bannerHtml = `
-        <div style="margin-top: 80px; padding: 40px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(236,216,166,0.3); background: linear-gradient(135deg, rgba(236,216,166,0.05) 0%, rgba(10,5,18,0.8) 100%);">
-           <h3 style="margin: 0 0 15px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 14px; opacity: 0.8;">✦ ${(adsConfig?.ad1?.sponsored?.[userInfoToUse.language] || adsConfig?.ad1?.sponsored?.en || "Sponsored")} ✦</h3>
-           <p style="margin: 0 0 25px 0; color: #f5eedc; font-size: 20px; font-family: 'Playfair Display', serif; font-weight: bold;">${(adsConfig?.ad1?.text?.[userInfoToUse.language] || adsConfig?.ad1?.text?.en || "Get 20% off Katina Tarot Cards on Amazon!")}</p>
-           
-           <div style="display: inline-block; background-color: #05000a; padding: 16px 32px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: bold; color: #ecd8a6; border: 1px dashed rgba(236,216,166,0.5); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
-             ${adsConfig?.ad1?.promoCode || "KATINA20"}
-           </div>
-           <br/>
-           <div style="display: inline-block; color: #ecd8a6; font-family: 'Playfair Display', serif; font-size: 15px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid rgba(236,216,166,0.4); padding-bottom: 4px;">${(adsConfig?.ad1?.buttonText?.[userInfoToUse.language] || adsConfig?.ad1?.buttonText?.en || "Shop Now")}</div>
-        </div>
-      `;
-
-      container.innerHTML = `
-        <div style="padding: 20px; background-color: #05000a; min-height: 1000px; box-sizing: border-box;">
-          <div style="border: 1px solid rgba(236,216,166,0.2); border-radius: 24px; padding: 60px 80px; background: radial-gradient(circle at top center, rgba(30,19,50,0.4) 0%, rgba(5,0,10,1) 50%); position: relative; overflow: hidden;">
-            
-            <div style="position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
-            <div style="position: absolute; top: 30px; right: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
-            <div style="position: absolute; bottom: 30px; left: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
-            <div style="position: absolute; bottom: 30px; right: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
-
-            <div style="text-align: center; margin-bottom: 50px;">
-              <h1 style="font-size: 48px; letter-spacing: 4px; margin: 0 0 10px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; font-weight: bold; text-shadow: 0 4px 20px rgba(236,216,166,0.2);">MADAME SOUL</h1>
-              <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-                <div style="height: 1px; width: 60px; background: linear-gradient(90deg, transparent, rgba(236,216,166,0.5));"></div>
-                <h2 style="font-size: 14px; letter-spacing: 6px; margin: 0; color: rgba(236,216,166,0.8); text-transform: uppercase; font-family: 'Playfair Display', serif;">Destiny Reading</h2>
-                <div style="height: 1px; width: 60px; background: linear-gradient(-90deg, transparent, rgba(236,216,166,0.5));"></div>
-              </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(236,216,166,0.2); border-top: 1px solid rgba(236,216,166,0.2); padding: 15px 0; margin-bottom: 30px; color: rgba(236,216,166,0.7); font-family: sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-              <div>Prepared For: <strong style="color: #ecd8a6;">${userInfoToUse.name}</strong></div>
-              <div>Date: <strong style="color: #ecd8a6;">${dateStr}</strong></div>
-            </div>
-            
-            ${cardsHtml}
-
-            <div style="font-size: 18px; line-height: 1.9; font-family: sans-serif; color: rgba(236, 216, 166, 0.95); padding: 0 20px; text-align: justify;">
-              ${cleanReading}
-            </div>
-
-            ${bannerHtml}
-            
-            <div style="margin-top: 100px;"></div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(container);
-      
-      // Wait for images to load
-      const images = Array.from(container.querySelectorAll('img'));
-      await Promise.all(images.map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      }));
-
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        backgroundColor: '#05000a',
-        useCORS: true,
-        allowTaint: false,
-        logging: false
-      });
-      
-      document.body.removeChild(container);
-      
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-      });
-
-      // Register and set Roboto font for Turkish character support
-      pdf.addFileToVFS('Roboto-Regular.ttf', robotoFontBase64);
-      pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
-      pdf.setFont('Roboto');
-      
-      pdf.setFillColor('#05000a');
-      pdf.rect(0, 0, canvas.width, canvas.height, 'F');
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-
-      pdf.setDrawColor(236, 216, 166);
-      pdf.setLineWidth(1);
-      pdf.line(canvas.width / 2 - 200, canvas.height - 150, canvas.width / 2 + 200, canvas.height - 150);
-      
-      pdf.setFontSize(20);
-      pdf.setTextColor(236, 216, 166);
-      
-      const t1 = "Instagram: @madamesoulstudio";
-      const w1 = pdf.getTextWidth(t1);
-      pdf.text(t1, (canvas.width - w1) / 2, canvas.height - 100);
-      pdf.link((canvas.width - w1) / 2, canvas.height - 120, w1, 24, { url: 'https://www.instagram.com/madamesoulstudio/' });
-
-      const t2 = "Etsy: madamesoulstudio";
-      const w2 = pdf.getTextWidth(t2);
-      pdf.text(t2, (canvas.width - w2) / 2, canvas.height - 70);
-      pdf.link((canvas.width - w2) / 2, canvas.height - 90, w2, 24, { url: 'https://www.etsy.com/shop/MadameSoulStudio?ref=sh-carousel-1' });
-
-      pdf.save(`Katina_Reading_${userInfoToUse.name.replace(/\s+/g, '_')}.pdf`);
-
-      // Mark PDF as downloaded in the transaction record
-      const activeTxId = actualPastReading ? actualPastReading.id : currentTransactionId;
-      if (activeTxId) {
-        try {
-          await updateDoc(doc(db, 'moon_transactions', activeTxId), {
-            pdfDownloaded: 1
-          });
-        } catch (error) {
-          console.error("PDF download update error:", error);
-        }
-      }
-    } catch (err) {
-      console.error('PDF Export Error:', err);
-    } finally {
-      setIsExportingPDF(false);
-    }
+    // Use imported standalone generatePDF service (MS-126)
+    await generatePDF({
+      readingText: readingToUse,
+      drawnCards: cardsToUse,
+      userInfo: userInfoToUse,
+      locales,
+      adsConfig,
+      currentTransactionId: actualPastReading ? actualPastReading.id : pendingTxId.current,
+      user,
+      showToast,
+      setIsExportingPDF
+    });
   };
 
   const handleStartOver = () => {
@@ -768,6 +747,39 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       setShowOnboarding(true);
     } catch (err) {
       console.error("Sign out error:", err);
+    }
+  };
+
+  const handleLegalOpen = async () => {
+    setIsLegalOpen(true);
+    if (user) {
+      try {
+        const metadata = await gatherUserMetadata();
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          hasAcceptedLegal: 1,
+          legalAcceptedAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          metadata
+        });
+      } catch (error) {
+        try {
+          const metadata = await gatherUserMetadata();
+          const userRef = doc(db, 'users', user.uid);
+          await setDoc(userRef, {
+            userId: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            hasAcceptedLegal: 1,
+            legalAcceptedAt: serverTimestamp(),
+            lastLogin: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            metadata
+          }, { merge: true });
+        } catch (innerError) {
+          handleFirestoreError(innerError, 'write', `users/${user.uid}`);
+        }
+      }
     }
   };
 
@@ -786,7 +798,8 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         t={t}
         onComplete={() => {
           setShowOnboarding(false);
-          // Removing localStorage persistence to show on next reload
+          // Funnel Analytics: onboarding_complete (MS-134)
+          logAnalyticsEvent('onboarding_complete', { language: userInfo.language });
         }} 
       />
     );
@@ -797,7 +810,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
       <Login 
         onLogin={() => {}} 
         language={userInfo.language} 
-        onLanguageChange={(lang) => setUserInfo(prev => ({ ...prev, language: lang }))}
+        onLanguageChange={(lang) => setUserInfo({ language: lang })}
         onShowOnboarding={() => setShowOnboarding(true)}
       />
     );
@@ -805,16 +818,12 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
   return (
     <div className="min-h-screen bg-[#05000a] text-[#ecd8a6] font-sans selection:bg-purple-900/50 overflow-x-hidden relative">
-      {/* Background decoration - Deep velvet space vibe */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-fuchsia-900/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-amber-900/10 rounded-full blur-[100px]" />
-        
-        {/* Subtle star particles background */}
         <div className="absolute inset-0 z-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at center, #ecd8a6 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
-      {/* Top Header - Moons / Store */}
       {step !== 'DRAWING' && (
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -853,100 +862,26 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         </motion.div>
       )}
 
-      {/* Store Modal */}
+      {/* Store Modal Component (MS-126) */}
       <AnimatePresence>
         {isStoreOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[90vh] overflow-y-auto"
-            >
-              <div className="absolute top-4 right-4 z-10">
-                <button onClick={() => setIsStoreOpen(false)} className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-8 text-center pb-6 border-b border-[#ecd8a6]/10 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-[#ecd8a6]/10 to-transparent" />
-                <KatinaMoon className="w-12 h-12 text-[#ecd8a6] mx-auto mb-4" />
-                <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase">{storeTranslations.storeTitle[userInfo.language] || "Madame's Store"}</h2>
-              </div>
-              
-              <div className="p-6 flex flex-col gap-4">
-                {[
-                  { amount: 3, price: "$2.99", bonus: null },
-                  { amount: 10, price: "$8.99", bonus: "1 Free Katina Moon", popular: true },
-                  { amount: 25, price: "$19.99", bonus: "5 Free Katina Moons" }
-                ].map((pack) => (
-                  <div key={pack.amount} className={`relative flex items-center justify-between p-4 rounded-xl border ${pack.popular ? 'border-[#ecd8a6] bg-[#ecd8a6]/5' : 'border-[#ecd8a6]/20 bg-[#ffffff]/5'} hover:bg-[#ecd8a6]/10 transition-colors cursor-pointer group`} onClick={async () => {
-                        showToast(storeTranslations.paymentPending[userInfo.language], 'info');
-                        if (user) {
-                          try {
-                            const moonRef = doc(db, 'user_moons', user.uid);
-                            await updateDoc(moonRef, {
-                              balance: increment(pack.amount),
-                              updatedAt: serverTimestamp()
-                            });
-                            await addDoc(collection(db, 'moon_transactions'), {
-                              userId: user.uid,
-                              amount: pack.amount,
-                              type: 'buy',
-                              status: 'success',
-                              description: (locales['en'].transactionBuy || "Demo purchase of {amount} Katina Moons").replace('{amount}', pack.amount.toString()),
-                              pdfDownloaded: 0,
-                              userLanguage: userInfo.language,
-                              userName: "",
-                              userDob: "",
-                              userBirthplace: "",
-                              userRelationship: "",
-                              selectedCards: [],
-                              createdAt: serverTimestamp()
-                            });
-                          } catch (error) {
-                            handleFirestoreError(error, 'update', `user_moons/${user.uid}`);
-                          }
-                        }
-                        setIsStoreOpen(false);
-                      }}>
-                    
-                    {pack.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#ecd8a6] text-[#0a0512] text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-                        {storeTranslations.popular[userInfo.language]}
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#0a0512] border border-[#ecd8a6]/30 flex items-center justify-center group-hover:border-[#ecd8a6] transition-colors">
-                        <KatinaMoon className="w-5 h-5 text-[#ecd8a6]" />
-                      </div>
-                      <div className="text-left">
-                        <div className="text-[#ecd8a6] font-serif flex items-baseline gap-1">
-                          <span className="text-xl font-bold">{pack.amount}</span>
-                          <span className="text-sm opacity-80">{storeTranslations.moons[userInfo.language]}</span>
-                        </div>
-                        {pack.bonus && (
-                          <div className="text-xs text-amber-500/90 font-medium">✨ {pack.bonus}</div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="text-right flex flex-col items-end">
-                      <div className="text-[#ecd8a6] font-medium tracking-wide bg-[#0a0512] px-4 py-1.5 rounded-lg border border-[#ecd8a6]/20">
-                        {pack.price}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
+          <StoreModal 
+            isOpen={isStoreOpen}
+            onClose={() => setIsStoreOpen(false)}
+            user={user}
+            language={userInfo.language}
+            storeTranslations={storeTranslations}
+            showToast={showToast}
+            onErrorLog={handleFirestoreError}
+            onCheckoutInitiated={(pack) => {
+              // Funnel Analytics: checkout_initiated (MS-134)
+              logAnalyticsEvent('checkout_initiated', {
+                language: userInfo.language,
+                amount: pack.amount,
+                price: pack.price
+              });
+            }}
+          />
         )}
       </AnimatePresence>
 
@@ -960,14 +895,12 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
             readingCount={readingCount}
             onClose={() => setIsProfileOpen(false)}
             onUpdateUserInfo={(info) => {
-              // Update local state when profile is edited
-              setUserInfo(prev => ({
-                ...prev,
+              setUserInfo({
                 name: info.name,
                 dob: info.dob,
                 birthplace: info.birthplace,
                 relationship: info.relationship
-              }));
+              });
             }}
             translations={locales[userInfo.language]}
             onDownloadPastReading={handleDownload}
@@ -975,150 +908,26 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         )}
       </AnimatePresence>
 
-      {/* Legal Modal */}
+      {/* Legal Modal Component (MS-126) */}
       <AnimatePresence>
         {isLegalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="w-full max-w-2xl bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[85vh] flex flex-col"
-            >
-              <div className="p-6 border-b border-[#ecd8a6]/10 flex items-center justify-between bg-[#130b21]">
-                <h2 className="text-xl font-serif text-[#ecd8a6]">{t('legal.title')}</h2>
-                <button 
-                  onClick={() => setIsLegalOpen(false)} 
-                  className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-6 sm:p-10 overflow-y-auto custom-scrollbar flex-1">
-                <div className="legal-content prose prose-invert prose-amber max-w-none text-[#ecd8a6]/80 text-sm leading-relaxed">
-                  <Markdown>{LEGAL_CONTENT[userInfo.language] || LEGAL_CONTENT['en']}</Markdown>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+          <LegalModal 
+            language={userInfo.language}
+            onClose={() => setIsLegalOpen(false)}
+            t={t}
+          />
         )}
       </AnimatePresence>
 
-      {/* Contact Modal */}
+      {/* Contact Modal Component (MS-126) */}
       <AnimatePresence>
         {isContactOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 overflow-hidden shadow-[0_0_50px_rgba(236,216,166,0.1)] relative max-h-[90vh] overflow-y-auto"
-            >
-              <div className="absolute top-4 right-4 z-10">
-                <button onClick={() => { setIsContactOpen(false); setContactSuccess(false); }} className="p-2 bg-black/50 hover:bg-[#ecd8a6]/10 rounded-full text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-8 pb-4 border-b border-[#ecd8a6]/10 relative overflow-hidden">
-                <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase mb-2">{locales[userInfo.language].contact?.title || 'Bize Ulaşın'}</h2>
-                <p className="text-[#ecd8a6]/70 text-sm">{locales[userInfo.language].contact?.subtitle || 'Bizimle iletişime geçmek için aşağıdaki formu doldurabilirsiniz.'}</p>
-              </div>
-              
-              <div className="p-6">
-                {contactSuccess ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center mx-auto mb-4 text-[#ecd8a6]">
-                      <Check className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-xl font-serif text-[#ecd8a6] mb-2 uppercase tracking-wide">{locales[userInfo.language].contact?.successTitle || 'Mesajınız Alındı'}</h3>
-                    <p className="text-[#ecd8a6]/70">{locales[userInfo.language].contact?.successSubtitle || 'En kısa sürede size dönüş yapacağız.'}</p>
-                  </div>
-                ) : (
-                  <form className="flex flex-col gap-4" onSubmit={async (e) => {
-                    e.preventDefault();
-                    setIsContactSubmitting(true);
-                    try {
-                      await addDoc(collection(db, `messages_${userInfo.language}`), {
-                        ...contactForm,
-                        createdAt: serverTimestamp()
-                      });
-                      setContactSuccess(true);
-                      setContactForm({ fullName: '', email: '', subject: '', message: '' });
-                    } catch (error) {
-                      handleFirestoreError(error, 'create', `messages_${userInfo.language}`);
-                    } finally {
-                      setIsContactSubmitting(false);
-                    }
-                  }}>
-                    <div>
-                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.fullName || 'Ad Soyad'}</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={contactForm.fullName}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, fullName: e.target.value }))}
-                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.email || 'E-posta'}</label>
-                      <input 
-                        type="email" 
-                        required
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.subject || 'Konu'}</label>
-                      <input 
-                        type="text" 
-                        required
-                        value={contactForm.subject}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
-                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-1 uppercase">{locales[userInfo.language].contact?.message || 'Mesaj'}</label>
-                      <textarea 
-                        required
-                        rows={4}
-                        value={contactForm.message}
-                        onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                        className="w-full bg-[#120a1c] border border-[#ecd8a6]/20 rounded-xl px-4 py-3 text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 transition-colors resize-none"
-                      />
-                    </div>
-                    <button 
-                      type="submit" 
-                      disabled={isContactSubmitting}
-                      className="w-full mt-2 bg-gradient-to-br from-[#1e1332] to-[#05000a] text-[#ecd8a6] font-serif tracking-widest uppercase py-4 rounded-xl border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] transition-all flex justify-center items-center gap-2 group disabled:opacity-50"
-                    >
-                      {isContactSubmitting ? (
-                        <RefreshCw className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <>
-                          <span className="font-bold">{locales[userInfo.language].contact?.send || 'Gönder'}</span>
-                          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
+          <ContactModal 
+            language={userInfo.language}
+            locales={locales}
+            onClose={() => setIsContactOpen(false)}
+            onErrorLog={handleFirestoreError}
+          />
         )}
       </AnimatePresence>
 
@@ -1141,7 +950,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
       <main className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:py-16 flex flex-col items-center">
         
-        {/* Header */}
         {step !== 'SPLASH' && (
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -1169,7 +977,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
           </motion.div>
         )}
 
-        {/* Screens */}
         <AnimatePresence mode="wait">
           {step === 'SPLASH' && (
             <motion.div 
@@ -1180,7 +987,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
               className="w-full flex-1 flex flex-col items-center justify-center min-h-[70vh] relative pt-12 sm:pt-20"
             >
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
-                {/* Intricate glowing astrolabe/tarot circle effect */}
                 <motion.div 
                   animate={{ rotate: 360 }}
                   transition={{ duration: 120, repeat: Infinity, ease: 'linear' }}
@@ -1230,7 +1036,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                 </button>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
-                  {/* Ad Banner 1: Amazon */}
                   {adsConfig?.ad1?.enabled && (
                     <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
                       <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
@@ -1277,7 +1082,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                               setTimeout(() => setBannerCopied(false), 2000);
                             }}
                             className="p-1.5 hover:bg-[#ecd8a6]/10 rounded-md transition-colors text-[#ecd8a6]"
-                            title={bannerTranslations.copyCode[userInfo.language]}
+                            title={t('copyCode')}
                           >
                             {bannerCopied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 opacity-60" />}
                           </button>
@@ -1294,7 +1099,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     </div>
                   )}
 
-                  {/* Ad Banner 2: Etsy Live Reading */}
                   {adsConfig?.ad2?.enabled && (
                     <div className="relative bg-[#0a0512]/60 backdrop-blur-md border border-[#ecd8a6]/20 rounded-2xl overflow-hidden group hover:border-[#ecd8a6]/40 transition-colors h-full flex flex-col">
                       <div className="absolute top-0 right-0 bg-[#ecd8a6] text-[#0a0512] text-[9px] font-bold px-2 py-0.5 rounded-bl-lg uppercase tracking-wider z-10">
@@ -1306,20 +1110,20 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                             {adsConfig?.ad2?.title?.[userInfo.language] || adsConfig?.ad2?.title?.en || "Live Session"}
                           </p>
                           <p className="text-[#ecd8a6] text-sm md:text-base font-serif leading-relaxed whitespace-pre-line">
-                            {adsConfig?.ad2?.text?.[userInfo.language] || adsConfig?.ad2?.text?.en || "Visit our Etsy shop for professional live reading sessions and personalized consultations."}
+                            {adsConfig?.ad2?.text?.[userInfo.language] || adsConfig?.ad2?.text?.en || ""}
                           </p>
                         </div>
 
                         <div className="w-full aspect-[16/9] rounded-xl overflow-hidden border border-[#ecd8a6]/10 bg-black/40 shadow-inner group-hover:border-[#ecd8a6]/30 transition-colors">
                           {adsConfig?.ad2?.mediaType === 'image' ? (
                             <img 
-                              src={adsConfig?.ad2?.mediaSrc || "/ads/Govde.mp4"}
+                              src={adsConfig?.ad2?.mediaSrc}
                               className="w-full h-full object-cover grayscale-[0.2] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
                               referrerPolicy="no-referrer"
                             />
                           ) : (
                             <video 
-                              src={adsConfig?.ad2?.mediaSrc || "/ads/Govde.mp4"} 
+                              src={adsConfig?.ad2?.mediaSrc} 
                               autoPlay 
                               muted 
                               loop 
@@ -1355,7 +1159,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#ecd8a6]/50 to-transparent" />
               <form 
-                onSubmit={(e) => { e.preventDefault(); drawRancomCards(); }}
+                onSubmit={(e) => { e.preventDefault(); drawRandomCards(); }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 relative z-10"
               >
                 <div>
@@ -1364,7 +1168,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     required
                     type="text"
                     value={userInfo.name}
-                    onChange={e => setUserInfo(prev => ({...prev, name: e.target.value}))}
+                    onChange={e => setUserInfo({ name: e.target.value })}
                     className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
                     placeholder={t('namePlaceholder')}
                   />
@@ -1376,7 +1180,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     required
                     type="date"
                     value={userInfo.dob}
-                    onChange={e => setUserInfo(prev => ({...prev, dob: e.target.value}))}
+                    onChange={e => setUserInfo({ dob: e.target.value })}
                     className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] custom-date-picker font-sans [color-scheme:dark]"
                   />
                   <style>{`
@@ -1392,7 +1196,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     required
                     type="text"
                     value={userInfo.birthplace}
-                    onChange={e => setUserInfo(prev => ({...prev, birthplace: e.target.value}))}
+                    onChange={e => setUserInfo({ birthplace: e.target.value })}
                     className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
                     placeholder={t('pobPlaceholder')}
                   />
@@ -1403,7 +1207,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   <div className="relative">
                     <select 
                       value={userInfo.relationship}
-                      onChange={e => setUserInfo(prev => ({...prev, relationship: e.target.value}))}
+                      onChange={e => setUserInfo({ relationship: e.target.value })}
                       className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
                     >
                       {STATUS_OPTIONS.map(opt => (
@@ -1418,10 +1222,33 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   </div>
                 </div>
 
+                {/* MS-121 Open Reading Focus Category Selection form input */}
+                <div>
+                  <label className="block text-xs font-serif tracking-widest text-[#ecd8a6] mb-2 uppercase">
+                    {t('focusLabel')}
+                  </label>
+                  <div className="relative">
+                    <select 
+                      value={userInfo.focus}
+                      onChange={e => setUserInfo({ focus: e.target.value })}
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
+                    >
+                      {FOCUS_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
+                          {opt[userInfo.language as keyof typeof opt] || opt.value}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                      <ChevronRight className="w-4 h-4 rotate-90" />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="md:col-span-2 pt-4">
                   <button 
                     type="submit"
-                    className="w-full h-[58px] bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300 font-bold"
+                    className="w-full h-[58px] bg-gradient-to-br from-[#1e1332] to-[#0a0512] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-lg shadow-[0_0_15px_rgba(236,216,166,0.1)] hover:shadow-[0_0_25px_rgba(236,216,166,0.2)] flex items-center justify-center transition-all duration-300 font-bold cursor-pointer"
                   >
                     {t('submitButton')}
                   </button>
@@ -1449,7 +1276,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                     <div className="w-full h-full bg-gradient-to-br from-[#1e1332] to-[#0a0512] rounded-2xl border border-[#ecd8a6]/30 shadow-[0_0_30px_rgba(236,216,166,0.05)] flex flex-col items-center justify-between p-6 text-center transform transition-transform duration-500 group-hover:scale-105 group-hover:border-[#ecd8a6]/60 relative overflow-hidden">
                       <div className="absolute inset-0 bg-transparent border-[4px] border-double border-[#ecd8a6]/10 m-2 rounded-xl pointer-events-none" />
                       
-                      {/* Top Label */}
                       <div className="relative z-10 w-full flex flex-col items-center justify-start mt-2">
                         <div className="text-xs font-serif tracking-widest text-[#ecd8a6]/70 uppercase mb-4">
                           {label}
@@ -1457,7 +1283,6 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                         <div className="w-8 h-px bg-[#ecd8a6]/30 mb-4" />
                       </div>
                       
-                      {/* Image Area */}
                       <div className="flex w-full items-center justify-center my-4 relative group/img">
                         {!imageError[drawnCards[index]?.id] ? (
                           <motion.div 
@@ -1468,25 +1293,23 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                           >
                             <img 
                               src={`/cards/${drawnCards[index]?.id}.png`} 
-                              alt={locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}
+                              alt={locales[userInfo.language]?.cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}
                               onError={() => setImageError(prev => ({...prev, [drawnCards[index]?.id]: true}))}
                               className="w-full h-full object-cover transition-transform duration-700 ease-out"
                             />
-                            
                             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover/img:translate-x-full transition-transform duration-1000 ease-in-out z-20 pointer-events-none" />
                           </motion.div>
                         ) : (
                           <div className="flex flex-col mx-auto items-center justify-center w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] rounded-md border border-dashed border-[#ecd8a6]/20 bg-[#ecd8a6]/5 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]">
                             <Sparkles className="w-8 h-8 text-[#ecd8a6]/30 mb-2 animate-pulse" />
-                            <span className="text-[10px] text-[#ecd8a6]/40 uppercase tracking-widest font-serif">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</span>
+                            <span className="text-[10px] text-[#ecd8a6]/40 uppercase tracking-widest font-serif">{locales[userInfo.language]?.cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</span>
                           </div>
                         )}
                       </div>
 
-                      {/* Text Area */}
                       <div className="w-full relative z-10 mt-auto min-h-[96px] flex flex-col justify-center">
-                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</h3>
-                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-4 px-2">{locales[userInfo.language].cards?.[drawnCards[index]?.locKey]?.general || drawnCards[index]?.desc}</p>
+                        <h3 className="text-xl font-serif text-[#ecd8a6] mb-3">{locales[userInfo.language]?.cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}</h3>
+                        <p className="text-xs text-[#ecd8a6]/60 font-sans italic leading-relaxed line-clamp-4 px-2">{locales[userInfo.language]?.cards?.[drawnCards[index]?.locKey]?.general || drawnCards[index]?.desc}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -1538,7 +1361,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
                   <button 
                     onClick={() => handleDownload()}
                     disabled={isExportingPDF}
-                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
@@ -1546,7 +1369,7 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
 
                   <button 
                     onClick={handleStartOver}
-                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm cursor-pointer"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span className="font-serif tracking-widest text-xs uppercase">{t('restartBtn')}</span>
@@ -1562,19 +1385,22 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
         <div className="max-w-4xl mx-auto px-4 flex justify-center gap-6 sm:gap-12">
           <button
             onClick={handleLegalOpen}
-            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
+            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all cursor-pointer"
           >
             {t('legal.button')}
           </button>
           
           <button
             onClick={() => setIsContactOpen(true)}
-            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all"
+            className="text-[#ecd8a6] hover:text-[#fff] text-[10px] sm:text-xs font-serif tracking-widest uppercase hover:underline underline-offset-4 opacity-70 hover:opacity-100 transition-all cursor-pointer"
           >
             {t('contact.footerText')}
           </button>
         </div>
       </footer>
+
+      {/* Cookie Consent Banner */}
+      <CookieBanner language={userInfo.language} t={t} />
 
       {/* Custom Toast Notification */}
       <AnimatePresence>
@@ -1615,5 +1441,10 @@ CRITICAL: The entire reading MUST be written in ${t('languageName')}. Do not use
   );
 }
 
-export default App;
-
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
+  );
+}

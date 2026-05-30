@@ -21,6 +21,7 @@ service cloud.firestore {
              (!('password' in data) || (data.password is string && data.password.size() <= 256)) &&
              (!('hasAcceptedLegal' in data) || (data.hasAcceptedLegal is int && data.hasAcceptedLegal in [0, 1])) &&
              (!('legalAcceptedAt' in data) || data.legalAcceptedAt is timestamp) &&
+             (!('consentsAcceptedAt' in data) || data.consentsAcceptedAt is timestamp) &&
              (!('metadata' in data) || data.metadata is map) &&
              (!('providerId' in data) || (data.providerId == null || data.providerId is string)) &&
              (!('emailVerified' in data) || data.emailVerified is bool) &&
@@ -30,7 +31,10 @@ service cloud.firestore {
 
     function isValidUserMoon(data) {
       return data.userId == request.auth.uid &&
-             data.balance is int;
+             data.balance is int &&
+             (!('dailyFreeBalance' in data) || data.dailyFreeBalance is int) &&
+             (!('purchasedBalance' in data) || data.purchasedBalance is int) &&
+             (!('lastDailyClaimedAt' in data) || data.lastDailyClaimedAt == null || data.lastDailyClaimedAt is timestamp);
     }
 
     function isValidMoonTransaction(data) {
@@ -52,17 +56,62 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if request.auth != null && request.auth.uid == userId;
       allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(request.resource.data);
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     match /user_moons/{userId} {
       allow get: if request.auth != null && request.auth.uid == userId;
-      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUserMoon(request.resource.data);
+      allow create: if request.auth != null && request.auth.uid == userId && 
+                    isValidUserMoon(request.resource.data) && 
+                    (
+                      (request.resource.data.balance == 1 && 
+                       (!('dailyFreeBalance' in request.resource.data) || request.resource.data.dailyFreeBalance == 0) &&
+                       (!('purchasedBalance' in request.resource.data) || request.resource.data.purchasedBalance == 1))
+                      ||
+                      (request.resource.data.balance == 5)
+                    );
+      allow update: if request.auth != null && request.auth.uid == userId && 
+                    isValidUserMoon(request.resource.data) && 
+                    (
+                      // Case A: Harcama (Spend) - Bakiye 1 azalır
+                      (
+                        request.resource.data.balance == resource.data.balance - 1 &&
+                        (
+                          // Option 1: dailyFree'den düşüş
+                          (resource.data.dailyFreeBalance > 0 && 
+                           request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance - 1 &&
+                           request.resource.data.purchasedBalance == resource.data.purchasedBalance)
+                          ||
+                          // Option 2: purchased'dan düşüş
+                          (resource.data.dailyFreeBalance == 0 && 
+                           request.resource.data.dailyFreeBalance == 0 &&
+                           request.resource.data.purchasedBalance == resource.data.purchasedBalance - 1)
+                          ||
+                          // Option 3: Fallback (Eski şema için)
+                          (!('dailyFreeBalance' in resource.data) || !('purchasedBalance' in resource.data))
+                        )
+                      )
+                      ||
+                      // Case B: Günlük Hak Alımı (Daily Claim)
+                      (
+                        request.resource.data.dailyFreeBalance == 1 &&
+                        request.resource.data.purchasedBalance == resource.data.purchasedBalance &&
+                        request.resource.data.balance == resource.data.purchasedBalance + 1 &&
+                        request.resource.data.lastDailyClaimedAt == request.time &&
+                        (
+                          resource.data.lastDailyClaimedAt == null || 
+                          request.time.toMillis() - resource.data.lastDailyClaimedAt.toMillis() >= 24 * 60 * 60 * 1000
+                        )
+                      )
+                    );
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     match /moon_transactions/{transactionId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
       allow update: if request.auth != null && resource.data.userId == request.auth.uid && isValidMoonTransaction(request.resource.data);
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     match /messages_en/{messageId} {
@@ -93,6 +142,26 @@ service cloud.firestore {
     match /phones/{phoneNumber} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       allow write: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    match /marketing_consents/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /checkout_attempts/{sessionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create, update: if false;
+    }
+
+    match /error_logs/{logId} {
+      allow create: if request.resource.data.source == 'client' &&
+                    (request.resource.data.userId == null || (request.auth != null && request.resource.data.userId == request.auth.uid));
+      allow read, update, delete: if false;
+    }
+
+    match /ai_telemetry/{telemetryId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
     }
   }
 }

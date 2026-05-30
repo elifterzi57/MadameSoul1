@@ -98,3 +98,32 @@ Uygulama dil paketleri `src/locales/` dizinindedir. Mevcut bir çeviriyi düzelt
 
 ### Reklamları Yapılandırma
 Sponsorlu içerikler ve video reklamları dinamik olarak `public/ads/ads_config.json` üzerinden yönetilir. Reklam linklerini veya görsel/video yollarını değiştirmek için bu JSON dosyasını yerel olarak güncelleyebilirsiniz. Sunucu yeniden başlatılmadan değişiklikler anında yansır.
+
+---
+
+## 7. Git ve Sürüm Kontrol İş Akışı (Git Workflow)
+
+Projede geliştirilen tüm biletler (tickets) ve özellikler (features) için aşağıdaki Git standartları uygulanmalıdır. Bu kurallara hem insan geliştiriciler hem de yapay zeka ajanları (Amelia, vb.) uymak zorundadır.
+
+### Bilet Bazlı Dal (Branch) Oluşturma
+Her Jira bileti için `main` dalından yeni bir dal oluşturulmalıdır:
+- **Dal Adı Biçimi:** `ticket/MS-[ID]` (Örn: `ticket/MS-101`, `ticket/MS-124`)
+- **Dal Oluşturma Komutu:**
+  ```bash
+  git checkout main
+  git pull origin main
+  git checkout -b ticket/MS-[ID]
+  ```
+
+### İşleme (Commit) Mesaj Standartları
+Commit mesajları her zaman ilgili bilet ID'si ile başlamalı ve köşeli parantez içinde belirtilmelidir:
+- **Biçim:** `[MS-[ID]] kısa_açıklama`
+- **Örnekler:**
+  - `[MS-101] Profil durum senkronizasyon hatası giderildi`
+  - `[MS-124] user_moons koleksiyonu için firestore.rules yazma kısıtlaması getirildi`
+
+### Kodu Push Etme
+Geliştirme ve test adımları tamamlandıktan sonra, dalınızı uzaktaki depoya (origin) gönderin:
+```bash
+git push origin ticket/MS-[ID]
+```
