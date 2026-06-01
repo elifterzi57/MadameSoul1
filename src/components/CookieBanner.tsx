@@ -24,20 +24,10 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ language, t }) => {
     setIsVisible(false);
   };
 
-  const getTexts = (): { text: string; button: string } => {
-    if (language === 'tr') {
-      return {
-        text: "Gezinti deneyiminizi geliştirmek, kişiselleştirilmiş içerik sunmak ve fal analizlerinizi güvenle kaydetmek için çerezleri kullanıyoruz.",
-        button: "Kabul Et"
-      };
-    }
-    return {
-      text: "We use cookies to improve your browsing experience, deliver personalized content, and securely store your destiny readings.",
-      button: "Accept All"
-    };
+  const texts = {
+    text: t('cookieConsent.text'),
+    button: t('cookieConsent.button')
   };
-
-  const texts = getTexts();
 
   return (
     <AnimatePresence>

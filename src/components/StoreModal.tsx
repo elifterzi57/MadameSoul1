@@ -9,7 +9,7 @@ interface StoreModalProps {
   onClose: () => void;
   user: User | null;
   language: string;
-  storeTranslations: Record<string, Record<string, string>>;
+  t: (key: string, params?: Record<string, any>) => string;
   showToast: (msg: string, type: 'info' | 'error' | 'success') => void;
   onErrorLog: (error: unknown, operation: string, path: string) => void;
   onCheckoutInitiated?: (pack: { amount: number; price: string }) => void;
@@ -20,7 +20,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
   onClose,
   user,
   language,
-  storeTranslations,
+  t,
   showToast,
   onErrorLog,
   onCheckoutInitiated
@@ -30,7 +30,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
   const handleBuy = async (pack: { amount: number; price: string }) => {
     if (!user) return;
     try {
-      showToast(language === 'tr' ? "Ödeme sayfasına yönlendiriliyorsunuz..." : "Redirecting to checkout...", 'info');
+      showToast(t('store.redirecting'), 'info');
       
       // Funnel tracking (MS-134)
       if (onCheckoutInitiated) {
@@ -52,7 +52,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
       });
       
       if (!response.ok) {
-        throw new Error(language === 'tr' ? "Ödeme oturumu başlatılamadı." : "Failed to create checkout session.");
+        throw new Error(t('store.failedSession'));
       }
       
       const data = await response.json();
@@ -69,9 +69,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
     onClose();
   };
 
-  const getTranslation = (dict: Record<string, Record<string, string>>, key: string, lang: string) => {
-    return dict[key]?.[lang] || dict[key]?.['en'] || key;
-  };
+
 
   return (
     <motion.div
@@ -95,15 +93,15 @@ export const StoreModal: React.FC<StoreModalProps> = ({
           <div className="absolute inset-0 bg-gradient-to-b from-[#ecd8a6]/10 to-transparent" />
           <KatinaMoon className="w-12 h-12 text-[#ecd8a6] mx-auto mb-4" />
           <h2 className="text-2xl font-serif text-[#ecd8a6] tracking-widest uppercase">
-            {getTranslation(storeTranslations, 'storeTitle', language)}
+            {t('store.storeTitle')}
           </h2>
         </div>
         
         <div className="p-6 flex flex-col gap-4">
           {[
-            { amount: 3, price: "$2.99", bonus: null },
-            { amount: 10, price: "$8.99", bonus: "1 Free Katina Moon", popular: true },
-            { amount: 25, price: "$19.99", bonus: "5 Free Katina Moons" }
+            { amount: 3, price: "$2.99", bonusKey: null },
+            { amount: 10, price: "$8.99", bonusKey: "store.bonus1", popular: true },
+            { amount: 25, price: "$19.99", bonusKey: "store.bonus5" }
           ].map((pack) => (
             <div 
               key={pack.amount} 
@@ -114,7 +112,7 @@ export const StoreModal: React.FC<StoreModalProps> = ({
             >
               {pack.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#ecd8a6] text-[#0a0512] text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-                  {getTranslation(storeTranslations, 'popular', language)}
+                  {t('store.popular')}
                 </div>
               )}
               
@@ -125,10 +123,10 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                 <div className="text-left">
                   <div className="text-[#ecd8a6] font-serif flex items-baseline gap-1">
                     <span className="text-xl font-bold">{pack.amount}</span>
-                    <span className="text-sm opacity-80">{getTranslation(storeTranslations, 'moons', language)}</span>
+                    <span className="text-sm opacity-80">{t('store.moons')}</span>
                   </div>
-                  {pack.bonus && (
-                    <div className="text-xs text-amber-500/90 font-medium">✨ {pack.bonus}</div>
+                  {pack.bonusKey && (
+                    <div className="text-xs text-amber-500/90 font-medium">✨ {t(pack.bonusKey)}</div>
                   )}
                 </div>
               </div>

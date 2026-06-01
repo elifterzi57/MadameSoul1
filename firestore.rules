@@ -44,13 +44,17 @@ service cloud.firestore {
              data.description is string &&
              data.pdfDownloaded is int &&
              data.pdfDownloaded in [0, 1] &&
-             (!('status' in data) || data.status in ['pending', 'success', 'failed']) &&
+             (!('status' in data) || data.status in ['pending', 'success', 'failed', 'cached']) &&
              (!('userName' in data) || (data.userName is string && data.userName.size() < 500)) &&
              (!('userDob' in data) || (data.userDob is string && data.userDob.size() < 100)) &&
              (!('userBirthplace' in data) || (data.userBirthplace is string && data.userBirthplace.size() < 200)) &&
              (!('userRelationship' in data) || (data.userRelationship is string && data.userRelationship.size() < 100)) &&
              (!('userLanguage' in data) || (data.userLanguage is string && data.userLanguage.size() < 10)) &&
-             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10));
+             (!('selectedCards' in data) || (data.selectedCards is list && data.selectedCards.size() <= 10)) &&
+             (!('isFavorite' in data) || data.isFavorite is bool) &&
+             (!('customTitle' in data) || (data.customTitle is string && data.customTitle.size() <= 200)) &&
+             (!('reflectionNotes' in data) || (data.reflectionNotes is string && data.reflectionNotes.size() <= 5000)) &&
+             (!('readingText' in data) || (data.readingText is string && data.readingText.size() <= 20000));
     }
 
     match /users/{userId} {
@@ -101,6 +105,20 @@ service cloud.firestore {
                         (
                           resource.data.lastDailyClaimedAt == null || 
                           request.time.toMillis() - resource.data.lastDailyClaimedAt.toMillis() >= 24 * 60 * 60 * 1000
+                        )
+                      )
+                      ||
+                      // Case C: Rollback / Refund (İade/Geri Alma) - Bakiye 1 artar
+                      (
+                        request.resource.data.balance == resource.data.balance + 1 &&
+                        (
+                          // Option 1: dailyFree'ye iade
+                          (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance + 1 &&
+                           request.resource.data.purchasedBalance == resource.data.purchasedBalance)
+                          ||
+                          // Option 2: purchased'a iade
+                          (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance &&
+                           request.resource.data.purchasedBalance == resource.data.purchasedBalance + 1)
                         )
                       )
                     );

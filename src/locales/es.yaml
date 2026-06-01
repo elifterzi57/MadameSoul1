@@ -1,6 +1,8 @@
 transactionDesc: "Lectura con cartas: {cards}"
 transactionBuy: "Compra de {amount} Katina Moon (Demo)"
 welcomeBonus: "Bono de Bienvenida"
+dailyGift: "Regalo diario de Luna Katina"
+dailyGiftClaimed: "¡Se ha reclamado tu Luna Katina gratis diaria!"
 onboarding:
   skip: Omitir
   next: Siguiente
@@ -47,6 +49,12 @@ statusOptions:
   engaged: Comprometido/a
   complicated: Es Complicado
   breakup: Pasando por una Ruptura
+focusOptions:
+  general: Vida General y Destino
+  love: Amor y Relaciones
+  career: Carrera, Trabajo y Finanzas
+  health: Salud y Bienestar
+focusLabel: Área de enfoque de la lectura
 headings: |-
   **Ecos del Pasado**
   **Vientos del Presente**
@@ -1180,3 +1188,79 @@ profile:
     sage: "Sabio"
     lord: "Señor Místico"
   save: "Guardar"
+rateLimitError: "Demasiadas solicitudes. Por favor, inténtelo de nuevo más tarde."
+cookieConsent:
+  text: "Utilizamos cookies para mejorar su experiencia de navegación, ofrecer contenido personalizado y almacenar de forma segura sus lecturas de destino."
+  button: "Aceptar todo"
+errorBoundary:
+  title: "Interrupción de Energía Mística"
+  description: "Se produjo una interrupción inesperada en el flujo espiritual. Registramos el problema y estamos trabajando para resolverlo."
+  retryButton: "Recargar página"
+store:
+  storeTitle: "La Tienda de Madame"
+  buyMoons: "Comprar Lunas Katina"
+  moons: "Lunas Katina"
+  popular: "POPULAR"
+  buy: "Comprar"
+  paymentPending: "Integración de pago próximamente..."
+  logout: "Salir"
+  noMoons: "¡No hay suficientes Lunas Katina!"
+  bonus1: "1 Luna Katina Gratis"
+  bonus5: "5 Lunas Katina Gratis"
+  redirecting: "Redirigiendo al pago..."
+  failedSession: "No se pudo crear la sesión de pago."
+banner:
+  sponsored: "Patrocinado"
+  promoText: "¡Obtenga un 20% de descuento en Cartas de Tarot Katina en Amazon!"
+  promoCode: "Código:"
+  copyCode: "Copiar"
+  copied: "¡Copiado!"
+  shopNow: "Comprar ahora"
+login:
+  signInTitle: "Bienvenido a MadameSoul"
+  signInSubtitle: "Ingresa para recibir guía espiritual y secretos místicos"
+  signUpTitle: "Únete al Círculo de MadameSoul"
+  signUpSubtitle: "Únete a nuestro círculo espiritual para comenzar"
+  email: "Correo Electrónico"
+  phone: "Número de Teléfono"
+  password: "Contraseña"
+  signInLabel: "Iniciar Sesión"
+  signUpLabel: "Registrarse"
+  googleSignIn: "Continuar con Google"
+  appleSignIn: "Continuar con Apple"
+  switchToPhone: "Continuar con Teléfono"
+  switchToEmail: "Continuar con Correo"
+  sendCode: "Enviar Código"
+  verifyCode: "Verificar Código"
+  enterCode: "Ingrese el código de verificación"
+  hasAccount: "¿Ya tienes una cuenta? Iniciar Sesión"
+  noAccount: "¿No tienes una cuenta? Registrarse"
+  error: "Ocurrió un error. Por favor, verifique sus datos."
+  loading: "Cargando..."
+  showIntro: "Ver Introducción"
+  kvkkConsent: "He leído y acepto el Acuerdo de Usuario, la Política de Privacidad y el Consentimiento Explícito de RGPD/KVKK."
+  quote: \"Descubre los susurros de las estrellas y las profundidades de tu alma."
+  errorWrongCredentials: "Correo electrónico o contraseña incorrectos."
+  errorEmailInUse: "El correo electrónico ya está en uso."
+  errorInvalidEmail: "Dirección de correo electrónico no válida."
+  errorWeakPassword: "La contraseña es demasiado débil (debe tener al menos 6 caracteres)."
+  errorTooManyRequests: "Demasiados intentos fallidos. Por favor, inténtelo de nuevo más tarde."
+  errorInvalidPhone: "Número de teléfono no válido."
+  errorInvalidCode: "Código de verificación no válido."
+  errorPopupBlocked: "Ventana emergente bloqueada. Por favor, permita las ventanas emergentes."
+  errorPopupClosed: "Ventana de inicio de sesión cerrada."
+  errorConfigNotFound: "Error de configuración de Firebase: por favor, active el inicio de sesión de Google/Apple."
+  errorUnauthorizedDomain: "Dominio no autorizado: este dominio debe estar autorizado."
+  errorSmsNotAllowed: "El servicio de SMS no está habilitado para esta región."
+  errorBillingNotEnabled: "La verificación por SMS requiere habilitar la facturación de Firebase."
+profileDiary:
+  title: "Mi Diario de Tarot y Reflexiones"
+  reflectionTitle: "Notas de Reflexión y Manifestación"
+  reflectionPlaceholder: "Puede escribir cómo resuena esta lectura en su vida, sus sentimientos u observaciones de manifestación aquí..."
+  saveBtn: "Guardar Notas"
+  customTitleLabel: "Título Personalizado"
+  favoriteBtn: "Favorito"
+  detailsTitle: "Detalles de la Lectura"
+  closeBtn: "Cerrar"
+  saveSuccess: "¡Lectura actualizada con éxito!"
+  saveError: "Error al actualizar la lectura."

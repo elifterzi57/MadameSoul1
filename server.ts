@@ -7,6 +7,7 @@ import { rateLimit } from "express-rate-limit";
 import Stripe from "stripe";
 import YAML from "yaml";
 import "dotenv/config";
+import crypto from "crypto";
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
@@ -18,56 +19,95 @@ const KATINA_DECK = [
   { id: "Balik", locKey: "balik", name: "Balık", desc: "Maddi kazanç, bolluk ve şansın simgesidir." },
   { id: "Baykus", locKey: "baykus", name: "Baykuş", desc: "Bilgelik, gece gelen haberler veya etrafı gözlemleme zamanı." },
   { id: "Bulutlar", locKey: "bulutlar", name: "Bulutlar", desc: "Kafa karışıklığı, belirsizlik veya geçici sıkıntılar." },
-  { id: "Capa", locKey: "Capa", name: "Çapa", desc: "Güven, sadakat, bir yere veya kişiye bağlılık, umut." },
-  { id: "Cicekler", locKey: "Cicekler", name: "Çiçekler", desc: "Mutluluk, güzellik, armağanlar ve hoş sürprizler." },
-  { id: "Dag", locKey: "dag", name: "Dağ", desc: "Engeller, aşılması zor durumlar, gecikmeler ve sınanmalar." },
-  { id: "Dervis", locKey: "dervis", name: "Derviş", desc: "Bilgelik, yalnızlık, sabır ve manevi rehberlik." },
-  { id: "Deve", locKey: "deve", name: "Deve", desc: "Finansal konularda sabır, inatçılık veya uzun bir yolculuk." },
-  { id: "Ev", locKey: "ev", name: "Ev", desc: "Huzur, güvenlik, aile yaşantısı ve köklerin olduğu yer." },
-  { id: "Fareler", locKey: "fareler", name: "Fareler", desc: "Kayıplar, içten içe kemiren endişe ve stres." },
-  { id: "Gunes", locKey: "gunes", name: "Güneş", desc: "Büyük şans, mutluluk, aydınlanma ve başarı." },
-  { id: "Hac", locKey: "hac", name: "Haç", desc: "Kaderin bir cilvesi, zorunluluklar veya acı ama gerekli tecrübeler." },
-  { id: "Kale", locKey: "kale", name: "Kale", desc: "Güvenlik, sağlam yapı, dış etkenlere karşı korunaklı olma." },
-  { id: "Kalp", locKey: "kalp", name: "Kalp", desc: "Büyük aşk, sevgi, şefkat ve duygusal mutluluk." },
-  { id: "Kapi", locKey: "kapi", name: "Kapı", desc: "Fırsatlar, açılan yeni yollar veya verilmesi gereken bir karar." },
-  { id: "Kitap", locKey: "kitap", name: "Kitap", desc: "Sırlar, eğitim, öğrenilmesi gereken şaşırtıcı bir gerçek." },
-  { id: "Kopek", locKey: "kopek", name: "Köpek", desc: "Sadakat, dürüst bir dostluk veya güvenilir destek." },
-  { id: "KizCocugu", locKey: "kizCocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar veya genç bir enerji." },
-  { id: "Mektup", locKey: "mektup", name: "Mektup", desc: "Haberler, beklenen bir mesaj veya önemli bir iletişim." },
-  { id: "Mezar", locKey: "mezar", name: "Mezar", desc: "Bitişler, büyük değişim, bir devrin kapanıp yenisinin başlaması." },
-  { id: "Nil Nehri", locKey: "nil_nehri", name: "Nil Nehri", desc: "Bereketi, akışı, uzun ve verimli bir süreci temsil eder." },
-  { id: "Samyeli", locKey: "samyeli", name: "Samyeli", desc: "Beklenmedik olaylar, ani değişimler veya geçici rüzgarlar." },
-  { id: "Supurge", locKey: "supurge", name: "Süpürge", desc: "Temizlenme, kavga, hayatından bir şeyleri çıkarma gerekliliği." },
-  { id: "Tilki", locKey: "tilki", name: "Tilki", desc: "Kurnazlık, dikkatli olunması gereken bir fırsatçılık." },
-  { id: "Yatagan", locKey: "yatagan", name: "Yatağan", desc: "Keskin kararlar, güç, savunma veya yaklaşan bir tehlike." },
-  { id: "Yelkenli", locKey: "yelkenli", name: "Yelkenli", desc: "Yolculuklar, akışta kalmak veya uzaktan gelecek bir haber." },
-  { id: "Yol", locKey: "yol", name: "Yol", desc: "Seçimler, ayrılıklar ya da yeni bir hayata doğru atılan adım." },
+  { id: "Capa", locKey: "capa", name: "Çapa", desc: "Güvenlik, sadakat, iş hayatında kalıcılık ve istikrar." },
+  { id: "Cicekler", locKey: "cicekler", name: "Çiçekler", desc: "Mutluluk, hediye, sevinçli sürprizler ve kutlama." },
+  { id: "Dag", locKey: "dag", name: "Dağ", desc: "Engeller, büyük zorluklar, aşılması gereken blokajlar veya gecikmeler." },
+  { id: "Deve", locKey: "deve", name: "Deve", desc: "Yavaş ama emin adımlarla ilerleme, sabır ve uzun vadeli kazanç." },
+  { id: "Dervis", locKey: "dervis", name: "Derviş", desc: "İçsel bilgelik, sabır, maneviyat veya zamana bırakma." },
+  { id: "Ev", locKey: "ev", name: "Ev", desc: "Aile, yuva, emlak işleri, güvenlik ve huzur." },
+  { id: "Fareler", locKey: "fareler", name: "Fareler", desc: "Maddi veya manevi kayıp, hırsızlık, kemiren endişeler veya stres." },
+  { id: "Gunes", locKey: "gunes", name: "Güneş", desc: "Aydınlık, başarı, yaşamsal enerji, netleşen durumlar ve zafer." },
+  { id: "Hac", locKey: "hac", name: "Haç", desc: "Kader, keder, sınavlar, taşınması gereken bir yük." },
+  { id: "Kale", locKey: "kale", name: "Kale", desc: "Korunma, yalnızlık, resmi kurumlar veya güçlü sınırlar." },
+  { id: "Kalp", locKey: "kalp", name: "Kalp", desc: "Aşk, tutku, şefkat, duygusal zirveler." },
+  { id: "Kapi", locKey: "kapi", name: "Kapı", desc: "Yeni fırsatlar, geçiş dönemleri, karar anları." },
+  { id: "KizCocugu", locKey: "kizcocugu", name: "Kız Çocuğu", desc: "Masumiyet, yeni başlangıçlar, küçük sevinçler veya saflık." },
+  { id: "Kitap", locKey: "kitap", name: "Kitap", desc: "Sırlar, gizli bilgiler, eğitim veya henüz yazılmamış gelecek." },
+  { id: "Kopek", locKey: "kopek", name: "Köpek", desc: "Dostluk, sadakat, güvenilir arkadaşlar." },
+  { id: "Mektup", locKey: "mektup", name: "Mektup", desc: "Yazılı haberleşme, resmi evraklar, mesaj veya e-posta." },
+  { id: "Mezar", locKey: "mezar", name: "Mezar", desc: "Sonlanmalar, dönüşüm, eskiyi gömüp yeniye alan açma." },
+  { id: "Nil Nehri", locKey: "nilnehri", name: "Nil Nehri", desc: "Bolluk, bereket, uzun süren huzur ve refah akışı." },
+  { id: "Samyeli", locKey: "samyeli", name: "Samyeli", desc: "Ani değişimler, fırtınalar, sarsıcı ama temizleyici rüzgarlar." },
+  { id: "Supurge", locKey: "supurge", name: "Süpürge", desc: "Temizlik, tartışmalar, hayatınızdan fazlalıkları süpürüp atma." },
+  { id: "Tilki", locKey: "tilki", name: "Tilki", desc: "Zeka, strateji, kurnazlık veya etrafınızdaki sinsi oyunlar." },
+  { id: "Yatagan", locKey: "yatagan", name: "Yatağan", desc: "Keskin kararlar, mücadele, sözlü kavgalar veya ameliyatlar." },
+  { id: "Yelkenli", locKey: "yelkenli", name: "Yelkenli", desc: "Yolculuklar, uzaklardan gelen haberler, yeni ufuklara açılma." },
   { id: "Yilan", locKey: "yilan", name: "Yılan", desc: "İhanet, gizli düşmanlık, kıskançlık veya sinsilik." },
   { id: "Yildizlar", locKey: "yildizlar", name: "Yıldızlar", desc: "Umut, ilham, hayallerin gerçekleşmesi, ruhsal rehberlik." }
 ];
 
 const localesDir = path.resolve(process.cwd(), "src", "locales");
 
+const isProduction = process.env.NODE_ENV === "production";
+const localesCache: Record<string, any> = {};
+
+function loadLocalesToMemory() {
+  try {
+    if (!fs.existsSync(localesDir)) {
+      console.warn(`[Locales Cache] Directory not found: ${localesDir}`);
+      return;
+    }
+    const files = fs.readdirSync(localesDir);
+    files.forEach(file => {
+      if (file.endsWith(".yaml")) {
+        const lang = file.replace(".yaml", "");
+        const filePath = path.join(localesDir, file);
+        const fileContent = fs.readFileSync(filePath, "utf8");
+        localesCache[lang] = YAML.parse(fileContent);
+      }
+    });
+    console.log(`[Locales Cache] Loaded ${Object.keys(localesCache).length} language files into memory:`, Object.keys(localesCache));
+  } catch (err) {
+    console.error("[Locales Cache] Failed to load locales on startup:", err);
+  }
+}
+
+// Populate memory cache at server startup
+loadLocalesToMemory();
+
 function getTranslation(lang: string, key: string, params: Record<string, any> = {}): string {
   try {
-    const filePath = path.join(localesDir, `${lang}.yaml`);
-    let fileContent = "";
-    if (fs.existsSync(filePath)) {
-      fileContent = fs.readFileSync(filePath, "utf8");
+    let parsed: any = null;
+    
+    if (isProduction && localesCache[lang]) {
+      parsed = localesCache[lang];
     } else {
-      const fallbackPath = path.join(localesDir, "en.yaml");
-      fileContent = fs.readFileSync(fallbackPath, "utf8");
+      const filePath = path.join(localesDir, `${lang}.yaml`);
+      let fileContent = "";
+      if (fs.existsSync(filePath)) {
+        fileContent = fs.readFileSync(filePath, "utf8");
+      } else {
+        const fallbackPath = path.join(localesDir, "en.yaml");
+        fileContent = fs.readFileSync(fallbackPath, "utf8");
+      }
+      parsed = YAML.parse(fileContent);
     }
     
-    const parsed = YAML.parse(fileContent);
     let value = key.split('.').reduce((obj, k) => obj?.[k], parsed);
     
     // MS-118 Fallback translation key to English if missing in target locale
     if (value === undefined || value === null) {
-      const fallbackPath = path.join(localesDir, "en.yaml");
-      if (fs.existsSync(fallbackPath)) {
-        const fallbackContent = fs.readFileSync(fallbackPath, "utf8");
-        const fallbackParsed = YAML.parse(fallbackContent);
+      let fallbackParsed: any = null;
+      if (isProduction && localesCache["en"]) {
+        fallbackParsed = localesCache["en"];
+      } else {
+        const fallbackPath = path.join(localesDir, "en.yaml");
+        if (fs.existsSync(fallbackPath)) {
+          const fallbackContent = fs.readFileSync(fallbackPath, "utf8");
+          fallbackParsed = YAML.parse(fallbackContent);
+        }
+      }
+      if (fallbackParsed) {
         value = key.split('.').reduce((obj, k) => obj?.[k], fallbackParsed);
       }
     }
@@ -223,10 +263,12 @@ async function startServer() {
 
     let event;
 
-    if (stripe) {
-      if (!sig || !endpointSecret) {
-        console.error("[Webhook] Missing stripe-signature or endpoint secret when Stripe is active");
-        return res.status(400).send("Webhook Error: Signature verification required");
+    const isProduction = process.env.NODE_ENV === "production";
+
+    if (isProduction) {
+      if (!stripe || !sig || !endpointSecret) {
+        console.error("[Webhook] Production webhook error: Missing Stripe instance, signature, or endpoint secret");
+        return res.status(400).send("Webhook Error: Signature verification required in production");
       }
       try {
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
@@ -236,10 +278,21 @@ async function startServer() {
         return res.status(400).send(`Webhook Error: ${err.message}`);
       }
     } else {
-      try {
-        event = JSON.parse(req.body.toString());
-      } catch (err: any) {
-        return res.status(400).send(`Webhook Error: Invalid JSON body`);
+      // In development or testing environment
+      if (stripe && sig && endpointSecret) {
+        try {
+          event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        } catch (err: any) {
+          console.error(`[Webhook] Signature verification failed (dev):`, err.message);
+          return res.status(400).send(`Webhook Error: ${err.message}`);
+        }
+      } else {
+        // Bypass signature verification in development mode when Stripe or secret keys are missing
+        try {
+          event = JSON.parse(req.body.toString());
+        } catch (err: any) {
+          return res.status(400).send(`Webhook Error: Invalid JSON body`);
+        }
       }
     }
 
@@ -272,11 +325,20 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Rate limiter for Gemini generation endpoint
+  // Rate limiter for Gemini generation endpoint (MS-155 User UID based)
   const generateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 15, // limit each IP to 15 requests per windowMs
-    message: { error: "Too many requests from this IP, please try again after an hour" },
+    max: 15, // limit each user/IP to 15 requests per windowMs
+    validate: false,
+    keyGenerator: (req: any) => {
+      // Use verified user UID if available, fallback to IP
+      return req.user?.uid || req.ip;
+    },
+    handler: (req: any, res: any) => {
+      const lang = req.body?.language || "en";
+      const message = getTranslation(lang, "rateLimitError") || "Too many requests from this IP, please try again after an hour";
+      res.status(429).json({ error: message });
+    },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   });
@@ -324,7 +386,7 @@ async function startServer() {
   };
 
   // API Route for Gemini (Authenticated) - MS-110 & MS-121 backend prompt validation
-  app.post("/api/generate", generateLimiter, authenticate, async (req: any, res: any) => {
+  app.post("/api/generate", authenticate, generateLimiter, async (req: any, res: any) => {
     const uid = req.user.uid || req.user.user_id || req.user.sub;
     try {
       const { cards, userName, dob, birthplace, relationship, language, focus } = req.body;
@@ -334,6 +396,26 @@ async function startServer() {
       }
       if (!userName || !dob || !birthplace || !relationship || !language || !focus) {
         return res.status(400).json({ error: "Missing required reading details" });
+      }
+
+      // Generate cache hash (MS-151)
+      const cardKey = [...cards].sort().join(",");
+      const hash = crypto.createHash("sha256").update(`${uid}:${cardKey}:${focus}`).digest("hex");
+
+      if (useFirebaseAdmin) {
+        try {
+          const cacheDoc = await adminDb.collection("reading_cache").doc(hash).get();
+          if (cacheDoc.exists) {
+            const cacheData = cacheDoc.data();
+            const createdAt = cacheData?.createdAt?.toDate();
+            if (createdAt && (Date.now() - createdAt.getTime() < 24 * 60 * 60 * 1000)) {
+              console.log(`[Cache Hit] Returning cached reading for user ${uid}, hash: ${hash}`);
+              return res.json({ text: cacheData.text, cached: true });
+            }
+          }
+        } catch (cacheErr) {
+          console.error("[Server] Error querying reading_cache:", cacheErr);
+        }
       }
 
       if (useFirebaseAdmin) {
@@ -425,6 +507,22 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           });
         } catch (telemetryErr) {
           console.error("[Server] Failed to log AI telemetry:", telemetryErr);
+        }
+      }
+
+      // Save to cache (MS-151)
+      if (useFirebaseAdmin) {
+        try {
+          await adminDb.collection("reading_cache").doc(hash).set({
+            userId: uid,
+            cards,
+            focus,
+            text: response.text,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+          console.log(`[Cache Write] Reading cached with hash: ${hash}`);
+        } catch (cacheWriteErr) {
+          console.error("[Server] Failed to write to reading_cache:", cacheWriteErr);
         }
       }
 

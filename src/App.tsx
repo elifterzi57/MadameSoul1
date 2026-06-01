@@ -38,7 +38,9 @@ import {
   Check, 
   LogOut, 
   Loader2,
-  User as UserIcon
+  User as UserIcon,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -80,30 +82,20 @@ const KATINA_DECK = [
 ];
 
 type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
+
 const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
+
+const ambientAudio = new Audio('/assets/audio/ambient.wav');
+ambientAudio.loop = true;
+const hoverAudio = new Audio('/assets/audio/hover.wav');
+const drawAudio = new Audio('/assets/audio/draw.wav');
+const revealAudio = new Audio('/assets/audio/reveal.wav');
+
 
 const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
 const FOCUS_KEYS = ['general', 'love', 'career', 'health'] as const;
 
-const storeTranslations: Record<string, Record<Language, string>> = {
-  storeTitle: { en: "Madame's Store", tr: "Madam'ın Mağazası", es: "La Tienda", fr: "La Boutique", zh: "商店", ko: "마담의 상점" },
-  buyMoons: { en: "Buy Katina Moons", tr: "Katina Moon Satın Al", es: "Comprar Lunas Katina", fr: "Acheter des Lunes Katina", zh: "购买 Katina 月亮", ko: "카티나 문 구매하기" },
-  moons: { en: "Katina Moon", tr: "Katina Moon", es: "Katina Luna", fr: "Katina Lune", zh: "Katina 月亮", ko: "카티나 문" },
-  popular: { en: "POPULAR", tr: "POPÜLER", es: "POPULAR", fr: "POPULAIRE", zh: "热门", ko: "인기" },
-  buy: { en: "Buy", tr: "Satın Al", es: "Comprar", fr: "Acheter", zh: "购买", ko: "구매" },
-  paymentPending: { en: "Payment integration coming soon...", tr: "Ödeme sistemi entegrasyonu yakında...", es: "Pronto el sistema de pago...", fr: "Le système de paiement arrivera bientôt...", zh: "支付系统即将推出...", ko: "결제 시스템 준비 중..." },
-  logout: { en: "Log Out", tr: "Çıkış", es: "Salir", fr: "Sortir", zh: "登出", ko: "로그아웃" },
-  noMoons: { en: "Not enough Katina Moons!", tr: "Yeterli Katina Moon'unuz yok!", es: "¡No hay suficientes lunas!", fr: "Pas assez de lunes !", zh: "Katina 月亮不足！", ko: "카티나 문이 부족합니다!" }
-};
 
-const bannerTranslations: Record<string, Record<Language, string>> = {
-  sponsored: { en: "Sponsored", tr: "Sponsorlu", es: "Patrocinado", fr: "Sponsorisé", zh: "赞助", ko: "스폰서" },
-  promoText: { en: "Get 20% off Katina Tarot Cards on Amazon!", tr: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!", es: "¡Obtenga un 20% de descuento en Cartas de Tarot Katina en Amazon!", fr: "Obtenez 20 % de réduction sur les cartes de tarot Katina sur Amazon !", zh: "在亚马逊上购买 Katina 塔罗牌可享受 20% 折扣！", ko: "아마존에서 카티나 타로 카드를 20% 할인 받으세요!" },
-  promoCode: { en: "Use Code:", tr: "Kod:", es: "Código:", fr: "Code :", zh: "代码：", ko: "코드:" },
-  copyCode: { en: "Copy", tr: "Kopyala", es: "Copiar", fr: "Copier", zh: "复制", ko: "복사" },
-  copied: { en: "Copied!", tr: "Kopyalandı!", es: "¡Copiado!", fr: "Copié !", zh: "已复制！", ko: "복사됨!" },
-  shopNow: { en: "Shop Now", tr: "Hemen Al", es: "Comprar ahora", fr: "Acheter maintenant", zh: "立即购买", ko: "지금 쇼핑" }
-};
 
 const STATUS_OPTIONS: Array<{value: string} & Record<Language, string>> = STATUS_KEYS.map(key => {
   const opt: any = { value: key };
@@ -138,10 +130,40 @@ function AppContent() {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
+  const [shuffledDeck, setShuffledDeck] = useState<any[]>([]);
   const [reading, setReading] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
+  
+  // Audio state (MS-146)
+  const [isMuted, setIsMuted] = useState(() => {
+    return localStorage.getItem('madame_soul_muted') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('madame_soul_muted', String(isMuted));
+    ambientAudio.muted = isMuted;
+    hoverAudio.muted = isMuted;
+    drawAudio.muted = isMuted;
+    revealAudio.muted = isMuted;
+  }, [isMuted]);
+
+  useEffect(() => {
+    if (step === 'DRAWING') {
+      ambientAudio.play().catch(e => console.log("Audio autoplay blocked:", e));
+    } else {
+      ambientAudio.pause();
+      ambientAudio.currentTime = 0;
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (drawnCards.length > 0 && step === 'DRAWING') {
+      revealAudio.currentTime = 0;
+      revealAudio.play().catch(() => {});
+    }
+  }, [drawnCards.length, step]);
   
   // Modal states
   const [isStoreOpen, setIsStoreOpen] = useState(false);
@@ -583,7 +605,7 @@ function AppContent() {
       }
 
       const data = await response.json();
-      return data.text || t('errorSilent');
+      return { text: data.text || t('errorSilent'), cached: !!data.cached };
     },
     onMutate: () => {
       setIsGenerating(true);
@@ -595,17 +617,52 @@ function AppContent() {
       });
     },
     onSuccess: async (data) => {
-      setReading(data);
+      setReading(data.text);
       setIsGenerating(false);
 
       if (pendingTxId.current) {
         try {
           await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
-            readingText: data,
-            status: 'success'
+            readingText: data.text,
+            status: 'success',
+            cached: data.cached
           });
         } catch (e) {
           console.error("Error saving reading text:", e);
+        }
+      }
+
+      // Rollback balance on cache hit (MS-151)
+      if (data.cached && user && pendingDeducted.current && pendingDeductedFrom.current) {
+        try {
+          const moonRef = doc(db, 'user_moons', user.uid);
+          await runTransaction(db, async (transaction) => {
+            const moonDoc = await transaction.get(moonRef);
+            if (!moonDoc.exists()) return;
+            const mData = moonDoc.data();
+            const daily = mData.dailyFreeBalance || 0;
+            const purchased = mData.purchasedBalance || 0;
+
+            if (pendingDeductedFrom.current === 'daily') {
+              const newDaily = daily + 1;
+              transaction.update(moonRef, {
+                dailyFreeBalance: newDaily,
+                balance: newDaily + purchased,
+                updatedAt: serverTimestamp()
+              });
+            } else {
+              const newPurchased = purchased + 1;
+              transaction.update(moonRef, {
+                purchasedBalance: newPurchased,
+                balance: daily + newPurchased,
+                updatedAt: serverTimestamp()
+              });
+            }
+          });
+          setReadingCount(prev => Math.max(0, prev - 1));
+          showToast(userInfo.language === 'tr' ? "Önbellekten yüklendi, bakiyeniz iade edildi!" : "Loaded from cache, moon balance refunded!", 'success');
+        } catch (refundError) {
+          console.error("Error refunding cached moon balance:", refundError);
         }
       }
     },
@@ -659,10 +716,9 @@ function AppContent() {
     }
   });
 
-  // Rename typo drawRancomCards -> drawRandomCards (MS-111)
-  const drawRandomCards = async () => {
+  const startCardSelection = async () => {
     if (moonsCount <= 0) {
-      showToast(storeTranslations.noMoons[userInfo.language], 'error');
+      showToast(t('store.noMoons'), 'error');
       setIsStoreOpen(true);
       return;
     }
@@ -688,21 +744,17 @@ function AppContent() {
       }
     }
 
+    // Shuffle the deck of cards using Fisher-Yates shuffle
     const deck = [...KATINA_DECK];
-    const drawn: any[] = [];
-    for (let i = 0; i < 3; i++) {
-      const randomIndex = Math.floor(Math.random() * deck.length);
-      drawn.push(deck.splice(randomIndex, 1)[0]);
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
     }
-    setDrawnCards(drawn);
+
+    setShuffledDeck(deck);
+    setDrawnCards([]);
     setStep('DRAWING');
   };
-
-  useEffect(() => {
-    if (step === 'DRAWING' && drawnCards.length === 3) {
-      generateMutation.mutate(drawnCards);
-    }
-  }, [step, drawnCards]);
 
   const handleDownload = async (pastReading?: any) => {
     const isEvent = pastReading && pastReading.nativeEvent;
@@ -812,6 +864,7 @@ function AppContent() {
         language={userInfo.language} 
         onLanguageChange={(lang) => setUserInfo({ language: lang })}
         onShowOnboarding={() => setShowOnboarding(true)}
+        t={t}
       />
     );
   }
@@ -824,43 +877,58 @@ function AppContent() {
         <div className="absolute inset-0 z-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at center, #ecd8a6 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
       </div>
 
-      {step !== 'DRAWING' && (
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40] pointer-events-none"
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40] pointer-events-none"
+      >
+        {/* Mute/Unmute Button (MS-146) */}
+        <div 
+          onClick={() => setIsMuted(prev => !prev)}
+          className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
+          title={isMuted ? "Unmute" : "Mute"}
         >
-          <div 
-            onClick={() => setIsProfileOpen(true)}
-            className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
-            title="Profile"
-          >
-            <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
-          </div>
+          {isMuted ? (
+            <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+          ) : (
+            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+          )}
+        </div>
 
-          <div 
-            onClick={() => setIsStoreOpen(true)}
-            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
-          >
-            <KatinaMoon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
-            <span className="font-serif tracking-widest text-[#ecd8a6] text-xs sm:text-base font-semibold">{moonsCount}</span>
-            <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center ml-0.5 sm:ml-1 group-hover:bg-[#ecd8a6]/20 transition-colors">
-              <Plus className="w-2.5 h-2.5 sm:w-3 h-3 text-[#ecd8a6]" />
+        {step !== 'DRAWING' && (
+          <>
+            <div 
+              onClick={() => setIsProfileOpen(true)}
+              className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
+              title="Profile"
+            >
+              <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
             </div>
-          </div>
 
-          <button 
-            onClick={handleSignOut}
-            className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto"
-            title="Sign Out"
-          >
-            <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
-              {storeTranslations.logout[userInfo.language]}
-            </span>
-            <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </motion.div>
-      )}
+            <div 
+              onClick={() => setIsStoreOpen(true)}
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-[#0a0512]/80 backdrop-blur-md px-3 sm:px-4 hover:bg-[#120a1c]/90 rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
+            >
+              <KatinaMoon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
+              <span className="font-serif tracking-widest text-[#ecd8a6] text-xs sm:text-base font-semibold">{moonsCount}</span>
+              <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#ecd8a6]/10 flex items-center justify-center ml-0.5 sm:ml-1 group-hover:bg-[#ecd8a6]/20 transition-colors">
+                <Plus className="w-2.5 h-2.5 sm:w-3 h-3 text-[#ecd8a6]" />
+              </div>
+            </div>
+
+            <button 
+              onClick={handleSignOut}
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto"
+              title="Sign Out"
+            >
+              <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
+                {t('store.logout')}
+              </span>
+              <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </>
+        )}
+      </motion.div>
 
       {/* Store Modal Component (MS-126) */}
       <AnimatePresence>
@@ -870,7 +938,7 @@ function AppContent() {
             onClose={() => setIsStoreOpen(false)}
             user={user}
             language={userInfo.language}
-            storeTranslations={storeTranslations}
+            t={t}
             showToast={showToast}
             onErrorLog={handleFirestoreError}
             onCheckoutInitiated={(pack) => {
@@ -1159,7 +1227,7 @@ function AppContent() {
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-[#ecd8a6]/50 to-transparent" />
               <form 
-                onSubmit={(e) => { e.preventDefault(); drawRandomCards(); }}
+                onSubmit={(e) => { e.preventDefault(); startCardSelection(); }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 relative z-10"
               >
                 <div>
@@ -1257,6 +1325,153 @@ function AppContent() {
             </motion.div>
           )}
 
+                    {step === 'DRAWING' && (
+            <motion.div
+              key="drawing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full max-w-6xl mx-auto px-4 py-8 flex flex-col items-center"
+            >
+              {/* Header / Instructions */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-serif text-[#ecd8a6] mb-3 flex items-center justify-center gap-2">
+                  <Sparkles className="w-6 h-6 text-[#ecd8a6] animate-pulse" />
+                  {userInfo.language === 'tr' ? "Kaderinizin Kartlarını Seçin" : "Select the Cards of Your Destiny"}
+                </h2>
+                <p className="text-[#ecd8a6]/70 max-w-md mx-auto text-sm">
+                  {userInfo.language === 'tr'
+                    ? "Zihninizi boşaltın, sorunuza odaklanın ve sırasıyla Geçmiş, Şimdiki Zaman ve Gelecek için 3 kart seçin."
+                    : "Clear your mind, focus on your question, and select 3 cards for Past, Present, and Future."}
+                </p>
+                
+                {/* Progress / Status */}
+                <div className="mt-4 flex items-center justify-center gap-3">
+                  <span className="px-3 py-1 bg-[#1e1332] border border-[#ecd8a6]/20 rounded-full text-xs text-[#ecd8a6]">
+                    {userInfo.language === 'tr' ? `Seçilen: ${drawnCards.length} / 3` : `Selected: ${drawnCards.length} / 3`}
+                  </span>
+                  {drawnCards.length > 0 && (
+                    <span className="text-xs text-[#ecd8a6]/60 italic font-serif">
+                      {drawnCards.length === 1 && (userInfo.language === 'tr' ? "Sıradaki: Şimdiki Zaman" : "Next: Present")}
+                      {drawnCards.length === 2 && (userInfo.language === 'tr' ? "Sıradaki: Gelecek" : "Next: Future")}
+                      {drawnCards.length === 3 && (userInfo.language === 'tr' ? "Seçim tamamlandı!" : "Selection complete!")}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* The Row of 3 Selected Card Slots with flip animation */}
+              <div className="grid grid-cols-3 gap-4 max-w-xl w-full mb-10">
+                {[t('past'), t('present'), t('future')].map((label, idx) => {
+                  const card = drawnCards[idx];
+                  return (
+                    <div key={idx} className="flex flex-col items-center">
+                      <span className="text-[10px] uppercase tracking-widest text-[#ecd8a6]/60 mb-2 font-serif">{label}</span>
+                      <div className="w-full aspect-[2/3] max-w-[120px] rounded-lg border border-[#ecd8a6]/20 relative bg-[#120a1c]/60 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+                        {card ? (
+                          <motion.div
+                            initial={{ rotateY: 180 }}
+                            animate={{ rotateY: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="w-full h-full relative"
+                            style={{ transformStyle: 'preserve-3d' }}
+                          >
+                            <img
+                              src={`/cards/${card.id}.webp`} loading="lazy"
+                              alt={locales[userInfo.language]?.cards?.[card.locKey]?.name || card.name}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute bottom-0 inset-x-0 bg-black/60 py-1 text-center text-[10px] text-[#ecd8a6] truncate px-1 font-serif">
+                              {locales[userInfo.language]?.cards?.[card.locKey]?.name || card.name}
+                            </div>
+                          </motion.div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center p-2 text-center text-[#ecd8a6]/30 text-xs">
+                            <Sparkles className="w-4 h-4 mb-1 animate-pulse" />
+                            <span className="text-[9px] uppercase tracking-wider font-serif">
+                              {userInfo.language === 'tr' ? "Kart Seç" : "Draw Card"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Start Reading Button (if 3 selected) */}
+              {drawnCards.length === 3 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-8"
+                >
+                  <button
+                    onClick={() => generateMutation.mutate(drawnCards)}
+                    className="px-8 py-3 bg-gradient-to-r from-[#5a3a93] to-[#8d62ce] border border-[#ecd8a6]/60 text-[#ecd8a6] hover:text-[#fff] font-serif font-bold tracking-widest uppercase rounded-full shadow-[0_0_20px_rgba(141,98,206,0.4)] hover:shadow-[0_0_35px_rgba(141,98,206,0.6)] cursor-pointer transition-all duration-300 animate-bounce"
+                  >
+                    {userInfo.language === 'tr' ? "Açılımı Yorumla ✦" : "Interpret Spread ✦"}
+                  </button>
+                </motion.div>
+              )}
+
+              {/* The Interactive Deck/Board of 35 cards */}
+              <div className="grid grid-cols-5 sm:grid-cols-7 md:grid-cols-9 lg:grid-cols-10 gap-3 max-w-5xl w-full p-6 bg-[#0a0512]/40 backdrop-blur-md rounded-2xl border border-[#ecd8a6]/10 shadow-[0_0_30px_rgba(0,0,0,0.2)]">
+                {shuffledDeck.map((card, idx) => {
+                  const drawnIndex = drawnCards.findIndex(c => c.id === card.id);
+                  const isSelected = drawnIndex !== -1;
+                  return (
+                    <motion.div
+                      key={idx}
+                      whileHover={!isSelected && drawnCards.length < 3 ? {
+                        y: -8,
+                        scale: 1.05,
+                        boxShadow: "0 0 15px rgba(236,216,166,0.4)",
+                        borderColor: "rgba(236,216,166,0.8)"
+                      } : {}}
+                      onMouseEnter={() => {
+                        if (!isSelected && drawnCards.length < 3) {
+                          hoverAudio.currentTime = 0;
+                          hoverAudio.play().catch(() => {});
+                        }
+                      }}
+                      onClick={() => {
+                        if (isSelected || drawnCards.length >= 3) return;
+                        drawAudio.currentTime = 0;
+                        drawAudio.play().catch(() => {});
+                        setDrawnCards(prev => [...prev, card]);
+                      }}
+                      className={`aspect-[2/3] rounded-md border cursor-pointer relative overflow-hidden transition-all duration-300 ${
+                        isSelected
+                          ? 'border-[#ecd8a6] bg-[#120a1c]/80 shadow-[0_0_15px_rgba(236,216,166,0.3)]'
+                          : 'border-[#ecd8a6]/20 bg-gradient-to-br from-[#1e1332] to-[#0a0512] hover:border-[#ecd8a6]/60'
+                      }`}
+                    >
+                      {/* Card Back Design */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-1">
+                        <div className="absolute inset-1 border border-double border-[#ecd8a6]/10 rounded-sm pointer-events-none" />
+                        <Sparkles className={`w-5 h-5 ${isSelected ? 'text-[#ecd8a6]' : 'text-[#ecd8a6]/30'} transition-transform duration-300`} />
+                        
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-[#0a0512]/80 flex flex-col items-center justify-center z-10">
+                            <div className="w-6 h-6 rounded-full bg-[#ecd8a6] text-[#0a0512] font-serif font-bold text-xs flex items-center justify-center shadow-lg mb-1">
+                              {drawnIndex + 1}
+                            </div>
+                            <span className="text-[8px] text-[#ecd8a6] uppercase tracking-widest font-serif font-bold">
+                              {drawnIndex === 0 && (userInfo.language === 'tr' ? 'Geçmiş' : 'Past')}
+                              {drawnIndex === 1 && (userInfo.language === 'tr' ? 'Şimdi' : 'Present')}
+                              {drawnIndex === 2 && (userInfo.language === 'tr' ? 'Gelecek' : 'Future')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
           {step === 'RESULT' && (
             <motion.div 
               key="result"
@@ -1292,7 +1507,7 @@ function AppContent() {
                             className="relative w-full max-w-[140px] sm:max-w-[160px] aspect-[2/3] mx-auto rounded-md overflow-hidden border border-[#ecd8a6]/30 shadow-[0_5px_15px_rgba(0,0,0,0.5)] group-hover/img:shadow-[0_0_35px_rgba(236,216,166,0.25)] group-hover/img:border-[#ecd8a6]/60 transition-all duration-500 ease-out"
                           >
                             <img 
-                              src={`/cards/${drawnCards[index]?.id}.png`} 
+                              src={`/cards/${drawnCards[index]?.id}.webp`} loading="lazy" 
                               alt={locales[userInfo.language]?.cards?.[drawnCards[index]?.locKey]?.name || drawnCards[index]?.name}
                               onError={() => setImageError(prev => ({...prev, [drawnCards[index]?.id]: true}))}
                               className="w-full h-full object-cover transition-transform duration-700 ease-out"

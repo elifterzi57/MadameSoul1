@@ -2,6 +2,15 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Sparkles, RefreshCw } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { useAppStore } from '../store/useAppStore';
+import en from '../locales/en.yaml';
+import tr from '../locales/tr.yaml';
+import es from '../locales/es.yaml';
+import fr from '../locales/fr.yaml';
+import zh from '../locales/zh.yaml';
+import ko from '../locales/ko.yaml';
+
+const locales: Record<string, any> = { en, tr, es, fr, zh, ko };
 
 interface Props {
   children: ReactNode;
@@ -42,6 +51,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      const language = useAppStore.getState().userInfo.language || 'en';
+      const currentLocale = locales[language] || locales.en;
+      
+      const t = (key: string): string => {
+        let val = key.split('.').reduce((obj, k) => obj?.[k], currentLocale);
+        if (val === undefined || val === null) {
+          val = key.split('.').reduce((obj, k) => obj?.[k], locales.en);
+        }
+        return val !== undefined && val !== null ? String(val) : key;
+      };
+
       return (
         <div className="min-h-screen bg-[#05000a] text-[#ecd8a6] flex flex-col items-center justify-center p-6 text-center font-sans">
           <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden opacity-30">
@@ -52,17 +72,17 @@ export class ErrorBoundary extends Component<Props, State> {
               <Sparkles className="w-8 h-8 animate-pulse" />
             </div>
             <h1 className="text-2xl font-serif tracking-widest uppercase mb-4 text-red-200">
-              Mistik Enerji Kesintisi
+              {t('errorBoundary.title')}
             </h1>
             <p className="text-sm text-[#ecd8a6]/70 leading-relaxed mb-8">
-              Ruhsal akışta beklenmedik bir kesinti meydana geldi. Sorunu kaydettik ve çözmek için çalışıyoruz.
+              {t('errorBoundary.description')}
             </p>
             <button
               onClick={() => window.location.reload()}
               className="w-full h-[50px] bg-gradient-to-br from-red-950/30 to-[#0a0512] border border-red-900/40 text-red-200 hover:text-white hover:border-red-500/60 rounded-xl transition-all flex items-center justify-center gap-2 group font-serif tracking-widest uppercase text-xs"
             >
               <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
-              Yeniden Yükle
+              {t('errorBoundary.retryButton')}
             </button>
           </div>
         </div>

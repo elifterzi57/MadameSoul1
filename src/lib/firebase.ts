@@ -1,12 +1,22 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth();
+
+if (typeof window !== 'undefined') {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn("Firestore offline persistence failed (multiple tabs open).");
+    } else if (err.code === 'unimplemented') {
+      console.warn("Firestore offline persistence not supported in this browser.");
+    }
+  });
+}
 
 // Initialize Analytics conditionally as it might not be supported in all environments (e.g. iframes)
 export const initAnalytics = async () => {

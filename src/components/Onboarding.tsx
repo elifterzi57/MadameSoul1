@@ -10,9 +10,9 @@ interface OnboardingProps {
 }
 
 const slideImages = [
-  "/assets/onboarding/onboarding_1.jpg",
-  "/assets/onboarding/onboarding_1.jpg",
-  "/assets/onboarding/onboarding_1.jpg"
+  "/assets/onboarding/onboarding_welcome.webp",
+  "/assets/onboarding/onboarding_discovery.webp",
+  "/assets/onboarding/onboarding_journey.webp"
 ];
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t }) => {

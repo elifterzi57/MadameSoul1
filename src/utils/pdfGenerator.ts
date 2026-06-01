@@ -73,7 +73,7 @@ export const generatePDF = async ({
         ${drawnCards.map((c: any) => `
           <div style="text-align: center; width: 160px; position: relative; z-index: 2;">
             <div style="border-radius: 12px; overflow: hidden; border: 2px solid rgba(236,216,166,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(236,216,166,0.15); background-color: #1a1025; height: 240px; display: flex; align-items: center; justify-content: center;">
-               <img src="${window.location.origin}/cards/${c.id}.png" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
+               <img src="${window.location.origin}/cards/${c.id}.webp" style="width: 100%; height: 100%; object-fit: cover;" crossorigin="anonymous" />
             </div>
             <div style="margin-top: 16px; font-family: 'Playfair Display', serif; font-size: 16px; color: #ecd8a6; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
               ${locales[userInfo.language]?.cards?.[c.locKey]?.name || c.name}

@@ -9,6 +9,7 @@ import {
   History, 
   ShoppingBag, 
   Star,
+  Sparkles,
   ChevronRight,
   Loader2,
   CalendarDays,
@@ -58,6 +59,12 @@ export const Profile: React.FC<ProfileProps> = ({
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [isLoadingPurchases, setIsLoadingPurchases] = useState(true);
+
+  // Diary and Personalization States (MS-148)
+  const [expandedReadingId, setExpandedReadingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [notesStatus, setNotesStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   // Marketing consent state
   const [emailConsent, setEmailConsent] = useState(false);
@@ -126,34 +133,46 @@ export const Profile: React.FC<ProfileProps> = ({
     setIsDeletingAccount(true);
     setSettingsStatus(null);
     try {
-      // 1. Delete Firestore collections
+      // 1. Check if user's session is fresh (re-authentication check)
+      const lastSignInTime = user.metadata.lastSignInTime;
+      const isFresh = lastSignInTime && (Date.now() - new Date(lastSignInTime).getTime() < 5 * 60 * 1000);
+      if (!isFresh) {
+        const error = new Error("Requires recent login");
+        (error as any).code = "auth/requires-recent-login";
+        throw error;
+      }
+
+      // 2. Perform ALL Firestore deletions in a single atomic batch
+      const batch = writeBatch(db);
+
       // A. Delete user document from 'users'
       const userRef = doc(db, 'users', user.uid);
-      await deleteDoc(userRef);
+      batch.delete(userRef);
 
       // B. Delete user moons from 'user_moons'
       const moonsRef = doc(db, 'user_moons', user.uid);
-      await deleteDoc(moonsRef);
+      batch.delete(moonsRef);
 
       // C. Delete transactions from 'moon_transactions' where userId == uid
       const q = query(collection(db, 'moon_transactions'), where('userId', '==', user.uid));
       const querySnapshot = await getDocs(q);
-      const batch = writeBatch(db);
       querySnapshot.docs.forEach((doc) => {
         batch.delete(doc.ref);
       });
-      await batch.commit();
 
       // D. Also delete phone mapping if exists
       if (user.phoneNumber) {
         const phoneRef = doc(db, 'phones', user.phoneNumber);
-        await deleteDoc(phoneRef);
+        batch.delete(phoneRef);
       }
 
-      // 2. Delete User from Firebase Auth
+      // Execute batch commit atomically
+      await batch.commit();
+
+      // 3. Delete User from Firebase Auth
       await user.delete();
 
-      // 3. Trigger close
+      // 4. Trigger close
       onClose();
     } catch (error: any) {
       console.error("Account deletion error:", error);
@@ -220,6 +239,16 @@ export const Profile: React.FC<ProfileProps> = ({
     fetchPurchases();
   }, [user]);
 
+  useEffect(() => {
+    if (expandedReadingId) {
+      const item = history.find(h => h.id === expandedReadingId);
+      if (item) {
+        setEditTitle(item.customTitle || item.description);
+        setEditNotes(item.reflectionNotes || '');
+      }
+    }
+  }, [expandedReadingId, history]);
+
   const handleUpdatePassword = async () => {
     if (!user || !newPassword) return;
     setIsUpdating(true);
@@ -273,6 +302,33 @@ export const Profile: React.FC<ProfileProps> = ({
       setSettingsStatus({ type: 'error', message: error.message });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleToggleFavorite = async (itemId: string, currentVal: boolean) => {
+    try {
+      await updateDoc(doc(db, 'moon_transactions', itemId), {
+        isFavorite: !currentVal
+      });
+      setHistory(prev => prev.map(item => item.id === itemId ? { ...item, isFavorite: !currentVal } : item));
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    }
+  };
+
+  const handleSaveNotes = async (itemId: string, title: string, notes: string) => {
+    try {
+      await updateDoc(doc(db, 'moon_transactions', itemId), {
+        customTitle: title,
+        reflectionNotes: notes
+      });
+      setHistory(prev => prev.map(item => item.id === itemId ? { ...item, customTitle: title, reflectionNotes: notes } : item));
+      setNotesStatus({ type: 'success', message: translations?.profileDiary?.saveSuccess || "Reading updated successfully!" });
+      setTimeout(() => setNotesStatus(null), 3000);
+    } catch (err) {
+      console.error("Error saving notes:", err);
+      setNotesStatus({ type: 'error', message: translations?.profileDiary?.saveError || "Failed to update reading." });
+      setTimeout(() => setNotesStatus(null), 3000);
     }
   };
 
@@ -481,34 +537,132 @@ export const Profile: React.FC<ProfileProps> = ({
                     </div>
                   ) : history.length > 0 ? (
                     <div className="space-y-3">
-                      {history.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 hover:bg-[#ecd8a6]/5 transition-colors group">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-[#0a0512] border border-[#ecd8a6]/20 flex items-center justify-center">
-                              <History className="w-5 h-5 text-[#ecd8a6]/60" />
-                            </div>
-                            <div>
-                              <div className="text-[#ecd8a6] text-sm font-medium">{item.description}</div>
-                              <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
-                                <CalendarDays className="w-3 h-3" />
-                                {item.createdAt?.toDate().toLocaleDateString()}
+                      {history.map((item) => {
+                        const isExpanded = expandedReadingId === item.id;
+                        const isFav = !!item.isFavorite;
+                        return (
+                          <div key={item.id} className="rounded-xl bg-white/5 border border-[#ecd8a6]/10 overflow-hidden transition-all duration-300">
+                            {/* Row Header */}
+                            <div 
+                              className="flex items-center justify-between p-4 hover:bg-[#ecd8a6]/5 transition-colors cursor-pointer select-none" 
+                              onClick={() => setExpandedReadingId(isExpanded ? null : item.id)}
+                            >
+                              <div className="flex items-center gap-4 flex-1 min-w-0">
+                                {/* Favorite Star Button */}
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleFavorite(item.id, isFav);
+                                  }}
+                                  className="p-1 text-[#ecd8a6] hover:scale-110 transition-transform flex-shrink-0"
+                                >
+                                  <Star className={`w-5 h-5 ${isFav ? 'fill-[#ecd8a6] text-[#ecd8a6]' : 'text-[#ecd8a6]/40'}`} />
+                                </button>
+                                
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-[#ecd8a6] text-sm font-medium truncate">{item.customTitle || item.description}</div>
+                                  <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
+                                    <CalendarDays className="w-3 h-3" />
+                                    {item.createdAt?.toDate().toLocaleDateString()}
+                                    {item.cached && (
+                                      <span className="ml-2 px-1.5 py-0.5 bg-purple-950/40 border border-[#ecd8a6]/20 rounded text-[9px] text-[#ecd8a6]/60">
+                                        {userInfo.language === 'tr' ? 'Önbellek' : 'Cached'}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                {item.readingText && (
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDownloadPastReading?.(item);
+                                    }}
+                                    className="p-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] transition-all"
+                                    title={profileT.history.downloadPdf}
+                                  >
+                                    <Download className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <ChevronRight className={`w-4 h-4 text-[#ecd8a6]/20 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-[#ecd8a6]/60' : ''}`} />
                               </div>
                             </div>
+
+                            {/* Expanded Accordion Panel */}
+                            <AnimatePresence initial={false}>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.3 }}
+                                  className="border-t border-[#ecd8a6]/10 bg-black/40 overflow-hidden"
+                                >
+                                  <div className="p-4 sm:p-6 space-y-6">
+                                    {/* Form Status Notification */}
+                                    {notesStatus && expandedReadingId === item.id && (
+                                      <div className={`p-3 rounded-lg flex items-center gap-2 text-xs border ${
+                                        notesStatus.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'
+                                      }`}>
+                                        <Sparkles className="w-4 h-4 animate-pulse" />
+                                        <span>{notesStatus.message}</span>
+                                      </div>
+                                    )}
+
+                                    {/* Tarot Interpretation Reading Text */}
+                                    <div className="space-y-2">
+                                      <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
+                                        {translations?.profileDiary?.detailsTitle || "Reading Details"}
+                                      </h4>
+                                      <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-[#ecd8a6]/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
+                                        {item.readingText}
+                                      </div>
+                                    </div>
+
+                                    {/* Edit Custom Title Form */}
+                                    <div className="space-y-2">
+                                      <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
+                                        {translations?.profileDiary?.customTitleLabel || "Custom Title"}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        className="w-full bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-serif"
+                                        placeholder={item.description}
+                                      />
+                                    </div>
+
+                                    {/* Reflection / Manifestation Notes */}
+                                    <div className="space-y-2">
+                                      <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
+                                        {translations?.profileDiary?.reflectionTitle || "Reflection & Manifestation Notes"}
+                                      </label>
+                                      <textarea
+                                        value={editNotes}
+                                        onChange={(e) => setEditNotes(e.target.value)}
+                                        className="w-full h-24 bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-sans resize-none"
+                                        placeholder={translations?.profileDiary?.reflectionPlaceholder || "Record notes..."}
+                                      />
+                                    </div>
+
+                                    {/* Save Button */}
+                                    <div className="flex justify-end pt-2">
+                                      <button
+                                        onClick={() => handleSaveNotes(item.id, editTitle, editNotes)}
+                                        className="px-5 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all font-bold"
+                                      >
+                                        {translations?.profileDiary?.saveBtn || "Save Notes"}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {item.readingText && (
-                              <button 
-                                onClick={() => onDownloadPastReading?.(item)}
-                                className="p-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] transition-all"
-                                title={profileT.history.downloadPdf}
-                              >
-                                <Download className="w-4 h-4" />
-                              </button>
-                            )}
-                            <ChevronRight className="w-4 h-4 text-[#ecd8a6]/20 group-hover:text-[#ecd8a6]/60 transition-colors" />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-8 rounded-2xl border border-dashed border-[#ecd8a6]/10 bg-[#ecd8a6]/5">

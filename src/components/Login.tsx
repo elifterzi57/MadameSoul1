@@ -37,154 +37,8 @@ interface LoginProps {
   language: 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
   onLanguageChange: (lang: 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko') => void;
   onShowOnboarding: () => void;
+  t: (key: string, params?: Record<string, any>) => string;
 }
-
-const translations = {
-  tr: {
-    signInTitle: "MadameSoul'a Hoş Geldin",
-    signInSubtitle: "Ruhsal rehberlik ve mistik sırlar için giriş yapın",
-    signUpTitle: "MadameSoul Evrenine Katıl",
-    signUpSubtitle: "Aramıza katılmak için bilgilerinizi girin",
-    email: "E-posta Adresi",
-    phone: "Telefon Numarası",
-    password: "Şifre",
-    signInLabel: "Giriş Yap",
-    signUpLabel: "Kaydol",
-    googleSignIn: "Google ile Giriş Yap",
-    appleSignIn: "Apple ile Giriş Yap",
-    switchToPhone: "Telefon ile devam et",
-    switchToEmail: "E-posta ile devam et",
-    sendCode: "Kod Gönder",
-    verifyCode: "Kodu Doğrula",
-    enterCode: "SMS ile gelen kodu girin",
-    hasAccount: "Zaten bir hesabınız var mı? Giriş yapın",
-    noAccount: "Henüz bir hesabınız yok mu? Kaydolun",
-    error: "Bir hata oluştu, lütfen bilgileri kontrol edin.",
-    loading: "Yükleniyor...",
-    showIntro: "Uygulama Tanıtımını Gör",
-    kvkkConsent: "Kullanıcı Sözleşmesini, Gizlilik Politikasını ve KVKK/GDPR Açık Rıza Metnini okudum, onaylıyorum."
-  },
-  en: {
-    signInTitle: "Welcome to MadameSoul",
-    signInSubtitle: "Enter the realm for spiritual guidance and mystic secrets",
-    signUpTitle: "Join the MadameSoul Circle",
-    signUpSubtitle: "Join our spiritual circle to begin",
-    email: "Email Address",
-    phone: "Phone Number",
-    password: "Password",
-    signInLabel: "Sign In",
-    signUpLabel: "Sign Up",
-    googleSignIn: "Continue with Google",
-    appleSignIn: "Continue with Apple",
-    switchToPhone: "Continue with Phone",
-    switchToEmail: "Continue with Email",
-    sendCode: "Send Code",
-    verifyCode: "Verify Code",
-    enterCode: "Enter verification code",
-    hasAccount: "Already have an account? Sign In",
-    noAccount: "Don't have an account? Sign Up",
-    error: "An error occurred. Please check your details.",
-    loading: "Loading...",
-    showIntro: "Watch App Intro",
-    kvkkConsent: "I have read and agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."
-  },
-  es: {
-    signInTitle: "Bienvenido a MadameSoul",
-    signInSubtitle: "Ingresa para recibir guía espiritual y secretos místicos",
-    signUpTitle: "Únete al Círculo de MadameSoul",
-    signUpSubtitle: "Únete a nuestro círculo espiritual",
-    email: "Correo Electrónico",
-    phone: "Número de Télefono",
-    password: "Contraseña",
-    signInLabel: "Iniciar Sesión",
-    signUpLabel: "Registrarse",
-    googleSignIn: "Continuar con Google",
-    appleSignIn: "Continuar con Apple",
-    switchToPhone: "Continuar con Teléfono",
-    switchToEmail: "Continuar con Correo",
-    sendCode: "Enviar Código",
-    verifyCode: "Verificar Código",
-    enterCode: "Ingresa el código",
-    hasAccount: "¿Ya tienes cuenta? Inicia sesión",
-    noAccount: "¿No tienes cuenta? Regístrate",
-    error: "Ocurrió un error. Verifica tus datos.",
-    loading: "Cargando...",
-    showIntro: "Ver Introducción",
-    kvkkConsent: "He leído y acepto el Acuerdo de usuario, la Política de privacidad y el Consentimiento explícito de GDPR/KVKK."
-  },
-  fr: {
-    signInTitle: "Bienvenue sur MadameSoul",
-    signInSubtitle: "Entrez pour des conseils spirituels et des secrets mystiques",
-    signUpTitle: "Rejoignez le Cercle MadameSoul",
-    signUpSubtitle: "Rejoignez notre cercle spirituel",
-    email: "Adresse E-mail",
-    phone: "Numéro de Téléphone",
-    password: "Mot de Passe",
-    signInLabel: "Se Connecter",
-    signUpLabel: "S'inscrire",
-    googleSignIn: "Continuer avec Google",
-    appleSignIn: "Continuer avec Apple",
-    switchToPhone: "Continuer par Téléphone",
-    switchToEmail: "Continuer par E-mail",
-    sendCode: "Envoyer le Code",
-    verifyCode: "Vérifier le Code",
-    enterCode: "Entrez le code",
-    hasAccount: "Déjà un compte ? Connexion",
-    noAccount: "Pas de compte ? S'inscrire",
-    error: "Une erreur est survenue. Vérifiez vos infos.",
-    loading: "Chargement...",
-    showIntro: "Voir l'Introduction",
-    kvkkConsent: "J'ai lu et j'accepte les Conditions d'utilisation, la Politique de confidentialité et le consentement explicite GDPR/KVKK."
-  },
-  zh: {
-    signInTitle: "歡迎來到 MadameSoul",
-    signInSubtitle: "進入精神指導和神秘秘密的領域",
-    signUpTitle: "加入 MadameSoul 圈子",
-    signUpSubtitle: "加入我們的屬靈圈子開始吧",
-    email: "電子郵件地址",
-    phone: "電話號碼",
-    password: "密碼",
-    signInLabel: "登入",
-    signUpLabel: "註冊",
-    googleSignIn: "繼續使用 Google",
-    appleSignIn: "繼續使用 Apple",
-    switchToPhone: "繼續使用電話",
-    switchToEmail: "繼續使用電子郵件",
-    sendCode: "發送代碼",
-    verifyCode: "核實條碼",
-    enterCode: "輸入驗證碼",
-    hasAccount: "已有賬號？登入",
-    noAccount: "沒有賬號？註冊",
-    error: "發生錯誤。請檢查您的詳細信息。",
-    loading: "載入中...",
-    showIntro: "查看介紹",
-    kvkkConsent: "我已阅读并同意用户协议、隐私政策以及 GDPR/KVKK 明确同意。"
-  },
-  ko: {
-    signInTitle: "MadameSoul에 오신 것을 환영합니다",
-    signInSubtitle: "영적 안내와 신비로운 비밀을 위해 입장하세요",
-    signUpTitle: "MadameSoul 서클에 가입하세요",
-    signUpSubtitle: "영적 서클에 가입하여 시작하세요",
-    email: "이메일 주소",
-    phone: "전화번호",
-    password: "비밀번호",
-    signInLabel: "로그인",
-    signUpLabel: "회원가입",
-    googleSignIn: "Google로 계속하기",
-    appleSignIn: "Apple로 계속하기",
-    switchToPhone: "전화번호로 계속하기",
-    switchToEmail: "이메일로 계속하기",
-    sendCode: "코드 전송",
-    verifyCode: "코드 확인",
-    enterCode: "인증 코드 입력",
-    hasAccount: "이미 계정이 있으신가요? 로그인",
-    noAccount: "계정이 없으신가요? 회원가입",
-    error: "오류가 발생했습니다. 정보를 확인하세요.",
-    loading: "로딩 중...",
-    showIntro: "소개 보기",
-    kvkkConsent: "사용자 이용약관, 개인정보 처리방침 및 GDPR/KVKK 명시적 동의서에 읽고 동의합니다."
-  }
-};
 
 const languages = [
   { code: 'tr', name: 'Türkçe' },
@@ -218,7 +72,7 @@ const countryCodes = [
   { code: '+43', name: 'AT', flag: '🇦🇹' },
 ] as const;
 
-export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChange, onShowOnboarding }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChange, onShowOnboarding, t }) => {
   const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email');
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -233,7 +87,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [showLangs, setShowLangs] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
 
-  const t = translations[language] || translations.en;
 
   const saveUserToFirestore = async (user: User, password?: string, additionalInfo?: any) => {
     try {
@@ -354,17 +207,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       const errorCode = err.code || (err.message?.includes('auth/') ? err.message.match(/auth\/[a-z-]+/)?.[0] : null);
       
       if (errorCode === 'auth/user-not-found' || errorCode === 'auth/invalid-credential' || errorCode === 'auth/wrong-password') {
-        setError(language === 'tr' ? "E-posta adresi veya şifre hatalı." : "Invalid email or password.");
+        setError(t('login.errorWrongCredentials'));
       } else if (errorCode === 'auth/email-already-in-use') {
-        setError(language === 'tr' ? "Bu e-posta adresi zaten kullanımda." : "Email already in use.");
+        setError(t('login.errorEmailInUse'));
       } else if (errorCode === 'auth/invalid-email') {
-        setError(language === 'tr' ? "Geçersiz e-posta adresi." : "Invalid email address.");
+        setError(t('login.errorInvalidEmail'));
       } else if (errorCode === 'auth/weak-password') {
-        setError(language === 'tr' ? "Şifre çok zayıf (en az 6 karakter olmalı)." : "Password is too weak.");
+        setError(t('login.errorWeakPassword'));
       } else if (errorCode === 'auth/too-many-requests') {
-        setError(language === 'tr' ? "Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin." : "Too many requests. Please try again later.");
+        setError(t('login.errorTooManyRequests'));
       } else {
-        setError(err.message || t.error);
+        setError(err.message || t('login.error'));
       }
     } finally {
       setLoading(false);
@@ -391,13 +244,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       console.error("Phone auth error:", err);
       // Specifically handle the region error to inform the user
       if (err.code === 'auth/operation-not-allowed') {
-        setError("SMS servisi bu bölge için aktif edilmemiş. Lütfen Google Cloud/Firebase panelini kontrol edin (Authentication > Settings > Sign-in method).");
+        setError(t('login.errorSmsNotAllowed'));
       } else if (err.code === 'auth/billing-not-enabled') {
-        setError("SMS gönderimi için Firebase projesinde faturalandırmanın (Blaze Plan) aktif olması veya test numarası eklenmesi gerekiyor. Test için Firebase panelinden test numarası tanımlayabilirsiniz.");
+        setError(t('login.errorBillingNotEnabled'));
       } else if (err.code === 'auth/invalid-phone-number') {
-        setError(language === 'tr' ? "Geçersiz telefon numarası." : "Invalid phone number.");
+        setError(t('login.errorInvalidPhone'));
       } else {
-        setError(err.message || t.error);
+        setError(err.message || t('login.error'));
       }
     } finally {
       setLoading(false);
@@ -417,9 +270,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     } catch (err: any) {
       console.error("Code verify error:", err);
       if (err.code === 'auth/invalid-verification-code') {
-        setError(language === 'tr' ? "Geçersiz doğrulama kodu." : "Invalid verification code.");
+        setError(t('login.errorInvalidCode'));
       } else {
-        setError(err.message || t.error);
+        setError(err.message || t('login.error'));
       }
     } finally {
       setLoading(false);
@@ -438,15 +291,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     } catch (err: any) {
       console.error("Google login error:", err);
       if (err.code === 'auth/popup-blocked') {
-        setError(language === 'tr' ? "Giriş penceresi engellendi. Lütfen pop-uplara izin verin." : "Popup blocked. Please allow popups.");
+        setError(t('login.errorPopupBlocked'));
       } else if (err.code === 'auth/popup-closed-by-user') {
-        setError(language === 'tr' ? "Giriş penceresi kapatıldı." : "Login window closed.");
+        setError(t('login.errorPopupClosed'));
       } else if (err.code === 'auth/configuration-not-found') {
-        setError(language === 'tr' ? "Firebase Yapılandırma Hatası: Lütfen Firebase Console üzerinden Authentication > Sign-in method sekmesinden Google'ı aktif edin ve projeniz için bir destek e-postası seçin." : "Firebase Configuration Error: Please enable Google sign-in in the Firebase Console (Authentication > Sign-in method) and select a support email for your project.");
+        setError(t('login.errorConfigNotFound'));
       } else if (err.code === 'auth/unauthorized-domain') {
-        setError(language === 'tr' ? "Yetkisiz Alan Adı: Bu alan adının Firebase Console > Authentication > Settings > Authorized Domains listesine eklenmesi gerekiyor." : "Unauthorized Domain: This domain needs to be added to the Authorized Domains list in the Firebase Console (Authentication > Settings).");
+        setError(t('login.errorUnauthorizedDomain'));
       } else {
-        setError(err.message || t.error);
+        setError(err.message || t('login.error'));
       }
     } finally {
       setLoading(false);
@@ -468,15 +321,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     } catch (err: any) {
       console.error("Apple login error:", err);
       if (err.code === 'auth/popup-blocked') {
-        setError(language === 'tr' ? "Giriş penceresi engellendi. Lütfen pop-uplara izin verin." : "Popup blocked. Please allow popups.");
+        setError(t('login.errorPopupBlocked'));
       } else if (err.code === 'auth/popup-closed-by-user') {
-        setError(language === 'tr' ? "Giriş penceresi kapatıldı." : "Login window closed.");
+        setError(t('login.errorPopupClosed'));
       } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
-        setError(language === 'tr' ? "Firebase Yapılandırma Hatası: Lütfen Firebase Console üzerinden Apple giriş yönteminin tam olarak yapılandırıldığından emin olun (Service ID, Team ID, Key ID ve Private Key)." : "Firebase Configuration Error: Please ensure Apple sign-in is fully configured in the Firebase Console (Service ID, Team ID, Key ID, and Private Key).");
+        setError(t('login.errorConfigNotFound'));
       } else if (err.code === 'auth/unauthorized-domain') {
-        setError(language === 'tr' ? "Yetkisiz Alan Adı: Bu alan adının Firebase Console > Authentication > Settings > Authorized Domains listesine eklenmesi gerekiyor." : "Unauthorized Domain: This domain needs to be added to the Authorized Domains list in the Firebase Console (Authentication > Settings).");
+        setError(t('login.errorUnauthorizedDomain'));
       } else {
-        setError(err.message || t.error);
+        setError(err.message || t('login.error'));
       }
     } finally {
       setLoading(false);
@@ -523,7 +376,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
               <h1 className="text-3xl font-serif text-[#ecd8a6] mb-4 tracking-widest uppercase">MadameSoul</h1>
               <div className="w-12 h-px bg-[#ecd8a6]/40 mx-auto mb-6" />
               <p className="text-[#ecd8a6]/60 font-serif italic text-lg leading-relaxed max-w-xs">
-                {language === 'tr' ? '"Yıldızların fısıltısını ve ruhunuzun derinliklerini keşfedin."' : '"Discover the whispers of the stars and the depths of your soul."'}
+                {t('login.quote')}
               </p>
             </div>
             
@@ -545,10 +398,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
             {/* Dynamic Titles */}
             <div className="text-center mb-8 w-full flex flex-col items-center">
               <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-tight mb-2 uppercase">
-                {isSignUp ? t.signUpTitle : t.signInTitle}
+                {isSignUp ? t('login.signUpTitle') : t('login.signInTitle')}
               </h2>
               <p className="text-[#ecd8a6]/50 text-xs sm:text-sm max-w-[280px] md:max-w-none italic">
-                {isSignUp ? t.signUpSubtitle : t.signInSubtitle}
+                {isSignUp ? t('login.signUpSubtitle') : t('login.signInSubtitle')}
               </p>
             </div>
 
@@ -569,7 +422,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder={t.email}
+                        placeholder={t('login.email')}
                         required
                         className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
                       />
@@ -580,7 +433,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder={t.password}
+                        placeholder={t('login.password')}
                         required
                         className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
                       />
@@ -599,7 +452,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
                     />
                     <label htmlFor="kvkk-consent-email" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
-                      {t.kvkkConsent}
+                      {t('login.kvkkConsent')}
                     </label>
                   </div>
 
@@ -613,7 +466,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     >
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                         <>
-                          <span>{isSignUp ? t.signUpLabel : t.signInLabel}</span>
+                          <span>{isSignUp ? t('login.signUpLabel') : t('login.signInLabel')}</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -624,7 +477,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       onClick={() => setIsSignUp(!isSignUp)}
                       className="w-full text-[#ecd8a6]/60 hover:text-[#ecd8a6] text-[10px] sm:text-xs font-serif uppercase tracking-widest transition-all py-2"
                     >
-                      {isSignUp ? t.hasAccount : t.noAccount}
+                      {isSignUp ? t('login.hasAccount') : t('login.noAccount')}
                     </button>
                   </div>
 
@@ -643,7 +496,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
                         <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                       </svg>
-                      {t.googleSignIn}
+                      {t('login.googleSignIn')}
                     </button>
 
                     <button 
@@ -655,7 +508,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       }`}
                     >
                       <Apple className="w-4 h-4" />
-                      {t.appleSignIn}
+                      {t('login.appleSignIn')}
                     </button>
 
                     <button 
@@ -664,7 +517,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 border border-[#ecd8a6]/20 transition-all"
                     >
                       {authMethod === 'email' ? <Phone className="w-3.5 h-3.5 opacity-50" /> : <Mail className="w-3.5 h-3.5 opacity-50" />}
-                      <span>{authMethod === 'email' ? t.switchToPhone : t.switchToEmail}</span>
+                      <span>{authMethod === 'email' ? t('login.switchToPhone') : t('login.switchToEmail')}</span>
                     </button>
 
                     <div className="pt-2">
@@ -674,7 +527,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
                       >
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                        <span>{t.showIntro}</span>
+                        <span>{t('login.showIntro')}</span>
                       </button>
                     </div>
 
@@ -774,7 +627,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                             type="tel"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                            placeholder={t.phone}
+                            placeholder={t('login.phone')}
                             required
                             className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
                           />
@@ -793,7 +646,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                           className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
                         />
                         <label htmlFor="kvkk-consent-phone" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
-                          {t.kvkkConsent}
+                          {t('login.kvkkConsent')}
                         </label>
                       </div>
 
@@ -806,7 +659,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>
-                            <span>{t.sendCode}</span>
+                            <span>{t('login.sendCode')}</span>
                             <MessageSquare className="w-4 h-4" />
                           </>
                         )}
@@ -820,7 +673,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                           type="text"
                           value={code}
                           onChange={(e) => setCode(e.target.value)}
-                          placeholder={t.enterCode}
+                          placeholder={t('login.enterCode')}
                           required
                           className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-4 pl-11 pr-4 text-[#ecd8a6] focus:border-[#ecd8a6]/40 outline-none transition-all text-center tracking-[0.5em] text-lg font-bold"
                         />
@@ -835,7 +688,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
                           <>
-                            <span>{t.verifyCode}</span>
+                            <span>{t('login.verifyCode')}</span>
                             <ShieldCheck className="w-4 h-4" />
                           </>
                         )}
@@ -858,7 +711,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         <path fill="currentColor" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
                         <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                       </svg>
-                      {t.googleSignIn}
+                      {t('login.googleSignIn')}
                     </button>
 
                     <button 
@@ -870,7 +723,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       }`}
                     >
                       <Apple className="w-4 h-4" />
-                      {t.appleSignIn}
+                      {t('login.appleSignIn')}
                     </button>
 
                     <button 
@@ -882,7 +735,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       className="w-full bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6] py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border border-[#ecd8a6]/10 transition-all flex items-center justify-center gap-3"
                     >
                       <Mail className="w-3.5 h-3.5 opacity-70" />
-                      {t.switchToEmail}
+                      {t('login.switchToEmail')}
                     </button>
 
                     <div className="pt-2">
@@ -892,7 +745,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
                       >
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                        <span>{t.showIntro}</span>
+                        <span>{t('login.showIntro')}</span>
                       </button>
                     </div>
 

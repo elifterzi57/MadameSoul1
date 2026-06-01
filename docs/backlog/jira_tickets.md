@@ -6,19 +6,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **42** | Açık: **6** | Tamamlanan: **36**
+Toplam Bilet: **51** | Açık: **0** | Tamamlanan: **51**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Atanan (Assignee) | Hedef Dosya |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-103**](#-ms-103) | Feature | İnteraktif Kart Seçim Ritüelinin Geliştirilmesi | Yüksek | Amelia (💻 Dev) | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
-| [**MS-146**](#-ms-146) | Feature | İnteraktif Kart Çekme Ritüelinde Mistik Arka Plan Müzikleri ve Ses Efektleri | Düşük | Amelia (💻 Dev) | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
-| [**MS-148**](#-ms-148) | Feature | Kaydedilen Falları Kişiselleştirme, Favorileme ve Yansıma/Gerçekleşme Notları | Orta | Amelia (💻 Dev) | [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx) |
-| [**MS-149**](#-ms-149) | Performance | Görsel Optimizasyonu ve Tarot Kart Görsellerinin WebP/Lazy-Loading ile Yüklenmesi | Düşük | Amelia (💻 Dev) | [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx) |
-| [**MS-150**](#-ms-150) | UX / UI | Çevrimdışı Kullanım Desteği ve PWA (Progressive Web App) Altyapısının Kurulması | Orta | Amelia (💻 Dev) | [index.html](file:///Users/elifterzi/antigravity/MadameSoul/index.html) |
-| [**MS-151**](#-ms-151) | Architecture | Gemini API Yanıtlarının Önbelleğe Alınması (Caching) ile Maliyet Optimizasyonu | Orta | Amelia (💻 Dev) | [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts) |
+| - | - | Tüm biletler tamamlandı. | - | - | - |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
@@ -61,6 +56,21 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-127**](#-ms-127) | Feature | Vite Bağımlılığının Üretim Ortamından (Dependencies) Çıkarılması | Orta | `vite` paketi `devDependencies`'e taşındı; `server.ts` içinde üretim ortamı için Vite bağımlılığı ve dinamik importu devre dışı bırakıldı. | Winston |
 | [**MS-134**](#-ms-134) | Feature | Firebase Analytics ve Dönüşüm Hunisi (Conversion Funnel) İzleme Altyapısı | Orta | Firebase Analytics kuruldu; onboarding tamamlama, sepet yönlendirme ve ödeme tamamlama gibi kritik huni eventleri loglandı. | John |
 | [**MS-143**](#-ms-143) | Feature | PDF Çıktısında Aynı Anda İki Reklam Görseli Gösterilmesi ve Tıklanabilir Yapılması | Orta | `pdfGenerator.ts` altında `ad1` ve `ad2` reklamlarının alt alta çizilmesi ve jsPDF `pdf.link(...)` ile tıklanabilir olması sağlandı. | John |
+| [**MS-103**](#-ms-103) | Feature | İnteraktif Kart Seçim Ritüelinin Geliştirilmesi | Yüksek | Form gönderiminde kart çekim ritüeli ekranı (DRAWING) eklendi, 35 kapalı karttan hover/seçim/flip animasyonlarıyla 3 kart çekilip "Açılımı Yorumla" ile Gemini API tetiklenmesi sağlandı. | Sally |
+| [**MS-152**](#-ms-152) | Bug | Üretim Ortamında Stripe Webhook İmza Doğrulamasının Zorunlu Kılınması | En Yüksek | Stripe webhook endpointinde üretim ortamında webhook imza doğrulaması (`constructEvent`) zorunlu kılındı. | Paige |
+| [**MS-153**](#-ms-153) | Bug | Hesap Silme Akışında Re-Authentication Kontrolü ve İşlem Sırası Güvencesi | Yüksek | Hesap silme öncesi son oturum zamanı (lastSignInTime) ile re-auth tazeliği kontrolü yapıldı, veritabanı silmeleri tek bir atomik writeBatch içinde yapıldıktan sonra auth hesabı silindi. | Paige |
+| [**MS-160**](#-ms-160) | i18n / Bug | Eksik Dil Çevirilerinin (dailyGift, focusOptions vb.) Eklenmesi | Yüksek | `es.yaml`, `fr.yaml`, `zh.yaml` ve `ko.yaml` dosyalarına eksik olan dailyGift, dailyGiftClaimed ve focusOptions / focusLabel anahtarları eklendi. | Paige |
+| [**MS-146**](#-ms-146) | Feature | İnteraktif Kart Çekme Ritüelinde Mistik Arka Plan Müzikleri ve Ses Efektleri | Düşük | `App.tsx` içerisine ses kontrolü (Mute/Unmute) eklendi, kart çekme adımında mistik ortam müziği (ambient) ve kart etkileşimlerinde (hover, click, flip) chime ses efektleri entegre edildi. | John |
+| [**MS-148**](#-ms-148) | Feature | Kaydedilen Falları Kişiselleştirme, Favorileme ve Yansıma/Gerçekleşme Notları | Orta | `Profile.tsx` fal geçmişi detaylandırılarak favorileme (yıldız), özel başlık (customTitle) ve yansıma notu (reflectionNotes) ekleme/kaydetme özellikleri Firestore işlemleriyle senkronize edildi. | John |
+| [**MS-149**](#-ms-149) | Performance | Görsel Optimizasyonu ve Tarot Kart Görsellerinin WebP/Lazy-Loading ile Yüklenmesi | Düşük | Tüm kart PNG görselleri `.webp` formatına dönüştürüldü, `App.tsx` ve `pdfGenerator.ts` üzerindeki görsel yolları güncellendi ve istemci tarafında `loading="lazy"` eklendi. | Winston |
+| [**MS-150**](#-ms-150) | UX / UI | Çevrimdışı Kullanım Desteği ve PWA (Progressive Web App) Altyapısının Kurulması | Orta | `manifest.json` ve Service Worker (`sw.js`) entegre edilerek statik varlıkların cache-first stratejisiyle önbelleğe alınması ve Firestore `enableIndexedDbPersistence` ile çevrimdışı çalışma sağlandı. | Sally |
+| [**MS-151**](#-ms-151) | Architecture | Gemini API Yanıtlarının Önbelleğe Alınması (Caching) ile Maliyet Optimizasyonu | Orta | Firestore `reading_cache` koleksiyonu kurularak `/api/generate` uç noktasında son 24 saatteki aynı (uid, cards, focus) talepleri için önbellekten yanıt dönülmesi ve rollback bakiye koruması sağlandı. | Winston |
+| [**MS-154**](#-ms-154) | Performance | Dil Dosyalarının Bellekte Önbelleğe Alınması (Locales Memory Caching) | Orta | Sunucu başlangıcında `src/locales/` klasöründeki YAML dosyaları okunup `localesCache` bellek içi nesnesine alındı ve her istekte diske erişmek yerine bu önbellekten çeviri değerleri döndürüldü. | Paige |
+| [**MS-155**](#-ms-155) | Architecture | Gemini İstek Sınırlandırmasının (Rate Limit) IP Yerine User UID Üzerinden Yapılması | Orta | `/api/generate` uç noktasında rate limiter kimlik doğrulamasından sonraya taşındı, IP yerine `req.user.uid` üzerinden sınırlandırma kuruldu ve limit aşımında yerelleştirilmiş hata mesajı dönüldü. | Paige |
+| [**MS-156**](#-ms-156) | i18n / UX | Çerez Çubuğu (CookieBanner) ve Hata Yakalayıcı (ErrorBoundary) Metinlerinin Yerelleştirilmesi | Düşük | `CookieBanner.tsx` ve `ErrorBoundary.tsx` içerisindeki tüm hardcoded metinler dil dosyalarına taşındı ve merkezi `t` fonksiyonu ile çağrılarak yerelleştirildi. | Paige |
+| [**MS-157**](#-ms-157) | i18n / UX | Mağaza Paket Metinlerinin ve Giriş Bileşeni Çevirilerinin Taşınması | Düşük | `StoreModal.tsx` bonus metinleri ve `Login.tsx` içindeki yerel çeviri nesneleri kaldırılarak tamamı merkezi dil dosyalarına (YAML) taşındı ve yerel `t` fonksiyonuyla okundu. | Paige |
+| [**MS-158**](#-ms-158) | UX / UI | Onboarding Ekranındaki Slayt Görsellerinin Çeşitlendirilmesi | Düşük | `Onboarding.tsx` onboarding tanıtım akışında hoş geldin, keşif ve yolculuk temaları için 3 ayrı WebP görseli kullanılarak arayüz zenginleştirildi. | Paige |
+| [**MS-159**](#-ms-159) | Test | Fal Çekme ve Profil Etkileşimleri İçin Playwright E2E Test Kapsamının Genişletilmesi | Orta | Playwright test senaryoları onboarding geçişi, form doldurma, kart çekim chimes ritüeli, fal sonucunun yüklenmesi ve profil geçmişi/günlük düzenleme akışlarını kapsayacak şekilde genişletildi. | Paige |
 
 
 ---
@@ -69,29 +79,27 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-### 🔴 MS-103: İnteraktif Kart Seçim Ritüelinin Geliştirilmesi (Feature)
 
-* **Öncelik:** Yüksek (High)
-* **Durum:** 📋 Yapılacak (To Do)
-* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Kullanıcı Deneyimi (UX / UI)
-* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx)
-* **Açıklama:**  
-  Tarot falı bakma sürecinin en büyüleyici aşaması, kullanıcının kendi kartlarını seçtiği andır. Şu anki yapıda kullanıcı formu doldurduktan sonra sistem doğrudan 3 kart çekip sonuç ekranına geçmektedir. Bu durum ritüel hissini baltalamakta ve sıradan bir form doldurma hissi yaratmaktadır. Kullanıcının önüne ters çevrilmiş tarot kartı destesi (card deck/board) serilmeli, kullanıcı kartların üzerinde gezinirken mistik hover animasyonları görmeli ve tıklayarak sırasıyla 3 kart seçmelidir (Geçmiş, Şimdiki Zaman, Gelecek). Kartlar seçildikten sonra animasyonlu bir geçişle yorumlama aşamasına geçilmelidir.
-* **Kabul Kriterleri:**
-  1. Form gönderildikten sonra `step === 'DRAWING'` aşamasına geçildiğinde kullanıcıya 3 kart seçmesini söyleyen mistik bir arayüz gösterilmelidir.
-  2. Ters çevrilmiş kartlardan oluşan ve mistik temaya (mor/altın tonları) uygun arkalıklara sahip interaktif bir deste (kart tahtası) sunulmalıdır.
-  3. Kartların üzerine gelindiğinde (hover) yumuşak bir yükselme, parlama (glow) ve hafif eğilme (tilt/scale) mikro-etkileşimleri olmalıdır.
-  4. Kullanıcı kartlara tıkladığında kart seçilmeli, kaçıncı kart olduğu (Geçmiş/Şimdi/Gelecek) görsel olarak belirtilmeli ve 3 kart tamamlanana kadar seçim devam etmelidir.
-  5. 3 kart seçildiğinde otomatik olarak veya "Açılımı Başlat" butonuyla yorum yükleme aşamasına (Gemini API isteğine) geçilmeli ve kartlar animasyonla ters yüz (flip animation) edilerek gösterilmelidir.
 
----
 
-### 🟢 MS-146: İnteraktif Kart Çekme Ritüelinde Mistik Arka Plan Müzikleri ve Ses Efektleri (Feature)
+
+
+
+
+
+
+
+
+
+
+
+
+## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-146: İnteraktif Kart Çekme Ritüelinde Mistik Arka Plan Müzikleri ve Ses Efektleri (Feature)
 
 * **Öncelik:** Düşük (Low)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** John (📋 PM / `bmad-agent-pm`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Kullanıcı Deneyimi (UX / UI)
@@ -104,12 +112,15 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   3. Kart seçerken, hover yaparken ve kartlar açılırken yumuşak ses efektleri (card sound) çalmalıdır.
   4. Ses dosyaları `public/assets/audio/` altında telifsiz ve yüksek kaliteli formatlarda saklanmalıdır.
 
+
+* **Çözüm:** `App.tsx` içerisine ses kontrolü (Mute/Unmute) butonu eklendi ve seçimi localStorage'a kaydedildi. Kart çekim ekranına geçildiğinde döngüsel ambient müzik (`ambient.wav`) çalmaya başlar. Kartların üzerine gelindiğinde, seçildiğinde ve çevrildiğinde sırasıyla `hover.wav`, `draw.wav`, `reveal.wav` chime sesleri oynatılır.
+
 ---
 
-### 🟡 MS-148: Kaydedilen Falları Kişiselleştirme, Favorileme ve Yansıma/Gerçekleşme Notları (Feature)
+### ✅ MS-148: Kaydedilen Falları Kişiselleştirme, Favorileme ve Yansıma/Gerçekleşme Notları (Feature)
 
 * **Öncelik:** Orta (Medium)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** John (📋 PM / `bmad-agent-pm`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Profil / Geçmiş Modülü
@@ -121,12 +132,15 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   2. Kullanıcı fal geçmişindeki kayıtlara özel bir başlık (örn. "İş Görüşmesi Öncesi Açılım") verebilmelidir.
   3. Kullanıcı geçmiş faldaki detay ekranında "Yansıma ve Gerçekleşme Notu" başlığı altında serbest metin alanı ile kendi notlarını ekleyip kaydedebilmelidir.
 
+
+* **Çözüm:** `Profile.tsx` fal geçmişi accordion yapısıyla genişletildi. Her fal kartına favorileme için yıldız ikonu eklendi. Tıklandığında açılan detay görünümünde, fal içeriğinin yanı sıra `customTitle` ve `reflectionNotes` düzenleme alanları sunuldu. Kaydet butonuna tıklandığında değişiklikler Firestore transaction'ı ile atomik olarak kaydedilmektedir.
+
 ---
 
-### 🔵 MS-149: Görsel Optimizasyonu ve Tarot Kart Görsellerinin WebP/Lazy-Loading ile Yüklenmesi (Performance)
+### ✅ MS-149: Görsel Optimizasyonu ve Tarot Kart Görsellerinin WebP/Lazy-Loading ile Yüklenmesi (Performance)
 
 * **Öncelik:** Düşük (Low)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Winston (📐 Architect / `bmad-agent-architect`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Performans ve Mobil Optimizasyon
@@ -137,12 +151,15 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   1. Tüm kart görselleri `.webp` formatına dönüştürülmeli ve `public/cards/` klasörüne aktarılmalıdır.
   2. Arayüzde kullanılan `<img>` etiketlerine `loading="lazy"` niteliği eklenmeli ve WebP yolları kullanılmalıdır.
 
+
+* **Çözüm:** Tüm kart resimleri `.webp` formatına dönüştürüldü ve `public/cards/` klasörüne yüklendi. `App.tsx` ve `pdfGenerator.ts` dosyalarındaki görsel yolları güncellendi. Arayüzdeki kart `<img>` etiketlerine `loading="lazy"` niteliği eklenerek LCP performansı optimize edildi.
+
 ---
 
-### 🔵 MS-150: Çevrimdışı Kullanım Desteği ve PWA (Progressive Web App) Altyapısının Kurulması (UX / UI)
+### ✅ MS-150: Çevrimdışı Kullanım Desteği ve PWA (Progressive Web App) Altyapısının Kurulması (UX / UI)
 
 * **Öncelik:** Orta (Medium)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Mobil Kullanıcı Deneyimi
@@ -154,12 +171,15 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   2. Service Worker (`sw.js`) entegre edilerek statik varlıkların (CSS, JS, Fontlar, Kart Görselleri) önbelleğe alınması ve çevrimdışı ortamda uygulamanın açılabilmesi sağlanmalıdır.
   3. Çevrimdışı durumda Firestore'daki geçmiş verilerin `enableIndexedDbPersistence` aracılığıyla yerel diskten okunması etkinleştirilmelidir.
 
+
+* **Çözüm:** Progressive Web App desteği için `manifest.json` ve Service Worker (`sw.js`) kuruldu. Varlıkların cache-first stratejisi ile önbelleğe alınması sağlandı. `firebase.ts` dosyasına `enableIndexedDbPersistence` entegre edilerek Firebase veritabanına çevrimdışı erişim yeteneği kazandırıldı.
+
 ---
 
-### 🔵 MS-151: Gemini API Yanıtlarının Önbelleğe Alınması (Caching) ile Maliyet Optimizasyonu (Architecture)
+### ✅ MS-151: Gemini API Yanıtlarının Önbelleğe Alınması (Caching) ile Maliyet Optimizasyonu (Architecture)
 
 * **Öncelik:** Orta (Medium)
-* **Durum:** 📋 Yapılacak (To Do)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Winston (📐 Architect / `bmad-agent-architect`)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** API Mimarisi ve Maliyet Optimizasyonu
@@ -171,9 +191,130 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   2. `/api/generate` uç noktasında, istek gövdesindeki (uid, cards, focus) bilgileri içeren bir hash anahtarı ile Firestore `reading_cache` sorgulanmalıdır.
   3. Eğer son 24 saatte üretilmiş bir kayıt varsa, Gemini çağrılmadan önbellekteki okuma metni dönülmeli ve bakiye tekrar düşürülmemelidir.
 
+
+* **Çözüm:** Firestore `reading_cache` koleksiyonu oluşturuldu. Sunucu tarafında `/api/generate` uç noktasında istek parametrelerinden üretilen `sha256(uid:cards:focus)` hash anahtarı aranır. Son 24 saat içinde üretilmiş bir önbellek kaydı varsa, Gemini API bypass edilerek önbellekteki okuma metni döndürülür ve kullanıcının bakiyesi düşürülmez. Bir hata veya rollback durumunda bakiye iade edilir.
+
 ---
 
-## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+### ✅ MS-154: Dil Dosyalarının Bellekte Önbelleğe Alınması (Locales Memory Caching) (Performance)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Sunucu Performansı ve Optimizasyon
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  `server.ts` içinde yer alan `getTranslation` yardımcı fonksiyonu, sunucuya gelen her fal üretme isteğinde (`/api/generate`) diske giderek ilgili dilin `.yaml` dosyasını senkron olarak okumaktadır (`fs.readFileSync`). Eşzamanlı isteklerin yoğun olduğu zamanlarda bu durum sunucu üzerinde disk I/O darboğazına (bottleneck) yol açarak yanıt sürelerini uzatır.
+* **Kabul Kriterleri:**
+  1. Sunucu başlatılırken (startup aşamasında) `src/locales/` dizinindeki tüm dil dosyaları bir kez okunmalı, ayrıştırılmalı (YAML.parse) ve bir bellek içi nesnede (memory cache) saklanmalıdır.
+  2. `getTranslation` fonksiyonu her istekte diske erişmek yerine bu bellek içi önbellekten çeviri değerlerini döndürmelidir.
+  3. Geliştirme ortamında dil dosyası değişikliklerinin yansıması için dosya izleme (file watcher/hot-reload) desteği eklenebilir veya üretim modunda kalıcı önbellek aktif edilmelidir.
+
+
+* **Çözüm:** Dil dosyaları için Locales Memory Caching entegre edildi. Sunucu startup aşamasında `src/locales/` klasöründeki YAML dosyaları bir kez okunup `localesCache` nesnesine parse edilerek yüklenir. `getTranslation` fonksiyonu her istekte disk okuması (fs.readFileSync) yapmak yerine bellek içi önbellekten hızlıca yanıt döner.
+
+---
+
+### ✅ MS-155: Gemini İstek Sınırlandırmasının (Rate Limit) IP Yerine User UID Üzerinden Yapılması (Architecture)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Sunucu Güvenliği ve İstek Sınırlandırma
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Gemini API uç noktasında bot/saldırı koruması amacıyla kullanılan `express-rate-limit` ara yazılımı IP adresi bazlı çalışmaktadır. Aynı mobil veri şebekesini, okul/ofis ağını veya VPN paylaşan kullanıcılar aynı harici IP adresini kullandıkları için birbirlerinin istek limitini doldurarak "Too many requests" hatası alabilirler. İstek atan kullanıcılar zaten sisteme üye girişi yaptığı için, limitleme IP yerine kullanıcının doğrulanmış Firebase UID'si üzerinden yapılmalıdır.
+* **Kabul Kriterleri:**
+  1. Rate limiter yapılandırmasında `keyGenerator` fonksiyonu güncellenmeli ve doğrulanmış `req.user.uid` değeri anahtar olarak kullanılmalıdır.
+  2. Kimliği doğrulanamamış veya geçersiz istek durumunda fallback olarak yine IP adresi kullanılmalıdır.
+  3. Kullanıcının limit aşımı durumunda kullanıcıya gösterilecek hata mesajı yerelleştirilmiş olmalı veya toast üzerinden düzgün aktarılmalıdır.
+
+
+* **Çözüm:** Express rate limiter `/api/generate` uç noktasında authenticate middleware'den sonraya taşındı. `keyGenerator` fonksiyonu doğrulanmış Firebase `req.user.uid` değerini anahtar olarak kullanacak şekilde güncellendi. Limit aşımında yerelleştirilmiş hata mesajı dönülmesi sağlandı.
+
+---
+
+### ✅ MS-156: Çerez Çubuğu (CookieBanner) ve Hata Yakalayıcı (ErrorBoundary) Metinlerinin Yerelleştirilmesi (i18n / UX)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Arayüz ve Yerelleştirme
+* **Hedef Dosya:** [CookieBanner.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/CookieBanner.tsx)
+* **Açıklama:**  
+  Uygulamadaki çerez bilgilendirme çubuğu (`CookieBanner.tsx`) ve çalışma zamanı hata yakalayıcısı (`ErrorBoundary.tsx`) içerisindeki metinler arayüzde doğrudan Türkçe veya İngilizce olarak hardcoded kodlanmıştır. Uygulamanın desteklediği diğer diller (İspanyolca, Fransızca, Çince, Korece) seçildiğinde bu bileşenlerde dil uyumluluğu sağlanamamakta ve kullanıcı deneyimi zarar görmektedir.
+* **Kabul Kriterleri:**
+  1. `CookieBanner` ve `ErrorBoundary` içindeki tüm başlık, açıklama ve buton metinleri `src/locales/` altındaki YAML dosyalarına (örneğin `cookieConsent.text`, `errorBoundary.title` vb. anahtarlarla) eklenmelidir.
+  2. Bileşenler doğrudan bu yerelleştirilmiş anahtarları `t` fonksiyonu ile çağıracak şekilde güncellenmelidir.
+  3. Tüm dillerde çerez onay çubuğu ve hata ekranı test edilmelidir.
+
+
+* **Çözüm:** `CookieBanner.tsx` ve `ErrorBoundary.tsx` bileşenlerindeki tüm hardcoded metinler kaldırılarak `src/locales/` YAML dosyalarındaki `cookieConsent.*` ve `errorBoundary.*` anahtarlarına taşındı ve arayüzde `t` yerelleştirme fonksiyonuyla okundu.
+
+---
+
+### ✅ MS-157: Mağaza Paket Metinlerinin ve Giriş Bileşeni Çevirilerinin Taşınması (i18n / UX)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Arayüz ve Dil Standartları
+* **Hedef Dosya:** [StoreModal.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/StoreModal.tsx)
+* **Açıklama:**  
+  `StoreModal.tsx` dosyasındaki kredi paketlerinin yanında yazan bonus metinleri ("1 Free Katina Moon", "5 Free Katina Moons") İngilizce olarak kod içerisine yazılmıştır. Ayrıca `Login.tsx` bileşeni kendi içinde devasa bir yerel `translations` nesnesi barındırmaktadır. Bu durum kod kalitesini düşürmece ve yerelleştirme yönetimini zorlaştırmaktadır.
+* **Kabul Kriterleri:**
+  1. Mağaza bonus metinleri ve `Login.tsx` içindeki tüm statik çeviriler merkezi `src/locales/` altındaki YAML dosyalarına aktarılmalıdır.
+  2. Bileşenler içindeki tüm sabit çeviri nesneleri kaldırılmalı, merkezi `t` fonksiyonu kullanılarak değerler çekilmelidir.
+  3. Tüm paketlerin bonus metinlerinin seçilen dille uyumlu şekilde değiştiği doğrulanmalıdır.
+
+
+* **Çözüm:** `StoreModal.tsx` bonus metinleri ve `Login.tsx` içindeki yerel çeviri sözlüğü tamamen temizlendi. Bu çeviriler merkezi `src/locales/` YAML dosyalarına aktarılarak bileşenlerin standard `t` çeviri prop'u ile çalışması sağlandı.
+
+---
+
+### ✅ MS-158: Onboarding Ekranındaki Slayt Görsellerinin Çeşitlendirilmesi (UX / UI)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Onboarding Tanıtım Ekranı
+* **Hedef Dosya:** [Onboarding.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Onboarding.tsx)
+* **Açıklama:**  
+  Uygulamanın onboarding tanıtım akışında 3 ayrı slayt bulunmasına rağmen, bu slaytların arka planında kullanılan görsel dizisi tek bir resmi (`onboarding_1.jpg`) işaret etmektedir. Bu durum tanıtım adımlarını görsel olarak monotonlaştırmakta ve premium hissiyatı zayıflatmaktadır.
+* **Kabul Kriterleri:**
+  1. Hoş Geldin (Welcome), Keşif (Discovery) ve Yolculuk (Journey) temalarını temsil eden 3 ayrı mistik tasarım görseli oluşturularak `/public/assets/onboarding/` klasörüne eklenmelidir.
+  2. `Onboarding.tsx` dosyasındaki `slideImages` dizisi bu yeni görselleri çağıracak şekilde güncellenmelidir.
+  3. Slaytlar arasında geçiş yaparken görsellerin yumuşak bir fade-in animasyonuyla değiştiği teyit edilmelidir.
+
+
+* **Çözüm:** Onboarding slayt akışında Hoş Geldin, Keşif ve Yolculuk temalarına özel 3 adet benzersiz mistik WebP görseli (`onboarding_welcome.webp`, `onboarding_discovery.webp`, `onboarding_journey.webp`) tasarlandı ve `Onboarding.tsx` slayt dizisine eklendi.
+
+---
+
+### ✅ MS-159: Fal Çekme ve Profil Etkileşimleri İçin Playwright E2E Test Kapsamının Genişletilmesi (Test)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Test Otomasyonu
+* **Hedef Dosya:** [app.spec.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/e2e/app.spec.ts)
+* **Açıklama:**  
+  Mevcut Playwright E2E testlerimiz sadece onboarding slaytlarını geçmeyi ve login ekranının açılmasını kontrol etmektedir. Uygulamanın kalbi olan kart seçme formu, kart çekme ritüeli, fal yorumu gösterimi, profil modalının açılması ve dil değiştirme işlemlerinin otomatik olarak doğrulanması gerekmektedir.
+* **Kabul Kriterleri:**
+  1. Playwright test senaryolarına mock kullanıcı ile giriş yapma adımları eklenmelidir.
+  2. Giriş sonrası ad soyad, doğum tarihi ve odak alanı formunun doldurulması, 3 kart çekilmesi ve fal sonucunun yüklenmesi senaryoları simüle edilmelidir.
+  3. Profil modalının açılması ve geçmiş falların listelenmesi akışları da test kapsamına dahil edilmelidir.
+
+
+* **Çözüm:** Playwright E2E testleri (`tests/e2e/app.spec.ts`) onboarding adımlarını geçme, form doldurma (isim, doğum tarihi, odak alanı seçimi), kapalı desteden 3 kart çekme ritüeli, mistik ses kontrollerinin testi, fal sonucunun alınması ve profil geçmişindeki falları düzenleyip not kaydetme akışlarını kapsayacak şekilde baştan sona genişletildi.
+
+---
 
 ### ✅ MS-101: Profil Bilgisi Durum Senkronizasyon Hatası (Bug)
 
@@ -539,6 +680,24 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 
 * **Çözüm:** `index.css` dosyasında Google Fonts `Inter` yazı tipi içe aktarıldı, `--font-sans` değişkeni `Inter` olarak değiştirildi ve `--font-playfair` eklendi. Gövde metinleri ve inputlar için varsayılan font `Inter` yapılırken satır yüksekliği `1.8` olarak optimize edildi.
 
+---
+
+### ✅ MS-103: İnteraktif Kart Seçim Ritüelinin Geliştirilmesi (Feature)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı Deneyimi (UX / UI)
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx)
+* **Açıklama:**  
+  Tarot falı bakma sürecinin en büyüleyici aşaması, kullanıcının kendi kartlarını seçtiği andır. Şu anki yapıda kullanıcı formu doldurduktan sonra sistem doğrudan 3 kart çekip sonuç ekranına geçmektedir. Bu durum ritüel hissini baltalamakta ve sıradan bir form doldurma hissi yaratmaktadır. Kullanıcının önüne ters çevrilmiş tarot kartı destesi (card deck/board) serilmeli, kullanıcı kartların üzerinde gezinirken mistik hover animasyonları görmeli ve tıklayarak sırasıyla 3 kart seçmelidir (Geçmiş, Şimdiki Zaman, Gelecek). Kartlar seçildikten sonra animasyonlu bir geçişle yorumlama aşamasına geçilmelidir.
+* **Kabul Kriterleri:**
+  1. Form gönderildikten sonra `step === 'DRAWING'` aşamasına geçildiğinde kullanıcıya 3 kart seçmesini söyleyen mistik bir arayüz gösterilmelidir.
+  2. Ters çevrilmiş kartlardan oluşan ve mistik temaya (mor/altın tonları) uygun arkalıklara sahip interaktif bir deste (kart tahtası) sunulmalıdır.
+  3. Kartların üzerine gelindiğinde (hover) yumuşak bir yükselme, parlama (glow) ve hafif eğilme (tilt/scale) mikro-etkileşimleri olmalıdır.
+  4. Kullanıcı kartlara tıkladığında kart seçilmeli, kaçıncı kart olduğu (Geçmiş/Şimdi/Gelecek) görsel olarak belirtilmeli ve 3 kart tamamlanana kadar seçim devam etmelidir.
+  5. 3 kart seçildiğinde otomatik olarak veya "Açılımı Başlat" butonuyla yorum yükleme aşamasına (Gemini API isteğine) geçilmeli ve kartlar animasyonla ters yüz (flip animation) edilerek gösterilmelidir.
 ---
 
 ### ✅ MS-104: Tarayıcı `alert()` Yapısının Özel Modal/Toast ile Değiştirilmesi (Task)
@@ -992,3 +1151,61 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 * **Çözüm:** PDF şablonu oluşturma aşamasında `ads_config.json` dosyasındaki `ad1` ve `ad2` reklamlarının her ikisinin de aktif olduğu durumlarda, görsellerin alt alta hizalanması sağlandı. html2canvas öncesinde görsellerin bounding box'ları okunup, jsPDF tarafında `pdf.link(...)` ile her iki görsel için ayrı ayrı tıklanabilir yönlendirme koordinatları tanımlandı.
 
 ---
+
+---
+
+### ✅ MS-152: Üretim Ortamında Stripe Webhook İmza Doğrulamasının Zorunlu Kılınması (Bug - Security)
+
+* **Öncelik:** En Yüksek (Highest)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** API Güvenliği / Stripe Ödeme Entegrasyonu
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Express sunucusunda yer alan `/api/stripe-webhook` rotası, Stripe API anahtarları veya webhook imza bilgisi eksik olduğunda doğrulamayı bypass ederek gelen isteğin gövdesini doğrudan `JSON.parse` ile ayrıştırıp ödeme onayı vermektedir. Bu durum geliştirme ortamında kolaylık sağlasa da, üretim ortamında (`process.env.NODE_ENV === 'production'`) ciddi bir güvenlik açığıdır. Saldırganlar sahte webhook istekleriyle kendi hesaplarına bedelsiz bakiye tanımlayabilirler.
+* **Kabul Kriterleri:**
+  1. Üretim ortamında (`process.env.NODE_ENV === 'production'`) webhook imza doğrulaması (`stripe.webhooks.constructEvent`) kesinlikle zorunlu olmalı ve doğrulanamayan hiçbir webhook çağrısına bakiye tanımlanmamalıdır.
+  2. İmza doğrulaması başarısız olan istekler HTTP 400 Bad Request hatasıyla reddedilmelidir.
+  3. Geliştirme ortamında imza doğrulamasını esneten veya bypass eden mekanizma sadece `NODE_ENV !== 'production'` koşulunda çalışmalıdır.
+
+---
+
+### ✅ MS-153: Hesap Silme Akışında Re-Authentication Kontrolü ve İşlem Sırası Güvencesi (Bug - Data Integrity)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı Gizliliği ve Veri Güvenliği
+* **Hedef Dosya:** [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx)
+* **Açıklama:**  
+  Kullanıcı profil sekmesinden hesabını sildiğinde, Firestore koleksiyonlarındaki (users, user_moons, transactions, phones) veriler silindikten sonra Firebase Auth üzerindeki `user.delete()` fonksiyonu tetiklenmektedir. Firebase Auth kuralları gereği, eğer kullanıcının oturum süresi eskiyse Auth silme adımı `auth/requires-recent-login` hatasıyla başarısız olur. Bu durum, kullanıcının Firestore'daki tüm verilerinin silinip Auth hesabının açık kalmasına sebep olarak veritabanında bozuk/kimsesiz (orphaned) hesaplar oluşturur.
+* **Kabul Kriterleri:**
+  1. Hesap silme akışında Firestore veritabanı silme işlemlerine başlanmadan önce kullanıcının re-authenticate (yeniden şifre doğrulama veya SMS onaylama) yapması zorunlu kılınmalıdır.
+  2. Firebase Auth `user.delete()` işlemi başarılı bir şekilde gerçekleştirildikten sonra (veya reauth güvencesi alındıktan sonra) veritabanı silme adımları çalıştırılmalıdır.
+  3. Hata alınması durumunda Firestore verilerinin kısmi silinmesini engellemek için silme akışı işlem güvenliği kurallarına uygun tasarlanmalıdır.
+
+---
+
+### ✅ MS-160: Eksik Dil Çevirilerinin (dailyGift, focusOptions vb.) Eklenmesi (i18n / Bug)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Paige (📚 Tech Writer / `bmad-agent-tech-writer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Yerelleştirme (Localization - i18n)
+* **Hedef Dosya:** [es.yaml](file:///Users/elifterzi/antigravity/MadameSoul/src/locales/es.yaml)
+* **Açıklama:**  
+  Uygulamaya yeni eklenen günlük ücretsiz bakiye alma (daily claim) ve tarot odak/kategori seçimi (reading focus area) özellikleri kapsamında yeni dil anahtarları tanımlanmıştır. Ancak bu anahtarlar sadece Türkçe (`tr.yaml`) ve İngilizce (`en.yaml`) dil dosyalarında yer almaktadır. İspanyolca (`es`), Fransızca (`fr`), Çince (`zh`) ve Korece (`ko`) dil dosyalarında bu anahtarlar eksik olduğu için ilgili dilleri seçen kullanıcılarda bu alanlar İngilizceye fallback yapmakta veya hatalı görüntülenebilmektedir.
+  Eksik anahtarlar:
+  - `dailyGift`
+  - `dailyGiftClaimed`
+  - `focusOptions.general`
+  - `focusOptions.love`
+  - `focusOptions.career`
+  - `focusOptions.health`
+  - `focusLabel`
+* **Kabul Kriterleri:**
+  1. `es.yaml`, `fr.yaml`, `zh.yaml` ve `ko.yaml` dosyalarına belirtilen 7 yerelleştirme anahtarı kendi hedef dillerindeki anlamlı karşılıklarıyla eklenmelidir.
+  2. Giriş sonrası fal formunda yer alan odak seçim kutusu ve günlük ücretsiz kredi kazanım bildirimlerinin tüm dillerde doğru şekilde yüklendiği doğrulanmalıdır.
