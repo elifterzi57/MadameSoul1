@@ -1160,7 +1160,7 @@ login:
   loading: "Yükleniyor..."
   showIntro: "Uygulama Tanıtımını Gör"
   kvkkConsent: "Kullanıcı Sözleşmesini, Gizlilik Politikasını ve KVKK/GDPR Açık Rıza Metnini okudum, onaylıyorum."
-  quote: \"Yıldızların fısıltısını ve ruhunuzun derinliklerini keşfedin."
+  quote: "Yıldızların fısıltısını ve ruhunuzun derinliklerini keşfedin."
   errorWrongCredentials: "E-posta adresi veya şifre hatalı."
   errorEmailInUse: "Bu e-posta adresi zaten kullanımda."
   errorInvalidEmail: "Geçersiz e-posta adresi."

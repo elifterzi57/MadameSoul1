@@ -31,44 +31,68 @@ Sunucunun ayakta olup olmadığını ve istekleri kabul edip etmediğini hızlı
 
 ## 2. Gemini İçerik Üretim Uç Noktası (Gemini Content Generation)
 
-Kullanıcının seçtiği Katina kartları ve kişisel bilgilerine göre Gemini AI kullanarak tarot okuması (yorum) oluşturur. Bu uç nokta backend üzerinden Google Gemini API (`gemini-3-flash-preview` modeli) ile güvenli bir şekilde iletişim kurar.
+Kullanıcının seçtiği Katina kartları ve kişisel bilgilerine göre Gemini AI kullanarak asenkron olarak tarot okuması (yorum) oluşturur. Bu uç nokta backend üzerinden Google Gemini API ile güvenli bir şekilde iletişim kurar.
 
 - **URL:** `/api/generate`
 - **Yöntem (Method):** `POST`
-- **Kimlik Doğrulama (Auth):** Gerekmiyor (ancak istemci tarafında Firebase Auth üzerinden giriş yapılmış olması ve işlemlerin Firestore tarafında doğrulanması gerekir. Doğrudan API çağrısı API anahtarının gizliliği için backend üzerinden proxilenmiştir).
+- **Kimlik Doğrulama (Auth):** Zorunlu. Firebase Auth ID Token istek başlığında gönderilmelidir: `Authorization: Bearer <ID_TOKEN>`.
+- **Hız Sınırı (Rate Limit):** Kullanıcı (UID) başına saatte 15 istek.
 - **İstek Gövdesi (Request Body):**
 ```json
 {
-  "prompt": "Örnek prompt metni. Seçilen kartlar, kullanıcının bilgileri ve ilişki durumu gibi detayları içerir."
+  "transactionId": "tx_xyz123",
+  "cards": ["mira", "valide", "deste"],
+  "userName": "Elif",
+  "dob": "1990-01-01",
+  "birthplace": "Istanbul",
+  "relationship": "single",
+  "language": "tr",
+  "focus": "love"
 }
 ```
 
 ### Yanıtlar (Responses)
 
-- **Başarı Durumu (200 OK):**
+- **Başarı Durumu (200 OK) - Üretim Başlatıldı (Firebase Admin Aktif):**
+  İstek hemen yanıtlanır ve arka planda Gemini yorum üretimi süreci başlar.
 ```json
 {
-  "text": "Gemini tarafından üretilen tarot yorumu metni..."
+  "status": "pending",
+  "transactionId": "tx_xyz123"
 }
 ```
 
-- **Hata Durumu (400 Bad Request) - Prompt Eksik:**
+- **Başarı Durumu (200 OK) - Senkron Üretim (Yerel Geliştirme/Bypass Modu):**
 ```json
 {
-  "error": "Prompt is required"
+  "text": "Gemini tarafından üretilen fal yorumu metni..."
 }
 ```
 
-- **Hata Durumu (500 Internal Server Error) - API Anahtarı Yok veya API Hatası:**
+- **Hata Durumu (400 Bad Request) - Eksik Parametre veya Hatalı Kart Sayısı:**
 ```json
 {
-  "error": "Gemini API key is not configured. Please set it in the Secrets panel."
+  "error": "Exactly 3 cards must be drawn"
 }
 ```
 veya:
 ```json
 {
-  "error": "Hata mesajı detayları..."
+  "error": "Missing required reading details"
+}
+```
+
+- **Hata Durumu (403 Forbidden) - Yetersiz Bakiye veya Kimlik Doğrulama Hatası:**
+```json
+{
+  "error": "Not enough Katina Moons! Please purchase more."
+}
+```
+
+- **Hata Durumu (500 Internal Server Error) - API Hatası:**
+```json
+{
+  "error": "All model generation attempts failed"
 }
 ```
 

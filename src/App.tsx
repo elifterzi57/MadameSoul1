@@ -15,8 +15,10 @@ import { ContactModal } from './components/ContactModal';
 import { LegalModal } from './components/LegalModal';
 import { CookieBanner } from './components/CookieBanner';
 import { generatePDF } from './utils/pdfGenerator';
+import { convertToLocaleUppercase } from './utils/textUtils';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useMutation } from '@tanstack/react-query';
+import { requestPushNotificationPermission, disablePushNotifications } from './lib/firebase';
 
 import en from './locales/en.yaml';
 import tr from './locales/tr.yaml';
@@ -29,6 +31,7 @@ import {
   Sparkles, 
   RefreshCw, 
   ChevronRight, 
+  Settings, 
   Download, 
   Globe, 
   ArrowLeft, 
@@ -38,9 +41,7 @@ import {
   Check, 
   LogOut, 
   Loader2,
-  User as UserIcon,
-  Volume2,
-  VolumeX
+  User as UserIcon
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -85,11 +86,6 @@ type Language = 'tr' | 'en' | 'es' | 'fr' | 'zh' | 'ko';
 
 const locales: Record<Language, any> = { en, tr, es, fr, zh, ko };
 
-const ambientAudio = new Audio('/assets/audio/ambient.wav');
-ambientAudio.loop = true;
-const hoverAudio = new Audio('/assets/audio/hover.wav');
-const drawAudio = new Audio('/assets/audio/draw.wav');
-const revealAudio = new Audio('/assets/audio/reveal.wav');
 
 
 const STATUS_KEYS = ['single', 'relationship', 'married', 'engaged', 'complicated', 'breakup'] as const;
@@ -116,11 +112,13 @@ const FOCUS_OPTIONS: Array<{value: string} & Record<Language, string>> = FOCUS_K
 function AppContent() {
   const {
     user,
+    userRole,
     userInfo,
     moonsCount,
     readingCount,
     step,
     setUser,
+    setUserRole,
     setUserInfo,
     setMoonsCount,
     setReadingCount,
@@ -136,42 +134,33 @@ function AppContent() {
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ message: string; type: 'info' | 'error' | 'success' } | null>(null);
   
-  // Audio state (MS-146)
-  const [isMuted, setIsMuted] = useState(() => {
-    return localStorage.getItem('madame_soul_muted') === 'true';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('madame_soul_muted', String(isMuted));
-    ambientAudio.muted = isMuted;
-    hoverAudio.muted = isMuted;
-    drawAudio.muted = isMuted;
-    revealAudio.muted = isMuted;
-  }, [isMuted]);
-
-  useEffect(() => {
-    if (step === 'DRAWING') {
-      ambientAudio.play().catch(e => console.log("Audio autoplay blocked:", e));
-    } else {
-      ambientAudio.pause();
-      ambientAudio.currentTime = 0;
-    }
-  }, [step]);
-
-  useEffect(() => {
-    if (drawnCards.length > 0 && step === 'DRAWING') {
-      revealAudio.currentTime = 0;
-      revealAudio.play().catch(() => {});
-    }
-  }, [drawnCards.length, step]);
   
   // Modal states
   const [isStoreOpen, setIsStoreOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showPushPrompt, setShowPushPrompt] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: 'name' | 'birthplace'
+  ) => {
+    const input = e.target;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const upperVal = convertToLocaleUppercase(input.value, userInfo.language);
+    
+    setUserInfo({ [field]: upperVal });
+    
+    requestAnimationFrame(() => {
+      if (input) {
+        input.setSelectionRange(start, end);
+      }
+    });
+  };
 
   // Refs for tracking transaction status during async TanStack Query mutation
   const pendingTxId = useRef<string | null>(null);
@@ -276,6 +265,17 @@ function AppContent() {
           if (claimedMoons > 0) {
             const dailyGiftDesc = locales[userInfo.language]?.dailyGift || "Daily Free Gift";
             const txRef = doc(collection(db, 'moon_transactions'));
+            const clientMetadata = {
+              userAgent: navigator.userAgent,
+              os: navigator.userAgent.includes("Mac") ? "macOS" :
+                  navigator.userAgent.includes("Win") ? "Windows" :
+                  navigator.userAgent.includes("Linux") ? "Linux" :
+                  navigator.userAgent.includes("Android") ? "Android" :
+                  navigator.userAgent.includes("like Mac") ? "iOS" : "Unknown",
+              appVersion: "1.0.0"
+            };
+            const dailyIdempotencyKey = `daily_gift_${userId}_${new Date().toISOString().split('T')[0]}`;
+            
             transaction.set(txRef, {
               userId,
               amount: 1,
@@ -289,6 +289,9 @@ function AppContent() {
               userBirthplace: "",
               userRelationship: "",
               selectedCards: [],
+              paymentProvider: 'daily_gift',
+              idempotencyKey: dailyIdempotencyKey,
+              clientMetadata,
               createdAt: serverTimestamp()
             });
           }
@@ -337,6 +340,19 @@ function AppContent() {
       });
 
       if (u) {
+        // Fetch user custom claim role (MS-161)
+        try {
+          const tokenResult = await u.getIdTokenResult();
+          let role = (tokenResult.claims.role as 'user' | 'employee' | 'admin') || 'user';
+          if ((import.meta as any).env.DEV) {
+            role = 'admin';
+          }
+          setUserRole(role);
+        } catch (roleErr) {
+          console.error("Error fetching user role claims:", roleErr);
+          setUserRole((import.meta as any).env.DEV ? 'admin' : 'user');
+        }
+
         const moonRef = doc(db, 'user_moons', u.uid);
         const userRef = doc(db, 'users', u.uid);
         
@@ -374,6 +390,83 @@ function AppContent() {
           setReadingCount(snap.size);
         });
 
+        // Check and recover any stuck pending transactions (MS-181)
+        const pendingQuery = query(
+          collection(db, 'moon_transactions'),
+          where('userId', '==', u.uid),
+          where('status', '==', 'pending')
+        );
+        getDocs(pendingQuery).then(async (snap) => {
+          for (const docSnap of snap.docs) {
+            const txData = docSnap.data();
+            const createdAt = txData.createdAt?.toDate?.() || txData.createdAt;
+            if (createdAt && (Date.now() - new Date(createdAt).getTime() > 2 * 60 * 1000)) {
+              console.warn(`[Client Recovery] Recovering stuck pending transaction: ${docSnap.id}`);
+              const moonRef = doc(db, 'user_moons', u.uid);
+              try {
+                await runTransaction(db, async (transaction) => {
+                  const moonDoc = await transaction.get(moonRef);
+                  if (!moonDoc.exists()) return;
+                  const mData = moonDoc.data();
+                  const daily = mData.dailyFreeBalance || 0;
+                  const purchased = mData.purchasedBalance || 0;
+                  const deductedFrom = txData.deductedFrom || 'daily';
+
+                  if (deductedFrom === 'daily') {
+                    const newDaily = daily + 1;
+                    transaction.update(moonRef, {
+                      dailyFreeBalance: newDaily,
+                      balance: newDaily + purchased,
+                      updatedAt: serverTimestamp()
+                    });
+                  } else {
+                    const newPurchased = purchased + 1;
+                    transaction.update(moonRef, {
+                      purchasedBalance: newPurchased,
+                      balance: daily + newPurchased,
+                      updatedAt: serverTimestamp()
+                    });
+                  }
+
+                  // Mark transaction as failed
+                  transaction.update(docSnap.ref, {
+                    status: 'failed',
+                    error: 'Transaction timed out / server restart'
+                  });
+
+                  // Log system refund transaction (MS-182)
+                  const refundTxRef = doc(collection(db, 'moon_transactions'));
+                  transaction.set(refundTxRef, {
+                    userId: u.uid,
+                    amount: 1,
+                    type: 'refund',
+                    status: 'success',
+                    description: userInfo.language === 'tr' ? 'Zaman Aşımı İadesi (Sistem İadesi)' : 'Timeout Refund (System Refund)',
+                    pdfDownloaded: 0,
+                    paymentProvider: deductedFrom === 'daily' ? 'daily_gift' : 'stripe',
+                    idempotencyKey: `refund_timeout_${docSnap.id}`,
+                    clientMetadata: {
+                      userAgent: navigator.userAgent,
+                      os: "WebClient",
+                      appVersion: "1.0.0"
+                    },
+                    createdAt: serverTimestamp()
+                  });
+                });
+                console.log(`[Client Recovery] Successfully recovered transaction: ${docSnap.id}`);
+                
+                // Fetch the updated balance
+                const updatedMoon = await getDoc(moonRef);
+                if (updatedMoon.exists()) {
+                  setMoonsCount(updatedMoon.data().balance || 0);
+                }
+              } catch (err) {
+                console.error(`[Client Recovery] Failed to recover transaction ${docSnap.id}:`, err);
+              }
+            }
+          }
+        });
+
         if (unsubscribeMoons) unsubscribeMoons();
         
         unsubscribeMoons = onSnapshot(moonRef, (docSnap) => {
@@ -409,6 +502,15 @@ function AppContent() {
               lastDailyClaimedAt: null,
               updatedAt: serverTimestamp()
             });
+            const clientMetadata = {
+              userAgent: navigator.userAgent,
+              os: navigator.userAgent.includes("Mac") ? "macOS" :
+                  navigator.userAgent.includes("Win") ? "Windows" :
+                  navigator.userAgent.includes("Linux") ? "Linux" :
+                  navigator.userAgent.includes("Android") ? "Android" :
+                  navigator.userAgent.includes("like Mac") ? "iOS" : "Unknown",
+              appVersion: "1.0.0"
+            };
             addDoc(collection(db, 'moon_transactions'), {
               userId: u.uid,
               amount: 1,
@@ -422,6 +524,9 @@ function AppContent() {
               userBirthplace: "",
               userRelationship: "",
               selectedCards: [],
+              paymentProvider: 'welcome_bonus',
+              idempotencyKey: `welcome_bonus_${u.uid}`,
+              clientMetadata,
               createdAt: serverTimestamp()
             });
             setMoonsCount(1);
@@ -429,8 +534,16 @@ function AppContent() {
         }, (error) => {
           handleFirestoreError(error, 'get', `user_moons/${u.uid}`);
         });
+
+        // Silent token check/refresh if permission is already granted (MS-169)
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          requestPushNotificationPermission(u.uid).catch(err => {
+            console.warn("Silent token refresh failed:", err);
+          });
+        }
       } else {
         setMoonsCount(0);
+        setUserRole(null);
         if (unsubscribeMoons) {
           unsubscribeMoons();
           unsubscribeMoons = undefined;
@@ -487,6 +600,52 @@ function AppContent() {
     }
   }, [user]);
 
+  // Web Push Soft Prompt trigger and handlers (MS-169)
+  useEffect(() => {
+    if (step === 'RESULT' && !isGenerating && user) {
+      const prompted = localStorage.getItem(`madamesoul_push_prompted_${user.uid}`);
+      if (!prompted && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+        const timer = setTimeout(() => {
+          setShowPushPrompt(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [step, isGenerating, user]);
+
+  const handleClosePushPrompt = () => {
+    if (user) {
+      localStorage.setItem(`madamesoul_push_prompted_${user.uid}`, 'true');
+    }
+    setShowPushPrompt(false);
+  };
+
+  const handleEnablePush = async () => {
+    if (!user) return;
+    try {
+      const token = await requestPushNotificationPermission(user.uid);
+      if (token) {
+        showToast(
+          userInfo.language === 'tr' 
+            ? "Bildirimleriniz başarıyla etkinleştirildi!" 
+            : "Notifications enabled successfully!", 
+          'success'
+        );
+      } else {
+        showToast(
+          userInfo.language === 'tr' 
+            ? "Bildirim izni alınamadı." 
+            : "Failed to get notification permission.", 
+          'error'
+        );
+      }
+    } catch (e) {
+      console.error("Error enabling push notifications:", e);
+    } finally {
+      handleClosePushPrompt();
+    }
+  };
+
   // MS-118 Fallback translate logic
   const t = (key: string, params: Record<string, any> = {}) => {
     const currentLocale = locales[userInfo.language] || locales.en;
@@ -514,6 +673,17 @@ function AppContent() {
   const generateMutation = useMutation({
     mutationFn: async (cards: Card[]) => {
       if (!user) throw new Error("User not signed in");
+
+      const clientMetadata = {
+        userAgent: navigator.userAgent,
+        os: navigator.userAgent.includes("Mac") ? "macOS" :
+            navigator.userAgent.includes("Win") ? "Windows" :
+            navigator.userAgent.includes("Linux") ? "Linux" :
+            navigator.userAgent.includes("Android") ? "Android" :
+            navigator.userAgent.includes("like Mac") ? "iOS" : "Unknown",
+        appVersion: "1.0.0"
+      };
+      const idempotencyKey = `spend_${user.uid}_${cards.map(c => c.id).join('_')}_${Date.now()}`;
 
       const moonRef = doc(db, 'user_moons', user.uid);
       const cardNamesEn = cards.map(c => locales['en']?.cards?.[c.locKey]?.name || c.name).join(', ');
@@ -557,6 +727,8 @@ function AppContent() {
           updatedAt: serverTimestamp()
         });
 
+        const paymentProvider = deductedFrom === 'daily' ? 'daily_gift' : 'stripe';
+
         transaction.set(txRef, {
           userId: user.uid,
           amount: -1,
@@ -571,6 +743,9 @@ function AppContent() {
           userRelationship: userInfo.relationship,
           cards: cards.map(c => ({ id: c.id, locKey: c.locKey, name: c.name })),
           deductedFrom,
+          paymentProvider,
+          idempotencyKey,
+          clientMetadata,
           createdAt: serverTimestamp()
         });
       });
@@ -589,13 +764,16 @@ function AppContent() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          transactionId: txRef.id,
           cards: cards.map(c => c.id),
           userName: userInfo.name,
           dob: userInfo.dob,
           birthplace: userInfo.birthplace,
           relationship: userInfo.relationship,
           language: userInfo.language,
-          focus: userInfo.focus
+          focus: userInfo.focus,
+          idempotencyKey,
+          clientMetadata
         }),
       });
 
@@ -605,6 +783,27 @@ function AppContent() {
       }
 
       const data = await response.json();
+
+      if (data.status === 'pending') {
+        return new Promise<{ text: string; cached: boolean }>((resolve, reject) => {
+          const unsubscribe = onSnapshot(doc(db, 'moon_transactions', txRef.id), (docSnap) => {
+            if (docSnap.exists()) {
+              const txData = docSnap.data();
+              if (txData.status === 'success') {
+                unsubscribe();
+                resolve({ text: txData.readingText || '', cached: false });
+              } else if (txData.status === 'failed') {
+                unsubscribe();
+                reject(new Error(userInfo.language === 'tr' ? "Mistik yorum oluşturulurken sunucuda bir hata oluştu." : "Server failed to generate mystical reading. Please try again."));
+              }
+            }
+          }, (error) => {
+            unsubscribe();
+            reject(error);
+          });
+        });
+      }
+
       return { text: data.text || t('errorSilent'), cached: !!data.cached };
     },
     onMutate: () => {
@@ -697,6 +896,31 @@ function AppContent() {
                 updatedAt: serverTimestamp()
               });
             }
+
+            // Log system refund transaction (MS-182)
+            const refundPaymentProvider = pendingDeductedFrom.current === 'daily' ? 'daily_gift' : 'stripe';
+            const refundTxRef = doc(collection(db, 'moon_transactions'));
+            const clientMetadata = {
+              userAgent: navigator.userAgent,
+              os: navigator.userAgent.includes("Mac") ? "macOS" :
+                  navigator.userAgent.includes("Win") ? "Windows" :
+                  navigator.userAgent.includes("Linux") ? "Linux" :
+                  navigator.userAgent.includes("Android") ? "Android" :
+                  navigator.userAgent.includes("like Mac") ? "iOS" : "Unknown",
+              appVersion: "1.0.0"
+            };
+            transaction.set(refundTxRef, {
+              userId: user.uid,
+              amount: 1,
+              type: 'refund',
+              status: 'success',
+              description: userInfo.language === 'tr' ? 'Mistik Yorum Hatası İadesi (Sistem İadesi)' : 'Mystical Reading Error Refund (System Refund)',
+              pdfDownloaded: 0,
+              paymentProvider: refundPaymentProvider,
+              idempotencyKey: `refund_error_${pendingTxId.current || Date.now()}`,
+              clientMetadata,
+              createdAt: serverTimestamp()
+            });
           });
         } catch (refundError) {
           console.error("Error refunding user moon balance:", refundError);
@@ -795,6 +1019,9 @@ function AppContent() {
 
   const handleSignOut = async () => {
     try {
+      if (user) {
+        await disablePushNotifications(user.uid);
+      }
       await signOut(auth);
       setShowOnboarding(true);
     } catch (err) {
@@ -882,18 +1109,6 @@ function AppContent() {
         animate={{ opacity: 1, y: 0 }}
         className="absolute top-0 right-0 w-full p-4 sm:p-6 flex justify-end items-center gap-2 sm:gap-3 z-[40] pointer-events-none"
       >
-        {/* Mute/Unmute Button (MS-146) */}
-        <div 
-          onClick={() => setIsMuted(prev => !prev)}
-          className="h-9 sm:h-10 flex items-center justify-center p-2 bg-[#0a0512]/80 backdrop-blur-md rounded-full border border-[#ecd8a6]/30 shadow-lg cursor-pointer transition-all hover:border-[#ecd8a6]/60 group pointer-events-auto"
-          title={isMuted ? "Unmute" : "Mute"}
-        >
-          {isMuted ? (
-            <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
-          ) : (
-            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#ecd8a6] group-hover:scale-110 transition-transform" />
-          )}
-        </div>
 
         {step !== 'DRAWING' && (
           <>
@@ -973,6 +1188,57 @@ function AppContent() {
             translations={locales[userInfo.language]}
             onDownloadPastReading={handleDownload}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Soft Push Notification Prompt (MS-169) */}
+      <AnimatePresence>
+        {showPushPrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="w-full max-w-md bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/30 p-8 shadow-[0_0_50px_rgba(236,216,166,0.15)] text-center relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-[#ecd8a6]/5 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-transparent border-[4px] border-double border-[#ecd8a6]/10 m-2 rounded-2xl pointer-events-none" />
+              
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#ecd8a6]/10 border border-[#ecd8a6]/30 flex items-center justify-center relative z-10">
+                <Sparkles className="w-8 h-8 text-[#ecd8a6]" />
+              </div>
+              
+              <h3 className="text-xl font-serif text-[#ecd8a6] tracking-widest uppercase mb-4 relative z-10">
+                {userInfo.language === 'tr' ? "Kehanetlerinizi Kaçırmayın" : "Don't Miss Your Destiny"}
+              </h3>
+              
+              <p className="text-xs text-[#ecd8a6]/70 leading-relaxed font-sans mb-8 px-2 relative z-10">
+                {userInfo.language === 'tr' 
+                  ? "Günlük ücretsiz Katina Moon kredileriniz yüklendiğinde ve falınız hazır olduğunda mistik bildirimler almak için tarayıcı bildirimlerini etkinleştirin." 
+                  : "Enable browser notifications to receive mystic updates when your daily free Katina Moon credits are loaded or when your readings are prepared."}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center relative z-10">
+                <button
+                  onClick={handleEnablePush}
+                  className="w-full sm:w-auto px-6 py-3 bg-[#ecd8a6] hover:bg-white text-[#0a0512] rounded-xl text-xs font-serif tracking-widest uppercase font-bold transition-all cursor-pointer"
+                >
+                  {userInfo.language === 'tr' ? "Bildirimleri Aç" : "Enable Notifications"}
+                </button>
+                <button
+                  onClick={handleClosePushPrompt}
+                  className="w-full sm:w-auto px-6 py-3 bg-[#120a1c]/80 hover:bg-white/5 text-[#ecd8a6]/70 hover:text-[#ecd8a6] rounded-xl text-xs font-serif tracking-widest uppercase font-bold transition-all border border-[#ecd8a6]/20 cursor-pointer"
+                >
+                  {userInfo.language === 'tr' ? "Daha Sonra" : "Maybe Later"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -1236,8 +1502,8 @@ function AppContent() {
                     required
                     type="text"
                     value={userInfo.name}
-                    onChange={e => setUserInfo({ name: e.target.value })}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
+                    onChange={e => handleInputChange(e, 'name')}
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
                     placeholder={t('namePlaceholder')}
                   />
                 </div>
@@ -1264,8 +1530,8 @@ function AppContent() {
                     required
                     type="text"
                     value={userInfo.birthplace}
-                    onChange={e => setUserInfo({ birthplace: e.target.value })}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-serif"
+                    onChange={e => handleInputChange(e, 'birthplace')}
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
                     placeholder={t('pobPlaceholder')}
                   />
                 </div>
@@ -1276,7 +1542,7 @@ function AppContent() {
                     <select 
                       value={userInfo.relationship}
                       onChange={e => setUserInfo({ relationship: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
                     >
                       {STATUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
@@ -1299,7 +1565,7 @@ function AppContent() {
                     <select 
                       value={userInfo.focus}
                       onChange={e => setUserInfo({ focus: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-serif"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
                     >
                       {FOCUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
@@ -1335,9 +1601,9 @@ function AppContent() {
             >
               {/* Header / Instructions */}
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-serif text-[#ecd8a6] mb-3 flex items-center justify-center gap-2">
-                  <Sparkles className="w-6 h-6 text-[#ecd8a6] animate-pulse" />
-                  {userInfo.language === 'tr' ? "Kaderinizin Kartlarını Seçin" : "Select the Cards of Your Destiny"}
+                <h2 className="text-3xl font-serif text-[#ecd8a6] mb-3 flex items-center justify-center gap-3">
+                  <KatinaMoon className="w-8 h-8 text-[#ecd8a6] animate-[spin_15s_linear_infinite] flex-shrink-0" />
+                  <span>{userInfo.language === 'tr' ? "Kaderinizin Kartlarını Seçin" : "Select the Cards of Your Destiny"}</span>
                 </h2>
                 <p className="text-[#ecd8a6]/70 max-w-md mx-auto text-sm">
                   {userInfo.language === 'tr'
@@ -1351,7 +1617,7 @@ function AppContent() {
                     {userInfo.language === 'tr' ? `Seçilen: ${drawnCards.length} / 3` : `Selected: ${drawnCards.length} / 3`}
                   </span>
                   {drawnCards.length > 0 && (
-                    <span className="text-xs text-[#ecd8a6]/60 italic font-serif">
+                    <span className="text-xs text-[#ecd8a6]/60 italic font-sans font-medium">
                       {drawnCards.length === 1 && (userInfo.language === 'tr' ? "Sıradaki: Şimdiki Zaman" : "Next: Present")}
                       {drawnCards.length === 2 && (userInfo.language === 'tr' ? "Sıradaki: Gelecek" : "Next: Future")}
                       {drawnCards.length === 3 && (userInfo.language === 'tr' ? "Seçim tamamlandı!" : "Selection complete!")}
@@ -1366,7 +1632,7 @@ function AppContent() {
                   const card = drawnCards[idx];
                   return (
                     <div key={idx} className="flex flex-col items-center">
-                      <span className="text-[10px] uppercase tracking-widest text-[#ecd8a6]/60 mb-2 font-serif">{label}</span>
+                      <span className="text-[10px] uppercase tracking-widest text-[#ecd8a6]/60 mb-2 font-sans font-medium">{label}</span>
                       <div className="w-full aspect-[2/3] max-w-[120px] rounded-lg border border-[#ecd8a6]/20 relative bg-[#120a1c]/60 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]">
                         {card ? (
                           <motion.div
@@ -1381,14 +1647,14 @@ function AppContent() {
                               alt={locales[userInfo.language]?.cards?.[card.locKey]?.name || card.name}
                               className="w-full h-full object-cover"
                             />
-                            <div className="absolute bottom-0 inset-x-0 bg-black/60 py-1 text-center text-[10px] text-[#ecd8a6] truncate px-1 font-serif">
+                            <div className="absolute bottom-0 inset-x-0 bg-black/60 py-1 text-center text-[10px] text-[#ecd8a6] truncate px-1 font-sans font-medium">
                               {locales[userInfo.language]?.cards?.[card.locKey]?.name || card.name}
                             </div>
                           </motion.div>
                         ) : (
                           <div className="flex flex-col items-center justify-center p-2 text-center text-[#ecd8a6]/30 text-xs">
                             <Sparkles className="w-4 h-4 mb-1 animate-pulse" />
-                            <span className="text-[9px] uppercase tracking-wider font-serif">
+                            <span className="text-[9px] uppercase tracking-wider font-sans font-medium">
                               {userInfo.language === 'tr' ? "Kart Seç" : "Draw Card"}
                             </span>
                           </div>
@@ -1408,9 +1674,10 @@ function AppContent() {
                 >
                   <button
                     onClick={() => generateMutation.mutate(drawnCards)}
-                    className="px-8 py-3 bg-gradient-to-r from-[#5a3a93] to-[#8d62ce] border border-[#ecd8a6]/60 text-[#ecd8a6] hover:text-[#fff] font-serif font-bold tracking-widest uppercase rounded-full shadow-[0_0_20px_rgba(141,98,206,0.4)] hover:shadow-[0_0_35px_rgba(141,98,206,0.6)] cursor-pointer transition-all duration-300 animate-bounce"
+                    className="px-8 py-3.5 bg-gradient-to-br from-[#1e1332] to-[#05000a] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-sans font-semibold tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {userInfo.language === 'tr' ? "Açılımı Yorumla ✦" : "Interpret Spread ✦"}
+                    <KatinaMoon className="w-5 h-5 text-[#ecd8a6] animate-[spin_6s_linear_infinite]" />
+                    <span>{userInfo.language === 'tr' ? "Açılımı Yorumla" : "Interpret Spread"}</span>
                   </button>
                 </motion.div>
               )}
@@ -1429,16 +1696,8 @@ function AppContent() {
                         boxShadow: "0 0 15px rgba(236,216,166,0.4)",
                         borderColor: "rgba(236,216,166,0.8)"
                       } : {}}
-                      onMouseEnter={() => {
-                        if (!isSelected && drawnCards.length < 3) {
-                          hoverAudio.currentTime = 0;
-                          hoverAudio.play().catch(() => {});
-                        }
-                      }}
                       onClick={() => {
                         if (isSelected || drawnCards.length >= 3) return;
-                        drawAudio.currentTime = 0;
-                        drawAudio.play().catch(() => {});
                         setDrawnCards(prev => [...prev, card]);
                       }}
                       className={`aspect-[2/3] rounded-md border cursor-pointer relative overflow-hidden transition-all duration-300 ${
@@ -1457,7 +1716,7 @@ function AppContent() {
                             <div className="w-6 h-6 rounded-full bg-[#ecd8a6] text-[#0a0512] font-serif font-bold text-xs flex items-center justify-center shadow-lg mb-1">
                               {drawnIndex + 1}
                             </div>
-                            <span className="text-[8px] text-[#ecd8a6] uppercase tracking-widest font-serif font-bold">
+                            <span className="text-[8px] text-[#ecd8a6] uppercase tracking-widest font-sans font-bold">
                               {drawnIndex === 0 && (userInfo.language === 'tr' ? 'Geçmiş' : 'Past')}
                               {drawnIndex === 1 && (userInfo.language === 'tr' ? 'Şimdi' : 'Present')}
                               {drawnIndex === 2 && (userInfo.language === 'tr' ? 'Gelecek' : 'Future')}

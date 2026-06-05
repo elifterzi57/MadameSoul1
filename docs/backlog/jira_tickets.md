@@ -6,14 +6,16 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **51** | Açık: **0** | Tamamlanan: **51**
+Toplam Bilet: **68** | Açık: **3** | Tamamlanan: **65**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Atanan (Assignee) | Hedef Dosya |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| - | - | Tüm biletler tamamlandı. | - | - | - |
+| [**MS-186**](#-ms-186) | Analytics / CRM | Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu | Orta | Amelia | `App.tsx`, `server.ts` |
+| [**MS-187**](#-ms-187) | Feature / AI Quality | Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü | Orta | Amelia | `App.tsx`, `Profile.tsx`, `firestore.rules` |
+| [**MS-191**](#-ms-191) | UX / UI / Bug | PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması | Yüksek | Amelia | `src/utils/pdfGenerator.ts` |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
@@ -60,6 +62,17 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-152**](#-ms-152) | Bug | Üretim Ortamında Stripe Webhook İmza Doğrulamasının Zorunlu Kılınması | En Yüksek | Stripe webhook endpointinde üretim ortamında webhook imza doğrulaması (`constructEvent`) zorunlu kılındı. | Paige |
 | [**MS-153**](#-ms-153) | Bug | Hesap Silme Akışında Re-Authentication Kontrolü ve İşlem Sırası Güvencesi | Yüksek | Hesap silme öncesi son oturum zamanı (lastSignInTime) ile re-auth tazeliği kontrolü yapıldı, veritabanı silmeleri tek bir atomik writeBatch içinde yapıldıktan sonra auth hesabı silindi. | Paige |
 | [**MS-160**](#-ms-160) | i18n / Bug | Eksik Dil Çevirilerinin (dailyGift, focusOptions vb.) Eklenmesi | Yüksek | `es.yaml`, `fr.yaml`, `zh.yaml` ve `ko.yaml` dosyalarına eksik olan dailyGift, dailyGiftClaimed ve focusOptions / focusLabel anahtarları eklendi. | Paige |
+| [**MS-161**](#-ms-161) | Security | Rol Tabanlı Yetkilendirme (RBAC) Altyapısı | Yüksek | Firebase Custom Claims altyapısı kuruldu, Zustand store ve Express API middleware katmanları eklendi. | Winston |
+| [**MS-162**](#-ms-162) | Feature | Admin Panel - Kullanıcı Yönetimi Arayüzü | Yüksek | Arama, bakiye düzenleme (credit dusting) ve fal geçmişi listesi geliştirildi. | Winston |
+| [**MS-163**](#-ms-163) | Feature | Admin Panel - Arayüz ve Sistem Konfigürasyon Arayüzü | Yüksek | Dinamik reklam banner yönetimi, Gemini model seçimi ve AI Telemetri paneli kuruldu. | Winston |
+| [**MS-164**](#-ms-164) | Security | Firestore Güvenlik Kuralları Güncellemesi | Yüksek | isEmployee() ve isAdmin() doğrulama fonksiyonları eklenerek veri erişimi yetkilendirildi. | Winston |
+| [**MS-176**](#-ms-176) | Feature | Kullanıcı Dil Seçiminin Kalıcı Hale Getirilmesi | Orta | Zustand `useAppStore` başlatılırken önbellekten dil bilgisi okunması ve güncellemelerde `localStorage`'a yazılması sağlandı. | Sally |
+| [**MS-180**](#-ms-180) | Bug | PDF Promosyon Kodu Dikey Hizalama Optimizasyonu | Orta | PDF çıktısında promosyon kodu metninin dikey hizalaması line-height: 1 verilerek ortalandı. | Sally |
+| [**MS-181**](#-ms-181) | Bug | Pending Durumunda Kalan ve Bakiye Düşüren İşlemlerin Otomatik İadesi | En Yüksek | Girişte son 2 dakikadır pending kalan işlemler tespit edilip bakiye otomatik iade edilir ve işlem failed yapılır. | Sally |
+| [**MS-182**](#-ms-182) | Feature | Sistem Hataları Kredi İadelerinin Satın Alım Geçmişinde Gösterilmesi | Yüksek | Sunucu ve istemci taraflı fal yorumlama hataları sonucu iade edilen krediler için 'type: bonus' türünde 'Sistem İadesi' işlem kaydı oluşturuldu, Profil ekranında yeşil iade rozetiyle listelendi. | Sally |
+| [**MS-183**](#-ms-183) | Refactor | Sistem İadeleri İşlem Tipinin 'refund' Olarak Güncellenmesi | Orta | Sistem hatalarından kaynaklı kredi iadelerinin tipi 'bonus' yerine 'refund' olarak değiştirildi, firestore.rules güncellendi, Profil ekranı her iki tipi de destekleyecek şekilde uyumlu hale getirildi. | Sally |
+| [**MS-185**](#-ms-185) | Security / Refactor | `moon_transactions` Koleksiyonuna `transactionId` Eklenmesi ve Güvenlik Kuralları Güncellemesi | Yüksek | İşlem güvenliğini artırmak için transactionId eklendi ve firestore kuralları güncellendi. | Winston |
+| [**MS-184**](#-ms-184) | Refactor / Cleanup | `promo_codes` ve `reading_cache` Firestore Koleksiyonlarının/Alanlarının Temizlenmesi | Orta | Artık kullanılmayan `promo_codes` ve `reading_cache` Firestore koleksiyonları veri modelleri dokümantasyonundan ve sunucudaki ilgili kod bloklarından temizlendi. | John |
 | [**MS-146**](#-ms-146) | Feature | İnteraktif Kart Çekme Ritüelinde Mistik Arka Plan Müzikleri ve Ses Efektleri | Düşük | `App.tsx` içerisine ses kontrolü (Mute/Unmute) eklendi, kart çekme adımında mistik ortam müziği (ambient) ve kart etkileşimlerinde (hover, click, flip) chime ses efektleri entegre edildi. | John |
 | [**MS-148**](#-ms-148) | Feature | Kaydedilen Falları Kişiselleştirme, Favorileme ve Yansıma/Gerçekleşme Notları | Orta | `Profile.tsx` fal geçmişi detaylandırılarak favorileme (yıldız), özel başlık (customTitle) ve yansıma notu (reflectionNotes) ekleme/kaydetme özellikleri Firestore işlemleriyle senkronize edildi. | John |
 | [**MS-149**](#-ms-149) | Performance | Görsel Optimizasyonu ve Tarot Kart Görsellerinin WebP/Lazy-Loading ile Yüklenmesi | Düşük | Tüm kart PNG görselleri `.webp` formatına dönüştürüldü, `App.tsx` ve `pdfGenerator.ts` üzerindeki görsel yolları güncellendi ve istemci tarafında `loading="lazy"` eklendi. | Winston |
@@ -71,6 +84,12 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-157**](#-ms-157) | i18n / UX | Mağaza Paket Metinlerinin ve Giriş Bileşeni Çevirilerinin Taşınması | Düşük | `StoreModal.tsx` bonus metinleri ve `Login.tsx` içindeki yerel çeviri nesneleri kaldırılarak tamamı merkezi dil dosyalarına (YAML) taşındı ve yerel `t` fonksiyonuyla okundu. | Paige |
 | [**MS-158**](#-ms-158) | UX / UI | Onboarding Ekranındaki Slayt Görsellerinin Çeşitlendirilmesi | Düşük | `Onboarding.tsx` onboarding tanıtım akışında hoş geldin, keşif ve yolculuk temaları için 3 ayrı WebP görseli kullanılarak arayüz zenginleştirildi. | Paige |
 | [**MS-159**](#-ms-159) | Test | Fal Çekme ve Profil Etkileşimleri İçin Playwright E2E Test Kapsamının Genişletilmesi | Orta | Playwright test senaryoları onboarding geçişi, form doldurma, kart çekim chimes ritüeli, fal sonucunun yüklenmesi ve profil geçmişi/günlük düzenleme akışlarını kapsayacak şekilde genişletildi. | Paige |
+| [**MS-188**](#-ms-188) | UX / UI | Yönetim Paneli Tek Sayfa Akordeon Düzeni ve Ayar Arama Özelliği | Yüksek | Sekmeli görünüm kaldırılarak tek sayfada dikey collapsible akordeonlar ve regex arama vurgulaması yapıldı. | Sally |
+| [**MS-189**](#-ms-189) | Feature | Yönetim Paneli Yapılandırma Değişikliklerinin Loglanması ve Firestore Takibi | Orta | Config güncellemeleri config_logs koleksiyonuna kaydedildi ve en tepede son değişiklik bilgisi gösterildi. | Winston |
+| [**MS-190**](#-ms-190) | Feature | Yönetim Paneli Çift Yönlü (+/-) Bakiye Arayüzü, Onay Modalı ve Marka Entegrasyonu | Yüksek | +/- bakiye değiştirme seçimi, onay modalı, performedBy/targetUser alanları ve KatinaMoon ikonu eklendi. | Sally |
+| [**MS-193**](#-ms-193) | Security / Auditing | Yönetim ve Çalışan Denetimi İçin Audit Log (`admin_audit_logs`) Altyapısının Kurulması | Yüksek | Bakiye, rol ve konfigürasyon değişiklikleri için admin_audit_logs altyapısı kurulup kuralları yazıldı. | Winston |
+| [**MS-194**](#-ms-194) | UX / UI | Yönetim Paneli Akordeon Bölümlerinin Dikey Tek Kolon Olarak Hizalanması | Düşük | Geniş ekranlardaki 2 sütunlu grid yapısı kaldırılarak tüm akordeon bölümleri dikey tek kolon halinde alt alta sıralandı. | Sally |
+| [**MS-192**](#-ms-192) | Security / Analytics | `moon_transactions` Koleksiyonu İçin Güvenlik ve İşlem Takibi Alanlarının Eklenmesi | Orta | `moon_transactions` koleksiyonuna `paymentProvider`, `idempotencyKey` ve `clientMetadata` alanları eklenip, `firestore.rules` kuralları ve backend/frontend entegrasyonu tamamlandı. | Winston |
 
 
 ---
@@ -79,20 +98,200 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
+### ⏳ MS-186: Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu (Analytics / CRM)
 
+* **Öncelik:** Orta (Medium)
+* **Durum:** ⏳ Yapılacak (To Do)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı İlişkileri Yönetimi (CRM) ve Analitik
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Uygulamanın pazarlama, bildirim gönderme ve kullanıcı segmentasyonu çalışmalarında elimizi güçlendirmek amacıyla; kullanıcıların saat dilimleri, tarayıcı/cihaz bilgileri, uygulama sürümleri ve o güne kadarki satın alımlarının toplamı (LTV) Firestore'daki kullanıcı belgesinde tutulmalıdır.
+* **Kabul Kriterleri:**
+  1. Kullanıcı kaydolurken veya profil güncellediğinde, tarayıcının saat dilimi (`Intl.DateTimeFormat().resolvedOptions().timeZone`) ve işletim sistemi bilgileri `users` belgesinde `timezone` ve `deviceInfo` (cihaz markası/işletim sistemi) alanlarında güncellenmelidir.
+  2. Stripe ödemesi başarıyla tamamlandığında (`server.ts` webhook veya completed payment adımı), kullanıcının `users` belgesinde `lifetimeValue` (toplam harcama tutarı) alanı güncellenerek kümülatif olarak artırılmalıdır.
+  3. Uygulama açılışında kullanıcının kullandığı güncel uygulama versiyonu (`appVersion`) `users` belgesine yazılarak eski sürüm kullanan istemcilerin tespiti kolaylaştırılmalıdır.
 
+---
 
+### ⏳ MS-187: Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü (Feature / AI Quality)
 
+* **Öncelik:** Orta (Medium)
+* **Durum:** ⏳ Yapılacak (To Do)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı Deneyimi ve YZ Kalite Kontrolü
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules)
+* **Açıklama:**  
+  Yapay zeka tarafından üretilen tarot yorumlarının kalitesini ve kullanıcı memnuniyetini ölçmek amacıyla, fal sonucunun altında mini bir değerlendirme (Thumbs Up / Thumbs Down veya 5 yıldız) arayüzü kurulmalı ve bu geri bildirimler Firestore'da analiz edilmek üzere kaydedilmelidir.
+* **Kabul Kriterleri:**
+  1. Fal sonucu gösterildiğinde ve profil sayfasındaki eski fal detaylarında, kullanıcının bu yorumu puanlayabilmesi için tıklanabilir butonlar eklenmelidir.
+  2. Geri bildirimler `ai_feedback` adında yeni bir Firestore koleksiyonunda saklanmalı; `transactionId`, `userId`, `rating` (puan/beğeni), `comment` (varsa kullanıcının yazdığı not) ve `createdAt` alanları bulunmalıdır.
+  3. Güvenlik kuralları (`firestore.rules`) kullanıcının sadece kendi işlemlerine ait puanlama yapabilmesini sağlayacak şekilde düzenlenmelidir.
 
+---
 
+### ✅ MS-188: Yönetim Paneli (Admin Panel) Tek Sayfa Akordeon Düzeni ve Ayar Arama Özelliği (UX / UI)
 
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli Arayüzü
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Mevcut sekme tabanlı yönetim paneli tasarımı yerine, tüm yönetim sekmelerinin dikey akordeon (collapsible) yapısıyla tek sayfada sunulduğu yeni bir düzene geçilecektir. Ayrıca paneldeki ayarlar ve seçenekler arttıkça aranılan ayara hızlıca ulaşabilmek için en tepeye bir "Ayar ve Kullanıcı Arama" alanı entegre edilecektir. Bu alan, yazılan kelimeye göre eşleşen ayar başlıklarını filtreleyip ilgili akordeon section'ını otomatik olarak açacaktır.
+* **Kabul Kriterleri:**
+  1. Arayüzde sekmeler (tabs) kaldırılmalı; sekmeler dikey bloklar (sections) haline getirilmelidir.
+  2. Her blok (Kullanıcı Yönetimi, Reklam Yapılandırması, Sistem Parametreleri, Yetki Atama vb.) başlığına tıklandığında açılıp kapanabilir (collapsible accordion) olmalıdır. Blokların varsayılan durumları (açık/kapalı) kullanıcı rollerine göre optimize edilmelidir (Örn: Çalışanlar için Kullanıcı Yönetimi varsayılan olarak açık, Sistem Ayarları kapalı).
+  3. Sayfanın en üstünde sabit (sticky) bir arama barı yer almalıdır. Arama barına yazılan metinler, section başlıklarında veya içindeki ayar alanlarında (label) eşleşme arayıp arayüzü dinamik filtrelemelidir. Eşleşen bir ayar bulunduğunda, ait olduğu section otomatik olarak açılmalı (expand) ve aranan terim vurgulanmalıdır.
+  4. Düzen, geniş ekranlarda (desktop) yan yana iki kolonlu, mobil ve tablet ekranlarında ise alt alta tek kolonlu olacak şekilde responsive tasarlanmalıdır.
 
+---
 
+### ✅ MS-189: Yönetim Paneli Yapılandırma Değişikliklerinin Loglanması ve Firestore Takibi (Feature)
 
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli & Loglama
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Yönetim panelindeki herhangi bir ayarın (reklam banner'ları, Gemini model parametreleri vb.) değiştirilmesi durumunda, değişikliğin izlenebilirliğini artırmak için bu işlemler Firestore'da `config_logs` koleksiyonuna kaydedilmelidir. Ayrıca admin panelinde son yapılan değişikliğin detayları (kim, ne zaman, hangi ayarı neyden neye çevirmiş) tarih ve saatiyle gösterilmelidir.
+* **Kabul Kriterleri:**
+  1. Firestore'da `config_logs` adında yeni bir koleksiyon oluşturulmalıdır.
+  2. Yönetim panelinde herhangi bir ayar güncellendiğinde, backend API'sine istek gönderilerek `config_logs` koleksiyonuna şu alanlarla yeni bir belge yazılmalıdır:
+     - `performedBy`: İşlemi yapan personelin e-postası/ID'si.
+     - `changedSetting`: Değiştirilen ayar adı (Örn: "Gemini Model Selection").
+     - `oldValue`: Eski değer.
+     - `newValue`: Yeni değer.
+     - `createdAt`: Güncelleme zamanı (timestamp).
+  3. Yönetim panelinin en üstünde veya alt bilgi alanında (footer/header) son yapılan değişikliğini gösteren bir bilgi satırı yer almalıdır: *"[E-posta], [Tarih/Saat] tarihinde [Ayar Adı] ayarını [Eski Değer] değerinden [Yeni Değer] değerine güncelledi."*
 
+---
 
+### ✅ MS-190: Yönetim Paneli Çift Yönlü (+/-) Bakiye Arayüzü, Onay Modalı ve Marka Entegrasyonu (Feature)
 
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli & Tipografi
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Kullanıcı bakiyelerinin (Katina Moon) yönetim panelinden değiştirilmesi esnasında yanlış işlemlerin önlenmesi amacıyla bakiye değişikliği için komut sistemi yerine, kullanıcı adı/e-posta ve tanımlanacak miktar alanlarından oluşan çift yönlü (+/-) bir arayüz tasarlanmalıdır. İşlem öncesi onay modalı çıkartılmalı ve her işlem detaylıca loglanmalıdır. Ayrıca panel genelinde MadameSoul tipografi kuralları (Cinzel ve Inter yazı tipleri) ve marka kimliğini yansıtan `KatinaMoon` ikonu entegre edilmelidir.
+* **Kabul Kriterleri:**
+  1. Kullanıcı arandıktan sonra bakiye güncelleme alanı olarak bir miktar girdisi (`input type="number"`) ve bu miktarı eklemeyi veya çıkarmayı belirleyen çift yönlü (+ / -) bir arayüz seçeneği bulunmalıdır. Yanlış girilen bakiyeleri azaltmak için negatif değer veya "Azalt" seçeneği aktif çalışmalıdır.
+  2. "Bakiyeyi Güncelle" butonuna basıldığında doğrudan veritabanına yazılmamalı, ekranda onay modalı (uyarı penceresi) açılmalıdır: *"Bu kullanıcının bakiyesini [X] Moon [artırmayı/azaltmayı] onaylıyor musunuz?"*. Onaylandıktan sonra işlem yürütülmelidir.
+  3. Bakiye değişiklikleri `moon_transactions` tablosuna şu detaylı log verileriyle yazılmalıdır:
+     - `performedBy`: İşlemi yapan personelin e-postası/ID'si.
+     - `targetUser`: İşlem uygulanan kullanıcının bilgileri.
+     - `amount`: Değişim miktarı (+X veya -X).
+     - `createdAt`: İşlem zamanı.
+  4. Yönetim paneli başlığında ve butonlarda uygulamanın `KatinaMoon` marka ikonu kullanılmalıdır.
+  5. Yönetim panelindeki tüm yazılar, butonlar ve form etiketleri MadameSoul tipografi standardına (Cinzel ve Inter yazı tipleri, index.html içerisine import edilerek) tamamen uymalıdır.
 
+---
+
+### ⏳ MS-191: PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması (UX / UI / Bug)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ⏳ Yapılacak (To Do)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** PDF Üretim Modülü
+* **Hedef Dosya:** [pdfGenerator.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/utils/pdfGenerator.ts)
+* **Açıklama:**  
+  Kullanıcıların tarot okuma sonuçlarını PDF olarak indirmesini sağlayan modülde yapılan son çoklu sayfa sayfalandırma (pagination) geliştirilmesi beğenilmemiştir. Sayfa sınırlarının hesaplanması, başlıkların bölünmesi ve reklamların sayfalara dağıtılması yerine, PDF çıktısının eskisi gibi tek bir uzun sayfa (continuous single-page canvas) formatına geri döndürülmesi istenmektedir.
+* **Kabul Kriterleri:**
+  1. `src/utils/pdfGenerator.ts` dosyasında yer alan element ölçme (`measureElementHeight`), sayfalandırma hesaplamaları (`pages.push`, `look-ahead for orphan headings`) ve birden fazla sayfa oluşturma (`pdf.addPage`) mantığı kaldırılmalıdır.
+  2. PDF çıktısı, tek bir geniş ve dinamik uzunluğa sahip canvas üzerinden tek sayfa olarak çizilmelidir. Canvas'ın yüksekliği, içeriklerin (Header, Kartlar, Yorum Metni, Reklamlar ve Footer) toplam yüksekliğine göre dinamik olarak hesaplanmalıdır.
+  3. Tıklanabilir reklam ve footer linklerinin koordinatları, tek sayfa yapısına uygun olacak şekilde dinamik olarak ayarlanmalı ve jsPDF `pdf.link(...)` ile doğru yerlere yerleştirilmelidir.
+  4. PDF çıktısının dikeyde tek ve kesintisiz bir akış sunduğu, taşma veya dikey hizalama boşlukları içermediği doğrulanmalıdır.
+
+---
+
+### ✅ MS-192: `moon_transactions` Koleksiyonu İçin Güvenlik ve İşlem Takibi Alanlarının Eklenmesi (Security / Analytics)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Veritabanı Mimarisi ve İşlem Takibi
+* **Hedef Dosya:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [data-models.md](file:///Users/elifterzi/antigravity/MadameSoul/docs/architecture/data-models.md)
+* **Açıklama:**  
+  Finansal mutabakatın kolaylaştırılması, mükerrer işlemlerin (çift harcama) önlenmesi ve işlemlerin yapıldığı tarayıcı/cihaz kaynaklı sorunların analiz edilebilmesi amacıyla `moon_transactions` koleksiyonuna yeni takip alanları eklenmeli ve güvenlik kuralları bu yeni alanları doğrulayacak şekilde güncellenmelidir.
+* **Çözüm Özeti:**  
+  `moon_transactions` şemasına `paymentProvider`, `idempotencyKey` ve `clientMetadata` alanları eklenerek, `firestore.rules` güvenlik kurallarında ve sunucu/istemci kodlarında (Stripe webhook'ları, günlük kredi, karşılama bonusları ve tarot harcama akışları) entegrasyonu tamamlanmıştır. Mükerrer istekleri engellemek için `/api/generate` uç noktasında 5 saniye bekleme ve önbellek iade mekanizması entegre edilmiştir.
+* **Kabul Kriterleri:**
+  1. `moon_transactions` koleksiyonundaki her yeni belgeye şu alanlar eklenmelidir:
+     - `paymentProvider`: Kredinin kazanım kaynağını belirtir (`stripe`, `app_store`, `google_play`, `daily_gift`, `welcome_bonus` veya `admin_dusting`).
+     - `idempotencyKey`: Mükerrer istekleri engellemek için istemci veya API tarafından üretilen benzersiz işlem anahtarı.
+     - `clientMetadata`: İşlemin yapıldığı istemciye ait cihaz/tarayıcı bilgileri (`userAgent`, `os`, `appVersion`).
+  2. `firestore.rules` dosyasındaki `isValidMoonTransaction` fonksiyonu bu yeni alanların tiplerini (string, opsiyonel/zorunlu vb.) doğrulayacak şekilde güncellenmelidir.
+  3. `docs/architecture/data-models.md` dosyasındaki `moon_transactions` veri modeli şeması bu alanları içerecek şekilde güncellenmelidir.
+
+---
+
+### ✅ MS-193: Yönetim ve Çalışan Denetimi İçin Audit Log (admin_audit_logs) Altyapısının Kurulması (Security / Auditing)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Yönetim Paneli Güvenliği ve Denetim (Auditing)
+* **Hedef Dosya:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [data-models.md](file:///Users/elifterzi/antigravity/MadameSoul/docs/architecture/data-models.md)
+* **Açıklama:**  
+  Yönetim panelinden (Admin Panel) yapılan bakiye düzenlemeleri (credit dusting), yetkilendirme değişiklikleri ve sistem/reklam yapılandırma güncellemeleri gibi kritik işlemlerin izlenebilirliğini tam sağlamak ve manipülasyon riskini önlemek için `admin_audit_logs` adında yeni bir Firestore koleksiyonu oluşturulmalıdır.
+* **Kabul Kriterleri:**
+  1. Firestore'da `admin_audit_logs` adında yeni bir koleksiyon tanımlanmalı ve aşağıdaki alanları barındırmalıdır:
+     - `operatorUid`: İşlemi gerçekleştiren çalışan/admin kullanıcının UID'si.
+     - `operatorEmail`: İşlemi yapan çalışanın e-posta adresi.
+     - `targetUid`: İşlemden etkilenen kullanıcının UID'si (eğer varsa, örn: bakiye düzenlenen kullanıcı).
+     - `actionType`: Yapılan işlem türü (`credit_dusting`, `role_change`, `system_config_update`, `ui_config_update`).
+     - `details`: İşlem detayları (örn: bakiye değişim miktarı, eski ve yeni değerleri içeren bir map nesnesi).
+     - `timestamp`: İşlemin yapıldığı sunucu zamanı (serverTimestamp).
+  2. `firestore.rules` güncellenerek bu koleksiyona yazma yetkisi sadece çalışanlara (`isEmployee()`) veya adminlere (`isAdmin()`) verilmeli; normal kullanıcıların erişimi tamamen engellenmelidir. Okuma yetkisi sadece adminlere açık olmalıdır.
+  3. `docs/architecture/data-models.md` dosyasına `admin_audit_logs` koleksiyonunun şema ve veri modeli dokümantasyonu eklenmelidir.
+
+---
+
+### ✅ MS-194: Yönetim Paneli Akordeon Bölümlerinin Dikey Tek Kolon Olarak Hizalanması (UX / UI)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli Arayüzü
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Yönetim panelindeki akordeon bölümlerinin (sections) geniş ekranlarda iki kolonlu yan yana olan yerleşimi, kullanım ve okuma kolaylığı açısından dikey tek kolon olacak şekilde güncellenecektir.
+* **Kabul Kriterleri:**
+  1. `admin-panel/src/App.tsx` dosyasındaki akordeon sütun yapısı kaldırılmalı; tüm bölümler tek bir dikey akışta alt alta listelenmelidir.
+  2. Tüm ekran boyutlarında tek kolonlu düzen korunmalıdır.
+
+---
+
+### ✅ MS-184: `promo_codes` ve `reading_cache` Firestore Koleksiyonlarının/Alanlarının Temizlenmesi (Refactor / Cleanup)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** John (📋 PM / `bmad-agent-pm`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Sunucu Uç Noktaları ve Veri Yapısı Dokümantasyonu
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [data-models.md](file:///Users/elifterzi/antigravity/MadameSoul/docs/architecture/data-models.md)
+* **Açıklama:**  
+  Uygulamada artık ihtiyaç duyulmayan ve kullanılmayan `promo_codes` (kampanya kuponları altyapısı) ve `reading_cache` (çift istek önleme önbelleği) Firestore koleksiyon tanımları ile `/api/generate` uç noktasındaki cache sorgulama ve cache yazma kodları temizlenmelidir.
+* **Kabul Kriterleri:**
+  1. `docs/architecture/data-models.md` dosyasından `promo_codes` ve `reading_cache` koleksiyonlarının tanımları (bölüm 10 ve 11) kaldırılmalıdır.
+  2. `server.ts` içerisindeki `/api/generate` rotasında bulunan `reading_cache` collection okuma ve yazma işlemleri kaldırılacaktır.
+  3. Proje derleme (`npm run build`) ve testlerin (`npm run test` ve `npm run test:e2e`) hatasız çalıştığı doğrulanmalıdır.
+
+* **Çözüm:** `docs/architecture/data-models.md` dosyasından `promo_codes` ve `reading_cache` koleksiyon tanımları kaldırıldı. Express sunucusundaki `/api/generate` rotasından önbellek okuma/yazma işlemleri temizlendi.
+
+---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
 
@@ -1209,3 +1408,174 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 * **Kabul Kriterleri:**
   1. `es.yaml`, `fr.yaml`, `zh.yaml` ve `ko.yaml` dosyalarına belirtilen 7 yerelleştirme anahtarı kendi hedef dillerindeki anlamlı karşılıklarıyla eklenmelidir.
   2. Giriş sonrası fal formunda yer alan odak seçim kutusu ve günlük ücretsiz kredi kazanım bildirimlerinin tüm dillerde doğru şekilde yüklendiği doğrulanmalıdır.
+
+---
+
+### ✅ MS-176: Kullanıcı Dil Seçiminin Kalıcı Hale Getirilmesi (Feature)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Yerelleştirme / Durum Yönetimi
+* **Hedef Dosya:** [useAppStore.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/store/useAppStore.ts)
+* **Açıklama:**  
+  Kullanıcı uygulamada dili değiştirdiğinde bu seçim tarayıcı hafızasında tutulmalı, sayfa yenilendiğinde ya da çıkış yapıp tekrar girildiğinde varsayılan İngilizce yerine kullanıcının son seçtiği dil ile açılmalıdır.
+* **Kabul Kriterleri:**
+  1. Kullanıcının dil seçimi `localStorage` üzerinde `madamesoul_language` anahtarı altında saklanmalıdır.
+  2. Uygulama açılışında Zustand state initialize edilirken öncelikle `localStorage`'dan dil verisi okunmalı, yoksa varsayılan olarak `en` (İngilizce) yüklenmelidir.
+  3. `setUserInfo` içinde `language` değişimi algılandığında `localStorage` güncellenmelidir.
+  4. Sayfa yenilendiğinde veya uygulama kapatılıp açıldığında kullanıcının son seçtiği dilin korunduğu doğrulanmalıdır.
+
+* **Çözüm:** Zustand `useAppStore.ts` store yapısında dil alanının başlangıç değeri `localStorage.getItem('madamesoul_language')` ile okunacak şekilde güncellendi. `setUserInfo` işlevinde dil seçeneği değiştiğinde bu değer tarayıcı hafızasına (`localStorage.setItem`) otomatik olarak yazıldı.
+
+---
+
+### ✅ MS-180: PDF Çıktısında Promosyon Kodu Kutucuğunun Dikey Hizalama ve Dolgu (Padding) Optimizasyonu (Bug / UI)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** PDF Üretim Modülü
+* **Hedef Dosya:** [pdfGenerator.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/utils/pdfGenerator.ts)
+* **Açıklama:**  
+  PDF çıktısında yer alan promosyon kodu (kupon kodu) kutucuğunun tasarımı incelendiğinde, kod metninin ("MADAMESOUL10") kutu içinde dikey olarak ortalanmadığı, üst kısımda gereğinden fazla boşluk (padding-top) kalırken alt sınırla metin arasında çok az pay olduğu tespit edilmiştir. Bu durum kutunun asimetrik görünmesine ve kalitesiz bir izlenim bırakmasına sebep olmaktadır. Metnin kutucuk içerisinde mükemmel bir şekilde dikey ve yatay olarak ortalanması gerekmektedir.
+* **Kabul Kriterleri:**
+  1. `pdfGenerator.ts` dosyasında yer alan kupon kodu çizim koordinatları ve dolgu (padding) parametreleri güncellenmelidir.
+  2. Kupon kodu metni, arka plandaki koyu renkli yuvarlatılmış köşeli kutunun (filled rounded rectangle) dikey and yatay eksenlerinde tam olarak ortalanmalıdır.
+  3. Metin yüksekliği (`text height`) ile kutu yüksekliği arasındaki oran dengelenmeli; üst ve alt boşluklar birbirine eşitlenmelidir.
+  4. PDF çıktısı üretildiğinde kupon kodunun görsel olarak kusursuz, dengeli ve simetrik durduğu doğrulanmalıdır.
+
+* **Çözüm:** `pdfGenerator.ts` dosyasında ad1 promosyon kodu (`promoCode`) kapsayıcı kutusu CSS özelliklerine `line-height: 1;` eklenerek metnin konteynerin varsayılan 1.9 satır yüksekliğini devralması önlendi. Böylece kupon kodu kutusu dikey ve yatay eksende tam olarak ortalandı ve simetrik duruş sağlandı.
+
+---
+
+### ✅ MS-181: Pending Durumunda Kalan ve Bakiye Düşüren İşlemlerin Otomatik İadesi (Bug)
+
+* **Öncelik:** En Yüksek (Highest)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Veri Tutarlılığı ve Kredi İşlemleri
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx)
+* **Açıklama:**  
+  Fal yorumlama esnasında sunucu çökmesi, yeniden başlatılması veya ağ kesintisi gibi durumlarda `moon_transactions` altındaki işlem pending durumunda kalmakta, kullanıcı bakiyesi düşürülmüş olmasına rağmen fal yorumu üretilememektedir. Bu durum kullanıcı mağduriyetine yol açmaktadır.
+* **Kabul Kriterleri:**
+  1. Kullanıcı giriş yaptığında kendi adına olan `pending` durumundaki işlemler sorgulanmalıdır.
+  2. Eğer işlemin `createdAt` oluşturulma zamanından bu yana 2 dakikadan fazla geçmişse, işlem kilitlenmiş (stuck) kabul edilmelidir.
+  3. Kilitlenmiş işlemler için bir Firestore Transaction yürütülerek:
+     - İşlemin harcandığı bakiye türüne (`dailyFreeBalance` veya `purchasedBalance`) göre kullanıcının `user_moons` bakiyesi atomik olarak 1 artırılmalıdır.
+     - İşlem durumu `failed` olarak güncellenmeli ve hata açıklaması eklenmelidir.
+  4. İade işlemi sonrasında kullanıcının güncel bakiyesi ekranda anlık olarak yenilenmelidir.
+
+* **Çözüm:** `App.tsx` dosyasında `onAuthStateChanged` kancası içine otomatik kontrol eklendi. Kullanıcı giriş yaptığında `status == 'pending'` olan son 2 dakikadan eski işlemleri sorgular. Bulunan işlemler için Firestore `runTransaction` tetiklenerek bakiye harcandığı kaynağa (`deductedFrom`) göre 1 Moon iade edilir, işlemin durumu `failed` olarak işaretlenir ve arayüz bakiyesi güncellenir.
+
+---
+
+### ✅ MS-182: Sistem Hataları Kredi İadelerinin Satın Alım Geçmişinde Gösterilmesi (Feature)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Profil / Satın Alım Geçmişi & Hata Yönetimi
+* **Hedef Dosyalar:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Sistem hataları nedeniyle yarıda kalan veya iptal olan tarot falı açılımlarının iade edilen kredileri, kullanıcının profili altında yer alan Satın Alım Geçmişi (Purchase History) sekmesinde gösterilmelidir. Böylece kullanıcılar sistem tarafından yapılan bakiye iadelerini şeffaf bir şekilde takip edebilirler.
+* **Kabul Kriterleri:**
+  1. Hem sunucu tarafında (`server.ts` background error flow) hem de istemci tarafında (`App.tsx` error flow & auto-recovery) bakiye iade edilirken `moon_transactions` koleksiyonuna `type: 'bonus'` olan yeni bir iade işlem belgesi eklenmelidir.
+  2. İade işlemi açıklaması (description) Türkçe için "İadesi (Sistem İadesi)", İngilizce için "Refund (System Refund)" ifadelerini barındırmalıdır.
+  3. `Profile.tsx` satın alım geçmişi sekmesinde, `buy` işlemlerinin yanında `bonus` türündeki iade işlemleri de getirilmelidir. Standart günlük ücretsiz hak alımları (Daily Free Gift) filtrelenerek gizlenmeli, sadece gerçek satın almalar ve sistem iadeleri listelenmelidir.
+  4. Sistem iadeleri listede farklı bir görsel tasarımla gösterilmeli; mor satın alım ikonu yerine yeşil renkli dairesel `RotateCcw` iade ikonu kullanılmalı ve yanında yeşil renkli "+1 İade" / "+1 Refund" rozeti yer almalıdır.
+
+* **Çözüm:** İstemci tarafı `App.tsx` hata kurtarma (recovery) ve istek başarısızlığı (onError) bloklarında bakiye iade edilirken, veritabanına `type: 'bonus'` ve "Sistem İadesi" açıklamalı transaction belgesi yazılması sağlandı. Sunucu tarafı `server.ts` arka plan fal üretim hata yakalama bloğunda da Firestore transaction'ı içerisine aynı iade transaction logunun yazılması eklendi. `Profile.tsx` bileşeninde `fetchPurchases` sorgusu `buy` ve `bonus` tiplerini kapsayacak şekilde güncellendi, günlük ücretsiz haklar in-memory filtrelenerek gizlendi. Rozet ve ikon tasarımı `RotateCcw` ile yeşil temaya güncellendi.
+
+---
+
+### ✅ MS-183: Sistem İadeleri İşlem Tipinin 'refund' Olarak Güncellenmesi (Refactor)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Veritabanı Mimarisi & Profil Satın Alım Geçmişi
+* **Hedef Dosyalar:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Sistem hatalarından dolayı yapılan kredi iade işlemleri `type: 'bonus'` olarak kaydedildiğinde, günlük hediyeler (daily gifts) veya hoş geldin bonusu (welcome bonus) gibi diğer promosyonel bakiyelerle veri tabanında aynı kategoriye girmekte ve raporlamada/takipte karışıklık yaratmaktadır. İade işlemlerinin türü `type: 'refund'` olarak güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. `firestore.rules` dosyasındaki `isValidMoonTransaction` kuralında geçerli işlem tiplerine `'refund'` eklenmelidir (`['spend', 'buy', 'bonus', 'refund']`).
+  2. İstemci tarafında (`App.tsx` hata kurtarma ve API hata iadesi) ve sunucu tarafında (`server.ts` arka plan fal yorumlama hatası) yazılan iade işlemleri `type: 'refund'` olarak kaydedilmelidir.
+  3. Profil satın alma geçmişi sekmesinde (`Profile.tsx`), sorgulama ve filtreleme mantığı yeni `'refund'` tipini de kapsayacak şekilde güncellenmeli ve eski `'bonus'` tipindeki iade kayıtlarını da desteklemeye devam edecek şekilde backward-compatible (geriye dönük uyumlu) olmalıdır.
+
+* **Çözüm:** `firestore.rules` dosyasına `'refund'` tipi eklendi. İstemcideki (`App.tsx`) ve sunucudaki (`server.ts`) tüm sistem iadesi log yazımları `type: 'refund'` olarak değiştirildi. `Profile.tsx` içerisinde satın alım geçmişi sorgusu `buy`, `bonus` ve `refund` tiplerini çekecek şekilde güncellendi. Arayüzde listeleme ve `isRefund` koşulu hem yeni `'refund'` tipini hem de geriye dönük olarak eski `'bonus'` iadelerini ("İade" ve "Refund" açıklamaları üzerinden) tanıyacak şekilde ayarlandı.
+
+---
+
+### ✅ MS-185: `moon_transactions` Koleksiyonuna `transactionId` Eklenmesi ve Güvenlik Kuralları Güncellemesi (Security / Refactor)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Veritabanı Güvenliği ve İşlem İzlenebilirliği
+* **Hedef Dosya:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [AdminPanel.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/AdminPanel.tsx)
+* **Açıklama:**  
+  İşlem güvenliğini ve izlenebilirliğini artırmak için, Firestore `moon_transactions` koleksiyonuna yazılan her yeni belgenin içine Document ID ile eşleşen bir `transactionId` alanı eklenmelidir. Ayrıca, çalışanların (employee) admin panelinden credit dusting işlemleri yapabilmesini sağlamak amacıyla güvenlik kurallarındaki `userId` kısıtlaması, `isEmployee()` kontrolü eklenerek güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. `firestore.rules` dosyasındaki `isValidMoonTransaction` fonksiyonu güncellenmeli; `data.userId == request.auth.uid` kontrolü `(data.userId == request.auth.uid || isEmployee())` olacak şekilde güncellenmeli ve opsiyonel `transactionId` alanı için `data.transactionId == transactionId` doğrulaması eklenmelidir.
+  2. `src/App.tsx` içerisindeki tüm `moon_transactions` yazma alanlarına (günlük bakiye alımı, hoş geldin bonusu, fal harcaması, sistem iadeleri) `transactionId` alanı Document ID ile aynı olacak şekilde eklenmelidir. Hoş geldin bonusu için `addDoc` yerine `doc()` ve `setDoc` kullanılarak ID önceden elde edilmelidir.
+  3. `src/components/AdminPanel.tsx` içerisindeki bakiye düzenleme (`handleAdjustMoons`) yazımına `transactionId: txRef.id` alanı eklenmelidir.
+  4. `server.ts` içerisindeki Stripe ödeme webhook'u, günlük otomatik kredi yenileme cron-like kodları ve API iade loglarındaki işlem kayıtlarına `transactionId: txRef.id` eklenmelidir.
+  5. `docs/architecture/data-models.md` altındaki şema dokümantasyonu `transactionId` alanını içerecek şekilde güncellenmelidir.
+
+* **Çözüm:** `transactionId` alanı tüm veritabanı yazımlarına eklendi, `firestore.rules` ve `data-models.md` güncellenerek güvenli işlemler ve izlenebilirlik sağlandı.
+
+---
+
+### ✅ MS-161: Rol Tabanlı Yetkilendirme (RBAC) Altyapısı (Security)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Güvenlik ve Yetkilendirme
+* **Açıklama:** Kullanıcıların yetkilerine göre dynamic olarak Admin Panel erişimi kazanması için Firebase Custom Claims altyapısının kurulması, useAppStore store yapısına rol bilgisinin entegre edilmesi ve backend rotalarında yetki denetimi yapılması.
+* **Çözüm:** `scripts/set_role.ts` CLI aracı oluşturuldu, Zustand global state ve Firebase onAuthStateChanged claims okuma yapısı kuruldu, Express'e `requireRole` middleware'i eklendi.
+
+---
+
+### ✅ MS-162: Admin Panel - Kullanıcı Yönetimi Arayüzü (Feature)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Arayüzü
+* **Açıklama:** Çalışan ve adminlerin kullanıcı sorgulaması, güncel bakiyelerini incelemesi ve bakiye hareketlerini loglayacak şekilde bakiye düzenlemesi (credit dusting) yapabilmesi için Sekme 1 modülünün tasarlanması.
+* **Çözüm:** `AdminPanel.tsx` içerisinde kullanıcı arama, bakiye ekleme/düşürme ve fal geçmişi listesi geliştirildi.
+
+---
+
+### ✅ MS-163: Admin Panel - Arayüz ve Sistem Konfigürasyon Arayüzü (Feature)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Arayüzü
+* **Açıklama:** Dinamik PDF reklam banner yönetimi (pdfImage ve link güncelleme) ile yöneticilere özel Gemini modeli, saatlik rate limit kontrolü ve AI Telemetri verilerini izleme modüllerinin Sekme 2 ve Sekme 3 altında geliştirilmesi.
+* **Çözüm:** `AdminPanel.tsx` Sekme 2 (reklam ayarları) ve Sekme 3 (sistem ayarları & telemetri grafikleri) backend API'leriyle çalışır halde tamamlandı.
+
+---
+
+### ✅ MS-164: Firestore Güvenlik Kuralları Güncellemesi (Security)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Veritabanı Güvenliği
+* **Açıklama:** Firestore security kurallarında `isEmployee()` ve `isAdmin()` rolleri doğrulanarak `ui_configs` ve `system_configs` koleksiyonlarının yetkisiz kullanıcılara tamamen kapatılması, `users` ve `user_moons` koleksiyonlarında ise çalışan yetkilendirmelerinin yapılması.
+* **Çözüm:** `firestore.rules` dosyasına helper functions ve Match kuralları eklenerek veri koruması sağlandı.
+

@@ -785,7 +785,7 @@ login:
   loading: "로드 중..."
   showIntro: "앱 소개 보기"
   kvkkConsent: "사용자 약관, 개인정보 취급방침 및 GDPR/KVKK 명시적 동의 사항을 읽고 동의합니다."
-  quote: \"별들의 속삭임과 영혼의 깊이를 발견하십시오."
+  quote: "별들의 속삭임과 영혼의 깊이를 발견하십시오."
   errorWrongCredentials: "이메일 또는 비밀번호가 잘못되었습니다."
   errorEmailInUse: "이미 사용 중인 이메일입니다."
   errorInvalidEmail: "유효하지 않은 이메일 주소입니다."

@@ -1239,7 +1239,7 @@ login:
   loading: "Cargando..."
   showIntro: "Ver Introducción"
   kvkkConsent: "He leído y acepto el Acuerdo de Usuario, la Política de Privacidad y el Consentimiento Explícito de RGPD/KVKK."
-  quote: \"Descubre los susurros de las estrellas y las profundidades de tu alma."
+  quote: "Descubre los susurros de las estrellas y las profundidades de tu alma."
   errorWrongCredentials: "Correo electrónico o contraseña incorrectos."
   errorEmailInUse: "El correo electrónico ya está en uso."
   errorInvalidEmail: "Dirección de correo electrónico no válida."

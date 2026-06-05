@@ -280,6 +280,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   };
 
   const handleGoogleLogin = async () => {
+    if (!consentAccepted) {
+      setError(language === 'tr' ? "Lütfen önce Kullanıcı Sözleşmesini ve KVKK Açık Rıza Metnini onaylayın." : "Please accept the User Agreement and KVKK Consent first.");
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -307,6 +311,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   };
 
   const handleAppleLogin = async () => {
+    if (!consentAccepted) {
+      setError(language === 'tr' ? "Lütfen önce Kullanıcı Sözleşmesini ve KVKK Açık Rıza Metnini onaylayın." : "Please accept the User Agreement and KVKK Consent first.");
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -485,9 +493,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={loading || !consentAccepted}
+                      disabled={loading}
                       className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
                       }`}
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -502,9 +510,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleAppleLogin}
-                      disabled={loading || !consentAccepted}
+                      disabled={loading}
                       className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
                       }`}
                     >
                       <Apple className="w-4 h-4" />
@@ -700,9 +708,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleGoogleLogin}
-                      disabled={loading || !consentAccepted}
+                      disabled={loading}
                       className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
                       }`}
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -717,9 +725,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     <button 
                       type="button"
                       onClick={handleAppleLogin}
-                      disabled={loading || !consentAccepted}
+                      disabled={loading}
                       className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading || !consentAccepted ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
+                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
                       }`}
                     >
                       <Apple className="w-4 h-4" />

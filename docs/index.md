@@ -3,7 +3,7 @@
 **Tür:** Monolith (Tek parçalı yapı)  
 **Ana Dil:** TypeScript  
 **Mimari Desen:** Layered / Component-Based (React Frontend + Express API Backend)  
-**Son Güncelleme:** 2026-05-22  
+**Son Güncelleme:** 2026-06-05  
 
 ---
 

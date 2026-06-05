@@ -1,12 +1,81 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { getFirestore, enableIndexedDbPersistence, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getMessaging, getToken, deleteToken, isSupported as isMessagingSupported } from 'firebase/messaging';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth();
+
+let messaging: any = null;
+
+export const initMessaging = async () => {
+  if (typeof window !== 'undefined' && await isMessagingSupported()) {
+    if (!messaging) {
+      messaging = getMessaging(app);
+    }
+    return messaging;
+  }
+  return null;
+};
+
+export const VAPID_KEY = "BH_0eao9CxHECVLy_eeSZzoX3fTMI_9tnNmmSakEv_zq3VXJKCTsYhylt6r4vDR9PBRysynjZDAIBj0Q9ITE2FI";
+
+export const requestPushNotificationPermission = async (userId: string): Promise<string | null> => {
+  try {
+    const messagingInstance = await initMessaging();
+    if (!messagingInstance) {
+      console.warn("FCM Messaging is not supported on this browser.");
+      return null;
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn("Notification permission was not granted:", permission);
+      return null;
+    }
+
+    const reg = await navigator.serviceWorker.ready;
+    const token = await getToken(messagingInstance, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: reg
+    });
+
+    if (token) {
+      const tokenRef = doc(db, 'user_push_tokens', userId);
+      await setDoc(tokenRef, {
+        token,
+        userId,
+        updatedAt: new Date().toISOString()
+      });
+      console.log("FCM Token successfully saved to Firestore:", token);
+      return token;
+    } else {
+      console.warn("Failed to get FCM Token.");
+      return null;
+    }
+  } catch (err) {
+    console.error("Error requesting notification permission or token:", err);
+    return null;
+  }
+};
+
+export const disablePushNotifications = async (userId: string): Promise<void> => {
+  try {
+    const messagingInstance = await initMessaging();
+    if (messagingInstance) {
+      await deleteToken(messagingInstance);
+    }
+    const tokenRef = doc(db, 'user_push_tokens', userId);
+    await deleteDoc(tokenRef);
+    console.log("FCM Token successfully removed from Firestore.");
+  } catch (err) {
+    console.error("Error disabling push notifications:", err);
+  }
+};
+
 
 if (typeof window !== 'undefined') {
   enableIndexedDbPersistence(db).catch((err) => {

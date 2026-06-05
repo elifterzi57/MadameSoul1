@@ -1,6 +1,6 @@
 # MadameSoul - Proje Genel Bakışı (Project Overview)
 
-**Tarih:** 2026-05-22  
+**Tarih:** 2026-06-05  
 **Proje Tipi:** Web Uygulaması (web)  
 **Mimari Yapı:** Monolith (React + Express)  
 
@@ -25,8 +25,10 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 | Kategori | Teknoloji | Sürüm | Kullanım Amacı / Gerekçe |
 | :--- | :--- | :--- | :--- |
 | **Arayüz (Frontend)** | React | `^19.0.1` | Modern, bileşen tabanlı kullanıcı arayüzü oluşturma. |
+| **Durum Yönetimi** | Zustand | `^5.0.14` | Global uygulama durumu ve dil seçimi önbellek yönetimi. |
+| **Sunucu Durumu / API**| TanStack Query | `^5.100.14` | API istekleri yönetimi, fal gönderme mutasyonları ve mükerrer istek koruması. |
 | **Sunucu (Backend)** | Express | `^4.21.2` | API isteklerini yönetme ve istemciye proxy sağlama. |
-| **Yapay Zeka (AI)** | Google GenAI SDK | `^1.29.0` | Gemini 3 Flash Preview ile tarot okuması üretme. |
+| **Yapay Zeka (AI)** | Google GenAI SDK | `^1.29.0` | Gemini API ile yedekli model geçişli (fallback) fal üretimi. |
 | **Veritabanı** | Cloud Firestore (Firebase) | `^12.13.0` | Kullanıcı profili, bakiye ve işlem kayıtlarını saklama. |
 | **Kimlik Doğrulama** | Firebase Authentication | `^12.13.0` | Google, Apple, E-posta ve SMS ile giriş desteği. |
 | **Stil / Tasarım** | Tailwind CSS / Motion | `^4.1.14` / `^12.23.24` | Modern stil ve akıcı mikro-animasyonlar. |
@@ -41,8 +43,10 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 2. **Giriş ve Kimlik Doğrulama:** E-posta/Şifre, Google Pop-up, Apple Sign-In ve SMS Telefon doğrulama yöntemleriyle zenginleştirilmiş güvenli kimlik doğrulama ekranı.
 3. **Mistik Bakiye Sistemi (Moon):** Tarot okumaları yapabilmek için "Moon" kredileri kullanılır. Hoş geldin bonusu, harcamalar ve satın alımlar Firestore üzerinde transaction bazlı olarak yönetilir.
 4. **Onboarding Tanıtım Ekranı:** Uygulamayı ilk kez kullananlara yönelik premium, akıcı ve görsellerle zenginleştirilmiş tanıtım adımları.
-5. **Geçmiş Okumalar ve PDF:** Kullanıcılar daha önceki tarot yorumlarını profillerinden listeleyebilir ve bunları cihazlarına PDF olarak indirebilirler.
+5. **Geçmiş Okumalar ve PDF:** Kullanıcılar daha önceki tarot yorumlarını profillerinden listeleyebilir, favorileyebilir ve bunları cihazlarına PDF olarak indirebilirler.
 6. **Dinamik Reklam Yönetimi:** `/ads/ads_config.json` dosyası üzerinden harici video veya görsel reklam bileşenlerini yönetme imkanı.
+7. **Asenkron Fal Yorumlama ve FCM:** Gemini API istekleri asenkron olarak arka planda çalıştırılır; fal hazır olduğunda Firestore `moon_transactions` kaydı güncellenir ve Firebase Cloud Messaging (FCM) ile bildirim gönderilir.
+8. **Zustand & React Query Entegrasyonu:** Performanslı durum yönetimi ve mükerrer istek koruması için modern kütüphanelerle entegre arayüz.
 
 ---
 

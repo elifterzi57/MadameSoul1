@@ -21,11 +21,13 @@ export type UserInfo = {
 
 export type AppState = {
   user: User | null;
+  userRole: 'user' | 'employee' | 'admin' | null;
   userInfo: UserInfo;
   moonsCount: number;
   readingCount: number;
   step: 'SPLASH' | 'FORM' | 'DRAWING' | 'RESULT';
   setUser: (user: User | null) => void;
+  setUserRole: (role: 'user' | 'employee' | 'admin' | null) => void;
   setUserInfo: (info: Partial<UserInfo>) => void;
   setMoonsCount: (count: number) => void;
   setReadingCount: (count: number | ((prev: number) => number)) => void;
@@ -34,22 +36,29 @@ export type AppState = {
 
 export const useAppStore = create<AppState>((set) => ({
   user: null,
+  userRole: null,
   userInfo: {
     name: '',
     dob: '',
     birthplace: '',
     relationship: 'single',
-    language: 'en',
+    language: (localStorage.getItem('madamesoul_language') as Language) || 'en',
     focus: 'general',
   },
   moonsCount: 0,
   readingCount: 0,
   step: 'SPLASH',
   setUser: (user) => set({ user }),
+  setUserRole: (userRole) => set({ userRole }),
   setUserInfo: (info) =>
-    set((state) => ({
-      userInfo: { ...state.userInfo, ...info },
-    })),
+    set((state) => {
+      if (info.language) {
+        localStorage.setItem('madamesoul_language', info.language);
+      }
+      return {
+        userInfo: { ...state.userInfo, ...info },
+      };
+    }),
   setMoonsCount: (moonsCount) => set({ moonsCount }),
   setReadingCount: (count) =>
     set((state) => ({

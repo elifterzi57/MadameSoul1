@@ -5,6 +5,18 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
+    function isEmployee() {
+      return request.auth != null && 
+             ('role' in request.auth.token) &&
+             (request.auth.token.role == 'employee' || request.auth.token.role == 'admin');
+    }
+
+    function isAdmin() {
+      return request.auth != null && 
+             ('role' in request.auth.token) &&
+             request.auth.token.role == 'admin';
+    }
+
     function isValidMessage(data) {
       return data.keys().hasAll(['fullName', 'email', 'subject', 'message', 'createdAt']) && 
              data.keys().size() == 5 &&
@@ -37,13 +49,16 @@ service cloud.firestore {
              (!('lastDailyClaimedAt' in data) || data.lastDailyClaimedAt == null || data.lastDailyClaimedAt is timestamp);
     }
 
-    function isValidMoonTransaction(data) {
-      return data.userId == request.auth.uid &&
+    function isValidMoonTransaction(data, transactionId) {
+      return (data.userId == request.auth.uid || isEmployee()) &&
              data.amount is int &&
-             data.type in ['spend', 'buy', 'bonus'] &&
+             data.type in ['spend', 'buy', 'bonus', 'refund'] &&
              data.description is string &&
              data.pdfDownloaded is int &&
              data.pdfDownloaded in [0, 1] &&
+             (!('transactionId' in data) || data.transactionId == transactionId) &&
+             (!('performedBy' in data) || data.performedBy is string) &&
+             (!('targetUser' in data) || data.targetUser is string) &&
              (!('status' in data) || data.status in ['pending', 'success', 'failed', 'cached']) &&
              (!('userName' in data) || (data.userName is string && data.userName.size() < 500)) &&
              (!('userDob' in data) || (data.userDob is string && data.userDob.size() < 100)) &&
@@ -54,82 +69,104 @@ service cloud.firestore {
              (!('isFavorite' in data) || data.isFavorite is bool) &&
              (!('customTitle' in data) || (data.customTitle is string && data.customTitle.size() <= 200)) &&
              (!('reflectionNotes' in data) || (data.reflectionNotes is string && data.reflectionNotes.size() <= 5000)) &&
-             (!('readingText' in data) || (data.readingText is string && data.readingText.size() <= 20000));
+             (!('readingText' in data) || (data.readingText is string && data.readingText.size() <= 20000)) &&
+             (!('paymentProvider' in data) || (data.paymentProvider is string && data.paymentProvider in ['stripe', 'app_store', 'google_play', 'daily_gift', 'welcome_bonus', 'admin_dusting'])) &&
+             (!('idempotencyKey' in data) || data.idempotencyKey is string) &&
+             (!('clientMetadata' in data) || (data.clientMetadata is map &&
+                                              data.clientMetadata.userAgent is string &&
+                                              data.clientMetadata.os is string &&
+                                              data.clientMetadata.appVersion is string));
     }
 
     match /users/{userId} {
-      allow get: if request.auth != null && request.auth.uid == userId;
-      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(request.resource.data);
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      allow get: if request.auth != null && (request.auth.uid == userId || isEmployee());
+      allow list: if request.auth != null && isEmployee();
+      allow create, update: if request.auth != null && (request.auth.uid == userId || isEmployee()) && isValidUser(request.resource.data);
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
     match /user_moons/{userId} {
-      allow get: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId && 
-                    isValidUserMoon(request.resource.data) && 
+      allow get: if request.auth != null && (request.auth.uid == userId || isEmployee());
+      allow create: if request.auth != null && 
                     (
-                      (request.resource.data.balance == 1 && 
-                       (!('dailyFreeBalance' in request.resource.data) || request.resource.data.dailyFreeBalance == 0) &&
-                       (!('purchasedBalance' in request.resource.data) || request.resource.data.purchasedBalance == 1))
+                      (request.auth.uid == userId && 
+                       isValidUserMoon(request.resource.data) && 
+                       (
+                         (request.resource.data.balance == 1 && 
+                          (!('dailyFreeBalance' in request.resource.data) || request.resource.data.dailyFreeBalance == 0) &&
+                          (!('purchasedBalance' in request.resource.data) || request.resource.data.purchasedBalance == 1))
+                         ||
+                         (request.resource.data.balance == 5)
+                       ))
                       ||
-                      (request.resource.data.balance == 5)
+                      isEmployee()
                     );
-      allow update: if request.auth != null && request.auth.uid == userId && 
-                    isValidUserMoon(request.resource.data) && 
+      allow update: if request.auth != null && 
                     (
-                      // Case A: Harcama (Spend) - Bakiye 1 azalır
-                      (
-                        request.resource.data.balance == resource.data.balance - 1 &&
-                        (
-                          // Option 1: dailyFree'den düşüş
-                          (resource.data.dailyFreeBalance > 0 && 
-                           request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance - 1 &&
-                           request.resource.data.purchasedBalance == resource.data.purchasedBalance)
-                          ||
-                          // Option 2: purchased'dan düşüş
-                          (resource.data.dailyFreeBalance == 0 && 
-                           request.resource.data.dailyFreeBalance == 0 &&
-                           request.resource.data.purchasedBalance == resource.data.purchasedBalance - 1)
-                          ||
-                          // Option 3: Fallback (Eski şema için)
-                          (!('dailyFreeBalance' in resource.data) || !('purchasedBalance' in resource.data))
-                        )
-                      )
+                      (request.auth.uid == userId && 
+                       isValidUserMoon(request.resource.data) && 
+                       (
+                         // Case A: Harcama (Spend) - Bakiye 1 azalır
+                         (
+                           request.resource.data.balance == resource.data.balance - 1 &&
+                           (
+                             // Option 1: dailyFree'den düşüş
+                             (resource.data.dailyFreeBalance > 0 && 
+                              request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance - 1 &&
+                              request.resource.data.purchasedBalance == resource.data.purchasedBalance)
+                             ||
+                             // Option 2: purchased'dan düşüş
+                             (resource.data.dailyFreeBalance == 0 && 
+                              request.resource.data.dailyFreeBalance == 0 &&
+                              request.resource.data.purchasedBalance == resource.data.purchasedBalance - 1)
+                             ||
+                             // Option 3: Fallback (Eski şema için)
+                             (!('dailyFreeBalance' in resource.data) || !('purchasedBalance' in resource.data))
+                           )
+                         )
+                         ||
+                         // Case B: Günlük Hak Alımı (Daily Claim)
+                         (
+                           request.resource.data.dailyFreeBalance == 1 &&
+                           request.resource.data.purchasedBalance == resource.data.purchasedBalance &&
+                           request.resource.data.balance == resource.data.purchasedBalance + 1 &&
+                           request.resource.data.lastDailyClaimedAt == request.time &&
+                           (
+                             resource.data.lastDailyClaimedAt == null || 
+                             request.time.toMillis() - resource.data.lastDailyClaimedAt.toMillis() >= 24 * 60 * 60 * 1000
+                           )
+                         )
+                         ||
+                         // Case C: Rollback / Refund (İade/Geri Alma) - Bakiye 1 artar
+                         (
+                           request.resource.data.balance == resource.data.balance + 1 &&
+                           (
+                             // Option 1: dailyFree'ye iade
+                             (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance + 1 &&
+                              request.resource.data.purchasedBalance == resource.data.purchasedBalance)
+                             ||
+                             // Option 2: purchased'a iade
+                             (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance &&
+                              request.resource.data.purchasedBalance == resource.data.purchasedBalance + 1)
+                           )
+                         )
+                       ))
                       ||
-                      // Case B: Günlük Hak Alımı (Daily Claim)
-                      (
-                        request.resource.data.dailyFreeBalance == 1 &&
-                        request.resource.data.purchasedBalance == resource.data.purchasedBalance &&
-                        request.resource.data.balance == resource.data.purchasedBalance + 1 &&
-                        request.resource.data.lastDailyClaimedAt == request.time &&
-                        (
-                          resource.data.lastDailyClaimedAt == null || 
-                          request.time.toMillis() - resource.data.lastDailyClaimedAt.toMillis() >= 24 * 60 * 60 * 1000
-                        )
-                      )
-                      ||
-                      // Case C: Rollback / Refund (İade/Geri Alma) - Bakiye 1 artar
-                      (
-                        request.resource.data.balance == resource.data.balance + 1 &&
-                        (
-                          // Option 1: dailyFree'ye iade
-                          (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance + 1 &&
-                           request.resource.data.purchasedBalance == resource.data.purchasedBalance)
-                          ||
-                          // Option 2: purchased'a iade
-                          (request.resource.data.dailyFreeBalance == resource.data.dailyFreeBalance &&
-                           request.resource.data.purchasedBalance == resource.data.purchasedBalance + 1)
-                        )
-                      )
+                      isEmployee()
                     );
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
     match /moon_transactions/{transactionId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null && isValidMoonTransaction(request.resource.data);
-      allow update: if request.auth != null && resource.data.userId == request.auth.uid && isValidMoonTransaction(request.resource.data);
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
+      allow create: if request.auth != null && 
+                    (request.resource.data.userId == request.auth.uid || isEmployee()) && 
+                    isValidMoonTransaction(request.resource.data, transactionId) &&
+                    request.resource.data.paymentProvider is string &&
+                    request.resource.data.idempotencyKey is string &&
+                    request.resource.data.clientMetadata is map;
+      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee()) && isValidMoonTransaction(request.resource.data, transactionId);
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     match /messages_en/{messageId} {
@@ -179,6 +216,32 @@ service cloud.firestore {
 
     match /ai_telemetry/{telemetryId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /ui_configs/{configId} {
+      allow read: if true;
+      allow write: if isEmployee();
+    }
+
+    match /user_push_tokens/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isEmployee());
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /system_configs/{configId} {
+      allow read: if isEmployee();
+      allow write: if isAdmin();
+    }
+
+    match /admin_audit_logs/{logId} {
+      allow read: if request.auth != null && isAdmin();
+      allow create: if request.auth != null && (isEmployee() || isAdmin());
+      allow update, delete: if false;
+    }
+
+    match /config_logs/{logId} {
+      allow read: if request.auth != null && (isEmployee() || isAdmin());
       allow write: if false;
     }
   }

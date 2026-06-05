@@ -10,7 +10,13 @@ Koleksiyon listesi:
 2. `user_moons` - Kullanıcıların kredi/coin (Moon) bakiyeleri.
 3. `moon_transactions` - Harcama (okumalar) ve satın alım işlemleri.
 4. `phones` - Pazarlama ve SMS takibi için telefon numarası kayıtları.
-5. `messages_{lang}` - İletişim formu mesajları (Dile özgü koleksiyonlar: `messages_en`, `messages_tr` vb.)
+5. `messages_{lang}` - İletişim formu mesajları (Dile özgü koleksiyonlar: `messages_en`, `messages_tr` vb.).
+6. `marketing_consents` - Pazarlama onayları ve ilgi alanları.
+7. `checkout_attempts` - Ödeme hunisi başlatma ve terk etme kayıtları.
+8. `error_logs` - Sunucu/istemci çalışma zamanı hataları.
+9. `ai_telemetry` - Yapay zeka token/latency maliyet analizi.
+10. `config_logs` - Sistem ve reklam yapılandırma değişikliklerinin takibi.
+11. `admin_audit_logs` - Yönetim paneli denetim ve izlenebilirlik günlükleri.
 
 ---
 
@@ -66,8 +72,9 @@ Kullanıcının yaptığı tüm bakiye işlemlerini (satın alma, harcama, hoş 
 | Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
 | :--- | :--- | :--- | :--- |
 | `userId` | String | Evet | Firebase Auth UID ile eşleşmelidir. |
+| `transactionId` | String | Hayır | İşlem belgesinin kendi benzersiz ID'si ile eşleşen alan (izlenebilirlik için). |
 | `amount` | Integer | Evet | Bakiyedeki değişim miktarı (Negatif veya pozitif tam sayı). |
-| `type` | String | Evet | Alabileceği değerler: `spend` (harcama), `buy` (satın alım), `bonus`. |
+| `type` | String | Evet | Alabileceği değerler: `spend` (harcama), `buy` (satın alım), `bonus`, `refund` (iade). |
 | `description` | String | Evet | İşlemin açıklaması. |
 | `pdfDownloaded` | Integer | Evet | Okuma PDF'inin indirilip indirilmediği: `0` veya `1`. |
 | `userName` | String | Hayır | Maksimum 500 karakter. |
@@ -77,6 +84,11 @@ Kullanıcının yaptığı tüm bakiye işlemlerini (satın alma, harcama, hoş 
 | `userLanguage` | String | Hayır | Okuma dili (Maksimum 10 karakter). |
 | `selectedCards` | List | Hayır | Seçilen kartların listesi (Maksimum 10 kart). |
 | `readingText` | String | Hayır | Gemini tarafından üretilen tarot okuma yorumu metni. |
+| `performedBy` | String | Hayır | İşlemi gerçekleştiren çalışanın e-postası/ID'si (Yönetim paneli işlemleri için). |
+| `targetUser` | String | Hayır | İşlemin uygulandığı kullanıcının adı ve e-postası. |
+| `paymentProvider` | String | Evet | Ödeme/kazanım kaynağı (`stripe`, `app_store`, `google_play`, `daily_gift`, `welcome_bonus`, `admin_dusting`). |
+| `idempotencyKey` | String | Evet | Mükerrer işlemleri önlemek için benzersiz anahtar. |
+| `clientMetadata` | Map | Evet | İstemci cihaz/tarayıcı bilgileri (`userAgent`, `os`, `appVersion`). |
 | `createdAt` | Timestamp | Evet | İşlemin oluşturulduğu zaman damgası. |
 
 ---
@@ -199,4 +211,47 @@ Gemini API'sine yapılan içerik üretme isteklerinin maliyetlerini kontrol etme
 | `candidatesTokens` | Integer | Evet | Gemini tarafından üretilen çıktı token sayısı. |
 | `latencyMs` | Integer | Evet | API yanıt süresi (milisaniye cinsinden). |
 | `createdAt` | Timestamp | Evet | Talebin işlendiği tarih. |
+
+---
+
+## 10. `config_logs` Koleksiyonu (Yeni - MS-189)
+
+Yönetim panelinde sistem veya arayüz konfigürasyonlarının (Gemini model parametreleri, reklam afiş bağlantıları vb.) ne zaman, kimin tarafından ve ne şekilde değiştirildiğini takip eder.
+
+- **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
+- **Güvenlik Kuralları:** Yalnızca çalışanlar ve yöneticiler (`isEmployee() || isAdmin()`) okuyabilir. İstemciler doğrudan yazamaz, yazma işlemi backend API katmanı tarafından gerçekleştirilir.
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `performedBy` | String | Evet | Değişikliği gerçekleştiren çalışanın e-posta adresi. |
+| `changedSetting` | String | Evet | Güncellenen ayarın adı. |
+| `oldValue` | String | Evet | Ayarın güncelleme öncesindeki eski değeri (JSON formatında dizge). |
+| `newValue` | String | Evet | Ayarın güncelleme sonrasındaki yeni değeri (JSON formatında dizge). |
+| `createdAt` | Timestamp | Evet | Güncellemenin yapıldığı zaman damgası. |
+
+---
+
+## 11. `admin_audit_logs` Koleksiyonu (Yeni - MS-193)
+
+Yönetim panelinden yapılan bakiye düzenlemeleri (credit dusting), rol atamaları ve konfigürasyon güncellemeleri gibi kritik sistem işlemlerini denetim (audit) amacıyla detaylı olarak saklar.
+
+- **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
+- **Güvenlik Kuralları:** Okuma yetkisi sadece adminlere (`isAdmin()`) açıktır. Çalışanlar (`isEmployee()`) ve adminler (`isAdmin()`) yeni log belgesi ekleyebilir (`create`). Normal kullanıcılar erişemez.
+
+### Şema (Schema)
+
+| Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
+| :--- | :--- | :--- | :--- |
+| `operatorUid` | String | Evet | İşlemi yapan çalışanın Firebase Auth UID'si. |
+| `operatorEmail` | String | Evet | İşlemi yapan çalışanın e-posta adresi. |
+| `targetUid` | String / null | Hayır | İşlemden etkilenen kullanıcının UID'si (örn. bakiye düzenlenen kullanıcı). |
+| `actionType` | String | Evet | İşlem türü: `credit_dusting`, `role_change`, `system_config_update`, `ui_config_update`. |
+| `details` | Map | Evet | İşleme dair detaylar (örn. miktar, eski ve yeni rol, eski/yeni ayarlar). |
+| `timestamp` | Timestamp | Evet | İşlemin gerçekleştirildiği sunucu zaman damgası. |
+
+
+
+
 

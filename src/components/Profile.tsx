@@ -19,11 +19,14 @@ import {
   EyeOff,
   Download,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Bell,
+  RotateCcw
 } from 'lucide-react';
-import { db, auth } from '../lib/firebase';
+import { db, auth, requestPushNotificationPermission, disablePushNotifications } from '../lib/firebase';
 import { collection, query, where, getDocs, getDoc, setDoc, orderBy, limit, Timestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { convertToLocaleUppercase } from '../utils/textUtils';
 
 interface ProfileProps {
   user: any;
@@ -66,10 +69,45 @@ export const Profile: React.FC<ProfileProps> = ({
   const [editNotes, setEditNotes] = useState('');
   const [notesStatus, setNotesStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-  // Marketing consent state
-  const [emailConsent, setEmailConsent] = useState(false);
-  const [smsConsent, setSmsConsent] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  // Web Push notification states and handlers
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [checkingPush, setCheckingPush] = useState(true);
+
+  useEffect(() => {
+    const checkPushToken = async () => {
+      if (!user) return;
+      try {
+        const docRef = doc(db, 'user_push_tokens', user.uid);
+        const docSnap = await getDoc(docRef);
+        setPushEnabled(docSnap.exists());
+      } catch (e) {
+        console.error("Error checking push token status:", e);
+      } finally {
+        setCheckingPush(false);
+      }
+    };
+    checkPushToken();
+  }, [user]);
+
+  const handleTogglePush = async () => {
+    if (!user) return;
+    setCheckingPush(true);
+    try {
+      if (pushEnabled) {
+        await disablePushNotifications(user.uid);
+        setPushEnabled(false);
+      } else {
+        const token = await requestPushNotificationPermission(user.uid);
+        if (token) {
+          setPushEnabled(true);
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling push status:", err);
+    } finally {
+      setCheckingPush(false);
+    }
+  };
 
   // Profile edit state
   const [editName, setEditName] = useState(userInfo.name);
@@ -92,40 +130,22 @@ export const Profile: React.FC<ProfileProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
-  // Fetch marketing consents
-  useEffect(() => {
-    if (!user) return;
-    const fetchConsents = async () => {
-      try {
-        const consentRef = doc(db, 'marketing_consents', user.uid);
-        const consentSnap = await getDoc(consentRef);
-        if (consentSnap.exists()) {
-          const data = consentSnap.data();
-          setEmailConsent(data.emailConsent || false);
-          setSmsConsent(data.smsConsent || false);
-          setSelectedInterests(data.interests || []);
-        }
-      } catch (error) {
-        console.error("Error fetching marketing consents:", error);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: (val: string) => void
+  ) => {
+    const input = e.target;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const upperVal = convertToLocaleUppercase(input.value, userInfo.language as any);
+    
+    setter(upperVal);
+    
+    requestAnimationFrame(() => {
+      if (input) {
+        input.setSelectionRange(start, end);
       }
-    };
-    fetchConsents();
-  }, [user]);
-
-  const saveConsents = async (email: boolean, sms: boolean, interests: string[]) => {
-    if (!user) return;
-    try {
-      const consentRef = doc(db, 'marketing_consents', user.uid);
-      await setDoc(consentRef, {
-        userId: user.uid,
-        emailConsent: email,
-        smsConsent: sms,
-        interests,
-        updatedAt: Timestamp.now()
-      }, { merge: true });
-    } catch (error) {
-      console.error("Error saving marketing consents:", error);
-    }
+    });
   };
 
   const handleDeleteAccount = async () => {
@@ -218,15 +238,22 @@ export const Profile: React.FC<ProfileProps> = ({
         const q = query(
           collection(db, 'moon_transactions'),
           where('userId', '==', user.uid),
-          where('type', '==', 'buy'),
+          where('type', 'in', ['buy', 'bonus', 'refund']),
           orderBy('createdAt', 'desc'),
-          limit(10)
+          limit(20)
         );
         const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const items = querySnapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as any))
+          .filter(item => {
+            if (item.type === 'buy' || item.type === 'refund') return true;
+            const desc = item.description || '';
+            return desc.includes('İade') || desc.includes('Refund') || desc.includes('adjustment');
+          })
+          .slice(0, 10);
         setPurchases(items);
       } catch (error) {
         console.error('Error fetching purchases:', error);
@@ -460,7 +487,7 @@ export const Profile: React.FC<ProfileProps> = ({
                       <input 
                         type="text" 
                         value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
+                        onChange={(e) => handleInputChange(e, setEditName)}
                         className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1"
                         placeholder="Ad Soyad"
                       />
@@ -485,7 +512,7 @@ export const Profile: React.FC<ProfileProps> = ({
                       <input 
                         type="text" 
                         value={editBirthplace}
-                        onChange={(e) => setEditBirthplace(e.target.value)}
+                        onChange={(e) => handleInputChange(e, setEditBirthplace)}
                         className="bg-transparent border-b border-[#ecd8a6]/10 text-[#ecd8a6] font-medium focus:border-[#ecd8a6]/40 outline-none pb-1"
                         placeholder={profileT.birthplace}
                       />
@@ -684,36 +711,48 @@ export const Profile: React.FC<ProfileProps> = ({
                     </div>
                   ) : purchases.length > 0 ? (
                     <div className="space-y-3">
-                      {purchases.map((item) => (
-                        <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 hover:bg-[#ecd8a6]/5 transition-colors group">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-lg bg-[#0a0512] border border-[#ecd8a6]/20 flex items-center justify-center">
-                              <ShoppingBag className="w-5 h-5 text-[#ecd8a6]/60" />
-                            </div>
-                            <div>
-                              <div className="text-[#ecd8a6] text-sm font-medium">{item.description}</div>
-                              <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
-                                <CalendarDays className="w-3 h-3" />
-                                {item.createdAt?.toDate().toLocaleDateString()}
+                      {purchases.map((item) => {
+                        const isRefund = item.type === 'refund' || (item.type === 'bonus' && (item.description?.includes('İade') || item.description?.includes('Refund')));
+                        return (
+                          <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 hover:bg-[#ecd8a6]/5 transition-colors group">
+                            <div className="flex items-center gap-4">
+                              <div className={`w-10 h-10 rounded-lg bg-[#0a0512] border flex items-center justify-center ${isRefund ? 'border-green-500/30' : 'border-[#ecd8a6]/20'}`}>
+                                {isRefund ? (
+                                  <RotateCcw className="w-5 h-5 text-green-400/80" />
+                                ) : (
+                                  <ShoppingBag className="w-5 h-5 text-[#ecd8a6]/60" />
+                                )}
+                              </div>
+                              <div>
+                                <div className="text-[#ecd8a6] text-sm font-medium">{item.description}</div>
+                                <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
+                                  <CalendarDays className="w-3 h-3" />
+                                  {item.createdAt?.toDate().toLocaleDateString()}
+                                </div>
                               </div>
                             </div>
+                            
+                            <div className="flex items-center gap-2 font-serif">
+                              {isRefund && (
+                                <span className="text-[10px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full font-sans font-semibold tracking-wide uppercase mr-2">
+                                  {userInfo.language === 'tr' ? "+1 İade" : "+1 Refund"}
+                                </span>
+                              )}
+                              {item.stripeReceiptUrl && (
+                                <a 
+                                  href={item.stripeReceiptUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"
+                                >
+                                  {userInfo.language === 'tr' ? "Makbuz" : "Receipt"}
+                                </a>
+                              )}
+                              <ChevronRight className="w-4 h-4 text-[#ecd8a6]/20 group-hover:text-[#ecd8a6]/60 transition-colors" />
+                            </div>
                           </div>
-                          
-                          <div className="flex items-center gap-2 font-serif">
-                            {item.stripeReceiptUrl && (
-                              <a 
-                                href={item.stripeReceiptUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"
-                              >
-                                {userInfo.language === 'tr' ? "Makbuz" : "Receipt"}
-                              </a>
-                            )}
-                            <ChevronRight className="w-4 h-4 text-[#ecd8a6]/20 group-hover:text-[#ecd8a6]/60 transition-colors" />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-8 rounded-2xl border border-dashed border-[#ecd8a6]/10 bg-[#ecd8a6]/5">
@@ -776,30 +815,36 @@ export const Profile: React.FC<ProfileProps> = ({
 
                 <hr className="border-[#ecd8a6]/10 my-6" />
 
+                {/* Web Push Notification Settings */}
                 <section className="space-y-4">
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
-                    <History className="w-3.5 h-3.5" />
-                    {userInfo.language === 'tr' ? "Uygulama Tanıtımı" : "App Intro"}
+                    <Bell className="w-3.5 h-3.5" />
+                    {userInfo.language === 'tr' ? "Bildirim Ayarları" : "Notification Settings"}
                   </h3>
-                  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex justify-between items-center gap-4">
                     <div>
-                      <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">{userInfo.language === 'tr' ? "Tanıtımı Tekrar İzle" : "Watch App Intro"}</h4>
+                      <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
+                        {userInfo.language === 'tr' ? "Web Push Bildirimleri" : "Web Push Notifications"}
+                      </h4>
                       <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
                         {userInfo.language === 'tr' 
-                          ? "MadameSoul rehberlik adımlarını ve onboarding slaytlarını baştan izleyin." 
-                          : "Replay the MadameSoul onboarding tour and introductory guide from the beginning."}
+                          ? "Kredileriniz yenilendiğinde ve falınız hazır olduğunda anında bildirim alın." 
+                          : "Get instant notifications when your credits are renewed or when your reading is ready."}
                       </p>
                     </div>
                     <button
-                      onClick={() => {
-                        if (onShowOnboarding) {
-                          onShowOnboarding();
-                        }
-                        onClose();
-                      }}
-                      className="px-5 py-2.5 bg-[#1a1025] hover:bg-white/5 text-[#ecd8a6]/70 hover:text-[#ecd8a6] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all border border-[#ecd8a6]/20 font-bold whitespace-nowrap active:scale-95"
+                      onClick={handleTogglePush}
+                      disabled={checkingPush}
+                      className={`px-5 py-2.5 rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all duration-300 border font-bold active:scale-95 flex items-center gap-2 ${
+                        pushEnabled 
+                          ? 'bg-rose-950/30 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-[#0a0512]' 
+                          : 'bg-[#ecd8a6] text-[#0a0512] border-transparent hover:bg-white'
+                      }`}
                     >
-                      {userInfo.language === 'tr' ? "İzlemeye Başla" : "Watch Now"}
+                      {checkingPush && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      {pushEnabled 
+                        ? (userInfo.language === 'tr' ? "Kapat" : "Disable") 
+                        : (userInfo.language === 'tr' ? "Etkinleştir" : "Enable")}
                     </button>
                   </div>
                 </section>
@@ -809,96 +854,7 @@ export const Profile: React.FC<ProfileProps> = ({
                 <section className="space-y-4">
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
                     <Settings className="w-3.5 h-3.5" />
-                    {userInfo.language === 'tr' ? "Pazarlama Tercihleri" : "Marketing Preferences"}
-                  </h3>
-                  <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
-                          {userInfo.language === 'tr' ? "E-posta Bildirimleri" : "Email Notifications"}
-                        </h4>
-                        <p className="text-xs text-[#ecd8a6]/50 mt-0.5 leading-relaxed">
-                          {userInfo.language === 'tr' ? "Yenilikler ve kampanyalar hakkında e-posta alın." : "Receive emails about updates and special offers."}
-                        </p>
-                      </div>
-                      <input 
-                        type="checkbox"
-                        checked={emailConsent}
-                        onChange={(e) => {
-                          const val = e.target.checked;
-                          setEmailConsent(val);
-                          saveConsents(val, smsConsent, selectedInterests);
-                        }}
-                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
-                          {userInfo.language === 'tr' ? "SMS Bildirimleri" : "SMS Notifications"}
-                        </h4>
-                        <p className="text-xs text-[#ecd8a6]/50 mt-0.5 leading-relaxed">
-                          {userInfo.language === 'tr' ? "Önemli duyuruları kısa mesajla alın." : "Get important announcements via text message."}
-                        </p>
-                      </div>
-                      <input 
-                        type="checkbox"
-                        checked={smsConsent}
-                        onChange={(e) => {
-                          const val = e.target.checked;
-                          setSmsConsent(val);
-                          saveConsents(emailConsent, val, selectedInterests);
-                        }}
-                        className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
-                      />
-                    </div>
-
-                    <div className="pt-2 border-t border-[#ecd8a6]/10">
-                      <h4 className="text-sm font-serif font-bold text-[#ecd8a6] mb-3">
-                        {userInfo.language === 'tr' ? "İlgi Alanları" : "Interests"}
-                      </h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {[
-                          { id: 'daily_horoscope', labelTr: 'Günlük Burçlar', labelEn: 'Daily Horoscopes' },
-                          { id: 'love_tarot', labelTr: 'Aşk Açılımları', labelEn: 'Love Readings' },
-                          { id: 'career_tarot', labelTr: 'Kariyer ve Para', labelEn: 'Career & Finance' },
-                          { id: 'special_deals', labelTr: 'Özel İndirimler', labelEn: 'Special Deals' },
-                        ].map((interest) => {
-                          const isChecked = selectedInterests.includes(interest.id);
-                          const label = userInfo.language === 'tr' ? interest.labelTr : interest.labelEn;
-                          return (
-                            <label key={interest.id} className="flex items-center gap-3 cursor-pointer">
-                              <input 
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  let newInterests = [...selectedInterests];
-                                  if (e.target.checked) {
-                                    newInterests.push(interest.id);
-                                  } else {
-                                    newInterests = newInterests.filter(id => id !== interest.id);
-                                  }
-                                  setSelectedInterests(newInterests);
-                                  saveConsents(emailConsent, smsConsent, newInterests);
-                                }}
-                                className="w-3.5 h-3.5 rounded border-gray-300 text-purple-600 focus:ring-purple-500 accent-[#ecd8a6]"
-                              />
-                              <span className="text-xs text-[#ecd8a6]/70 hover:text-[#ecd8a6] transition-colors">{label}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <hr className="border-[#ecd8a6]/10 my-6" />
-
-                <section className="space-y-4">
-                  <h3 className="text-xs font-serif tracking-[0.2em] text-red-400/70 uppercase mb-2 flex items-center gap-2">
-                    <AlertCircle className="w-3.5 h-3.5 text-red-400" />
-                    {userInfo.language === 'tr' ? "TEHLİKELİ ALAN" : "DANGER ZONE"}
+                    {userInfo.language === 'tr' ? "Hesap Yönetimi" : "Account Management"}
                   </h3>
                   
                   {!showDeleteConfirm ? (

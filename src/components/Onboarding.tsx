@@ -9,11 +9,6 @@ interface OnboardingProps {
   t: (key: string, params?: Record<string, string>) => string;
 }
 
-const slideImages = [
-  "/assets/onboarding/onboarding_welcome.webp",
-  "/assets/onboarding/onboarding_discovery.webp",
-  "/assets/onboarding/onboarding_journey.webp"
-];
 
 export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -77,22 +72,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete, language, t 
   return (
     <div className="fixed inset-0 z-50 bg-[#06040a] flex items-center justify-center text-white overflow-hidden font-sans">
       {/* Background with Ambient Light */}
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <motion.img 
-            key={currentSlide}
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.3 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            src={slideImages[currentSlide]} 
-            alt="" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-[#06040a]/60 backdrop-blur-[2px]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#06040a]/50 to-[#06040a]" />
+      <div className="absolute inset-0 z-0 bg-[#06040a]">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#160c24]/20 via-transparent to-[#06040a]" />
       </div>
 
       {/* Floating Particles */}

@@ -5,21 +5,20 @@ Bu belgede, MadameSoul React uygulamasını oluşturan temel kullanıcı arayüz
 ---
 
 ## 1. `App.tsx` (Ana Konteyner ve İş Akışı Yöneticisi)
-Uygulamanın merkezidir. Yönlendirme (routing), kart seçme mantığı, durum yönetimi ve dış kütüphane entegrasyonlarının çoğunu barındırır.
+Uygulamanın merkezidir. Zustand store ile entegre çalışarak yönlendirme (routing), kart seçme ritüeli, asenkron API entegrasyonu ve modüler bileşenlerin yönetimini koordine eder.
 
 - **Dosya Konumu:** `src/App.tsx`
 - **Temel Görevleri:**
-  - Kullanıcının tarayıcı dilini tespit edip uygun yerelleştirmeyi (i18n) yükleme.
+  - Zustand store üzerinden global uygulama durumunu (`user`, `userInfo`, `moonsCount`, `view`, `language`) yönetme.
   - Kart çekme ekranını yönetme (3 kart seçilmesi zorunluluğu).
-  - Gemini API'sine tarot yorumu isteği atma.
+  - Gemini API'sine asenkron tarot yorumu isteği atma ve transaction durumunu takip etme.
   - Okunan tarot yorumunu PDF formatına dönüştürüp yerel cihazına indirme (`jspdf` ve `html2canvas` ile).
-- **Yönettiği Durumlar (States):**
+- **Zustand Store Bağımlılıkları:**
   - `user`: Aktif oturum açmış kullanıcı (Firebase Auth nesnesi).
-  - `userInfo`: Firestore'dan çekilen kullanıcı profili (ad, doğum tarihi, doğum yeri vb.).
+  - `userInfo`: Firestore'dan çekilen kullanıcı profili.
   - `moonsCount`: Kullanıcının sahip olduğu kredi bakiyesi.
   - `view`: Aktif görünüm (`'landing' | 'select' | 'reading' | 'history' | 'profile'`).
-  - `selectedCards`: Kullanıcının seçtiği 3 Katina kartı.
-  - `reading`: Gemini tarafından oluşturulan güncel tarot yorumu.
+  - `language`: Seçili aktif arayüz dili (lokal depolama ile kalıcı).
 
 ---
 
@@ -70,14 +69,31 @@ Uygulamanın mistik ve premium havasını pekiştiren estetik bir görsel bileş
 
 ---
 
+## 6. Modüler Bileşenler (Extracted Modal & Helper Components)
+
+Uygulamanın büyümesini yönetmek ve kod kalitesini korumak için `App.tsx` içerisindeki modallar ve yardımcı arayüzler ayrı bileşenlere bölünmüştür:
+
+- **`ContactModal.tsx`:** Kullanıcının destek veya geri bildirim mesajları göndermesini sağlayan iletişim formu.
+- **`CookieBanner.tsx`:** KVKK / GDPR uyumluluğu için çerez politikası izinlerini toplayan alt banner arayüzü.
+- **`ErrorBoundary.tsx`:** Çalışma zamanında arayüzde oluşabilecek çökmeleri yakalayan ve Firestore `error_logs` koleksiyonuna yazan hata koruma katmanı.
+- **`LegalModal.tsx`:** Kullanıcı üyelik sözleşmesi ve gizlilik bildirimlerini barındıran yasal onay penceresi.
+- **`StoreModal.tsx`:** Kullanıcıların bakiye ("Moon") paketi seçerek Stripe Checkout ödeme sayfasına yönlendirilmesini yöneten mağaza modalı.
+
+---
+
 ## Bileşenler Arası Veri Akışı ve Entegrasyon
 ```mermaid
 graph TD
-    App[src/App.tsx] -->|Oturum / Dil Durumu| Login[components/Login.tsx]
-    App -->|Tamamlama Tetikleyicisi| Onboarding[components/Onboarding.tsx]
-    App -->|Bakiye / Profil Verisi| Profile[components/Profile.tsx]
+    Store[src/store/useAppStore.ts] -->|Global Durum / Yönlendirme| App[src/App.tsx]
+    App -->|Oturum / Giriş İşlemi| Login[components/Login.tsx]
+    App -->|Sihirbaz Adımları| Onboarding[components/Onboarding.tsx]
+    App -->|Profil ve Fal Günlüğü| Profile[components/Profile.tsx]
+    App -->|Mağaza Paketi Seçimi| StoreModal[components/StoreModal.tsx]
+    App -->|İletişim / Geri Bildirim| ContactModal[components/ContactModal.tsx]
+    App -->|Yasal Sözleşmeler| LegalModal[components/LegalModal.tsx]
+    App -->|Çerez İzinleri| CookieBanner[components/CookieBanner.tsx]
     Login -->|Süsleme| KatinaMoon[components/KatinaMoon.tsx]
     Onboarding -->|Süsleme| KatinaMoon
 ```
-- **Durum Güncellemeleri:** Kullanıcı oturum açtığında `Login` bileşeni Firebase üzerinden tetiklenir, `App.tsx` içindeki `onAuthStateChanged` dinleyicisi bu durumu algılayarak ana görünümü günceller.
-- **Veri Senkronizasyonu:** `Profile.tsx` içinde güncellenen profil detayları anında `App.tsx`'teki `userInfo` durumuna aktarılır ve veri tutarlılığı sağlanır.
+- **Durum Yönetimi:** Tüm durumlar ve yerelleştirme (YAML) verileri Zustand global deposundan yönetilir; bileşenler `useAppStore` kancası (hook) üzerinden durumları okur ve günceller.
+- **Asenkron API Entegrasyonu:** Fal üretim talebi React Query yardımıyla sarmalanarak `App.tsx` ve `Profile.tsx` ekranlarındaki asenkron bakiye güncellemelerinin tutarlı şekilde yönetilmesini sağlar.

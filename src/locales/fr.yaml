@@ -1300,7 +1300,7 @@ login:
   loading: "Chargement..."
   showIntro: "Voir l'Intro de l'App"
   kvkkConsent: "J'ai lu et j'accepte les Conditions d'Utilisation, la Politique de Confidentialité et le Consentement Explicite RGPD/KVKK."
-  quote: \"Découvrez les chuchotements des étoiles et les profondeurs de votre âme."
+  quote: "Découvrez les chuchotements des étoiles et les profondeurs de votre âme."
   errorWrongCredentials: "Adresse e-mail ou mot de passe incorrect."
   errorEmailInUse: "Cet e-mail est déjà utilisé."
   errorInvalidEmail: "Adresse e-mail invalide."

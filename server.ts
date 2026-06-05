@@ -241,6 +241,13 @@ async function startServer() {
           userBirthplace: "",
           userRelationship: "",
           selectedCards: [],
+          paymentProvider: 'stripe',
+          idempotencyKey: sessionId,
+          clientMetadata: {
+            userAgent: "stripe-webhook",
+            os: "stripe-server",
+            appVersion: "1.0.0"
+          },
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
       });
@@ -325,10 +332,27 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // Helper to fetch dynamic configs from system_configs collection in Firestore
+  async function getSystemConfig(configId: string, defaults: Record<string, any>) {
+    if (!useFirebaseAdmin) return defaults;
+    try {
+      const doc = await adminDb.collection("system_configs").doc(configId).get();
+      if (doc.exists) {
+        return { ...defaults, ...doc.data() };
+      }
+    } catch (e) {
+      console.error(`[Server] Failed to load system config ${configId}:`, e);
+    }
+    return defaults;
+  }
+
   // Rate limiter for Gemini generation endpoint (MS-155 User UID based)
   const generateLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 15, // limit each user/IP to 15 requests per windowMs
+    max: async (req: any) => {
+      const config = await getSystemConfig("limits", { generateHourLimit: 15 });
+      return config.generateHourLimit || 15;
+    },
     validate: false,
     keyGenerator: (req: any) => {
       // Use verified user UID if available, fallback to IP
@@ -385,11 +409,25 @@ async function startServer() {
     }
   };
 
-  // API Route for Gemini (Authenticated) - MS-110 & MS-121 backend prompt validation
+  // Middleware to restrict endpoint access by custom claims roles (MS-161)
+  const requireRole = (allowedRoles: ('user' | 'employee' | 'admin')[]) => {
+    return (req: any, res: any, next: any) => {
+      let role = req.user?.role || 'user';
+      if (!useFirebaseAdmin) {
+        role = 'admin'; // Allow all actions as admin in local development mode without credentials
+      }
+      if (!allowedRoles.includes(role)) {
+        return res.status(403).json({ error: "Forbidden: Access denied" });
+      }
+      next();
+    };
+  };
+
+  // API Route for Gemini (Authenticated) - MS-110 & MS-121 backend prompt validation & MS-170 Async generation
   app.post("/api/generate", authenticate, generateLimiter, async (req: any, res: any) => {
     const uid = req.user.uid || req.user.user_id || req.user.sub;
     try {
-      const { cards, userName, dob, birthplace, relationship, language, focus } = req.body;
+      const { transactionId, cards, userName, dob, birthplace, relationship, language, focus } = req.body;
       
       if (!cards || !Array.isArray(cards) || cards.length !== 3) {
         return res.status(400).json({ error: "Exactly 3 cards must be drawn" });
@@ -398,27 +436,57 @@ async function startServer() {
         return res.status(400).json({ error: "Missing required reading details" });
       }
 
-      // Generate cache hash (MS-151)
-      const cardKey = [...cards].sort().join(",");
-      const hash = crypto.createHash("sha256").update(`${uid}:${cardKey}:${focus}`).digest("hex");
-
-      if (useFirebaseAdmin) {
-        try {
-          const cacheDoc = await adminDb.collection("reading_cache").doc(hash).get();
-          if (cacheDoc.exists) {
-            const cacheData = cacheDoc.data();
-            const createdAt = cacheData?.createdAt?.toDate();
-            if (createdAt && (Date.now() - createdAt.getTime() < 24 * 60 * 60 * 1000)) {
-              console.log(`[Cache Hit] Returning cached reading for user ${uid}, hash: ${hash}`);
-              return res.json({ text: cacheData.text, cached: true });
-            }
-          }
-        } catch (cacheErr) {
-          console.error("[Server] Error querying reading_cache:", cacheErr);
-        }
+      if (useFirebaseAdmin && !transactionId) {
+        return res.status(400).json({ error: "transactionId is required" });
       }
 
+
+
       if (useFirebaseAdmin) {
+        // Fetch transaction and validate ownership
+        const txDoc = await adminDb.collection("moon_transactions").doc(transactionId).get();
+        if (!txDoc.exists) {
+          return res.status(404).json({ error: "Transaction not found" });
+        }
+        const txData = txDoc.data()!;
+        if (txData.userId !== uid) {
+          return res.status(403).json({ error: "Unauthorized transaction owner" });
+        }
+
+        // Idempotency check: look for other transactions with the same key
+        const idempotencyKey = txData.idempotencyKey;
+        if (idempotencyKey) {
+          let checkAttempts = 0;
+          while (checkAttempts < 5) {
+            const dupQuery = await adminDb.collection("moon_transactions")
+              .where("userId", "==", uid)
+              .where("idempotencyKey", "==", idempotencyKey)
+              .get();
+              
+            const successTx = dupQuery.docs.find(d => d.id !== transactionId && d.data().status === "success");
+            if (successTx) {
+              console.log(`[Server] Duplicate successful transaction found for key ${idempotencyKey}. Returning cached text.`);
+              return res.json({ text: successTx.data().readingText });
+            }
+            
+            const pendingTx = dupQuery.docs.find(d => d.id !== transactionId && d.data().status === "pending");
+            if (pendingTx) {
+              console.log(`[Server] Concurrent pending transaction found for key ${idempotencyKey}. Waiting 1s...`);
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              checkAttempts++;
+            } else {
+              break;
+            }
+          }
+        }
+
+        if (txData.status === "success") {
+          return res.json({ text: txData.readingText });
+        }
+        if (txData.status === "failed") {
+          return res.status(400).json({ error: "Transaction already failed" });
+        }
+
         // Check user moon balance in Firestore
         const moonDoc = await adminDb.collection("user_moons").doc(uid).get();
         if (!moonDoc.exists) {
@@ -481,52 +549,175 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         }
       });
 
-      const startTime = Date.now();
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: promptText,
-      });
+      const geminiConfig = await getSystemConfig("gemini", { model: "gemini-2.5-flash" });
+      const modelName = geminiConfig.model;
 
-      const latencyMs = Date.now() - startTime;
-
-      if (!response.text) {
-        throw new Error("Empty response from AI model");
-      }
-
-      // Log AI Telemetry to Firestore
-      if (useFirebaseAdmin) {
-        try {
-          const promptTokens = response.usageMetadata?.promptTokenCount || 0;
-          const completionTokens = response.usageMetadata?.candidatesTokenCount || 0;
-          await adminDb.collection("ai_telemetry").add({
-            userId: uid,
-            promptTokens,
-            completionTokens,
-            latencyMs,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
-          });
-        } catch (telemetryErr) {
-          console.error("[Server] Failed to log AI telemetry:", telemetryErr);
+      const generateWithFallback = async (model: string, prompt: string) => {
+        const fallbacks = [model, "gemini-2.0-flash", "gemini-1.5-flash"];
+        const uniqueModels = Array.from(new Set(fallbacks));
+        let lastError: any = null;
+        for (const m of uniqueModels) {
+          try {
+            console.log(`[Server] Generating content using model: ${m}`);
+            const resp = await ai.models.generateContent({
+              model: m,
+              contents: prompt,
+            });
+            if (resp && resp.text) {
+              return { response: resp, usedModel: m };
+            }
+            throw new Error("Empty response from AI model");
+          } catch (err) {
+            console.warn(`[Server] Model ${m} failed:`, err);
+            lastError = err;
+          }
         }
+        throw lastError || new Error("All model generation attempts failed");
+      };
+
+      if (!useFirebaseAdmin) {
+        // Run synchronously/directly for local development when credentials are bypass
+        const { response } = await generateWithFallback(modelName, promptText);
+        return res.json({ text: response.text });
       }
 
-      // Save to cache (MS-151)
-      if (useFirebaseAdmin) {
+      // 1. Immediately return pending status to client
+      res.json({ status: 'pending', transactionId });
+
+      // 2. Spawn background task to process reading
+      (async () => {
         try {
-          await adminDb.collection("reading_cache").doc(hash).set({
-            userId: uid,
-            cards,
-            focus,
-            text: response.text,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
-          });
-          console.log(`[Cache Write] Reading cached with hash: ${hash}`);
-        } catch (cacheWriteErr) {
-          console.error("[Server] Failed to write to reading_cache:", cacheWriteErr);
-        }
-      }
+          console.log(`[Server Background] Starting reading generation for user ${uid}, transaction ${transactionId}`);
+          const startTime = Date.now();
+          const { response, usedModel } = await generateWithFallback(modelName, promptText);
 
-      res.json({ text: response.text });
+          const latencyMs = Date.now() - startTime;
+
+          if (!response.text) {
+            throw new Error("Empty response from AI model");
+          }
+
+          // Update transaction status to success
+          await adminDb.collection("moon_transactions").doc(transactionId).update({
+            status: "success",
+            readingText: response.text,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Log AI Telemetry to Firestore
+          try {
+            const promptTokens = response.usageMetadata?.promptTokenCount || 0;
+            const completionTokens = response.usageMetadata?.candidatesTokenCount || 0;
+            await adminDb.collection("ai_telemetry").add({
+              userId: uid,
+              modelName: usedModel,
+              promptTokens,
+              completionTokens,
+              latencyMs,
+              createdAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+          } catch (telemetryErr) {
+            console.error("[Server Background] Failed to log AI telemetry:", telemetryErr);
+          }
+
+
+
+          // Fetch user's push token and send FCM notification
+          try {
+            const tokenDoc = await adminDb.collection("user_push_tokens").doc(uid).get();
+            if (tokenDoc.exists) {
+              const token = tokenDoc.data()?.token;
+              if (token) {
+                const message = {
+                  token,
+                  notification: {
+                    title: language === "tr" ? "MadameSoul Kehanetiniz Hazır" : "MadameSoul Reading Ready",
+                    body: language === "tr" 
+                      ? "Kartlarınızın mistik yorumu tamamlandı, görmek için tıklayın!" 
+                      : "The mystical interpretation of your cards is complete. Click to view!"
+                  },
+                  data: {
+                    url: "/"
+                  }
+                };
+                await admin.messaging().send(message);
+                console.log(`[Server Background] Push notification sent to user ${uid}`);
+              }
+            }
+          } catch (pushErr) {
+            console.error("[Server Background] Failed to send push notification:", pushErr);
+          }
+
+        } catch (error: any) {
+          console.error("[Server Background] Gemini API Error:", error.message);
+          await logServerError(error, "Background Gemini text generation", uid);
+
+          // Atomic refund of moon balance on failure
+          try {
+            const moonRef = adminDb.collection("user_moons").doc(uid);
+            await adminDb.runTransaction(async (tx) => {
+              const moonDoc = await tx.get(moonRef);
+              if (!moonDoc.exists) return;
+              const data = moonDoc.data();
+              const daily = data?.dailyFreeBalance || 0;
+              const purchased = data?.purchasedBalance || 0;
+
+              const txDoc = await adminDb.collection("moon_transactions").doc(transactionId).get();
+              const deductedFrom = txDoc.data()?.deductedFrom;
+
+              if (deductedFrom === 'daily') {
+                const newDaily = daily + 1;
+                tx.update(moonRef, {
+                  dailyFreeBalance: newDaily,
+                  balance: newDaily + purchased,
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+              } else {
+                const newPurchased = purchased + 1;
+                tx.update(moonRef, {
+                  purchasedBalance: newPurchased,
+                  balance: daily + newPurchased,
+                  updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                });
+              }
+
+              // Log system refund transaction (MS-182)
+              const refundPaymentProvider = deductedFrom === 'daily' ? 'daily_gift' : 'stripe';
+              const refundTxRef = adminDb.collection("moon_transactions").doc();
+              tx.set(refundTxRef, {
+                userId: uid,
+                amount: 1,
+                type: 'refund',
+                status: 'success',
+                description: language === 'tr' ? 'Mistik Yorum Hatası İadesi (Sistem İadesi)' : 'Mystical Reading Error Refund (System Refund)',
+                pdfDownloaded: 0,
+                paymentProvider: refundPaymentProvider,
+                idempotencyKey: `refund_error_${transactionId}`,
+                clientMetadata: {
+                  userAgent: "system-refund",
+                  os: "system-server",
+                  appVersion: "1.0.0"
+                },
+                createdAt: admin.firestore.FieldValue.serverTimestamp()
+              });
+            });
+            console.log(`[Server Background] Moon balance successfully refunded to user ${uid}`);
+          } catch (refundError) {
+            console.error("[Server Background] Failed to refund user moon balance:", refundError);
+          }
+
+          // Set transaction status to failed
+          try {
+            await adminDb.collection("moon_transactions").doc(transactionId).update({
+              status: "failed",
+              updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+          } catch (txStatusError) {
+            console.error("[Server Background] Error updating transaction status to failed:", txStatusError);
+          }
+        }
+      })();
+
     } catch (error: any) {
       console.error("[Server] Gemini API Error:", error.message);
       await logServerError(error, "Gemini text generation", uid);
@@ -634,6 +825,211 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }
   });
 
+  // Dynamic Ads Configuration Interceptor (MS-163)
+  app.get("/ads/ads_config.json", async (req: any, res: any) => {
+    try {
+      if (useFirebaseAdmin) {
+        const doc = await adminDb.collection("ui_configs").doc("ads").get();
+        if (doc.exists) {
+          return res.json(doc.data());
+        }
+      }
+      // Fallback to static ads config if not in database
+      const staticPath = path.resolve(process.cwd(), "public", "ads", "ads_config.json");
+      if (fs.existsSync(staticPath)) {
+        return res.json(JSON.parse(fs.readFileSync(staticPath, "utf8")));
+      }
+      res.status(404).json({ error: "Ads configuration not found" });
+    } catch (err: any) {
+      await logServerError(err, "GET /ads/ads_config.json");
+      res.status(500).json({ error: "Failed to load ads configuration" });
+    }
+  });
+
+  // Get UI Config (Employee & Admin) (MS-163)
+  app.get("/api/admin/ui-configs/:id", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const doc = await adminDb.collection("ui_configs").doc(id).get();
+      if (!doc.exists) {
+        return res.status(404).json({ error: "Config not found" });
+      }
+      res.json(doc.data());
+    } catch (err: any) {
+      await logServerError(err, `GET /api/admin/ui-configs/${req.params.id}`, req.user?.uid);
+      res.status(500).json({ error: "Failed to fetch UI config" });
+    }
+  });
+
+  // Set UI Config (Employee & Admin) (MS-163)
+  app.post("/api/admin/ui-configs/:id", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const docRef = adminDb.collection("ui_configs").doc(id);
+      const docSnap = await docRef.get();
+      const oldValue = docSnap.exists ? docSnap.data() : null;
+      const newValue = req.body;
+
+      await docRef.set({
+        ...newValue,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      // Log to config_logs (MS-189) and admin_audit_logs (MS-193)
+      const operatorUid = req.user?.uid || "unknown";
+      const operatorEmail = req.user?.email || "unknown";
+
+      try {
+        await adminDb.collection("config_logs").add({
+          performedBy: operatorEmail,
+          changedSetting: `UI Config: ${id}`,
+          oldValue: oldValue ? JSON.stringify(oldValue) : "None",
+          newValue: JSON.stringify(newValue),
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        await adminDb.collection("admin_audit_logs").add({
+          operatorUid,
+          operatorEmail,
+          targetUid: null,
+          actionType: "ui_config_update",
+          details: {
+            configId: id,
+            oldValue,
+            newValue
+          },
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("[Server] Error writing UI config logs:", logErr);
+      }
+
+      res.json({ status: "success" });
+    } catch (err: any) {
+      await logServerError(err, `POST /api/admin/ui-configs/${req.params.id}`, req.user?.uid);
+      res.status(500).json({ error: "Failed to update UI config" });
+    }
+  });
+
+  // Get System Config (Admin only) (MS-163)
+  app.get("/api/admin/system-configs/:id", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const doc = await adminDb.collection("system_configs").doc(id).get();
+      if (!doc.exists) {
+        return res.status(404).json({ error: "Config not found" });
+      }
+      res.json(doc.data());
+    } catch (err: any) {
+      await logServerError(err, `GET /api/admin/system-configs/${req.params.id}`, req.user?.uid);
+      res.status(500).json({ error: "Failed to fetch system config" });
+    }
+  });
+
+  // Set System Config (Admin only) (MS-163)
+  app.post("/api/admin/system-configs/:id", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
+    try {
+      const { id } = req.params;
+      const docRef = adminDb.collection("system_configs").doc(id);
+      const docSnap = await docRef.get();
+      const oldValue = docSnap.exists ? docSnap.data() : null;
+      const newValue = req.body;
+
+      await docRef.set({
+        ...newValue,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      // Log to config_logs (MS-189) and admin_audit_logs (MS-193)
+      const operatorUid = req.user?.uid || "unknown";
+      const operatorEmail = req.user?.email || "unknown";
+
+      try {
+        await adminDb.collection("config_logs").add({
+          performedBy: operatorEmail,
+          changedSetting: `System Config: ${id}`,
+          oldValue: oldValue ? JSON.stringify(oldValue) : "None",
+          newValue: JSON.stringify(newValue),
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        await adminDb.collection("admin_audit_logs").add({
+          operatorUid,
+          operatorEmail,
+          targetUid: null,
+          actionType: "system_config_update",
+          details: {
+            configId: id,
+            oldValue,
+            newValue
+          },
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("[Server] Error writing system config logs:", logErr);
+      }
+
+      res.json({ status: "success" });
+    } catch (err: any) {
+      await logServerError(err, `POST /api/admin/system-configs/${req.params.id}`, req.user?.uid);
+      res.status(500).json({ error: "Failed to update system config" });
+    }
+  });
+
+  // Assign Custom Claim Role (Admin only) (MS-173)
+  app.post("/api/admin/set-role", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
+    try {
+      const { email, role } = req.body;
+      if (!email || !role) {
+        return res.status(400).json({ error: "Email and role are required" });
+      }
+      if (!["admin", "employee", "user"].includes(role)) {
+        return res.status(400).json({ error: "Invalid role value" });
+      }
+
+      let targetUid = null;
+      if (useFirebaseAdmin) {
+        const userRecord = await admin.auth().getUserByEmail(email);
+        targetUid = userRecord.uid;
+        await admin.auth().setCustomUserClaims(userRecord.uid, { role });
+        
+        await adminDb.collection("users").doc(userRecord.uid).update({
+          role,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        console.log(`[Admin] Assigned role ${role} to user ${email} (${userRecord.uid})`);
+      } else {
+        console.log(`[Admin] Local Dev Mode: Mocked set-role call for ${email} to ${role}`);
+      }
+
+      // Log to admin_audit_logs (MS-193)
+      const operatorUid = req.user?.uid || "unknown";
+      const operatorEmail = req.user?.email || "unknown";
+
+      try {
+        await adminDb.collection("admin_audit_logs").add({
+          operatorUid,
+          operatorEmail,
+          targetUid,
+          actionType: "role_change",
+          details: {
+            email,
+            role
+          },
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("[Server] Error writing role change audit log:", logErr);
+      }
+
+      res.json({ status: "success", userId: targetUid || "mock-uid", mock: !useFirebaseAdmin });
+    } catch (err: any) {
+      await logServerError(err, "POST /api/admin/set-role", req.user?.uid);
+      res.status(500).json({ error: err.message || "Failed to set user role custom claims" });
+    }
+  });
+
   // Global Error Handler Middleware
   app.use(async (err: any, req: any, res: any, next: any) => {
     const userId = req.user?.uid || null;
@@ -669,6 +1065,115 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       appType: "spa",
     });
     app.use(vite.middlewares);
+  }
+
+  // Hourly cron-like task for daily credit renewal (MS-170)
+  if (useFirebaseAdmin) {
+    setInterval(async () => {
+      console.log("[Cron] Running hourly daily free Katina Moon credit check...");
+      try {
+        const now = admin.firestore.Timestamp.now();
+        const past24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        
+        const neverClaimedQuery = adminDb.collection("user_moons")
+          .where("lastDailyClaimedAt", "==", null);
+          
+        const oldClaimedQuery = adminDb.collection("user_moons")
+          .where("lastDailyClaimedAt", "<=", past24Hours);
+          
+        const [neverSnap, oldSnap] = await Promise.all([
+          neverClaimedQuery.get(),
+          oldClaimedQuery.get()
+        ]);
+        
+        const eligibleDocs = [...neverSnap.docs, ...oldSnap.docs];
+        console.log(`[Cron] Found ${eligibleDocs.length} eligible users for daily credit renewal.`);
+        
+        for (const doc of eligibleDocs) {
+          const userId = doc.id;
+          const data = doc.data();
+          const daily = data?.dailyFreeBalance || 0;
+          const purchased = data?.purchasedBalance || 0;
+          
+          if (daily >= 1) {
+            continue;
+          }
+          
+          await adminDb.runTransaction(async (tx) => {
+            const moonRef = adminDb.collection("user_moons").doc(userId);
+            const freshMoonDoc = await tx.get(moonRef);
+            if (!freshMoonDoc.exists) return;
+            const freshData = freshMoonDoc.data();
+            const freshDaily = freshData?.dailyFreeBalance || 0;
+            const freshPurchased = freshData?.purchasedBalance || 0;
+            
+            if (freshDaily >= 1) return;
+            
+            const newDaily = 1;
+            const newBalance = newDaily + freshPurchased;
+            
+            tx.update(moonRef, {
+              dailyFreeBalance: newDaily,
+              balance: newBalance,
+              lastDailyClaimedAt: now,
+              updatedAt: now
+            });
+            
+            const txRef = adminDb.collection("moon_transactions").doc();
+            const dailyIdempotencyKey = `renew_daily_${userId}_${now.toDate().toISOString().split('T')[0]}`;
+            tx.set(txRef, {
+              userId,
+              amount: 1,
+              type: 'bonus',
+              status: 'success',
+              description: 'Daily Free Katina Moon credit renewed by system',
+              pdfDownloaded: 0,
+              userLanguage: 'tr',
+              userName: "",
+              userDob: "",
+              userBirthplace: "",
+              userRelationship: "",
+              selectedCards: [],
+              paymentProvider: 'daily_gift',
+              idempotencyKey: dailyIdempotencyKey,
+              clientMetadata: {
+                userAgent: "system-cron",
+                os: "system-server",
+                appVersion: "1.0.0"
+              },
+              createdAt: now
+            });
+          });
+          
+          console.log(`[Cron] Renewed daily free credit for user: ${userId}`);
+          
+          try {
+            const tokenDoc = await adminDb.collection("user_push_tokens").doc(userId).get();
+            if (tokenDoc.exists) {
+              const token = tokenDoc.data()?.token;
+              if (token) {
+                const message = {
+                  token,
+                  notification: {
+                    title: "Katina Moon Hediye Kredisi",
+                    body: "Günlük ücretsiz Katina Moon krediniz yüklendi! Falınıza bakmak için hemen tıklayın."
+                  },
+                  data: {
+                    url: "/"
+                  }
+                };
+                await admin.messaging().send(message);
+                console.log(`[Cron] FCM push notification sent to user: ${userId}`);
+              }
+            }
+          } catch (pushErr) {
+            console.error(`[Cron] Failed to send push notification to user ${userId}:`, pushErr);
+          }
+        }
+      } catch (cronErr) {
+        console.error("[Cron] Daily renewal cron error:", cronErr);
+      }
+    }, 60 * 60 * 1000);
   }
 
   app.listen(PORT, "0.0.0.0", () => {

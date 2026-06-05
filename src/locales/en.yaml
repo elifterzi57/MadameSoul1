@@ -1241,7 +1241,7 @@ login:
   loading: "Loading..."
   showIntro: "Watch App Intro"
   kvkkConsent: "I have read and agree to the User Agreement, Privacy Policy, and GDPR/KKVK Explicit Consent."
-  quote: \"Discover the whispers of the stars and the depths of your soul."
+  quote: "Discover the whispers of the stars and the depths of your soul."
   errorWrongCredentials: "Invalid email or password."
   errorEmailInUse: "Email already in use."
   errorInvalidEmail: "Invalid email address."

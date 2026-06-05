@@ -1,6 +1,6 @@
 # MadameSoul - Kaynak Kod Yapısı Analizi (Source Tree Analysis)
 
-**Tarih:** 2026-05-22  
+**Tarih:** 2026-06-05  
 
 ---
 
@@ -20,10 +20,15 @@ MadameSoul/
 │   └── ads/                     # Sunucu üzerinden sunulan statik reklam materyalleri
 ├── src/                         # React Frontend kaynak dosyaları
 │   ├── components/              # Yeniden kullanılabilir React UI bileşenleri
+│   │   ├── ContactModal.tsx     # İletişim formu modal bileşeni
+│   │   ├── CookieBanner.tsx     # Çerez onay banner'ı
+│   │   ├── ErrorBoundary.tsx    # Hata yakalayıcı bileşen
 │   │   ├── KatinaMoon.tsx       # Animasyonlu SVG ay süslemesi
+│   │   ├── LegalModal.tsx       # Yasal sözleşme modalı
 │   │   ├── Login.tsx            # Çoklu giriş ekranı bileşeni
 │   │   ├── Onboarding.tsx       # Hoş geldin ve tanıtım sihirbazı
-│   │   └── Profile.tsx          # Profil bilgileri ve geçmiş okumalar
+│   │   ├── Profile.tsx          # Profil bilgileri, geçmiş okumalar ve fal günlüğü
+│   │   └── StoreModal.tsx       # Mağaza/Kredi paketleri modalı
 │   ├── data/                    # Kart desteleri, yasal metinler vb. statik veriler
 │   │   ├── deck_info.json       # Deste bilgileri
 │   │   ├── katina_cards.json    # Katina kartlarının mistik anlamları ve detayları
@@ -39,10 +44,19 @@ MadameSoul/
 │   │   ├── ko.yaml              # Korece dil paketleri
 │   │   ├── tr.yaml              # Türkçe dil paketleri
 │   │   └── zh.yaml              # Çince dil paketleri
-│   ├── App.tsx                  # Ana React bileşeni (Uygulama durumları, kart seçimi, API bağlantıları)
+│   ├── store/                   # Zustand global durum yönetimi klasörü
+│   │   └── useAppStore.ts       # Global store (user, moons, view, language vb.)
+│   ├── App.tsx                  # Ana React bileşeni (Zustand ve React Query entegrasyonu)
 │   ├── index.css                # Küresel CSS ve Tailwind ayarları
 │   ├── main.tsx                 # İstemci tarafı giriş noktası (React bağlama)
 │   └── yaml.d.ts                # YAML modülü için TypeScript tip bildirimi
+├── tests/                       # Test klasörü
+│   ├── e2e/                     # Playwright uçtan uca testler klasörü
+│   │   └── app.spec.ts          # E2E kullanıcı senaryoları testi
+│   └── unit/                    # Vitest birim testleri klasörü
+│       ├── helpers.test.ts      # Yardımcı fonksiyonlar birim testi
+│       └── rbac.test.ts         # Rol yetkilendirme kuralları birim testi
+├── admin-panel/                 # Arayüz yöneticisi/çalışan yönetim paneli projesi
 ├── .env                         # Geliştirme ortamı değişkenleri (API anahtarları vb.)
 ├── .env.example                 # Ortam değişkenleri için şablon dosya
 ├── .gitignore                   # Git tarafından yoksayılacak dosyalar

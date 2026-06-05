@@ -10,12 +10,13 @@ Uygulamada iki tür test altyapısı bulunmaktadır:
 
 ## 1. Birim Testleri (Unit Tests - Vitest)
 
-Birim testleri, uygulamanın arayüzünden bağımsız olarak çalışan küçük yardımcı fonksiyonların (helpers, formatters, state logic vb.) doğru çalışıp çalışmadığını denetler.
+Birim testleri, uygulamanın arayüzünden bağımsız olarak çalışan küçük yardımcı fonksiyonların (helpers, formatters, state logic vb.) ve yetkilendirme kurallarının doğru çalışıp çalışmadığını denetler.
 
 * **Kullanılan Kütüphane:** [Vitest](https://vitest.dev/)
 * **Test Klasörü:** [tests/unit/](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/)
 * **Mevcut Testler:**
   - [helpers.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/helpers.test.ts): Tarih formatlama (`formatDate`) ve doğum tarihi doğrulama (`isValidDob`) mantığını test eder.
+  - [rbac.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/rbac.test.ts): Rol tabanlı erişim kontrolünü (Role-Based Access Control) test eder; çalışan (employee), yönetici (admin) ve standart kullanıcı yetkilerinin API katmanındaki davranışını doğrular.
 
 ### Komutlar ve Çalıştırma
 

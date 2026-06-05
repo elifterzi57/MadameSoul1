@@ -26,10 +26,9 @@ graph TD
 İstemci mimarisi, modern web standartları ve mistik bir kullanıcı deneyimi göz önünde bulundurularak React 19 ve TypeScript kullanılarak yapılandırılmıştır.
 
 ### 2.1 Durum Yönetimi (State Management)
-Uygulama genelinde karmaşık global durum yöneticileri (Redux vb.) yerine, uygulamanın monolith yapısına uygun olarak **React Context** ve `App.tsx` bileşeni seviyesinde **in-memory states** tercih edilmiştir:
-- **`user` ve `userInfo` Durumları:** Kullanıcının aktif oturum bilgisi Firebase Auth dinleyicisi (`onAuthStateChanged`) ile anlık izlenir ve Firestore `users` koleksiyonundan profil detayları çekilerek güncel tutulur.
-- **`moonsCount` (Bakiye):** Firestore'daki `user_moons` belgesi gerçek zamanlı olarak dinlenir, bakiye değişiklikleri anında arayüze yansıtılır.
-- **`view` (Görünüm Yönlendirmesi):** Basit ve hızlı bir sayfa yönlendirmesi için `'landing' | 'select' | 'reading' | 'history' | 'profile'` durumları üzerinden görünüm kontrolü sağlanır.
+Uygulamanın durum yönetimi, modern standartlara uygun olarak **Zustand** store yapısı ve **TanStack Query (React Query)** entegrasyonu ile merkezileştirilmiştir:
+- **Zustand Store (`src/store/useAppStore.ts`):** Global durumları (aktif kullanıcı `user`, profil detayı `userInfo`, bakiye miktarı `moonsCount`, dil seçimi `language` ve sayfa görünümü `view` gibi) yönetir. Dil seçimi yerel tarayıcı önbelleğinde (`localStorage`) saklanarak kalıcı hale getirilir.
+- **TanStack Query (`@tanstack/react-query`):** API isteklerini (özellikle tarot okuma mutasyonlarını) sarmalayarak veri getirme, mutasyon durumları (yükleniyor, hata, başarı) ve mükerrer isteklerin önlenmesi korumasını optimize eder.
 
 ### 2.2 Yerelleştirme (Localization - i18n)
 Uygulama 6 dili destekler: Türkçe (`tr`), İngilizce (`en`), İspanyolca (`es`), Fransızca (`fr`), Korece (`ko`), Çince (`zh`).
@@ -62,12 +61,16 @@ En kritik sunucu görevi, Google Gemini API anahtarının güvenliğini sağlama
 ## 4. Veri ve Güvenlik Mimarisi (Data & Security)
 
 ### 4.1 Cloud Firestore Veri Modeli
-Firestore üzerinde 5 temel koleksiyon bulunur:
-1. **`users`:** Kullanıcının temel profili ve yasal onay durumu.
-2. **`user_moons`:** Kullanıcı bakiyeleri.
-3. **`moon_transactions`:** Okumalar (kart seçimleri ve Gemini yorumları dahil) ve bakiye hareketleri.
+Firestore üzerinde 9 temel aktif koleksiyon bulunur:
+1. **`users`:** Kullanıcının temel profili, yasal sözleşme onay durumu ve cihaz bilgisi.
+2. **`user_moons`:** Kullanıcının ücretsiz ve satın alınmış sanal bakiye ("Moon") değerleri.
+3. **`moon_transactions`:** Okumalar (kart seçimleri, Gemini yorumları ve transactionId dahil) ve bakiye hareketleri (refund/bonus dahil).
 4. **`phones`:** SMS pazarlama ve telefon kayıtları.
 5. **`messages_{lang}`:** Dile özgü iletişim formu mesajları.
+6. **`marketing_consents`:** Kullanıcının pazarlama izinleri ve iletişim onayları.
+7. **`checkout_attempts`:** Ödeme hunisi başlatma ve terk etme log kayıtları.
+8. **`error_logs`:** Çalışma zamanında karşılaşılan sistem ve istemci hataları.
+9. **`ai_telemetry`:** Gemini API istekleri için token tüketimi ve latency analiz verileri.
 
 ### 4.2 Güvenlik Kuralları (`firestore.rules`)
 Veritabanı güvenliği, Firestore Security Rules aracılığıyla sunucu tarafında sıkı bir şekilde denetlenir:
