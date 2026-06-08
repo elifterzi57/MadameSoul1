@@ -600,6 +600,12 @@ export const Profile: React.FC<ProfileProps> = ({
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 flex-shrink-0">
+                                {item.status === 'failed' && (
+                                  <span className="flex items-center gap-1 text-[9px] sm:text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg font-sans font-semibold tracking-wide uppercase mr-1">
+                                    <AlertCircle className="w-3.5 h-3.5" />
+                                    {userInfo.language === 'tr' ? "Sistem Hatası" : "System Error"}
+                                  </span>
+                                )}
                                 {item.readingText && (
                                   <button 
                                     onClick={(e) => {
@@ -643,7 +649,14 @@ export const Profile: React.FC<ProfileProps> = ({
                                         {translations?.profileDiary?.detailsTitle || "Reading Details"}
                                       </h4>
                                       <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-[#ecd8a6]/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
-                                        {item.readingText}
+                                        {item.readingText || (
+                                          <span className="text-rose-400/80 flex items-center gap-2">
+                                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                            {userInfo.language === 'tr' 
+                                              ? "Bu açılım bir sistem hatası nedeniyle tamamlanamadı. Harcanan krediniz iade edilmiştir." 
+                                              : "This reading could not be completed due to a system error. Your moon balance has been refunded."}
+                                          </span>
+                                        )}
                                       </div>
                                     </div>
 
