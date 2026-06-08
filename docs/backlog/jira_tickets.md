@@ -95,6 +95,8 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-197**](#-ms-197) | Feature / UX / UI | Satın Alım Geçmişi Bakiye İade ve Chevron Temizliği | Orta | Satın alım geçmişinde bakiye iade miktarı dinamik hale getirildi, işlevsiz chevron ok işareti kaldırıldı. | Elif |
 | [**MS-198**](#-ms-198) | Feature / UX / UI | Geçmiş Açılımlar (Past Readings) Hata Gösterim ve Detay Entegrasyonu | Orta | Başarısız fallara 'Sistem Hatası' rozeti eklendi, genişletildiğinde hatayı açıklayan detay metni gösterildi. | Elif |
 | [**MS-199**](#-ms-199) | Feature / UX / UI | Notification Settings Bildirimleri Kapatabilme Desteği | Yüksek | Bildirimleri kapatabilmek için çift yönlü toggle yapısı eklendi, disablePushNotifications metodunda FCM token ve Firestore silme işlemleri sağlamlaştırıldı. | Elif |
+| [**MS-200**](#-ms-200) | Bug / UX | Hesap Birleştirme (Account Linking) Esnasında 2 Saniyelik Sayfa Parlaması / Yönlendirme Hatası | Yüksek | Geçici oturum açma ve silme sırasında kullanıcının 2 saniyeliğine uygulamayı görüp ardından çıkış yapmasını engellemek amacıyla `isSocialLoginInProgress` global durum kontrolü eklendi. | Elif |
+| [**MS-201**](#-ms-201) | Bug / Security | Sosyal Girişlerde unverified E-posta/Şifre Sağlayıcısının Silinmesi ve Şifre Kaybı Hatası | Yüksek | Firebase Auth'un unverified e-posta üzerine sosyal giriş yapıldığında şifre sağlayıcısını silmesini önlemek için Firestore'daki şifre korundu ve otomatik geri bağlama (auto-restore) sağlandı. | Elif |
 
 
 ---
@@ -1690,4 +1692,41 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   2. `src/App.tsx` dosyasındaki custom toast bildirim sarmalayıcı sınıfındaki `z-50` değeri `z-[200]`'e yükseltilerek, modal arkasında kalması ve görünmemesi engellendi.
   3. `src/components/Profile.tsx` dosyasında, push notification toggle switch alanına `pushEnabled` değerine göre dinamik olarak renk değiştiren dil duyarlı "Açık"/"Kapalı" ("Enabled"/"Disabled") durum etiketleri eklenerek görsel netlik ve geribildirim sağlandı.
   4. **Tek Servis İşçisi (Single Service Worker) Entegrasyonu:** İzin sıfırlama senaryolarında oluşan kapsam (scope) çakışmasını önlemek için `/firebase-messaging-sw.js` silindi. FCM SDK'sının arka plan işlemleri, kütüphane yüklemeleri ve `notificationclick` olayı doğrudan ana `/sw.js` servis işçisinin en üstüne entegre edildi. `src/lib/firebase.ts` dosyasındaki `getToken` çağrısı `serviceWorkerRegistration: registration` parametresi ile bu aktif servis işçisine bağlandı.
+
+---
+
+### ✅ MS-200: Hesap Birleştirme (Account Linking) Esnasında 2 Saniyelik Sayfa Parlaması / Yönlendirme Hatası (Bug / UX)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Giriş / Yönlendirme Modülü
+* **Hedef Dosyalar:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [useAppStore.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/store/useAppStore.ts)
+* **Açıklama:**  
+  Sosyal giriş esnasında çakışma tespiti ve geçici hesap silme süreçleri devam ederken kullanıcının 2 saniyeliğine uygulamayı görüp ardından tekrar giriş sayfasına atılması engellenmelidir.
+* **Kabul Kriterleri:**
+  1. Sosyal giriş (Google/Apple) başladığında bir `isSocialLoginInProgress` bayrağı aktif edilmelidir.
+  2. Bu bayrak aktif olduğu sürece `App.tsx` bileşeni yönlendirme yapmayıp `Login` ekranını sabit tutmalıdır.
+  3. Çakışma tespiti ve geçici hesap silme süreçleri bitince bayrak pasif edilerek pürüzsüz geçiş sağlanmalıdır.
+
+* **Çözüm:** Zustand global state deposuna `isSocialLoginInProgress` eklendi. Sosyal giriş süresince aktif edilerek `App.tsx`'in Giriş ekranını ekranda sabit tutması sağlandı. Çakışma tespiti ve geçici hesap silme/temizleme bittikten sonra pasif edilerek pürüzsüz geçiş sağlandı.
+
+---
+
+### ✅ MS-201: Sosyal Girişlerde unverified E-posta/Şifre Sağlayıcısının Silinmesi ve Şifre Kaybı Hatası (Bug / Security)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Giriş / Hesap Birleştirme Modülü
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx)
+* **Açıklama:**  
+  Unverified e-posta hesabı üzerine aynı e-posta ile doğrulanmış sosyal giriş yapıldığında şifre sağlayıcısının silinmesi önlenmeli, kullanıcının hem Google hem de e-posta ile giriş yapabilme yeteneği korunmalıdır.
+* **Kabul Kriterleri:**
+  1. Sosyal girişlerde (şifresiz girişlerde) Firestore'daki mevcut kullanıcı şifresinin `null` ile ezilmesi önlenmeli, korunmalıdır.
+  2. Kullanıcı sosyal giriş yaptığında eğer hesapta `password` sağlayıcısı silinmişse, Firestore'da korunan şifre kullanılarak `linkWithCredential` ile sağlayıcı otomatik olarak geri bağlanmalıdır (auto-restore).
+
+* **Çözüm:** `saveUserToFirestore` içinde, şifresiz girişlerde önce veritabanındaki şifre okunarak korundu. Eğer hesaptaki `password` sağlayıcısı silinmişse, korunan bu şifre değeriyle arka planda `linkWithCredential` üzerinden e-posta/şifre sağlayıcısı otomatik olarak geri bağlanarak her iki giriş yöntemi de kullanılabilir hale getirildi.
 
