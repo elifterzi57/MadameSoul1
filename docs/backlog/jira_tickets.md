@@ -6,7 +6,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **69** | Açık: **3** | Tamamlanan: **66**
+Toplam Bilet: **70** | Açık: **3** | Tamamlanan: **67**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -91,6 +91,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-194**](#-ms-194) | UX / UI | Yönetim Paneli Akordeon Bölümlerinin Dikey Tek Kolon Olarak Hizalanması | Düşük | Geniş ekranlardaki 2 sütunlu grid yapısı kaldırılarak tüm akordeon bölümleri dikey tek kolon halinde alt alta sıralandı. | Sally |
 | [**MS-192**](#-ms-192) | Security / Analytics | `moon_transactions` Koleksiyonu İçin Güvenlik ve İşlem Takibi Alanlarının Eklenmesi | Orta | `moon_transactions` koleksiyonuna `paymentProvider`, `idempotencyKey` ve `clientMetadata` alanları eklenip, `firestore.rules` kuralları ve backend/frontend entegrasyonu tamamlandı. | Winston |
 | [**MS-195**](#-ms-195) | Feature / UX / UI | Yönetim Paneli Yetkili Personel Listesi ve Yetki Kaldırma | Yüksek | Rol ve yetki yönetimi altına yetkisi tanımlanan kişileri listeleyen sekme eklenip yetki kaldırma desteği entegre edildi. | Amelia |
+| [**MS-196**](#-ms-196) | Feature / Security | Google ve E-posta Giriş Yöntemlerinin Aynı E-posta İçin Bağlanması (Account Linking) | Yüksek | E-posta çakışması durumunda Firebase Auth hatası yakalanarak şifre doğrulama modalı sunuldu, `linkWithCredential` ile hesaplar birleştirildi. Firestore çakışmaları için yedek (fallback) kontrolü ve geçici sosyal kullanıcı silinmesi sağlandı. | Elif |
 
 
 ---
@@ -1599,4 +1600,24 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   4. Yetkisi kaldırılan kullanıcılar listeden otomatik olarak çıkmalıdır.
 
 * **Çözüm:** `admin-panel/src/App.tsx` dosyasında "Yetkili Personel Listesi" adında 5. bir akordeon section oluşturuldu. Firestore `users` koleksiyonundan `role` değeri `admin` veya `employee` olan kullanıcılar dynamic query (`where('role', 'in', ...)`) ile listelendi. Her kullanıcı için "Yetkiyi Kaldır" butonu ile backend rol güncelleme API'si tetiklenerek yetkileri anında iptal edilecek ve liste güncellenecek şekilde entegre edildi.
+
+---
+
+### ✅ MS-196: Google ve E-posta Giriş Yöntemlerinin Aynı E-posta İçin Bağlanması (Account Linking) (Feature / Security)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Giriş / Güvenlik Modülü
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx)
+* **Açıklama:**  
+  Kullanıcıların aynı e-posta adresiyle hem e-posta/şifre yöntemiyle hem de Google ile giriş yapması durumunda çakışan veya mükerrer hesapların (farklı UIDs) oluşması engellenmeli ve bu giriş yöntemleri aynı hesap altında birleştirilmelidir (Account Linking).
+* **Kabul Kriterleri:**
+  1. `src/components/Login.tsx` dosyasında `handleGoogleLogin` ve `handleAppleLogin` fonksiyonları, e-posta çakışması durumunda Firebase Auth tarafından fırlatılan `auth/account-exists-with-different-credential` hatasını yakalayacaktır.
+  2. Hata yakalandığında kullanıcıya şık, mistik tasarımlı bir şifre giriş modalı sunulacaktır. Kullanıcı şifresini girdiğinde, mevcut şifreli hesaba giriş yapılarak Google/Apple kimlik bilgisi (credential) bu hesaba `linkWithCredential` fonksiyonu ile bağlanacaktır.
+  3. Firebase Console'da çoklu hesaba izin verilmiş olma ihtimaline karşı, başarılı sosyal oturum açma sonrasında Firestore'da aynı e-posta ile kayıtlı başka bir UID olup olmadığı denetlenecek; varsa şifreyle doğrulama yapılıp hesaplar birleştirilecek ve geçici yeni sosyal UID silinecektir.
+  4. Hesaplar birleştirildikten sonra kullanıcının hem şifreyle hem de Google/Apple ile giriş yaptığında aynı UID (aynı bakiye ve geçmiş verileri) ile bağlandığı doğrulanacaktır.
+
+* **Çözüm:** E-posta çakışması durumunda Firebase Auth hatası yakalanarak şık ve animasyonlu (Framer Motion) şifre doğrulama modalı sunuldu. Girilen şifre doğrulanarak `linkWithCredential` ile Google/Apple hesapları mevcut şifreli hesaba bağlandı. Ayrıca çoklu hesaba izin verilen durumlar için Firestore e-posta çakışması taranıp aynı birleştirme tetiklendi ve geçici sosyal kullanıcının UID'si veritabanını temiz tutmak ve kimlik bilgisini serbest bırakmak amacıyla `delete()` metodu ile silindi.
 

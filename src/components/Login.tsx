@@ -10,9 +10,11 @@ import {
   OAuthProvider,
   signInWithPopup,
   User,
-  getAdditionalUserInfo
+  getAdditionalUserInfo,
+  linkWithCredential,
+  EmailAuthProvider
 } from 'firebase/auth';
-import { setDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, getDocs, query, collection, where } from 'firebase/firestore';
 import { gatherUserMetadata } from '../lib/metadata';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -87,6 +89,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [showLangs, setShowLangs] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
 
+  // Account Linking states (MS-196)
+  const [showLinkingModal, setShowLinkingModal] = useState(false);
+  const [linkingEmail, setLinkingEmail] = useState('');
+  const [linkingPassword, setLinkingPassword] = useState('');
+  const [pendingCredential, setPendingCredential] = useState<any>(null);
+  const [linkingProvider, setLinkingProvider] = useState<'Google' | 'Apple'>('Google');
+  const [linkingError, setLinkingError] = useState('');
+  const [linkingLoading, setLinkingLoading] = useState(false);
 
   const saveUserToFirestore = async (user: User, password?: string, additionalInfo?: any) => {
     try {
@@ -290,11 +300,43 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const additionalInfo = getAdditionalUserInfo(result);
+      
+      // Fallback: Check if another user with the same email already exists in Firestore (for multiple accounts console config)
+      if (result.user.email) {
+        const q = query(collection(db, 'users'), where('email', '==', result.user.email.toLowerCase()));
+        const snap = await getDocs(q);
+        const existingDocs = snap.docs.filter(d => d.id !== result.user.uid);
+        if (existingDocs.length > 0) {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (credential) {
+            setLinkingEmail(result.user.email);
+            setPendingCredential(credential);
+            setLinkingProvider('Google');
+            setShowLinkingModal(true);
+            setLoading(false);
+            // Delete the temporary Google user to free the credential and sign out
+            await result.user.delete();
+            return;
+          }
+        }
+      }
+
       await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
     } catch (err: any) {
       console.error("Google login error:", err);
-      if (err.code === 'auth/popup-blocked') {
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const email = err.customData?.email || err.email;
+        const credential = GoogleAuthProvider.credentialFromError(err);
+        if (email && credential) {
+          setLinkingEmail(email);
+          setPendingCredential(credential);
+          setLinkingProvider('Google');
+          setShowLinkingModal(true);
+        } else {
+          setError(err.message || t('login.error'));
+        }
+      } else if (err.code === 'auth/popup-blocked') {
         setError(t('login.errorPopupBlocked'));
       } else if (err.code === 'auth/popup-closed-by-user') {
         setError(t('login.errorPopupClosed'));
@@ -324,11 +366,43 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       
       const result = await signInWithPopup(auth, provider);
       const additionalInfo = getAdditionalUserInfo(result);
+
+      // Fallback: Check if another user with the same email already exists in Firestore (for multiple accounts console config)
+      if (result.user.email) {
+        const q = query(collection(db, 'users'), where('email', '==', result.user.email.toLowerCase()));
+        const snap = await getDocs(q);
+        const existingDocs = snap.docs.filter(d => d.id !== result.user.uid);
+        if (existingDocs.length > 0) {
+          const credential = OAuthProvider.credentialFromResult(result);
+          if (credential) {
+            setLinkingEmail(result.user.email);
+            setPendingCredential(credential);
+            setLinkingProvider('Apple');
+            setShowLinkingModal(true);
+            setLoading(false);
+            // Delete the temporary Apple user to free the credential and sign out
+            await result.user.delete();
+            return;
+          }
+        }
+      }
+
       await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
     } catch (err: any) {
       console.error("Apple login error:", err);
-      if (err.code === 'auth/popup-blocked') {
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const email = err.customData?.email || err.email;
+        const credential = OAuthProvider.credentialFromError(err);
+        if (email && credential) {
+          setLinkingEmail(email);
+          setPendingCredential(credential);
+          setLinkingProvider('Apple');
+          setShowLinkingModal(true);
+        } else {
+          setError(err.message || t('login.error'));
+        }
+      } else if (err.code === 'auth/popup-blocked') {
         setError(t('login.errorPopupBlocked'));
       } else if (err.code === 'auth/popup-closed-by-user') {
         setError(t('login.errorPopupClosed'));
@@ -341,6 +415,40 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLinkAccounts = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkingEmail || !linkingPassword || !pendingCredential) return;
+    setLinkingLoading(true);
+    setLinkingError('');
+    try {
+      // 1. Sign in with the existing email/password account
+      const result = await signInWithEmailAndPassword(auth, linkingEmail, linkingPassword);
+      const existingUser = result.user;
+
+      // 2. Link the pending social credential to this logged-in user
+      await linkWithCredential(existingUser, pendingCredential);
+
+      // 3. Save profile/metadata details to Firestore
+      await saveUserToFirestore(existingUser, linkingPassword);
+
+      // 4. Reset states, close modal, and complete login
+      setShowLinkingModal(false);
+      setLinkingEmail('');
+      setLinkingPassword('');
+      setPendingCredential(null);
+      onLogin();
+    } catch (err: any) {
+      console.error("Account linking failed:", err);
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setLinkingError(language === 'tr' ? "Hatalı şifre. Lütfen tekrar deneyin." : "Incorrect password. Please try again.");
+      } else {
+        setLinkingError(err.message || t('login.error'));
+      }
+    } finally {
+      setLinkingLoading(false);
     }
   };
 
@@ -801,6 +909,81 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
           </div>
         </div>
       </motion.div>
+
+      {/* Account Linking Modal (MS-196) */}
+      <AnimatePresence>
+        {showLinkingModal && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-md bg-[#160c24] border border-[#ecd8a6]/20 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden"
+            >
+              {/* Ethereal Glow */}
+              <div className="absolute -top-20 -left-20 w-48 h-48 bg-purple-900/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none" />
+
+              <h3 className="text-lg font-serif text-[#ecd8a6] tracking-wider uppercase mb-2 text-center">
+                {language === 'tr' ? "Hesapları Birleştir" : "Link Accounts"}
+              </h3>
+              <p className="text-xs text-[#ecd8a6]/60 font-sans mb-6 text-center leading-relaxed">
+                {language === 'tr' 
+                  ? `"${linkingEmail}" e-posta adresiyle zaten bir şifreli hesap mevcut. ${linkingProvider} girişinizi bu hesaba bağlamak için lütfen şifrenizi girin.`
+                  : `An account with email "${linkingEmail}" already exists. Enter your password to link your ${linkingProvider} login with this account.`}
+              </p>
+              
+              <form onSubmit={handleLinkAccounts} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="block text-[10px] text-[#ecd8a6]/60 uppercase tracking-widest font-serif">
+                    {language === 'tr' ? "Şifre" : "Password"}
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ecd8a6]/40" />
+                    <input 
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={linkingPassword}
+                      onChange={(e) => setLinkingPassword(e.target.value)}
+                      className="w-full bg-white/5 border border-[#ecd8a6]/25 rounded-xl pl-12 pr-4 py-3 text-sm text-[#ecd8a6] placeholder-white/20 focus:outline-none focus:border-[#ecd8a6]/50 transition-all font-sans"
+                    />
+                  </div>
+                </div>
+
+                {linkingError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 font-sans leading-relaxed">
+                    {linkingError}
+                  </div>
+                )}
+
+                <div className="flex gap-4 pt-2">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setShowLinkingModal(false);
+                      setLinkingEmail('');
+                      setLinkingPassword('');
+                      setPendingCredential(null);
+                    }}
+                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 active:scale-[0.98] text-[#ecd8a6]/80 border border-[#ecd8a6]/10 rounded-xl text-xs font-serif uppercase tracking-widest transition-all cursor-pointer font-bold animate-all"
+                  >
+                    {language === 'tr' ? "İptal" : "Cancel"}
+                  </button>
+                  <button 
+                    type="submit"
+                    disabled={linkingLoading}
+                    className="flex-1 py-3 bg-[#ecd8a6] hover:bg-white active:scale-[0.98] text-[#0a0512] rounded-xl text-xs font-serif font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {linkingLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    {language === 'tr' ? "Birleştir" : "Link"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
