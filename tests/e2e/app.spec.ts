@@ -61,9 +61,9 @@ test.describe('MadameSoul E2E Onboarding, Login, Card Draw and Diary Flow', () =
     await startReadingBtn.click();
 
     // 3. User Info Form Filling
-    await page.locator('input[placeholder*="Full Name"i]').or(page.locator('input[placeholder*="Ad Soyad"i]')).fill('E2E Tester');
+    await page.locator('input[type="text"]').first().fill('E2E Tester');
     await page.locator('input[type="date"]').fill('1990-01-01');
-    await page.locator('input[placeholder*="City"i]').or(page.locator('input[placeholder*="Şehir"i]')).fill('Istanbul');
+    await page.locator('input[type="text"]').nth(1).fill('Istanbul');
     
     // Click submit/next on form
     const formSubmitBtn = page.getByRole('button', { name: /Select Cards|Kartları Seç/i });

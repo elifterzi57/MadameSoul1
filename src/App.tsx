@@ -1187,6 +1187,7 @@ function AppContent() {
             }}
             translations={locales[userInfo.language]}
             onDownloadPastReading={handleDownload}
+            showToast={showToast}
           />
         )}
       </AnimatePresence>

@@ -44,6 +44,7 @@ interface ProfileProps {
   translations: any;
   onDownloadPastReading?: (reading: any) => void;
   onShowOnboarding?: () => void;
+  showToast?: (message: string, type?: 'info' | 'error' | 'success') => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({ 
@@ -55,7 +56,8 @@ export const Profile: React.FC<ProfileProps> = ({
   onUpdateUserInfo,
   translations,
   onDownloadPastReading,
-  onShowOnboarding
+  onShowOnboarding,
+  showToast
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
   const [history, setHistory] = useState<any[]>([]);
@@ -100,10 +102,21 @@ export const Profile: React.FC<ProfileProps> = ({
         const token = await requestPushNotificationPermission(user.uid);
         if (token) {
           setPushEnabled(true);
+        } else {
+          showToast?.(
+            userInfo.language === 'tr' 
+              ? "Bildirim izni reddedildi veya tarayıcınız tarafından desteklenmiyor." 
+              : "Notification permission denied or is not supported by your browser.", 
+            'error'
+          );
         }
       }
     } catch (err) {
       console.error("Error toggling push status:", err);
+      showToast?.(
+        userInfo.language === 'tr' ? "İşlem sırasında bir hata oluştu." : "An error occurred during the request.", 
+        'error'
+      );
     } finally {
       setCheckingPush(false);
     }
@@ -844,20 +857,23 @@ export const Profile: React.FC<ProfileProps> = ({
                           : "Get instant notifications when your credits are renewed or when your reading is ready."}
                       </p>
                     </div>
-                    <button
-                      onClick={handleTogglePush}
-                      disabled={checkingPush}
-                      className={`px-5 py-2.5 rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all duration-300 border font-bold active:scale-95 flex items-center gap-2 ${
-                        pushEnabled 
-                          ? 'bg-rose-950/30 text-rose-400 border-rose-500/20 hover:bg-rose-500 hover:text-[#0a0512]' 
-                          : 'bg-[#ecd8a6] text-[#0a0512] border-transparent hover:bg-white'
-                      }`}
-                    >
-                      {checkingPush && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                      {pushEnabled 
-                        ? (userInfo.language === 'tr' ? "Kapat" : "Disable") 
-                        : (userInfo.language === 'tr' ? "Etkinleştir" : "Enable")}
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {checkingPush && <Loader2 className="w-4 h-4 text-[#ecd8a6] animate-spin" />}
+                      <button
+                        onClick={handleTogglePush}
+                        disabled={checkingPush}
+                        type="button"
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
+                          pushEnabled ? 'bg-emerald-500 border border-emerald-400/20' : 'bg-white/10 border border-[#ecd8a6]/20'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-[#0a0512] transition-transform duration-300 ${
+                            pushEnabled ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </section>
 
