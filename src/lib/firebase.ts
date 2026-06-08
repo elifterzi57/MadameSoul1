@@ -37,8 +37,10 @@ export const requestPushNotificationPermission = async (userId: string): Promise
       return null;
     }
 
+    const registration = await navigator.serviceWorker.ready;
     const token = await getToken(messagingInstance, {
-      vapidKey: VAPID_KEY
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration
     });
 
     if (token) {
