@@ -21,7 +21,7 @@ export const initMessaging = async () => {
   return null;
 };
 
-export const VAPID_KEY = "BH_0eao9CxHECVLy_eeSZzoX3fTMI_9tnNmmSakEv_zq3VXJKCTsYhylt6r4vDR9PBRysynjZDAIBj0Q9ITE2FI";
+export const VAPID_KEY = "BILctmMY6XXmMyTU4kpOmtWaRkYqm181XeGhPZgRyShesGLHvL-F7pLZE66Yfhe_AmJ1jdb91MiBIHYDdhMpSAc";
 
 export const requestPushNotificationPermission = async (userId: string): Promise<string | null> => {
   try {
