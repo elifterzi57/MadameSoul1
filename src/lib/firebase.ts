@@ -66,13 +66,23 @@ export const disablePushNotifications = async (userId: string): Promise<void> =>
   try {
     const messagingInstance = await initMessaging();
     if (messagingInstance) {
-      await deleteToken(messagingInstance);
+      try {
+        await deleteToken(messagingInstance);
+      } catch (tokenErr) {
+        console.warn("FCM deleteToken failed or token already deleted:", tokenErr);
+      }
     }
+  } catch (err) {
+    console.error("Error initializing messaging during disable:", err);
+  }
+
+  try {
     const tokenRef = doc(db, 'user_push_tokens', userId);
     await deleteDoc(tokenRef);
     console.log("FCM Token successfully removed from Firestore.");
-  } catch (err) {
-    console.error("Error disabling push notifications:", err);
+  } catch (firestoreErr) {
+    console.error("Error deleting FCM token document from Firestore:", firestoreErr);
+    throw firestoreErr;
   }
 };
 

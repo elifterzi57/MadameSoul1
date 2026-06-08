@@ -6,7 +6,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **73** | Açık: **4** | Tamamlanan: **69**
+Toplam Bilet: **73** | Açık: **3** | Tamamlanan: **70**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -16,7 +16,6 @@ Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 | [**MS-186**](#-ms-186) | Analytics / CRM | Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu | Orta | Amelia | `App.tsx`, `server.ts` |
 | [**MS-187**](#-ms-187) | Feature / AI Quality | Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü | Orta | Amelia | `App.tsx`, `Profile.tsx`, `firestore.rules` |
 | [**MS-191**](#-ms-191) | UX / UI / Bug | PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması | Yüksek | Amelia | `src/utils/pdfGenerator.ts` |
-| [**MS-199**](#-ms-199) | Feature / UX / UI | Notification Settings Bildirimleri Kapatabilme Desteği | Yüksek | Amelia | `src/components/Profile.tsx` |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
@@ -95,6 +94,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-196**](#-ms-196) | Feature / Security | Google ve E-posta Giriş Yöntemlerinin Aynı E-posta İçin Bağlanması (Account Linking) | Yüksek | E-posta çakışması durumunda Firebase Auth hatası yakalanarak şifre doğrulama modalı sunuldu, `linkWithCredential` ile hesaplar birleştirildi. Firestore çakışmaları için yedek (fallback) kontrolü ve geçici sosyal kullanıcı silinmesi sağlandı. | Elif |
 | [**MS-197**](#-ms-197) | Feature / UX / UI | Satın Alım Geçmişi Bakiye İade ve Chevron Temizliği | Orta | Satın alım geçmişinde bakiye iade miktarı dinamik hale getirildi, işlevsiz chevron ok işareti kaldırıldı. | Elif |
 | [**MS-198**](#-ms-198) | Feature / UX / UI | Geçmiş Açılımlar (Past Readings) Hata Gösterim ve Detay Entegrasyonu | Orta | Başarısız fallara 'Sistem Hatası' rozeti eklendi, genişletildiğinde hatayı açıklayan detay metni gösterildi. | Elif |
+| [**MS-199**](#-ms-199) | Feature / UX / UI | Notification Settings Bildirimleri Kapatabilme Desteği | Yüksek | Bildirimleri kapatabilmek için çift yönlü toggle yapısı eklendi, disablePushNotifications metodunda FCM token ve Firestore silme işlemleri sağlamlaştırıldı. | Elif |
 
 
 ---
@@ -102,20 +102,6 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ## 🎫 Bilet Detayları (Ticket Details)
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
-
-### ⏳ MS-199: Notification Settings Bildirimleri Kapatabilme Desteği (Feature / UX / UI)
-
-* **Öncelik:** Yüksek (High)
-* **Durum:** ⏳ Yapılacak (To Do)
-* **Oluşturan (Reporter):** Elif (USER)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Profil / Ayarlar Modülü
-* **Hedef Dosya:** [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx)
-* **Açıklama:**  
-  Kullanıcıların Notification Settings alanında web push bildirimlerini diledikleri zaman kapatabilmeleri (disable/unenable) sağlanmalıdır. Mevcut yapıda sadece bildirimler aktif hale getirilebilmektedir, ancak devre dışı bırakılamamaktadır.
-* **Kabul Kriterleri:**
-  1. Profile Ayarlar sekmesindeki Web Push Notification seçeneğinde bildirimler açık olduğunda kapatılmasına, kapalı olduğunda ise açılmasına izin veren çift yönlü bir geçiş/anahtar (toggle/switch) yapısı kurulmalıdır.
-  2. Kullanıcı bildirimleri kapattığında Firestore `user_push_tokens` koleksiyonundaki ilgili FCM token belgesi silinmeli ve FCM SDK'sından token temizlenmelidir.
 
 ---
 
@@ -1674,5 +1660,23 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   1. Hatalı fal satırlarının yanında kırmızı "Sistem Hatası" / "System Error" rozeti gösterilmelidir.
   2. Genişletilen detay alanında boş kutu yerine açıklayıcı hata ve iade bildirim metni yer almalıdır.
 
-* **Çözüm:** `Profile.tsx` dosyasında `item.status === 'failed'` olan geçmiş açılımlar için "Sistem Hatası" / "System Error" rozeti (AlertCircle ikonlu) eklendi. Ayrıca genişletilen detay alanındaki `readingText` boş olduğunda iade ve hata açıklama mesajı gösterilmesi sağlandı.
+* **Çözüm:** `Profile.tsx` dosyasında `item.status === 'failed'` olan geçmiş açılımlar için "Sistem Hatası" / "System Error" rozeti (AlertCircle ikonlu) eklendi. Also genişletilen detay alanındaki `readingText` boş olduğunda iade ve hata açıklama mesajı gösterilmesi sağlandı.
+
+---
+
+### ✅ MS-199: Notification Settings Bildirimleri Kapatabilme Desteği (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Profil / Ayarlar Modülü
+* **Hedef Dosya:** [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx)
+* **Açıklama:**  
+  Kullanıcıların Notification Settings alanında web push bildirimlerini diledikleri zaman kapatabilmeleri (disable/unenable) sağlanmalıdır. Mevcut yapıda sadece bildirimler aktif hale getirilebilmektedir, ancak devre dışı bırakılamamaktadır.
+* **Kabul Kriterleri:**
+  1. Profile Ayarlar sekmesindeki Web Push Notification seçeneğinde bildirimler açık olduğunda kapatılmasına, kapalı olduğunda ise açılmasına izin veren çift yönlü bir geçiş/anahtar (toggle/switch) yapısı kurulmalıdır.
+  2. Kullanıcı bildirimleri kapattığında Firestore `user_push_tokens` koleksiyonundaki ilgili FCM token belgesi silinmeli ve FCM SDK'sından token temizlenmelidir.
+
+* **Çözüm:** `src/lib/firebase.ts` dosyasında yer alan `disablePushNotifications` metodu güncellenerek FCM `deleteToken` çağrısı izole bir try-catch bloğuna alındı. Böylelikle browser/ortam kaynaklı FCM hataları Firestore doküman silme işlemini engellemez hale getirildi ve Firestore `user_push_tokens` belgesinin silinmesi garanti altına alındı. `Profile.tsx` tarafındaki `handleTogglePush` ve geçiş butonunun (Enable/Disable) çift yönlü yapısı sorunsuz çalışır hale getirildi.
 
