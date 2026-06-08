@@ -138,7 +138,7 @@ test.describe('MadameSoul E2E Onboarding, Login, Card Draw and Diary Flow', () =
     await saveNotesBtn.click();
 
     // Wait for success toast / status update
-    await expect(page.getByText(/success|başarıyla/i)).toBeVisible();
+    await expect(page.locator('div').filter({ hasText: /updated successfully|başarıyla güncellendi/i }).first()).toBeVisible();
 
     // Verify list displays new custom title
     await expect(page.getByText('My Special E2E Reading')).toBeVisible();

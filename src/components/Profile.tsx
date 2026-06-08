@@ -735,7 +735,7 @@ export const Profile: React.FC<ProfileProps> = ({
                             <div className="flex items-center gap-2 font-serif">
                               {isRefund && (
                                 <span className="text-[10px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full font-sans font-semibold tracking-wide uppercase mr-2">
-                                  {userInfo.language === 'tr' ? "+1 İade" : "+1 Refund"}
+                                  {item.amount !== undefined ? (item.amount > 0 ? `+${item.amount}` : item.amount) : '+1'} {userInfo.language === 'tr' ? "İade" : "Refund"}
                                 </span>
                               )}
                               {item.stripeReceiptUrl && (
@@ -748,7 +748,6 @@ export const Profile: React.FC<ProfileProps> = ({
                                   {userInfo.language === 'tr' ? "Makbuz" : "Receipt"}
                                 </a>
                               )}
-                              <ChevronRight className="w-4 h-4 text-[#ecd8a6]/20 group-hover:text-[#ecd8a6]/60 transition-colors" />
                             </div>
                           </div>
                         );
