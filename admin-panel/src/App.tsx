@@ -157,7 +157,8 @@ const sectionKeywords = {
   users: ["kullanıcılar", "kullanıcı", "bakiye", "credit", "dusting", "bakiye düzenleme", "kullanıcı adı", "e-posta", "uid", "fal hareketleri", "ekle", "düşür", "arama sonuçları", "katina moon"],
   ui: ["reklam", "arayüz", "afiş", "görsel", "yönlendirme", "bağlantısı", "ad banner", "aktif", "kaydet", "dinamik"],
   system: ["sistem", "ayarları", "yapay zeka", "model", "versiyonu", "gemini", "istek", "limiti", "performans", "metrikler", "telemetry", "latency", "gecikme", "tokens"],
-  roles: ["yetki", "yönetimi", "rol", "atama", "hedef", "claims", "employee", "admin", "user"]
+  roles: ["yetki", "yönetimi", "rol", "atama", "hedef", "claims", "employee", "admin", "user"],
+  authorizedUsers: ["yetkili", "personel", "listesi", "kaldır", "revoke", "adminler", "çalışanlar", "listele"]
 };
 
 export default function App() {
@@ -176,7 +177,8 @@ export default function App() {
     users: true, // open by default
     ui: false,
     system: false,
-    roles: false
+    roles: false,
+    authorizedUsers: false
   });
 
   // Global Search State
@@ -309,12 +311,12 @@ export default function App() {
     }
   }, [user, userRole]);
 
-  // Load users with roles when roles section expands or on initial load
+  // Load users with roles when roles or authorizedUsers section expands or on initial load
   useEffect(() => {
-    if (expandedSections.roles && user && userRole === 'admin') {
+    if ((expandedSections.roles || expandedSections.authorizedUsers) && user && userRole === 'admin') {
       fetchUsersWithRoles();
     }
-  }, [expandedSections.roles, user, userRole]);
+  }, [expandedSections.roles, expandedSections.authorizedUsers, user, userRole]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1548,70 +1550,106 @@ export default function App() {
                                 </button>
                               </div>
                             </form>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-                            {/* Yetkili Personel Listesi */}
-                            <div className="border-t border-[#ecd8a6]/10 pt-6 space-y-4">
-                              <div className="flex items-center gap-2 pb-2 border-b border-[#ecd8a6]/10">
-                                <UserIcon className="w-4 h-4 text-[#ecd8a6]" />
-                                <h4 className="font-serif text-xs text-[#ecd8a6] uppercase tracking-wider font-bold">
-                                  {highlightText("YETKİLİ PERSONEL LİSTESİ", globalSearchQuery)}
-                                </h4>
+              {/* Accordion 5: Yetkili Personel Listesi */}
+              <div className="bg-[#0a0512] rounded-3xl border border-[#ecd8a6]/15 overflow-hidden transition-all shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:border-[#ecd8a6]/30">
+                <button 
+                  onClick={() => toggleSection('authorizedUsers')}
+                  className="w-full flex items-center justify-between p-6 text-left cursor-pointer focus:outline-none bg-gradient-to-r from-[#160d26]/40 to-transparent"
+                >
+                  <div className="flex items-center gap-3">
+                    <UserIcon className="w-5 h-5 text-[#ecd8a6]" />
+                    <span className="font-serif font-bold text-sm tracking-wider uppercase text-[#ecd8a6]">
+                      {highlightText("Yetkili Personel Listesi", globalSearchQuery)}
+                    </span>
+                  </div>
+                  {expandedSections.authorizedUsers ? <ChevronUp className="w-4 h-4 text-[#ecd8a6]/60" /> : <ChevronDown className="w-4 h-4 text-[#ecd8a6]/60" />}
+                </button>
+                
+                <AnimatePresence initial={false}>
+                  {expandedSections.authorizedUsers && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-6 pt-0 space-y-6">
+                        <hr className="border-[#ecd8a6]/10 mb-4" />
+                        
+                        {userRole !== 'admin' ? (
+                          <div className="bg-red-500/5 border border-red-500/20 rounded-2xl p-8 text-center space-y-4">
+                            <ShieldAlert className="w-12 h-12 text-red-400 mx-auto" />
+                            <h3 className="font-serif text-xs text-red-200 uppercase tracking-widest">
+                              {highlightText("YETKİSİZ ERİŞİM ENGELİ", globalSearchQuery)}
+                            </h3>
+                            <p className="text-[10px] text-[#ecd8a6]/60 leading-relaxed max-w-sm mx-auto">
+                              Yetkili personel listesini görüntüleme yetkisi yalnızca Sistem Yöneticilerine (Admin) aittir.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="bg-[#130b1c]/40 border border-[#ecd8a6]/10 rounded-2xl p-6 space-y-4">
+                            {isLoadingRoles ? (
+                              <div className="flex justify-center py-4">
+                                <Loader2 className="w-5 h-5 animate-spin text-[#ecd8a6]/40" />
                               </div>
-
-                              {isLoadingRoles ? (
-                                <div className="flex justify-center py-4">
-                                  <Loader2 className="w-5 h-5 animate-spin text-[#ecd8a6]/40" />
-                                </div>
-                              ) : usersWithRoles.length > 0 ? (
-                                <div className="overflow-x-auto">
-                                  <table className="w-full text-left border-collapse text-xs font-serif">
-                                    <thead>
-                                      <tr className="border-b border-[#ecd8a6]/15 text-[#ecd8a6]/50">
-                                        <th className="py-2 px-3">{highlightText("Kullanıcı Bilgisi", globalSearchQuery)}</th>
-                                        <th className="py-2 px-3">{highlightText("Rol / Yetki", globalSearchQuery)}</th>
-                                        <th className="py-2 px-3 text-right">{highlightText("İşlemler", globalSearchQuery)}</th>
+                            ) : usersWithRoles.length > 0 ? (
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse text-xs font-serif">
+                                  <thead>
+                                    <tr className="border-b border-[#ecd8a6]/15 text-[#ecd8a6]/50">
+                                      <th className="py-2 px-3">{highlightText("Kullanıcı Bilgisi", globalSearchQuery)}</th>
+                                      <th className="py-2 px-3">{highlightText("Rol / Yetki", globalSearchQuery)}</th>
+                                      <th className="py-2 px-3 text-right">{highlightText("İşlemler", globalSearchQuery)}</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-[#ecd8a6]/5 text-[#ecd8a6]/85">
+                                    {usersWithRoles.map((u: any) => (
+                                      <tr key={u.userId} className="hover:bg-[#ecd8a6]/5 transition-colors">
+                                        <td className="py-3 px-3">
+                                          <div className="font-sans font-medium text-[#ecd8a6]">
+                                            {u.name || "İsimsiz Kullanıcı"}
+                                          </div>
+                                          <div className="text-[10px] font-sans text-[#ecd8a6]/40 font-mono mt-0.5">
+                                            {u.email || "E-posta yok"}
+                                          </div>
+                                        </td>
+                                        <td className="py-3 px-3">
+                                          <span className={`px-2 py-0.5 rounded text-[9px] font-serif uppercase tracking-wider ${
+                                            u.role === 'admin' 
+                                              ? 'bg-purple-950/60 text-purple-400 border border-purple-500/30' 
+                                              : 'bg-amber-950/60 text-amber-400 border border-amber-500/30'
+                                          }`}>
+                                            {u.role}
+                                          </span>
+                                        </td>
+                                        <td className="py-3 px-3 text-right">
+                                          <button
+                                            onClick={() => handleUpdateRole(u.email, 'user')}
+                                            disabled={roleLoading}
+                                            className="px-2.5 py-1 bg-red-950/20 hover:bg-red-900/40 text-red-400 border border-red-500/20 rounded-lg text-[9px] font-serif uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
+                                          >
+                                            {highlightText("Yetkiyi Kaldır", globalSearchQuery)}
+                                          </button>
+                                        </td>
                                       </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-[#ecd8a6]/5 text-[#ecd8a6]/85">
-                                      {usersWithRoles.map((u: any) => (
-                                        <tr key={u.userId} className="hover:bg-[#ecd8a6]/5 transition-colors">
-                                          <td className="py-3 px-3">
-                                            <div className="font-sans font-medium text-[#ecd8a6]">
-                                              {u.name || "İsimsiz Kullanıcı"}
-                                            </div>
-                                            <div className="text-[10px] font-sans text-[#ecd8a6]/40 font-mono mt-0.5">
-                                              {u.email || "E-posta yok"}
-                                            </div>
-                                          </td>
-                                          <td className="py-3 px-3">
-                                            <span className={`px-2 py-0.5 rounded text-[9px] font-serif uppercase tracking-wider ${
-                                              u.role === 'admin' 
-                                                ? 'bg-purple-950/60 text-purple-400 border border-purple-500/30' 
-                                                : 'bg-amber-950/60 text-amber-400 border border-amber-500/30'
-                                            }`}>
-                                              {u.role}
-                                            </span>
-                                          </td>
-                                          <td className="py-3 px-3 text-right">
-                                            <button
-                                              onClick={() => handleUpdateRole(u.email, 'user')}
-                                              disabled={roleLoading}
-                                              className="px-2.5 py-1 bg-red-950/20 hover:bg-red-900/40 text-red-400 border border-red-500/20 rounded-lg text-[9px] font-serif uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
-                                            >
-                                              {highlightText("Yetkiyi Kaldır", globalSearchQuery)}
-                                            </button>
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              ) : (
-                                <div className="text-center py-6 text-[10px] text-[#ecd8a6]/30 uppercase font-serif">
-                                  Yetkili personel bulunmamaktadır
-                                </div>
-                              )}
-                            </div>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            ) : (
+                              <div className="text-center py-6 text-[10px] text-[#ecd8a6]/30 uppercase font-serif">
+                                Yetkili personel bulunmamaktadır
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

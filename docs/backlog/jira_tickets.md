@@ -6,7 +6,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **68** | Açık: **3** | Tamamlanan: **65**
+Toplam Bilet: **69** | Açık: **3** | Tamamlanan: **66**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -90,6 +90,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-193**](#-ms-193) | Security / Auditing | Yönetim ve Çalışan Denetimi İçin Audit Log (`admin_audit_logs`) Altyapısının Kurulması | Yüksek | Bakiye, rol ve konfigürasyon değişiklikleri için admin_audit_logs altyapısı kurulup kuralları yazıldı. | Winston |
 | [**MS-194**](#-ms-194) | UX / UI | Yönetim Paneli Akordeon Bölümlerinin Dikey Tek Kolon Olarak Hizalanması | Düşük | Geniş ekranlardaki 2 sütunlu grid yapısı kaldırılarak tüm akordeon bölümleri dikey tek kolon halinde alt alta sıralandı. | Sally |
 | [**MS-192**](#-ms-192) | Security / Analytics | `moon_transactions` Koleksiyonu İçin Güvenlik ve İşlem Takibi Alanlarının Eklenmesi | Orta | `moon_transactions` koleksiyonuna `paymentProvider`, `idempotencyKey` ve `clientMetadata` alanları eklenip, `firestore.rules` kuralları ve backend/frontend entegrasyonu tamamlandı. | Winston |
+| [**MS-195**](#-ms-195) | Feature / UX / UI | Yönetim Paneli Yetkili Personel Listesi ve Yetki Kaldırma | Yüksek | Rol ve yetki yönetimi altına yetkisi tanımlanan kişileri listeleyen sekme eklenip yetki kaldırma desteği entegre edildi. | Amelia |
 
 
 ---
@@ -1578,4 +1579,24 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 * **Bileşen:** Veritabanı Güvenliği
 * **Açıklama:** Firestore security kurallarında `isEmployee()` ve `isAdmin()` rolleri doğrulanarak `ui_configs` ve `system_configs` koleksiyonlarının yetkisiz kullanıcılara tamamen kapatılması, `users` ve `user_moons` koleksiyonlarında ise çalışan yetkilendirmelerinin yapılması.
 * **Çözüm:** `firestore.rules` dosyasına helper functions ve Match kuralları eklenerek veri koruması sağlandı.
+
+---
+
+### ✅ MS-195: Yönetim Paneli Yetkili Personel Listesi ve Yetki Kaldırma (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** John (📋 PM / `bmad-agent-pm`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli Arayüzü
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Yönetim panelinde kimlerin yetkilendirildiğini (admin veya çalışan/employee) şeffaf bir şekilde görebilmek ve gerektiğinde bu yetkileri hızlıca iptal edebilmek amacıyla, Rol ve Yetki Yönetimi bölümünün altına yeni bir sekme/bölüm eklenerek yetki tanımlanan kişiler listelenmeli ve yetki iptal butonu yerleştirilmelidir.
+* **Kabul Kriterleri:**
+  1. `admin-panel/src/App.tsx` dosyasında, "Rol ve Yetki Yönetimi" bölümünün hemen altına "Yetkili Personel Listesi" adında yeni bir akordeon sekmesi eklenmelidir.
+  2. Bu sekmede Firestore `users` koleksiyonundan `role` alanı `admin` veya `employee` olan tüm kullanıcılar dinamik olarak çekilip isim, e-posta ve rol etiketleriyle listelenmelidir.
+  3. Her kullanıcının yanında "Yetkiyi Kaldır" butonu yer almalı; butona tıklandığında kullanıcının rolü `user` seviyesine çekilerek yetkisi kaldırılmalı ve liste anında güncellenmelidir.
+  4. Yetkisi kaldırılan kullanıcılar listeden otomatik olarak çıkmalıdır.
+
+* **Çözüm:** `admin-panel/src/App.tsx` dosyasında "Yetkili Personel Listesi" adında 5. bir akordeon section oluşturuldu. Firestore `users` koleksiyonundan `role` değeri `admin` veya `employee` olan kullanıcılar dynamic query (`where('role', 'in', ...)`) ile listelendi. Her kullanıcı için "Yetkiyi Kaldır" butonu ile backend rol güncelleme API'si tetiklenerek yetkileri anında iptal edilecek ve liste güncellenecek şekilde entegre edildi.
 
