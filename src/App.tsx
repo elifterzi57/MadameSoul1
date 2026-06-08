@@ -122,7 +122,8 @@ function AppContent() {
     setUserInfo,
     setMoonsCount,
     setReadingCount,
-    setStep
+    setStep,
+    isSocialLoginInProgress
   } = useAppStore();
 
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -1084,7 +1085,7 @@ function AppContent() {
     );
   }
 
-  if (!user) {
+  if (!user || isSocialLoginInProgress) {
     return (
       <Login 
         onLogin={() => {}} 

@@ -14,8 +14,9 @@ import {
   linkWithCredential,
   EmailAuthProvider
 } from 'firebase/auth';
-import { setDoc, doc, serverTimestamp, getDocs, query, collection, where } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, getDocs, query, collection, where, deleteDoc } from 'firebase/firestore';
 import { gatherUserMetadata } from '../lib/metadata';
+import { useAppStore } from '../store/useAppStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Apple,
@@ -90,11 +91,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [consentAccepted, setConsentAccepted] = useState(false);
 
   // Account Linking states (MS-196)
-  const [showLinkingModal, setShowLinkingModal] = useState(false);
-  const [linkingEmail, setLinkingEmail] = useState('');
+  const {
+    linkingEmail,
+    pendingCredential,
+    linkingProvider,
+    showLinkingModal,
+    setLinkingEmail,
+    setPendingCredential,
+    setLinkingProvider,
+    setShowLinkingModal,
+    setIsSocialLoginInProgress
+  } = useAppStore();
+
   const [linkingPassword, setLinkingPassword] = useState('');
-  const [pendingCredential, setPendingCredential] = useState<any>(null);
-  const [linkingProvider, setLinkingProvider] = useState<'Google' | 'Apple'>('Google');
   const [linkingError, setLinkingError] = useState('');
   const [linkingLoading, setLinkingLoading] = useState(false);
 
@@ -296,6 +305,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     }
     setLoading(true);
     setError('');
+    setIsSocialLoginInProgress(true);
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -314,8 +324,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
             setLinkingProvider('Google');
             setShowLinkingModal(true);
             setLoading(false);
+            // Delete the temporary Firestore document if it was created
+            try {
+              await deleteDoc(doc(db, 'users', result.user.uid));
+            } catch (e) {
+              console.error("Error deleting temporary user document:", e);
+            }
             // Delete the temporary Google user to free the credential and sign out
             await result.user.delete();
+            setIsSocialLoginInProgress(false);
             return;
           }
         }
@@ -323,6 +340,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
       await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
+      setIsSocialLoginInProgress(false);
     } catch (err: any) {
       console.error("Google login error:", err);
       if (err.code === 'auth/account-exists-with-different-credential') {
@@ -349,6 +367,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       }
     } finally {
       setLoading(false);
+      setIsSocialLoginInProgress(false);
     }
   };
 
@@ -359,6 +378,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     }
     setLoading(true);
     setError('');
+    setIsSocialLoginInProgress(true);
     try {
       const provider = new OAuthProvider('apple.com');
       provider.addScope('email');
@@ -380,8 +400,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
             setLinkingProvider('Apple');
             setShowLinkingModal(true);
             setLoading(false);
+            // Delete the temporary Firestore document if it was created
+            try {
+              await deleteDoc(doc(db, 'users', result.user.uid));
+            } catch (e) {
+              console.error("Error deleting temporary user document:", e);
+            }
             // Delete the temporary Apple user to free the credential and sign out
             await result.user.delete();
+            setIsSocialLoginInProgress(false);
             return;
           }
         }
@@ -389,6 +416,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
       await saveUserToFirestore(result.user, undefined, additionalInfo);
       onLogin();
+      setIsSocialLoginInProgress(false);
     } catch (err: any) {
       console.error("Apple login error:", err);
       if (err.code === 'auth/account-exists-with-different-credential') {
@@ -415,6 +443,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       }
     } finally {
       setLoading(false);
+      setIsSocialLoginInProgress(false);
     }
   };
 
@@ -929,8 +958,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
               </h3>
               <p className="text-xs text-[#ecd8a6]/60 font-sans mb-6 text-center leading-relaxed">
                 {language === 'tr' 
-                  ? `"${linkingEmail}" e-posta adresiyle zaten bir şifreli hesap mevcut. ${linkingProvider} girişinizi bu hesaba bağlamak için lütfen şifrenizi girin.`
-                  : `An account with email "${linkingEmail}" already exists. Enter your password to link your ${linkingProvider} login with this account.`}
+                  ? `"${linkingEmail}" e-posta adresiyle zaten bir şifreli hesap mevcut. ${linkingProvider || 'Google'} girişinizi bu hesaba bağlamak için lütfen şifrenizi girin.`
+                  : `An account with email "${linkingEmail}" already exists. Enter your password to link your ${linkingProvider || 'Google'} login with this account.`}
               </p>
               
               <form onSubmit={handleLinkAccounts} className="space-y-4">
