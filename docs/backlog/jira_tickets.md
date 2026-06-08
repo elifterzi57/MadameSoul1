@@ -1671,12 +1671,17 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 * **Oluşturan (Reporter):** Elif (USER)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Profil / Ayarlar Modülü
-* **Hedef Dosya:** [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx)
+* **Hedef Dosyalar:** [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [firebase.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/lib/firebase.ts)
 * **Açıklama:**  
-  Kullanıcıların Notification Settings alanında web push bildirimlerini diledikleri zaman kapatabilmeleri (disable/unenable) sağlanmalıdır. Mevcut yapıda sadece bildirimler aktif hale getirilebilmektedir, ancak devre dışı bırakılamamaktadır.
+  Kullanıcıların Notification Settings alanında web push bildirimlerini diledikleri zaman kapatabilmeleri (disable/unenable) sağlanmalıdır. Ayrıca bu işlem esnasında oluşan uyarı bildirimlerinin (Toast) görünür olması ve buton durumunun net bir şekilde arayüzde yansıtılması gerekmektedir.
 * **Kabul Kriterleri:**
   1. Profile Ayarlar sekmesindeki Web Push Notification seçeneğinde bildirimler açık olduğunda kapatılmasına, kapalı olduğunda ise açılmasına izin veren çift yönlü bir geçiş/anahtar (toggle/switch) yapısı kurulmalıdır.
   2. Kullanıcı bildirimleri kapattığında Firestore `user_push_tokens` koleksiyonundaki ilgili FCM token belgesi silinmeli ve FCM SDK'sından token temizlenmelidir.
+  3. Bildirim açma/kapatma esnasında fırlatılan toast uyarı pencerelerinin Profil Modalı üzerinde (`z-[200]`) görünebilmesi için toast z-index değeri yükseltilmelidir.
+  4. Toggle switch butonunun hemen yanına, kullanıcının durumu net olarak görebilmesi için dil duyarlı dinamik durum metni ("Açık"/"Kapalı" veya "Enabled"/"Disabled") eklenmelidir.
 
-* **Çözüm:** `src/lib/firebase.ts` dosyasında yer alan `disablePushNotifications` metodu güncellenerek FCM `deleteToken` çağrısı izole bir try-catch bloğuna alındı. Böylelikle browser/ortam kaynaklı FCM hataları Firestore doküman silme işlemini engellemez hale getirildi ve Firestore `user_push_tokens` belgesinin silinmesi garanti altına alındı. `Profile.tsx` tarafındaki `handleTogglePush` ve geçiş butonunun (Enable/Disable) çift yönlü yapısı sorunsuz çalışır hale getirildi.
+* **Çözüm:** 
+  1. `src/lib/firebase.ts` dosyasında yer alan `disablePushNotifications` metodu güncellenerek FCM `deleteToken` çağrısı izole bir try-catch bloğuna alındı. Firestore `user_push_tokens` belgesinin silinmesi garanti altına alındı.
+  2. `src/App.tsx` dosyasındaki custom toast bildirim sarmalayıcı sınıfındaki `z-50` değeri `z-[200]`'e yükseltilerek, modal arkasında kalması ve görünmemesi engellendi.
+  3. `src/components/Profile.tsx` dosyasında, push notification toggle switch alanına `pushEnabled` değerine göre dinamik olarak renk değiştiren dil duyarlı "Açık"/"Kapalı" ("Enabled"/"Disabled") durum etiketleri eklenerek görsel netlik ve geribildirim sağlandı.
 

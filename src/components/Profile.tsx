@@ -859,6 +859,13 @@ export const Profile: React.FC<ProfileProps> = ({
                     </div>
                     <div className="flex items-center gap-3">
                       {checkingPush && <Loader2 className="w-4 h-4 text-[#ecd8a6] animate-spin" />}
+                      <span className={`text-[10px] font-sans font-medium tracking-wider uppercase transition-colors duration-300 ${
+                        pushEnabled ? 'text-emerald-400' : 'text-[#ecd8a6]/40'
+                      }`}>
+                        {pushEnabled 
+                          ? (userInfo.language === 'tr' ? 'Açık' : 'Enabled') 
+                          : (userInfo.language === 'tr' ? 'Kapalı' : 'Disabled')}
+                      </span>
                       <button
                         onClick={handleTogglePush}
                         disabled={checkingPush}

@@ -1884,7 +1884,7 @@ function AppContent() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 z-50 md:max-w-sm bg-[#160d26] border border-[#ecd8a6] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_20px_rgba(236,216,166,0.15)] overflow-hidden"
+            className="fixed bottom-6 left-6 right-6 md:left-auto md:right-6 z-[200] md:max-w-sm bg-[#160d26] border border-[#ecd8a6] rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5),0_0_20px_rgba(236,216,166,0.15)] overflow-hidden"
           >
             <div className="p-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
