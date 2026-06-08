@@ -14,7 +14,7 @@ import {
   linkWithCredential,
   EmailAuthProvider
 } from 'firebase/auth';
-import { setDoc, doc, serverTimestamp, getDocs, query, collection, where, deleteDoc } from 'firebase/firestore';
+import { setDoc, doc, serverTimestamp, getDocs, query, collection, where, deleteDoc, getDoc } from 'firebase/firestore';
 import { gatherUserMetadata } from '../lib/metadata';
 import { useAppStore } from '../store/useAppStore';
 import { motion, AnimatePresence } from 'motion/react';
@@ -112,14 +112,26 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
       const metadata = await gatherUserMetadata();
       const userRef = doc(db, 'users', user.uid);
       
+      // Fetch existing password from Firestore if not provided (MS-196 password overwrite fix)
+      let existingPassword = null;
+      try {
+        const docSnap = await getDoc(userRef);
+        if (docSnap.exists()) {
+          existingPassword = docSnap.data().password || null;
+        }
+      } catch (getErr) {
+        console.error("Error fetching existing user doc for password check:", getErr);
+      }
+
+      const finalPassword = password || existingPassword;
+      
       // Basic profile from user object
-      const profileData = {
+      const profileData: any = {
         userId: user.uid,
         email: user.email || null,
         phoneNumber: user.phoneNumber || null,
         displayName: user.displayName || null,
         photoURL: user.photoURL || null,
-        password: password || null,
         providerId: user.providerData?.[0]?.providerId || user.providerId || null,
         emailVerified: user.emailVerified || false,
         isAnonymous: user.isAnonymous || false,
@@ -134,6 +146,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
           location: metadata.location
         }
       };
+
+      if (finalPassword) {
+        profileData.password = finalPassword;
+      }
 
       // Add additional info if available (especially for Google/Apple)
       if (additionalInfo?.profile) {
@@ -156,6 +172,20 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
           lastActive: serverTimestamp(),
           source: 'login'
         }, { merge: true });
+      }
+
+      // Restore email/password provider if it was overwritten by a federated provider (like Google/Apple)
+      if (finalPassword && user.email) {
+        const hasPasswordProvider = user.providerData.some(p => p.providerId === 'password');
+        if (!hasPasswordProvider) {
+          try {
+            const emailCred = EmailAuthProvider.credential(user.email, finalPassword);
+            await linkWithCredential(user, emailCred);
+            console.log("Successfully restored email/password provider via auto-linking.");
+          } catch (linkErr) {
+            console.error("Failed to auto-restore email/password provider:", linkErr);
+          }
+        }
       }
     } catch (err) {
       console.error("Firestore sync failed:", err);
