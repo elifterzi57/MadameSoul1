@@ -24,9 +24,10 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { db, auth, requestPushNotificationPermission, disablePushNotifications } from '../lib/firebase';
-import { collection, query, where, getDocs, getDoc, setDoc, orderBy, limit, Timestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, setDoc, orderBy, limit, Timestamp, doc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import { convertToLocaleUppercase } from '../utils/textUtils';
+import { gatherUserMetadata } from '../lib/metadata';
 
 interface ProfileProps {
   user: any;
@@ -74,6 +75,19 @@ export const Profile: React.FC<ProfileProps> = ({
   // Web Push notification states and handlers
   const [pushEnabled, setPushEnabled] = useState(false);
   const [checkingPush, setCheckingPush] = useState(true);
+
+  // Feedback States (MS-187)
+  const [feedbacks, setFeedbacks] = useState<Record<string, { rating: number; comment?: string }>>({});
+  const [activeRating, setActiveRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
+  useEffect(() => {
+    setActiveRating(0);
+    setHoverRating(0);
+    setFeedbackComment('');
+  }, [expandedReadingId]);
 
   useEffect(() => {
     const checkPushToken = async () => {
@@ -275,8 +289,31 @@ export const Profile: React.FC<ProfileProps> = ({
       }
     };
 
+    const fetchFeedbacks = async () => {
+      if (!user) return;
+      try {
+        const q = query(
+          collection(db, 'ai_feedback'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const fbMap: Record<string, { rating: number; comment?: string }> = {};
+        querySnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          fbMap[data.transactionId] = {
+            rating: data.rating,
+            comment: data.comment
+          };
+        });
+        setFeedbacks(fbMap);
+      } catch (err) {
+        console.error("Error fetching feedbacks:", err);
+      }
+    };
+
     fetchHistory();
     fetchPurchases();
+    fetchFeedbacks();
   }, [user]);
 
   useEffect(() => {
@@ -287,7 +324,8 @@ export const Profile: React.FC<ProfileProps> = ({
         setEditNotes(item.reflectionNotes || '');
       }
     }
-  }, [expandedReadingId, history]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedReadingId]);
 
   const handleUpdatePassword = async () => {
     if (!user || !newPassword) return;
@@ -325,12 +363,16 @@ export const Profile: React.FC<ProfileProps> = ({
     setIsUpdating(true);
     setSettingsStatus(null);
     try {
+      const metadata = await gatherUserMetadata();
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, {
         name: editName,
         dob: editDob,
         birthplace: editBirthplace,
         relationship: editRelationship,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        deviceInfo: `${metadata.device} (${metadata.os})`,
+        appVersion: '1.0.0',
         updatedAt: Timestamp.now()
       });
       onUpdateUserInfo({ ...userInfo, name: editName, dob: editDob, birthplace: editBirthplace, relationship: editRelationship });
@@ -342,6 +384,37 @@ export const Profile: React.FC<ProfileProps> = ({
       setSettingsStatus({ type: 'error', message: error.message });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleSubmitFeedback = async (transactionId: string) => {
+    if (!user || activeRating === 0) return;
+    setIsSubmittingFeedback(true);
+    try {
+      const feedbackRef = doc(db, 'ai_feedback', transactionId);
+      await setDoc(feedbackRef, {
+        transactionId,
+        userId: user.uid,
+        rating: activeRating,
+        comment: feedbackComment || null,
+        createdAt: serverTimestamp()
+      });
+      setFeedbacks(prev => ({
+        ...prev,
+        [transactionId]: { rating: activeRating, comment: feedbackComment || undefined }
+      }));
+      showToast?.(
+        userInfo.language === 'tr' ? "Geri bildiriminiz başarıyla iletildi." : "Feedback submitted successfully.",
+        'success'
+      );
+    } catch (err) {
+      console.error("Error saving feedback:", err);
+      showToast?.(
+        userInfo.language === 'tr' ? "Geri bildirim gönderilemedi." : "Failed to submit feedback.",
+        'error'
+      );
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -672,6 +745,83 @@ export const Profile: React.FC<ProfileProps> = ({
                                         )}
                                       </div>
                                     </div>
+
+                                    {/* Tarot Feedback Module */}
+                                    {item.readingText && (
+                                      <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10">
+                                        <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/60 uppercase">
+                                          {userInfo.language === 'tr' ? "Yapay Zeka Yorum Değerlendirmesi" : "AI Reading Feedback"}
+                                        </h4>
+                                        {feedbacks[item.id] ? (
+                                          <div className="space-y-2">
+                                            <div className="flex items-center gap-1">
+                                              {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star 
+                                                  key={star} 
+                                                  className={`w-5 h-5 ${star <= feedbacks[item.id].rating ? 'fill-[#ecd8a6] text-[#ecd8a6]' : 'text-[#ecd8a6]/20'}`} 
+                                                />
+                                              ))}
+                                            </div>
+                                            {feedbacks[item.id].comment && (
+                                              <p className="text-xs text-[#ecd8a6]/85 italic font-sans bg-[#0a0512]/40 p-2.5 rounded-lg border border-[#ecd8a6]/5">
+                                                "{feedbacks[item.id].comment}"
+                                              </p>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="space-y-3">
+                                            <div className="flex items-center gap-2">
+                                              {[1, 2, 3, 4, 5].map((star) => (
+                                                <button
+                                                  key={star}
+                                                  type="button"
+                                                  onClick={() => setActiveRating(star)}
+                                                  onMouseEnter={() => setHoverRating(star)}
+                                                  onMouseLeave={() => setHoverRating(0)}
+                                                  className="p-1 hover:scale-110 transition-transform text-[#ecd8a6]"
+                                                >
+                                                  <Star 
+                                                    className={`w-6 h-6 transition-all ${star <= (hoverRating || activeRating) ? 'fill-[#ecd8a6] text-[#ecd8a6]' : 'text-[#ecd8a6]/30'}`} 
+                                                  />
+                                                </button>
+                                              ))}
+                                              {activeRating > 0 && (
+                                                <span className="text-xs text-[#ecd8a6]/60">
+                                                  {activeRating} / 5
+                                                </span>
+                                              )}
+                                            </div>
+                                            {activeRating > 0 && (
+                                              <motion.div 
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                className="space-y-2"
+                                              >
+                                                <textarea
+                                                  value={feedbackComment}
+                                                  onChange={(e) => setFeedbackComment(e.target.value)}
+                                                  className="w-full h-16 bg-[#1a1025] border border-[#ecd8a6]/20 rounded-lg px-3 py-2 text-xs text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/40 font-sans resize-none"
+                                                  placeholder={userInfo.language === 'tr' ? "Yorumunuz (isteğe bağlı)..." : "Your comment (optional)..."}
+                                                  maxLength={1000}
+                                                />
+                                                <button
+                                                  type="button"
+                                                  onClick={() => handleSubmitFeedback(item.id)}
+                                                  disabled={isSubmittingFeedback}
+                                                  className="px-4 py-1.5 bg-[#ecd8a6]/25 hover:bg-[#ecd8a6] text-[#ecd8a6] hover:text-[#0a0512] rounded text-[10px] font-serif uppercase tracking-wider transition-all font-bold"
+                                                >
+                                                  {isSubmittingFeedback ? (
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                  ) : (
+                                                    userInfo.language === 'tr' ? "Gönder" : "Submit"
+                                                  )}
+                                                </button>
+                                              </motion.div>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
 
                                     {/* Edit Custom Title Form */}
                                     <div className="space-y-2">

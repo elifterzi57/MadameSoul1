@@ -38,7 +38,14 @@ service cloud.firestore {
              (!('providerId' in data) || (data.providerId == null || data.providerId is string)) &&
              (!('emailVerified' in data) || data.emailVerified is bool) &&
              (!('isAnonymous' in data) || data.isAnonymous is bool) &&
-             (!('profile' in data) || (data.profile == null || data.profile is map));
+             (!('profile' in data) || (data.profile == null || data.profile is map)) &&
+             (!('termsAccepted' in data) || data.termsAccepted is bool) &&
+             (!('termsAcceptedAt' in data) || data.termsAcceptedAt is timestamp) &&
+             (!('termsVersion' in data) || (data.termsVersion is string && data.termsVersion.size() <= 50)) &&
+             (!('timezone' in data) || (data.timezone is string && data.timezone.size() <= 100)) &&
+             (!('deviceInfo' in data) || (data.deviceInfo is string && data.deviceInfo.size() <= 256)) &&
+             (!('appVersion' in data) || (data.appVersion is string && data.appVersion.size() <= 50)) &&
+             (!('lifetimeValue' in data) || (data.lifetimeValue is number || data.lifetimeValue is float || data.lifetimeValue is int));
     }
 
     function isValidUserMoon(data) {
@@ -76,6 +83,15 @@ service cloud.firestore {
                                               data.clientMetadata.userAgent is string &&
                                               data.clientMetadata.os is string &&
                                               data.clientMetadata.appVersion is string));
+    }
+
+    function isValidAiFeedback(data) {
+      return data.userId == request.auth.uid &&
+             data.transactionId is string &&
+             data.rating is int &&
+             data.rating >= 1 && data.rating <= 5 &&
+             (!('comment' in data) || data.comment == null || (data.comment is string && data.comment.size() <= 1000)) &&
+             data.createdAt == request.time;
     }
 
     match /users/{userId} {
@@ -168,6 +184,13 @@ service cloud.firestore {
       allow update: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee()) && isValidMoonTransaction(request.resource.data, transactionId);
       allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
+
+    match /ai_feedback/{feedbackId} {
+      allow get: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
+      allow create, update: if request.auth != null && (request.auth.uid == request.resource.data.userId) && isValidAiFeedback(request.resource.data);
+      allow delete: if request.auth != null && isEmployee();
+    }
+
 
     match /messages_en/{messageId} {
       allow create: if isValidMessage(request.resource.data);

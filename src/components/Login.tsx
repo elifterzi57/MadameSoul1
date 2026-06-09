@@ -88,7 +88,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showLangs, setShowLangs] = useState(false);
-  const [consentAccepted, setConsentAccepted] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(true);
 
   // Account Linking states (MS-196)
   const {
@@ -138,6 +138,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         lastLogin: serverTimestamp(),
         updatedAt: serverTimestamp(),
         consentsAcceptedAt: serverTimestamp(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        deviceInfo: `${metadata.device} (${metadata.os})`,
+        appVersion: '1.0.0',
         metadata: {
           device: metadata.device,
           os: metadata.os,
@@ -617,26 +620,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
                   {error && <p className="text-red-400 text-[10px] sm:text-xs text-center bg-red-400/5 py-2 rounded-lg border border-red-400/10">{error}</p>}
 
-                  {/* KVKK / GDPR Consent Checkbox */}
-                  <div className="flex items-start gap-2.5 px-1 py-1">
-                    <input 
-                      type="checkbox"
-                      id="kvkk-consent-email"
-                      checked={consentAccepted}
-                      onChange={(e) => setConsentAccepted(e.target.checked)}
-                      className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
-                    />
-                    <label htmlFor="kvkk-consent-email" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
-                      {t('login.kvkkConsent')}
-                    </label>
-                  </div>
-
                   <div className="flex flex-col gap-3 pt-2">
                     <button 
                       type="submit"
-                      disabled={loading || !consentAccepted}
+                      disabled={loading}
                       className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] sm:text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${
-                        loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                        loading ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
                       }`}
                     >
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
@@ -646,6 +635,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         </>
                       )}
                     </button>
+
+                    <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-1 mb-2 font-sans max-w-xs mx-auto">
+                      {language === 'tr' 
+                        ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
+                        : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                    </p>
 
                     <button 
                       type="button"
@@ -695,53 +690,51 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       <span>{authMethod === 'email' ? t('login.switchToPhone') : t('login.switchToEmail')}</span>
                     </button>
 
-                    <div className="pt-2">
-                       <button 
+                    {/* Language Selector */}
+                    <div className="pt-2 relative">
+                      <button 
+                        type="button"
+                        onClick={() => setShowLangs(!showLangs)}
+                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                      >
+                        <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <span>{languages.find(l => l.code === language)?.name}</span>
+                      </button>
+                      <AnimatePresence>
+                        {showLangs && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
+                          >
+                            {languages.map((lang) => (
+                              <button
+                                key={lang.code}
+                                onClick={() => {
+                                  onLanguageChange(lang.code);
+                                  setShowLangs(false);
+                                }}
+                                className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
+                              >
+                                {lang.name}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Show Intro Under Button */}
+                    <div className="flex flex-col items-center pt-2">
+                      <button 
                         type="button"
                         onClick={onShowOnboarding}
-                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                        className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest"
                       >
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
                         <span>{t('login.showIntro')}</span>
                       </button>
-                    </div>
-
-                    {/* Language Selector Under Button */}
-                    <div className="flex flex-col items-center pt-2">
-                      <div className="relative">
-                        <button 
-                          onClick={() => setShowLangs(!showLangs)}
-                          className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2"
-                        >
-                          <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100" />
-                          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">
-                            {languages.find(l => l.code === language)?.name}
-                          </span>
-                        </button>
-                        <AnimatePresence>
-                          {showLangs && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                              className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
-                            >
-                              {languages.map((lang) => (
-                                <button
-                                  key={lang.code}
-                                  onClick={() => {
-                                    onLanguageChange(lang.code);
-                                    setShowLangs(false);
-                                  }}
-                                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
-                                >
-                                  {lang.name}
-                                </button>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
                     </div>
                   </div>
                 </motion.form>
@@ -811,25 +804,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       <div id="recaptcha-container" className="hidden"></div>
                       {error && <p className="text-red-400 text-xs text-center">{error}</p>}
                       
-                      {/* KVKK / GDPR Consent Checkbox */}
-                      <div className="flex items-start gap-2.5 px-1 py-1">
-                        <input 
-                          type="checkbox"
-                          id="kvkk-consent-phone"
-                          checked={consentAccepted}
-                          onChange={(e) => setConsentAccepted(e.target.checked)}
-                          className="mt-1 w-4 h-4 accent-[#ecd8a6] cursor-pointer rounded border-[#ecd8a6]/20 bg-black/40"
-                        />
-                        <label htmlFor="kvkk-consent-phone" className="text-[10px] sm:text-xs text-[#ecd8a6]/60 leading-normal cursor-pointer select-none">
-                          {t('login.kvkkConsent')}
-                        </label>
-                      </div>
-
                       <button 
                         type="submit"
-                        disabled={loading || !consentAccepted}
+                        disabled={loading}
                         className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg transition-all ${
-                          loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                          loading ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
                         }`}
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
@@ -839,6 +818,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                           </>
                         )}
                       </button>
+
+                      <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-2 font-sans max-w-xs mx-auto">
+                        {language === 'tr' 
+                          ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
+                          : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                      </p>
                     </form>
                   ) : (
                     <form onSubmit={handleCodeVerify} className="space-y-4">
@@ -856,9 +841,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {error && <p className="text-red-400 text-xs text-center">{error}</p>}
                       <button 
                         type="submit"
-                        disabled={loading || !consentAccepted}
+                        disabled={loading}
                         className={`w-full py-4 rounded-xl font-serif uppercase tracking-widest text-[11px] font-bold flex items-center justify-center gap-3 shadow-lg transition-all ${
-                          loading || !consentAccepted ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
+                          loading ? 'bg-[#ecd8a6]/30 text-[#0a0512]/50 cursor-not-allowed' : 'bg-[#ecd8a6] text-[#0a0512] hover:bg-[#fff] active:scale-[0.98]'
                         }`}
                       >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
@@ -868,6 +853,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                           </>
                         )}
                       </button>
+
+                      <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-2 font-sans max-w-xs mx-auto">
+                        {language === 'tr' 
+                          ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
+                          : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                      </p>
                     </form>
                   )}
 
@@ -913,53 +904,51 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {t('login.switchToEmail')}
                     </button>
 
-                    <div className="pt-2">
+                    {/* Language Selector */}
+                    <div className="pt-2 relative">
+                      <button 
+                        type="button"
+                        onClick={() => setShowLangs(!showLangs)}
+                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                      >
+                        <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <span>{languages.find(l => l.code === language)?.name}</span>
+                      </button>
+                      <AnimatePresence>
+                        {showLangs && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
+                          >
+                            {languages.map((lang) => (
+                              <button
+                                key={lang.code}
+                                onClick={() => {
+                                  onLanguageChange(lang.code);
+                                  setShowLangs(false);
+                                }}
+                                className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
+                              >
+                                {lang.name}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Show Intro Under Button */}
+                    <div className="flex flex-col items-center pt-2">
                       <button 
                         type="button"
                         onClick={onShowOnboarding}
-                        className="w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl"
+                        className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest"
                       >
                         <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
                         <span>{t('login.showIntro')}</span>
                       </button>
-                    </div>
-
-                    {/* Language Selector Under Button */}
-                    <div className="flex flex-col items-center pt-2">
-                      <div className="relative">
-                        <button 
-                          onClick={() => setShowLangs(!showLangs)}
-                          className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2"
-                        >
-                          <Globe className="w-3 h-3 opacity-60 group-hover:opacity-100" />
-                          <span className="text-[10px] sm:text-xs font-serif uppercase tracking-widest">
-                            {languages.find(l => l.code === language)?.name}
-                          </span>
-                        </button>
-                        <AnimatePresence>
-                          {showLangs && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                              animate={{ opacity: 1, y: 0, scale: 1 }}
-                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                              className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-32 sm:w-40 bg-[#1a1025] border border-[#ecd8a6]/30 rounded-2xl overflow-hidden shadow-2xl z-[160]"
-                            >
-                              {languages.map((lang) => (
-                                <button
-                                  key={lang.code}
-                                  onClick={() => {
-                                    onLanguageChange(lang.code);
-                                    setShowLangs(false);
-                                  }}
-                                  className={`w-full px-3 py-2 sm:px-4 sm:py-3 text-left transition-colors font-serif text-[11px] sm:text-sm ${language === lang.code ? 'bg-[#ecd8a6] text-[#0a0512]' : 'text-[#ecd8a6] hover:bg-white/5'}`}
-                                >
-                                  {lang.name}
-                                </button>
-                              ))}
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
                     </div>
                   </div>
                 </motion.div>

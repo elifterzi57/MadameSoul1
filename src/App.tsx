@@ -13,6 +13,7 @@ import { useAppStore, Card } from './store/useAppStore';
 import { StoreModal } from './components/StoreModal';
 import { ContactModal } from './components/ContactModal';
 import { LegalModal } from './components/LegalModal';
+import { TermsModal } from './components/TermsModal';
 import { CookieBanner } from './components/CookieBanner';
 import { generatePDF } from './utils/pdfGenerator';
 import { convertToLocaleUppercase } from './utils/textUtils';
@@ -41,7 +42,8 @@ import {
   Check, 
   LogOut, 
   Loader2,
-  User as UserIcon
+  User as UserIcon,
+  Star
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -127,6 +129,7 @@ function AppContent() {
   } = useAppStore();
 
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [shuffledDeck, setShuffledDeck] = useState<any[]>([]);
@@ -167,6 +170,13 @@ function AppContent() {
   const pendingTxId = useRef<string | null>(null);
   const pendingDeducted = useRef(false);
   const pendingDeductedFrom = useRef<'daily' | 'purchased' | null>(null);
+
+  // Main screen AI Reading Feedback states (MS-187)
+  const [mainRating, setMainRating] = useState<number>(0);
+  const [mainHoverRating, setMainHoverRating] = useState<number>(0);
+  const [mainComment, setMainComment] = useState('');
+  const [submittingMainFeedback, setSubmittingMainFeedback] = useState(false);
+  const [hasSubmittedFeedback, setHasSubmittedFeedback] = useState(false);
 
   const [adsConfig, setAdsConfig] = useState<any>({
     ad1: {
@@ -337,10 +347,14 @@ function AppContent() {
         dob: '',
         birthplace: '',
         relationship: 'single',
-        focus: 'general'
+        focus: 'general',
+        termsAccepted: false,
+        termsAcceptedAt: undefined,
+        termsVersion: ''
       });
 
       if (u) {
+        setIsUserDataLoading(true);
         // Fetch user custom claim role (MS-161)
         try {
           const tokenResult = await u.getIdTokenResult();
@@ -358,6 +372,11 @@ function AppContent() {
         const userRef = doc(db, 'users', u.uid);
         
         getDoc(userRef).then(async (docSnap) => {
+          const metadata = await gatherUserMetadata();
+          const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          const deviceInfo = `${metadata.device} (${metadata.os})`;
+          const appVersion = '1.0.0';
+
           if (docSnap.exists()) {
             const data = docSnap.data();
             setUserInfo({
@@ -365,10 +384,24 @@ function AppContent() {
               dob: userInfo.dob || data.dob || '',
               birthplace: userInfo.birthplace || data.birthplace || '',
               relationship: userInfo.relationship || data.relationship || 'single',
-              focus: userInfo.focus || data.focus || 'general'
+              focus: userInfo.focus || data.focus || 'general',
+              termsAccepted: data.termsAccepted || false,
+              termsAcceptedAt: data.termsAcceptedAt 
+                ? (typeof data.termsAcceptedAt.toDate === 'function' 
+                    ? data.termsAcceptedAt.toDate().toISOString() 
+                    : new Date(data.termsAcceptedAt).toISOString()) 
+                : undefined,
+              termsVersion: data.termsVersion || ''
+            });
+
+            // Silent update of metadata/appVersion (MS-186)
+            await updateDoc(userRef, {
+              timezone,
+              deviceInfo,
+              appVersion,
+              updatedAt: serverTimestamp()
             });
           } else {
-            const metadata = await gatherUserMetadata();
             await setDoc(userRef, {
               userId: u.uid,
               email: u.email,
@@ -379,10 +412,17 @@ function AppContent() {
               focus: 'general',
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
+              timezone,
+              deviceInfo,
+              appVersion,
               metadata
             });
             setUserInfo({ name: u.displayName || '' });
           }
+          setIsUserDataLoading(false);
+        }).catch((err) => {
+          console.error("Error reading/writing user doc:", err);
+          setIsUserDataLoading(false);
         });
 
         const transactionsRef = collection(db, 'moon_transactions');
@@ -549,6 +589,7 @@ function AppContent() {
           unsubscribeMoons();
           unsubscribeMoons = undefined;
         }
+        setIsUserDataLoading(false);
       }
     });
 
@@ -1016,6 +1057,38 @@ function AppContent() {
     setStep('SPLASH');
     setDrawnCards([]);
     setReading(null);
+    setMainRating(0);
+    setMainHoverRating(0);
+    setMainComment('');
+    setHasSubmittedFeedback(false);
+  };
+
+  const handleSubmittingMainFeedback = async () => {
+    if (!user || mainRating === 0 || !pendingTxId.current) return;
+    setSubmittingMainFeedback(true);
+    try {
+      const feedbackRef = doc(db, 'ai_feedback', pendingTxId.current);
+      await setDoc(feedbackRef, {
+        transactionId: pendingTxId.current,
+        userId: user.uid,
+        rating: mainRating,
+        comment: mainComment || null,
+        createdAt: serverTimestamp()
+      });
+      setHasSubmittedFeedback(true);
+      showToast(
+        userInfo.language === 'tr' ? "Geri bildiriminiz başarıyla iletildi." : "Feedback submitted successfully.",
+        'success'
+      );
+    } catch (err) {
+      console.error("Error submitting main feedback:", err);
+      showToast(
+        userInfo.language === 'tr' ? "Geri bildirim gönderilemedi." : "Failed to submit feedback.",
+        'error'
+      );
+    } finally {
+      setSubmittingMainFeedback(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -1063,7 +1136,7 @@ function AppContent() {
     }
   };
 
-  if (isAuthLoading) {
+  if (isAuthLoading || (user && isUserDataLoading)) {
     return (
       <div className="min-h-screen bg-[#05000a] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-[#ecd8a6] animate-spin" />
@@ -1250,6 +1323,20 @@ function AppContent() {
           <LegalModal 
             language={userInfo.language}
             onClose={() => setIsLegalOpen(false)}
+            t={t}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Terms Approval Modal (MS-202 - MS-205) */}
+      <AnimatePresence>
+        {user && (!userInfo.termsAccepted || userInfo.termsVersion !== '1.0.0') && (
+          <TermsModal
+            userId={user.uid}
+            language={userInfo.language}
+            onAccept={() => {
+              console.log("Terms accepted successfully.");
+            }}
             t={t}
           />
         )}
@@ -1823,6 +1910,77 @@ function AppContent() {
                     <div className="markdown-body text-[#ecd8a6]/90 text-center">
                       <Markdown>{reading || ""}</Markdown>
                     </div>
+
+                    {/* AI Reading Feedback Form (MS-187) */}
+                    {reading && !isGenerating && (
+                      <div className="mt-8 pt-8 border-t border-[#ecd8a6]/10 flex flex-col items-center space-y-4">
+                        <div className="w-12 h-px bg-[#ecd8a6]/30 mb-2" />
+                        <h4 className="text-sm font-serif tracking-[0.2em] text-[#ecd8a6]/80 uppercase">
+                          {userInfo.language === 'tr' ? "Açılımı Nasıl Buldunuz?" : "How was your Reading?"}
+                        </h4>
+                        {hasSubmittedFeedback ? (
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star 
+                                  key={star} 
+                                  className={`w-6 h-6 ${star <= mainRating ? 'fill-[#ecd8a6] text-[#ecd8a6]' : 'text-[#ecd8a6]/20'}`} 
+                                />
+                              ))}
+                            </div>
+                            <p className="text-xs text-[#ecd8a6]/60 italic font-sans">
+                              {userInfo.language === 'tr' ? "Geri bildiriminiz için teşekkür ederiz!" : "Thank you for your feedback!"}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center space-y-3 w-full max-w-md">
+                            <div className="flex items-center gap-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setMainRating(star)}
+                                  onMouseEnter={() => setMainHoverRating(star)}
+                                  onMouseLeave={() => setMainHoverRating(0)}
+                                  className="p-1 hover:scale-110 transition-transform text-[#ecd8a6]"
+                                >
+                                  <Star 
+                                    className={`w-7 h-7 transition-all ${star <= (mainHoverRating || mainRating) ? 'fill-[#ecd8a6] text-[#ecd8a6]' : 'text-[#ecd8a6]/30'}`} 
+                                  />
+                                </button>
+                              ))}
+                            </div>
+                            {mainRating > 0 && (
+                              <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="space-y-3 w-full flex flex-col items-center"
+                              >
+                                <textarea
+                                  value={mainComment}
+                                  onChange={(e) => setMainComment(e.target.value)}
+                                  className="w-full h-20 bg-[#160c24] border border-[#ecd8a6]/20 rounded-xl px-4 py-2.5 text-xs text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/40 font-sans resize-none"
+                                  placeholder={userInfo.language === 'tr' ? "Yorumunuz (isteğe bağlı)..." : "Your comment (optional)..."}
+                                  maxLength={1000}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={handleSubmittingMainFeedback}
+                                  disabled={submittingMainFeedback}
+                                  className="px-6 py-2 bg-[#ecd8a6]/25 hover:bg-[#ecd8a6] text-[#ecd8a6] hover:text-[#0a0512] rounded-lg text-xs font-serif uppercase tracking-widest transition-all font-bold active:scale-95 cursor-pointer animate-all"
+                                >
+                                  {submittingMainFeedback ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    userInfo.language === 'tr' ? "Geri Bildirimi Gönder" : "Submit Feedback"
+                                  )}
+                                </button>
+                              </motion.div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </div>

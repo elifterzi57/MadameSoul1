@@ -5,6 +5,11 @@ test.describe('MadameSoul E2E Onboarding, Login, Card Draw and Diary Flow', () =
   const testPassword = 'Password123!';
 
   test('should complete the entire user journey: onboarding, signup, drawing cards, interpreting, and diary editing', async ({ page }) => {
+    // Capture browser console logs
+    page.on('console', msg => {
+      console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`);
+    });
+
     // Increase test timeout due to Gemini generation API simulation
     test.setTimeout(60000);
 
@@ -47,12 +52,14 @@ test.describe('MadameSoul E2E Onboarding, Login, Card Draw and Diary Flow', () =
     await page.locator('input[type="email"]').fill(randomEmail);
     await page.locator('input[type="password"]').fill(testPassword);
 
-    // Accept KVKK Consent
-    await page.locator('input[type="checkbox"]').check();
-
     // Click Register
     const registerBtn = page.getByRole('button', { name: /Sign Up|Kaydol/i }).first();
     await registerBtn.click();
+
+    // Accept post-login terms modal
+    const acceptTermsBtn = page.getByRole('button', { name: /Onayla ve Devam Et|Accept & Continue/i });
+    await expect(acceptTermsBtn).toBeVisible({ timeout: 10000 });
+    await acceptTermsBtn.click();
 
     // Wait for Splash screen after successful login
     // The main Start button for readings should appear

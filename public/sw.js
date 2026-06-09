@@ -35,7 +35,7 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // Caching configuration and caching handlers
-const CACHE_NAME = 'madamesoul-cache-v1';
+const CACHE_NAME = 'madamesoul-cache-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -68,6 +68,11 @@ self.addEventListener('activate', (event) => {
 // Fetch Event with Cache-First / Network-Fallback for assets and Card images
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // Disable service worker caching on localhost/development to prevent white screens from Vite HMR chunk mismatch
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+    return;
+  }
   
   // Skip non-GET requests (e.g. POST to firebase, stripe, api calls)
   if (event.request.method !== 'GET') {

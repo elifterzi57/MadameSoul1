@@ -17,6 +17,9 @@ export type UserInfo = {
   relationship: string;
   language: Language;
   focus: string; // MS-121
+  termsAccepted?: boolean;
+  termsAcceptedAt?: string;
+  termsVersion?: string;
 };
 
 export type AppState = {

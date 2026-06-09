@@ -78,7 +78,7 @@ export const generatePDF = async ({
       </div>
     `;
 
-    // Render ad1 banner html if enabled (with aspect ratio cover box)
+    // Render ad1 banner html if enabled
     const ad1Html = adsConfig?.ad1?.enabled ? `
       <div id="pdf-ad1" style="margin-top: 25px; padding: 25px; border-radius: 20px; text-align: center; position: relative; overflow: hidden; border: 1px solid rgba(236,216,166,0.3); background: linear-gradient(135deg, rgba(236,216,166,0.05) 0%, rgba(10,5,18,0.8) 100%); width: 100%; box-sizing: border-box;">
          <h3 style="margin: 0 0 10px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 4px; font-size: 12px; opacity: 0.8;">✦ ${(adsConfig.ad1.sponsored?.[userInfo.language] || adsConfig.ad1.sponsored?.en || "Sponsored")} ✦</h3>
@@ -126,171 +126,59 @@ export const generatePDF = async ({
       </div>
     `;
 
-    // ----------------------------------------------------
-    // Dynamic Measurement and Auto-Pagination Setup
-    // ----------------------------------------------------
     const PAGE_WIDTH = 800;
-    const PAGE_HEIGHT = 1130;
-    const PADDING_TOP = 80;
-    const PADDING_BOTTOM = 80;
-    const MAX_CONTENT_HEIGHT = PAGE_HEIGHT - PADDING_TOP - PADDING_BOTTOM; // 970px
 
-    const measureContainer = document.createElement('div');
-    measureContainer.style.position = 'absolute';
-    measureContainer.style.top = '-9999px';
-    measureContainer.style.left = '0';
-    measureContainer.style.width = '640px'; // 800 - 80 - 80
-    measureContainer.style.boxSizing = 'border-box';
-    measureContainer.style.fontSize = '18px';
-    measureContainer.style.lineHeight = '1.9';
-    measureContainer.style.fontFamily = 'sans-serif';
-    measureContainer.style.color = 'rgba(236, 216, 166, 0.95)';
-    measureContainer.style.textAlign = 'justify';
-    document.body.appendChild(measureContainer);
+    const singlePageHtml = `
+      <div id="pdf-single-page" style="width: 800px; box-sizing: border-box; padding: 75px 80px; position: relative; overflow: hidden; background: radial-gradient(circle at top center, rgba(30,19,50,0.4) 0%, rgba(5,0,10,1) 50%); border: 1px solid rgba(236,216,166,0.2); display: flex; flex-direction: column; justify-content: flex-start; gap: 20px; font-size: 18px; line-height: 1.9; font-family: sans-serif; color: rgba(236, 216, 166, 0.95); text-align: justify;">
+        <!-- Corner decorations -->
+        <div style="position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
+        <div style="position: absolute; top: 30px; right: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
+        <div style="position: absolute; bottom: 30px; left: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
+        <div style="position: absolute; bottom: 30px; right: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
+        
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 20px; width: 100%;">
+          <h1 style="font-size: 42px; letter-spacing: 4px; margin: 0 0 10px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; font-weight: bold; text-shadow: 0 4px 20px rgba(236,216,166,0.2);">MADAME SOUL</h1>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <div style="height: 1px; width: 60px; background: linear-gradient(90deg, transparent, rgba(236,216,166,0.5));"></div>
+            <h2 style="font-size: 13px; letter-spacing: 6px; margin: 0; color: rgba(236,216,166,0.8); text-transform: uppercase; font-family: 'Playfair Display', serif;">Destiny Reading</h2>
+            <div style="height: 1px; width: 60px; background: linear-gradient(-90deg, transparent, rgba(236,216,166,0.5));"></div>
+          </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(236,216,166,0.2); border-top: 1px solid rgba(236,216,166,0.2); padding: 12px 0; margin-bottom: 15px; color: rgba(236,216,166,0.7); font-family: sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
+          <div>Prepared For: <strong style="color: #ecd8a6;">${userInfo.name}</strong></div>
+          <div>Date: <strong style="color: #ecd8a6;">${dateStr}</strong></div>
+        </div>
 
-    const measureElementHeight = (html: string): number => {
-      const div = document.createElement('div');
-      div.style.boxSizing = 'border-box';
-      div.style.width = '640px';
-      div.innerHTML = html;
-      measureContainer.appendChild(div);
-      const rect = div.getBoundingClientRect();
-      const h = rect.height;
-      measureContainer.removeChild(div);
-      return h;
-    };
+        <!-- Cards -->
+        ${cardsHtml}
 
-    const headerHtml = `
-      <div style="text-align: center; margin-bottom: 40px; width: 100%;">
-        <h1 style="font-size: 42px; letter-spacing: 4px; margin: 0 0 10px 0; color: #ecd8a6; font-family: 'Playfair Display', serif; font-weight: bold; text-shadow: 0 4px 20px rgba(236,216,166,0.2);">MADAME SOUL</h1>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-          <div style="height: 1px; width: 60px; background: linear-gradient(90deg, transparent, rgba(236,216,166,0.5));"></div>
-          <h2 style="font-size: 13px; letter-spacing: 6px; margin: 0; color: rgba(236,216,166,0.8); text-transform: uppercase; font-family: 'Playfair Display', serif;">Destiny Reading</h2>
-          <div style="height: 1px; width: 60px; background: linear-gradient(-90deg, transparent, rgba(236,216,166,0.5));"></div>
+        <!-- Reading Text -->
+        <div style="width: 100%; box-sizing: border-box; text-align: justify;">
+          ${cleanReading}
+        </div>
+
+        <!-- Ad 1 -->
+        ${ad1Html ? `<div id="pdf-single-ad1" style="width: 100%; box-sizing: border-box;">${ad1Html}</div>` : ''}
+
+        <!-- Ad 2 -->
+        ${ad2Html ? `<div id="pdf-single-ad2" style="width: 100%; box-sizing: border-box;">${ad2Html}</div>` : ''}
+
+        <!-- Footer -->
+        <div id="pdf-single-footer" style="width: 100%; box-sizing: border-box;">
+          ${footerHtml}
         </div>
       </div>
-      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(236,216,166,0.2); border-top: 1px solid rgba(236,216,166,0.2); padding: 12px 0; margin-bottom: 25px; color: rgba(236,216,166,0.7); font-family: sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; width: 100%;">
-        <div>Prepared For: <strong style="color: #ecd8a6;">${userInfo.name}</strong></div>
-        <div>Date: <strong style="color: #ecd8a6;">${dateStr}</strong></div>
-      </div>
-      ${cardsHtml}
     `;
 
-    // 1. Measure and store all elements
-    const elementsToPaginate: { html: string; height: number; type: string }[] = [];
-    
-    // Header block height
-    const headerHeight = measureElementHeight(headerHtml);
-    elementsToPaginate.push({ html: headerHtml, height: headerHeight, type: 'header' });
-
-    // Parse reading paragraphs
-    const parser = document.createElement('div');
-    parser.innerHTML = cleanReading;
-    Array.from(parser.children).forEach(el => {
-      const html = el.outerHTML;
-      const height = measureElementHeight(html);
-      elementsToPaginate.push({ html, height, type: 'paragraph' });
-    });
-
-    // Ad 1
-    if (adsConfig?.ad1?.enabled) {
-      const h = measureElementHeight(ad1Html);
-      elementsToPaginate.push({ html: ad1Html, height: h, type: 'ad1' });
-    }
-
-    // Ad 2
-    if (adsConfig?.ad2?.enabled) {
-      const h = measureElementHeight(ad2Html);
-      elementsToPaginate.push({ html: ad2Html, height: h, type: 'ad2' });
-    }
-
-    // Footer
-    const footHeight = measureElementHeight(footerHtml);
-    elementsToPaginate.push({ html: footerHtml, height: footHeight, type: 'footer' });
-
-    document.body.removeChild(measureContainer);
-
-    // 2. Distribute elements into pages
-    const pages: { html: string; type: string }[][] = [[]];
-    let currentPageHeight = 0;
-
-    for (let i = 0; i < elementsToPaginate.length; i++) {
-      const item = elementsToPaginate[i];
-      let itemHeight = item.height;
-      const margin = 20; // typical element margin gap
-
-      // If it is header, it always goes on page 1 first
-      if (item.type === 'header') {
-        pages[0].push({ html: item.html, type: item.type });
-        currentPageHeight += itemHeight;
-        continue;
-      }
-
-      // Look-ahead for orphan headings prevention (don't place heading at page end if paragraph overflows)
-      if (item.html.startsWith('<h') && i + 1 < elementsToPaginate.length) {
-        const nextItem = elementsToPaginate[i + 1];
-        if (currentPageHeight + itemHeight + nextItem.height + 40 > MAX_CONTENT_HEIGHT) {
-          // Break page before heading
-          pages.push([]);
-          pages[pages.length - 1].push({ html: item.html, type: item.type });
-          currentPageHeight = itemHeight;
-          continue;
-        }
-      }
-
-      if (currentPageHeight + itemHeight + margin > MAX_CONTENT_HEIGHT) {
-        pages.push([]);
-        pages[pages.length - 1].push({ html: item.html, type: item.type });
-        currentPageHeight = itemHeight;
-      } else {
-        pages[pages.length - 1].push({ html: item.html, type: item.type });
-        currentPageHeight += itemHeight + margin;
-      }
-    }
-
-    // ----------------------------------------------------
-    // Construct HTML DOM Structure for Rendering
-    // ----------------------------------------------------
     const container = document.createElement('div');
     container.style.position = 'absolute';
     container.style.top = '-9999px';
     container.style.left = '0';
     container.style.width = '800px';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = '0';
     container.style.zIndex = '-9999';
-
-    const renderPageHtml = (pageIndex: number, pageEls: { html: string; type: string }[]) => {
-      const elementsHtml = pageEls.map(el => {
-        if (el.type === 'ad1') {
-          return `<div id="page-${pageIndex}-ad1" style="width: 100%; box-sizing: border-box;">${el.html}</div>`;
-        }
-        if (el.type === 'ad2') {
-          return `<div id="page-${pageIndex}-ad2" style="width: 100%; box-sizing: border-box;">${el.html}</div>`;
-        }
-        if (el.type === 'footer') {
-          return `<div id="page-${pageIndex}-footer" style="width: 100%; box-sizing: border-box;">${el.html}</div>`;
-        }
-        return el.html;
-      }).join('\n');
-
-      return `
-        <div class="pdf-page" style="width: 800px; height: 1130px; box-sizing: border-box; padding: 75px 80px; position: relative; overflow: hidden; background: radial-gradient(circle at top center, rgba(30,19,50,0.4) 0%, rgba(5,0,10,1) 50%); border: 1px solid rgba(236,216,166,0.2); display: flex; flex-direction: column; justify-content: flex-start; gap: 0;">
-          <!-- Corner decorations -->
-          <div style="position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
-          <div style="position: absolute; top: 30px; right: 30px; width: 40px; height: 40px; border-top: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
-          <div style="position: absolute; bottom: 30px; left: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-left: 2px solid rgba(236,216,166,0.4);"></div>
-          <div style="position: absolute; bottom: 30px; right: 30px; width: 40px; height: 40px; border-bottom: 2px solid rgba(236,216,166,0.4); border-right: 2px solid rgba(236,216,166,0.4);"></div>
-          
-          <div style="width: 100%; display: flex; flex-direction: column; justify-content: flex-start; gap: 20px; font-size: 18px; line-height: 1.9; font-family: sans-serif; color: rgba(236, 216, 166, 0.95); text-align: justify;">
-            ${elementsHtml}
-          </div>
-        </div>
-      `;
-    };
-
-    container.innerHTML = pages.map((pageEls, idx) => renderPageHtml(idx, pageEls)).join('\n');
+    container.innerHTML = singlePageHtml;
     document.body.appendChild(container);
     
     // Wait for images to load completely
@@ -303,10 +191,11 @@ export const generatePDF = async ({
       });
     }));
 
-    // Calculate coordinate map for clickable regions relative to their page wrapper
-    const pageDivs = Array.from(container.querySelectorAll('.pdf-page'));
+    const singlePageEl = container.querySelector('#pdf-single-page') as HTMLElement;
+    const totalHeight = singlePageEl.getBoundingClientRect().height;
+
+    // Calculate coordinate map for clickable regions relative to singlePageEl wrapper
     interface ClickableLink {
-      pageIndex: number;
       url: string;
       x: number;
       y: number;
@@ -314,67 +203,59 @@ export const generatePDF = async ({
       h: number;
     }
     const clickableLinks: ClickableLink[] = [];
+    const pageRect = singlePageEl.getBoundingClientRect();
 
-    pageDivs.forEach((pageDiv, idx) => {
-      const pageRect = pageDiv.getBoundingClientRect();
-
-      // Ad 1 Click Box
-      if (adsConfig?.ad1?.enabled && adsConfig?.ad1?.link) {
-        const adEl = pageDiv.querySelector(`#page-${idx}-ad1`);
-        if (adEl) {
-          const rect = adEl.getBoundingClientRect();
-          clickableLinks.push({
-            pageIndex: idx,
-            url: adsConfig.ad1.link,
-            x: rect.left - pageRect.left,
-            y: rect.top - pageRect.top,
-            w: rect.width,
-            h: rect.height
-          });
-        }
-      }
-
-      // Ad 2 Click Box
-      if (adsConfig?.ad2?.enabled && adsConfig?.ad2?.link) {
-        const adEl = pageDiv.querySelector(`#page-${idx}-ad2`);
-        if (adEl) {
-          const rect = adEl.getBoundingClientRect();
-          clickableLinks.push({
-            pageIndex: idx,
-            url: adsConfig.ad2.link,
-            x: rect.left - pageRect.left,
-            y: rect.top - pageRect.top,
-            w: rect.width,
-            h: rect.height
-          });
-        }
-      }
-
-      // Footer Links Click Boxes
-      const footerEl = pageDiv.querySelector(`#page-${idx}-footer`);
-      if (footerEl) {
-        const links = Array.from(footerEl.querySelectorAll('a'));
-        links.forEach(link => {
-          const rect = link.getBoundingClientRect();
-          clickableLinks.push({
-            pageIndex: idx,
-            url: link.href,
-            x: rect.left - pageRect.left,
-            y: rect.top - pageRect.top,
-            w: rect.width,
-            h: rect.height
-          });
+    // Ad 1 Click Box
+    if (adsConfig?.ad1?.enabled && adsConfig?.ad1?.link) {
+      const adEl = singlePageEl.querySelector(`#pdf-single-ad1`);
+      if (adEl) {
+        const rect = adEl.getBoundingClientRect();
+        clickableLinks.push({
+          url: adsConfig.ad1.link,
+          x: rect.left - pageRect.left,
+          y: rect.top - pageRect.top,
+          w: rect.width,
+          h: rect.height
         });
       }
-    });
+    }
 
-    // ----------------------------------------------------
-    // Generate Paginated jsPDF Document
-    // ----------------------------------------------------
+    // Ad 2 Click Box
+    if (adsConfig?.ad2?.enabled && adsConfig?.ad2?.link) {
+      const adEl = singlePageEl.querySelector(`#pdf-single-ad2`);
+      if (adEl) {
+        const rect = adEl.getBoundingClientRect();
+        clickableLinks.push({
+          url: adsConfig.ad2.link,
+          x: rect.left - pageRect.left,
+          y: rect.top - pageRect.top,
+          w: rect.width,
+          h: rect.height
+        });
+      }
+    }
+
+    // Footer Links Click Boxes
+    const footerEl = singlePageEl.querySelector(`#pdf-footer`);
+    if (footerEl) {
+      const links = Array.from(footerEl.querySelectorAll('a'));
+      links.forEach(link => {
+        const rect = link.getBoundingClientRect();
+        clickableLinks.push({
+          url: link.href,
+          x: rect.left - pageRect.left,
+          y: rect.top - pageRect.top,
+          w: rect.width,
+          h: rect.height
+        });
+      });
+    }
+
+    // Generate Single Page jsPDF Document
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
-      format: [PAGE_WIDTH, PAGE_HEIGHT]
+      format: [PAGE_WIDTH, totalHeight]
     });
 
     // Register and set Roboto font for Turkish character support
@@ -382,34 +263,25 @@ export const generatePDF = async ({
     pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
     pdf.setFont('Roboto');
 
-    for (let idx = 0; idx < pageDivs.length; idx++) {
-      if (idx > 0) {
-        pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-      }
+    const canvas = await html2canvas(singlePageEl, {
+      scale: 2, // retina quality sharpness
+      backgroundColor: '#05000a',
+      useCORS: true,
+      allowTaint: false,
+      logging: false
+    });
 
-      const pageDiv = pageDivs[idx] as HTMLElement;
+    const imgData = canvas.toDataURL('image/png', 1.0);
 
-      const canvas = await html2canvas(pageDiv, {
-        scale: 2, // retina quality sharpness
-        backgroundColor: '#05000a',
-        useCORS: true,
-        allowTaint: false,
-        logging: false
-      });
+    // Reset fill and draw page backdrop
+    pdf.setFillColor('#05000a');
+    pdf.rect(0, 0, PAGE_WIDTH, totalHeight, 'F');
+    pdf.addImage(imgData, 'PNG', 0, 0, PAGE_WIDTH, totalHeight);
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
-
-      // Reset fill and draw page backdrop
-      pdf.setFillColor('#05000a');
-      pdf.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F');
-      pdf.addImage(imgData, 'PNG', 0, 0, PAGE_WIDTH, PAGE_HEIGHT);
-
-      // Inject clickable area boxes for this specific page index
-      const pageLinks = clickableLinks.filter(l => l.pageIndex === idx);
-      pageLinks.forEach(link => {
-        pdf.link(link.x, link.y, link.w, link.h, { url: link.url });
-      });
-    }
+    // Inject clickable area boxes
+    clickableLinks.forEach(link => {
+      pdf.link(link.x, link.y, link.w, link.h, { url: link.url });
+    });
 
     // Remove hidden measuring container
     document.body.removeChild(container);

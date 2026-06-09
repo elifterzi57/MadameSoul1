@@ -6,22 +6,30 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **73** | Açık: **3** | Tamamlanan: **70**
+Toplam Bilet: **80** | Açık: **0** | Tamamlanan: **80**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Atanan (Assignee) | Hedef Dosya |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-186**](#-ms-186) | Analytics / CRM | Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu | Orta | Amelia | `App.tsx`, `server.ts` |
-| [**MS-187**](#-ms-187) | Feature / AI Quality | Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü | Orta | Amelia | `App.tsx`, `Profile.tsx`, `firestore.rules` |
-| [**MS-191**](#-ms-191) | UX / UI / Bug | PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması | Yüksek | Amelia | `src/utils/pdfGenerator.ts` |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-186**](#-ms-186) | Analytics / CRM | Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu | Orta | Kullanıcı belgesine giriş, uygulama başlangıcı ve profil güncellemesinde timezone, deviceInfo, appVersion verileri yazıldı. Stripe ve mock ödemelerde LTV değeri yapılan harcama miktarı oranında kümülatif olarak artırıldı. | Winston |
+| [**MS-187**](#-ms-187) | Feature / AI Quality | Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü | Orta | Tarot yorum sonucunun altına ve profil geçmişi detaylarına mor/altın temalı 5 yıldızlı derecelendirme ve yorum widget'ları eklendi. Feedback verileri `ai_feedback` koleksiyonuna yazıldı. | Winston |
+| [**MS-191**](#-ms-191) | UX / UI / Bug | PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması | Yüksek | PDF üretimindeki element ölçümleme ve çoklu sayfa sayfalandırma mantığı kaldırılarak dikeyde tek ve kesintisiz uzun sayfa formatına geçildi. | Sally |
+| [**MS-206**](#-ms-206) | UX / UI | Giriş Ekranı Dil Seçimi ve Uygulama Tanıtımı Butonlarının Konum ve Biçim Değişimi | Düşük | Hem E-posta hem de Telefon formunda Dil Seçimi ve Tanıtım butonlarının konumları ve stilleri yer değiştirildi. | Sally |
+| [**MS-208**](#-ms-208) | Bug / UX | PDF Tek Sayfa Formatına Geri Dönüş Çalışmasının Yenilenmesi ve Düzeltilmesi | Yüksek | Tek sayfa PDF çıktısında reklam ve footer linklerinin tıklanabilir alan koordinatları (pdf.link) tek sayfa yapısına göre dinamik hesaplanacak şekilde düzeltildi. | Sally |
+| [**MS-207**](#-ms-207) | Feature / Admin | Yönetim Paneline Gemini API Bağlantı Testi (Health Check) Arayüzü ve Sunucu Kontrolü Entegrasyonu | Yüksek | GET `/api/admin/test-gemini` uç noktası tanımlanarak aktif Gemini modeli üzerinden ping testi yapıldı; Sistem Ayarları içerisine test butonu, yüklenme animasyonu ve hata/başarı durum göstergeleri eklendi. | Amelia |
+| [**MS-202**](#-ms-202) | Legal / PM | Giriş Sonrası KVKK/Sözleşme Onayı - Yasal ve Ürün Gereksinimleri | Yüksek | Girişteki zorunlu onay kutusu kaldırıldı, oturum açtıktan sonra ilk girişte onay modalı üzerinden yasal onay alınacak şekilde akış güncellendi. | John |
+| [**MS-203**](#-ms-203) | UX / UI | Giriş Sonrası KVKK/Sözleşme Onay Modalı Tasarımı ve Örtük Onay Altbilgisi | Yüksek | Giriş ekranı butonlarının altına örtük onay metni eklendi; başarılı giriş sonrasında gösterilen mor-siyah glassmorphic, kaydırılabilir ve animasyonlu sözleşme onay modalı tasarlandı. | Sally |
+| [**MS-204**](#-ms-204) | Architecture / DB | KVKK/Sözleşme Onay Durumu Firestore Veri Şeması ve Güvenlik Kuralları Güncellemesi | Yüksek | `users` belgesinde yasal onay alanları tanımlandı; `firestore.rules` kuralları güncellenerek bu alanların güvenli şekilde güncellenebilmesi sağlandı. | Winston |
+| [**MS-205**](#-ms-205) | Feature / Dev | Giriş Sonrası KVKK/Sözleşme Onayı Wrapper ve Firestore Entegrasyonu | Yüksek | Girişteki checkbox mantığı kaldırıldı; global Zustand store ve `App.tsx` entegrasyonu ile eksik onay durumunda `TermsModal` gösterilerek onay alındığında Firestore'a güncellenmesi sağlandı. | Amelia |
+| [**MS-209**](#-ms-209) | Task / Infra | Backlog Biletlerinin GitHub Kanban Panosuna Taşınması | Yüksek | Tüm geçmiş backlog biletleri parse edilerek GitHub'daki MadameSoulKanban projesine otomatik aktarıldı ve geçiş tamamlandı. | Amelia |
 | [**MS-101**](#-ms-101) | Bug | Profil Bilgisi Durum Senkronizasyon Hatası | En Yüksek | `App.tsx` içindeki `onUpdateUserInfo` handler'ı güncellendi ... | Sally |
 | [**MS-102**](#-ms-102) | Task | Okuma Paragrafları ve Uzun Metinler İçin Okunabilir Tipografi Hiyerarşisi | Orta | `index.css` dosyasında Google Fonts `Inter` yazı tipi içe aktarıldı, `--font-sans` Inter olarak değiştirildi, gövde metinlerine line-height: 1.8 verildi. | Sally |
 | [**MS-104**](#-ms-104) | Task | Tarayıcı `alert()` Yapısının Özel Modal/Toast ile Değiştirilmesi | Orta | `App.tsx` dosyasında mor/altın temalı `toast` ve `showToast` ile `alert()` değiştirildi. | Sally |
@@ -107,38 +115,6 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ---
 
-### ⏳ MS-186: Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu (Analytics / CRM)
-
-* **Öncelik:** Orta (Medium)
-* **Durum:** ⏳ Yapılacak (To Do)
-* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Kullanıcı İlişkileri Yönetimi (CRM) ve Analitik
-* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
-* **Açıklama:**  
-  Uygulamanın pazarlama, bildirim gönderme ve kullanıcı segmentasyonu çalışmalarında elimizi güçlendirmek amacıyla; kullanıcıların saat dilimleri, tarayıcı/cihaz bilgileri, uygulama sürümleri ve o güne kadarki satın alımlarının toplamı (LTV) Firestore'daki kullanıcı belgesinde tutulmalıdır.
-* **Kabul Kriterleri:**
-  1. Kullanıcı kaydolurken veya profil güncellediğinde, tarayıcının saat dilimi (`Intl.DateTimeFormat().resolvedOptions().timeZone`) ve işletim sistemi bilgileri `users` belgesinde `timezone` ve `deviceInfo` (cihaz markası/işletim sistemi) alanlarında güncellenmelidir.
-  2. Stripe ödemesi başarıyla tamamlandığında (`server.ts` webhook veya completed payment adımı), kullanıcının `users` belgesinde `lifetimeValue` (toplam harcama tutarı) alanı güncellenerek kümülatif olarak artırılmalıdır.
-  3. Uygulama açılışında kullanıcının kullandığı güncel uygulama versiyonu (`appVersion`) `users` belgesine yazılarak eski sürüm kullanan istemcilerin tespiti kolaylaştırılmalıdır.
-
----
-
-### ⏳ MS-187: Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü (Feature / AI Quality)
-
-* **Öncelik:** Orta (Medium)
-* **Durum:** ⏳ Yapılacak (To Do)
-* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Kullanıcı Deneyimi ve YZ Kalite Kontrolü
-* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules)
-* **Açıklama:**  
-  Yapay zeka tarafından üretilen tarot yorumlarının kalitesini ve kullanıcı memnuniyetini ölçmek amacıyla, fal sonucunun altında mini bir değerlendirme (Thumbs Up / Thumbs Down veya 5 yıldız) arayüzü kurulmalı ve bu geri bildirimler Firestore'da analiz edilmek üzere kaydedilmelidir.
-* **Kabul Kriterleri:**
-  1. Fal sonucu gösterildiğinde ve profil sayfasındaki eski fal detaylarında, kullanıcının bu yorumu puanlayabilmesi için tıklanabilir butonlar eklenmelidir.
-  2. Geri bildirimler `ai_feedback` adında yeni bir Firestore koleksiyonunda saklanmalı; `transactionId`, `userId`, `rating` (puan/beğeni), `comment` (varsa kullanıcının yazdığı not) ve `createdAt` alanları bulunmalıdır.
-  3. Güvenlik kuralları (`firestore.rules`) kullanıcının sadece kendi işlemlerine ait puanlama yapabilmesini sağlayacak şekilde düzenlenmelidir.
-
 ---
 
 ### ✅ MS-188: Yönetim Paneli (Admin Panel) Tek Sayfa Akordeon Düzeni ve Ayar Arama Özelliği (UX / UI)
@@ -180,45 +156,139 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   3. Yönetim panelinin en üstünde veya alt bilgi alanında (footer/header) son yapılan değişikliğini gösteren bir bilgi satırı yer almalıdır: *"[E-posta], [Tarih/Saat] tarihinde [Ayar Adı] ayarını [Eski Değer] değerinden [Yeni Değer] değerine güncelledi."*
 
 ---
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston
+* **Çözüm:** `config_logs` koleksiyonu kuruldu, panelde canlı değişiklik takibi eklendi.
 
 ### ✅ MS-190: Yönetim Paneli Çift Yönlü (+/-) Bakiye Arayüzü, Onay Modalı ve Marka Entegrasyonu (Feature)
+  Giriş ekranında yer alan "Dil Seçimi" (Language Selector) butonu ile "Uygulama Tanıtımını Gör" (Show Onboarding) butonunun hem konumları hem de görsel biçimleri (tasarımları) yer değiştirilecektir.
+  - Yeni düzende "Dil Seçimi" butonu, eskiden onboarding butonunun olduğu üst sırada yer alacak ve onun gibi geniş (`w-full`), kenarlıklı (`border border-transparent hover:border-[#ecd8a6]/10 rounded-xl`) ve dolgulu (`py-3.5`) bir blok buton görünümünde olacaktır.
+  - "Uygulama Tanıtımını Gör" butonu ise eski dil seçim butonunun olduğu en alt satırda yer alacak ve onun gibi ortalanmış, daha küçük ve sade bir tasarımda (`px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest`) olacaktır.
+* **Kabul Kriterleri:**
+  1. Hem E-posta ile Giriş formunda hem de Telefon ile Giriş formunda ilgili iki butonun konumları yer değiştirmelidir.
+  2. Dil Seçimi butonu, eskiden onboarding butonunun sahip olduğu sınıf tanımlarına (`w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl`) sahip olmalı ve Globe ikonunu içermelidir. Açılır dil menüsü (dropdown) bu butona tıklandığında yine düzgün bir şekilde hizalanıp açılmalıdır.
+  3. Uygulama Tanıtımını Gör butonu, eskiden dil seçimi butonunun sahip olduğu sınıf tanımlarına (`flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest`) sahip olmalı ve RefreshCw ikonunu (hover edildiğinde dönme animasyonuyla birlikte) içermelidir.
+  4. Değişiklikler sonrası her iki butonun da işlevselliği (dil değiştirme ve onboarding ekranını açma) eksiksiz çalışmalıdır.
+
+---
+
+### ✅ MS-207: Yönetim Paneline Gemini API Bağlantı Testi (Health Check) Arayüzü ve Sunucu Kontrolü Entegrasyonu (Feature / Admin)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Yönetici Paneli & Sistem Parametreleri
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Çözüm Özeti:**  
+  GET `/api/admin/test-gemini` uç noktası tanımlanarak aktif Gemini modeli üzerinden ping testi yapıldı; Sistem Ayarları içerisine test butonu, yüklenme animasyonu ve hata/başarı durum göstergeleri eklendi.
+* **Açıklama:**  
+  Kullanıcıların fal yorumu alırken "Mistik bir enerji akışı kesintiye uğradı" hatasıyla karşılaşması durumunda, bunun Gemini API kaynaklı (bakiye, model sürümü, kota, geçici kesinti vb.) olup olmadığını tespit etmek amacıyla, yönetim paneline canlı bağlantı testi (ping) arayüzü kurulacaktır.
+* **Kabul Kriterleri:**
+  1. Sunucu tarafında (`server.ts`) sadece admin/çalışanların yetkiyle erişebileceği `GET /api/admin/test-gemini` veya `GET /api/admin/system-configs/test-gemini` uç noktası kurulmalıdır. Bu uç nokta, o an yapılandırılmış aktif Gemini modeline basit bir deneme isteği gönderip sonucu (Success/Failure, Latency ve hata detayı) dönmelidir.
+  2. Yönetim panelinin "Sistem Ayarları" (System Configs) akordeon bölümünün içerisine, "Gemini API Bağlantısını Test Et" (Test Gemini Connection) butonu eklenmelidir.
+  3. Butona tıklandığında istek atılmalı, başarılı olursa yeşil renkte başarılı mesajı ve gecikme süresi (latency) gösterilmeli; başarısız olursa kırmızı renkte sunucudan dönen ham hata mesajı arayüzde gösterilmelidir.
+
+---
+
+
+### ✅ MS-202: Giriş Sonrası KVKK/Sözleşme Onayı - Yasal ve Ürün Gereksinimleri (Legal / PM)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** John (📋 Product Manager / `bmad-agent-pm`)
+* **Atanan (Assignee):** John (📋 Product Manager / `bmad-agent-pm`)
+* **Bileşen:** Yasal Uyum ve Ürün Akış Yönetimi
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx)
+* **Açıklama:**  
+  Kullanıcıların giriş/kayıt süreci öncesinde yasal metin onay kutusunu işaretlemek zorunda kalmasının yarattığı sürtünmeyi ortadan kaldırmak için, bu onayın oturum açıldıktan sonra ilk girişte alınması sağlanmalıdır. KVKK/GDPR uyumluluğu açısından, kullanıcının bu izni verdiği zaman damgasıyla birlikte loglanmalıdır.
+* **Çözüm Özeti:**  
+  Girişteki zorunlu yasal onay kutusu kaldırılarak giriş butonları doğrudan etkinleştirilmiştir. Kullanıcı başarılı bir şekilde giriş yaptıktan sonra veritabanı kontrolüyle yasal izni yoksa TermsModal üzerinden engelleyici yasal onay alınarak zaman damgasıyla kaydedilmektedir.
+* **Kabul Kriterleri:**
+  1. Giriş ekranında explicit (açık) checkbox zorunluluğu kaldırılarak giriş butonları doğrudan aktif hale getirilmelidir.
+  2. Giriş/kayıt butonlarının altına implicit (örtük) onay metni eklenmeli ve ilgili yasal metin linkleri verilmelidir.
+  3. Kullanıcı giriş yaptıktan sonra eğer ilk girişi ise veya daha önce onay vermediyse, yasal metinleri onaylamadan uygulamayı kullanması engellenmelidir.
+  4. Onay loglama yapısının yasal gerekliliklere (KVKK/GDPR) uygunluğu denetlenmelidir.
+
+---
+
+### ✅ MS-203: Giriş Sonrası KVKK/Sözleşme Onay Modalı Tasarımı ve Örtük Onay Altbilgisi (UX / UI)
 
 * **Öncelik:** Yüksek (High)
 * **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Admin Paneli & Tipografi
-* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Atanan (Assignee):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Bileşen:** Kullanıcı Deneyimi ve Arayüz Tasarımı
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx)
 * **Açıklama:**  
-  Kullanıcı bakiyelerinin (Katina Moon) yönetim panelinden değiştirilmesi esnasında yanlış işlemlerin önlenmesi amacıyla bakiye değişikliği için komut sistemi yerine, kullanıcı adı/e-posta ve tanımlanacak miktar alanlarından oluşan çift yönlü (+/-) bir arayüz tasarlanmalıdır. İşlem öncesi onay modalı çıkartılmalı ve her işlem detaylıca loglanmalıdır. Ayrıca panel genelinde MadameSoul tipografi kuralları (Cinzel ve Inter yazı tipleri) ve marka kimliğini yansıtan `KatinaMoon` ikonu entegre edilmelidir.
+  Giriş sayfasındaki estetik dışı checkbox'ın kaldırılmasının ardından, ilk girişte tetiklenecek mistik, premium ve estetik standartlarımıza uygun bir sözleşme onay modalı tasarlanmalı ve giriş ekranı altbilgisi düzenlenmelidir.
+* **Çözüm Özeti:**  
+  Giriş butonlarının altına MadameSoul tasarım diline uygun, parıldayan ince yasal örtük onay metni eklenmiştir. Giriş sonrası görüntülenecek altın varaklı, koyu mor/siyah degrade arka planlı, cam efektli (glassmorphic), kaydırılabilir yasal metinli ve animasyonlu "Onayla ve Devam Et" butonuna sahip TermsModal bileşeni tasarlanıp hayata geçirilmiştir.
 * **Kabul Kriterleri:**
-  1. Kullanıcı arandıktan sonra bakiye güncelleme alanı olarak bir miktar girdisi (`input type="number"`) ve bu miktarı eklemeyi veya çıkarmayı belirleyen çift yönlü (+ / -) bir arayüz seçeneği bulunmalıdır. Yanlış girilen bakiyeleri azaltmak için negatif değer veya "Azalt" seçeneği aktif çalışmalıdır.
-  2. "Bakiyeyi Güncelle" butonuna basıldığında doğrudan veritabanına yazılmamalı, ekranda onay modalı (uyarı penceresi) açılmalıdır: *"Bu kullanıcının bakiyesini [X] Moon [artırmayı/azaltmayı] onaylıyor musunuz?"*. Onaylandıktan sonra işlem yürütülmelidir.
-  3. Bakiye değişiklikleri `moon_transactions` tablosuna şu detaylı log verileriyle yazılmalıdır:
-     - `performedBy`: İşlemi yapan personelin e-postası/ID'si.
-     - `targetUser`: İşlem uygulanan kullanıcının bilgileri.
-     - `amount`: Değişim miktarı (+X veya -X).
-     - `createdAt`: İşlem zamanı.
-  4. Yönetim paneli başlığında ve butonlarda uygulamanın `KatinaMoon` marka ikonu kullanılmalıdır.
-  5. Yönetim panelindeki tüm yazılar, butonlar ve form etiketleri MadameSoul tipografi standardına (Cinzel ve Inter yazı tipleri, index.html içerisine import edilerek) tamamen uymalıdır.
+  1. Giriş ekranı altına, MadameSoul tasarım diliyle uyumlu, parlayan ince font ile *"Giriş yaparak Kullanıcı Sözleşmesi ve Gizlilik Politikası'nı kabul etmiş olursunuz"* ibaresi eklenmelidir.
+  2. Başarılı giriş sonrasında görüntülenecek altın varak kenarlıklı, koyu mor ve siyah geçişli, yarı saydam (glassmorphic) bir "KVKK Açık Rıza ve Kullanıcı Sözleşmesi" modalı tasarlanmalıdır.
+  3. Modal içerisinde sözleşme metinleri kolayca kaydırılabilir (scrollable) ve okunabilir bir yapıda sunulmalıdır.
+  4. "Onayla ve Devam Et" butonu belirgin, mistik ve animasyonlu (hover/active micro-interactions) olmalıdır.
 
 ---
 
-### ⏳ MS-191: PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması (UX / UI / Bug)
+### ✅ MS-204: KVKK/Sözleşme Onay Durumu Firestore Veri Şeması ve Güvenlik Kuralları Güncellemesi (Architecture / DB)
 
 * **Öncelik:** Yüksek (High)
-* **Durum:** ⏳ Yapılacak (To Do)
-* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** PDF Üretim Modülü
-* **Hedef Dosya:** [pdfGenerator.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/utils/pdfGenerator.ts)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Bileşen:** Veritabanı ve Güvenlik Altyapısı
+* **Hedef Dosya:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
 * **Açıklama:**  
-  Kullanıcıların tarot okuma sonuçlarını PDF olarak indirmesini sağlayan modülde yapılan son çoklu sayfa sayfalandırma (pagination) geliştirilmesi beğenilmemiştir. Sayfa sınırlarının hesaplanması, başlıkların bölünmesi ve reklamların sayfalara dağıtılması yerine, PDF çıktısının eskisi gibi tek bir uzun sayfa (continuous single-page canvas) formatına geri döndürülmesi istenmektedir.
+  Onay durumunun veri tabanında tutarlı saklanması, yetkisiz yazma işlemlerine karşı korunması ve gelecekteki olası sözleşme güncellemeleri için versiyonlama altyapısının kurulması gerekmektedir.
+* **Çözüm Özeti:**  
+  Firestore `users` belgesinde `termsAccepted: boolean`, `termsAcceptedAt: Timestamp` ve `termsVersion: string` veri alanları tanımlanmış; `firestore.rules` güncellenerek kullanıcıların bu alanları sadece kendileri için ve geçerli tiplerle/koşullarla yazabileceği güvenlik kuralları eklenmiştir.
 * **Kabul Kriterleri:**
-  1. `src/utils/pdfGenerator.ts` dosyasında yer alan element ölçme (`measureElementHeight`), sayfalandırma hesaplamaları (`pages.push`, `look-ahead for orphan headings`) ve birden fazla sayfa oluşturma (`pdf.addPage`) mantığı kaldırılmalıdır.
-  2. PDF çıktısı, tek bir geniş ve dinamik uzunluğa sahip canvas üzerinden tek sayfa olarak çizilmelidir. Canvas'ın yüksekliği, içeriklerin (Header, Kartlar, Yorum Metni, Reklamlar ve Footer) toplam yüksekliğine göre dinamik olarak hesaplanmalıdır.
-  3. Tıklanabilir reklam ve footer linklerinin koordinatları, tek sayfa yapısına uygun olacak şekilde dinamik olarak ayarlanmalı ve jsPDF `pdf.link(...)` ile doğru yerlere yerleştirilmelidir.
-  4. PDF çıktısının dikeyde tek ve kesintisiz bir akış sunduğu, taşma veya dikey hizalama boşlukları içermediği doğrulanmalıdır.
+  1. Firestore `users` belgesinde `termsAccepted: boolean`, `termsAcceptedAt: Timestamp` ve `termsVersion: string` alanlarının şeması tanımlanmalı ve belgelenmelidir.
+  2. `firestore.rules` güncellenerek kullanıcıların bu alanları sadece kendi belgelerinde ve geçerli verilerle güncelleyebilmesi güvenceye alınmalıdır.
+  3. Gelecekte sözleşme güncellendiğinde tüm kullanıcılara tekrar onay modalı göstermeyi sağlayacak versiyon kontrol mekanizması (Örn: "1.0.0") veri şemasına dahil edilmelidir.
+
+---
+
+### ✅ MS-205: Giriş Sonrası KVKK/Sözleşme Onayı Wrapper ve Firestore Entegrasyonu (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Giriş / Kullanıcı Akış Mantığı
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [useAppStore.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/store/useAppStore.ts)
+* **Açıklama:**  
+  Tasarım ve mimari gereksinimleri bir araya getirerek, giriş sayfasındaki mantıksal engelleri kaldırmak, oturum açtıktan sonra veritabanı sorgusuna göre modalı tetiklemek ve onay durumunu Firestore'a yazmak üzere kodlama yapılmalıdır.
+* **Çözüm Özeti:**  
+  `Login.tsx` dosyasındaki explicit onay kutuları ve buton engellemeleri kaldırılmıştır. `App.tsx`'te kullanıcı Firestore belgesindeki `termsAccepted` ve `termsVersion` verilerini global Zustand store'a eşitleyecek mantık kurulmuştur. Eğer bu alanlar eksikse veya versiyon "1.0.0" değilse modal ekranda kilitlenmekte, modal onaylandığında Firestore'a güncel veriler yazılıp store güncellenerek modal akıcı şekilde kapatılmaktadır.
+* **Kabul Kriterleri:**
+  1. `src/components/Login.tsx` dosyasında butondaki `!consentAccepted` bağımlılıkları temizlenmeli, Google/Apple login fonksiyonlarındaki checkbox kontrolü kaldırılmalıdır.
+  2. `App.tsx` veya ilgili dashboard katmanında, oturum açmış kullanıcının `termsAccepted` durumunu kontrol eden ve eksikse Sally'nin tasarladığı onay modalını ekranda kilitleyen bir sarmalayıcı (wrapper) entegre edilmelidir.
+  3. Modal onaylandığında, Firestore'daki kullanıcı belgesine `termsAccepted: true`, `termsAcceptedAt: serverTimestamp()` ve `termsVersion: "1.0.0"` verileri `updateDoc` ile atomik olarak yazılmalıdır.
+  4. Başarılı yazma işleminden sonra global Zustand state güncellenmeli ve modal anında, akıcı bir animasyonla kaybolmalıdır.
+
+---
+
+### ✅ MS-209: Backlog Biletlerinin GitHub Kanban Panosuna Taşınması (Task / Infra)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Altyapı ve Proje Yönetimi
+* **Hedef Dosya:** [jira_tickets.md](file:///Users/elifterzi/antigravity/MadameSoul/docs/backlog/jira_tickets.md), [sync_backlog.js](file:///Users/elifterzi/antigravity/MadameSoul/scripts/sync_backlog.js)
+* **Açıklama:**  
+  MadameSoul projesinde yer alan tüm geçmiş backlog biletlerinin GitHub Kanban projesi (`MadameSoulKanban`) üzerine aktarılması ve bundan sonraki süreçlerin GitHub Projects üzerinden yürütülmesi amacıyla bu geçiş görevinin yerine getirilmesi.
+* **Çözüm Özeti:**  
+  `docs/backlog/jira_tickets.md` dosyasındaki tüm geçmiş biletleri okuyup parse eden bir Node.js betiği yazıldı. Classic PAT kullanılarak GitHub GraphQL API üzerinden projenin ID'si tespit edildi. Her bir bilet, `elifterzi57/MadameSoulStudio` deposunda gerçek bir Issue olarak açıldı ve ardından `MadameSoulKanban` projesine otomatik olarak bağlandı. Son olarak, bu taşıma görevi için de otomatik bir kart oluşturulup geçiş tamamlandıktan sonra kapatıldı.
+* **Kabul Kriterleri:**
+  1. `docs/backlog/jira_tickets.md` üzerindeki tüm tamamlanmış ve açık biletler (toplam 85 adet) parse edilmelidir.
+  2. Her bilet için `elifterzi57/MadameSoulStudio` üzerinde bir GitHub Issue açılmalıdır.
+  3. Açılan tüm Issues'lar GitHub GraphQL API kullanılarak `MadameSoulKanban` projesine otomatik olarak eklenmeli/bağlanmalıdır.
+  4. Geçişin kendisi için de bir bilet oluşturulup, geçiş bittiğinde bu bilet otomatik olarak "Closed" yapılmalıdır.
 
 ---
 
@@ -299,6 +369,103 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   3. Proje derleme (`npm run build`) ve testlerin (`npm run test` ve `npm run test:e2e`) hatasız çalıştığı doğrulanmalıdır.
 
 * **Çözüm:** `docs/architecture/data-models.md` dosyasından `promo_codes` ve `reading_cache` koleksiyon tanımları kaldırıldı. Express sunucusundaki `/api/generate` rotasından önbellek okuma/yazma işlemleri temizlendi.
+
+---
+
+## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-186: Kullanıcı Dil Seçimi, Saat Dilimi, Cihaz Bilgisi ve Yaşam Boyu Değer (LTV) Takip Entegrasyonu (Analytics / CRM)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı İlişkileri Yönetimi (CRM) ve Analitik
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Uygulamanın pazarlama, bildirim gönderme ve kullanıcı segmentasyonu çalışmalarında elimizi güçlendirmek amacıyla; kullanıcıların saat dilimleri, tarayıcı/cihaz bilgileri, uygulama sürümleri ve o güne kadarki satın alımlarının toplamı (LTV) Firestore'daki kullanıcı belgesinde tutulmalıdır.
+* **Kabul Kriterleri:**
+  1. Kullanıcı kaydolurken veya profil güncellediğinde, tarayıcının saat dilimi (`Intl.DateTimeFormat().resolvedOptions().timeZone`) ve işletim sistemi bilgileri `users` belgesinde `timezone` ve `deviceInfo` (cihaz markası/işletim sistemi) alanlarında güncellenmelidir.
+  2. Stripe ödemesi başarıyla tamamlandığında (`server.ts` webhook veya completed payment adımı), kullanıcının `users` belgesinde `lifetimeValue` (toplam harcama tutarı) alanı güncellenerek kümülatif olarak artırılmalıdır.
+  3. Uygulama açılışında kullanıcının kullandığı güncel uygulama versiyonu (`appVersion`) `users` belgesine yazılarak eski sürüm kullanan istemcilerin tespiti kolaylaştırılmalıdır.
+* **Çözüm:** Kullanıcı belgesine signup (Login.tsx), app open (App.tsx) ve profil güncellemesinde (Profile.tsx) `timezone`, `deviceInfo` ve `appVersion` verileri yazıldı. Stripe ve mock ödemelerde (server.ts completePayment) `lifetimeValue` değeri yapılan harcama miktarı oranında kümülatif olarak artırıldı.
+
+---
+
+### ✅ MS-187: Tarot Yorumları İçin Kullanıcı Değerlendirme (Feedback) ve Prompt Memnuniyet Ölçümü Modülü (Feature / AI Quality)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Kullanıcı Deneyimi ve YZ Kalite Kontrolü
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/App.tsx), [Profile.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Profile.tsx), [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules)
+* **Açıklama:**  
+  Yapay zeka tarafından üretilen tarot yorumlarının kalitesini ve kullanıcı memnuniyetini ölçmek amacıyla, fal sonucunun altında mini bir değerlendirme (Thumbs Up / Thumbs Down veya 5 yıldız) arayüzü kurulmalı ve bu geri bildirimler Firestore'da analiz edilmek üzere kaydedilmelidir.
+* **Kabul Kriterleri:**
+  1. Fal sonucu gösterildiğinde ve profil sayfasındaki eski fal detaylarında, kullanıcının bu yorumu puanlayabilmesi için tıklanabilir butonlar eklenmelidir.
+  2. Geri bildirimler `ai_feedback` adında yeni bir Firestore koleksiyonunda saklanmalı; `transactionId`, `userId`, `rating` (puan/beğeni), `comment` (varsa kullanıcının yazdığı not) ve `createdAt` alanları bulunmalıdır.
+  3. Güvenlik kuralları (`firestore.rules`) kullanıcının sadece kendi işlemlerine ait puanlama yapabilmesini sağlayacak şekilde düzenlenmelidir.
+* **Çözüm:** Tarot yorum sonucunun altına (App.tsx) ve profil geçmişi detaylarına (Profile.tsx) mor/altın temalı 5 yıldızlı derecelendirme ve yorum widget'ları eklendi. Feedback verileri `ai_feedback` koleksiyonuna yazıldı ve `firestore.rules` güncellenerek güvenlik sağlandı.
+
+---
+
+### ✅ MS-191: PDF Çoklu Sayfa Sayfalandırma (Pagination) Geliştirmesinin Geri Alınması (UX / UI / Bug)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** PDF Üretim Modülü
+* **Hedef Dosya:** [pdfGenerator.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/utils/pdfGenerator.ts)
+* **Açıklama:**  
+  Kullanıcıların tarot okuma sonuçlarını PDF olarak indirmesini sağlayan modülde yapılan son çoklu sayfa sayfalandırma (pagination) geliştirilmesi beğenilmemiştir. Sayfa sınırlarının hesaplanması, başlıkların bölünmesi ve reklamların sayfalara dağıtılması yerine, PDF çıktısının eskisi gibi tek bir uzun sayfa (continuous single-page canvas) formatına geri döndürülmesi istenmektedir.
+* **Kabul Kriterleri:**
+  1. `src/utils/pdfGenerator.ts` dosyasında yer alan element ölçme (`measureElementHeight`), sayfalandırma hesaplamaları (`pages.push`, `look-ahead for orphan headings`) ve birden fazla sayfa oluşturma (`pdf.addPage`) mantığı kaldırılmalıdır.
+  2. PDF çıktısı, tek bir geniş ve dinamik uzunluğa sahip canvas üzerinden tek sayfa olarak çizilmelidir. Canvas'ın yüksekliği, içeriklerin (Header, Kartlar, Yorum Metni, Reklamlar ve Footer) toplam yüksekliğine göre dinamik olarak hesaplanmalıdır.
+  3. Tıklanabilir reklam ve footer linklerinin koordinatları, tek sayfa yapısına uygun olacak şekilde dinamik olarak ayarlanmalı ve jsPDF `pdf.link(...)` ile doğru yerlere yerleştirilmelidir.
+  4. PDF çıktısının dikeyde tek ve kesintisiz bir akış sunduğu, taşma veya dikey hizalama boşlukları içermediği doğrulanmalıdır.
+* **Çözüm:** `src/utils/pdfGenerator.ts` dosyasında çoklu sayfaya bölme ve sayfa ölçümleme mantığı tamamen kaldırılarak tüm içeriklerin sığacağı dikeyde tek ve kesintisiz uzun sayfa (continuous single-page canvas) formatına dönüldü.
+
+---
+
+### ✅ MS-206: Giriş Ekranı Dil Seçimi ve Uygulama Tanıtımı Butonlarının Konum ve Biçim Değişimi (UX / UI)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Giriş Ekranı Arayüzü (Login UI)
+* **Hedef Dosya:** [Login.tsx](file:///Users/elifterzi/antigravity/MadameSoul/src/components/Login.tsx)
+* **Açıklama:**  
+  Giriş ekranında yer alan "Dil Seçimi" (Language Selector) butonu ile "Uygulama Tanıtımını Gör" (Show Onboarding) butonunun hem konumları hem de görsel biçimleri (tasarımları) yer değiştirilecektir.
+  - Yeni düzende "Dil Seçimi" butonu, eskiden onboarding butonunun olduğu üst sırada yer alacak ve onun gibi geniş (`w-full`), kenarlıklı (`border border-transparent hover:border-[#ecd8a6]/10 rounded-xl`) ve dolgulu (`py-3.5`) bir blok buton görünümünde olacaktır.
+  - "Uygulama Tanıtımını Gör" butonu ise eski dil seçim butonunun olduğu en alt satırda yer alacak ve onun gibi ortalanmış, daha küçük ve sade bir tasarımda (`px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest`) olacaktır.
+* **Kabul Kriterleri:**
+  1. Hem E-posta ile Giriş formunda hem de Telefon ile Giriş formunda ilgili iki butonun konumları yer değiştirmelidir.
+  2. Dil Seçimi butonu, eskiden onboarding butonunun sahip olduğu sınıf tanımlarına (`w-full text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 py-3.5 text-[10px] sm:text-xs font-serif uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group border border-transparent hover:border-[#ecd8a6]/10 rounded-xl`) sahip olmalı ve Globe ikonunu içermelidir. Açılır dil menüsü (dropdown) bu butona tıklandığında yine düzgün bir şekilde hizalanıp açılmalıdır.
+  3. Uygulama Tanıtımını Gör butonu, eskiden dil seçimi butonunun sahip olduğu sınıf tanımlarına (`flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest`) sahip olmalı ve RefreshCw ikonunu (hover edildiğinde dönme animasyonuyla birlikte) içermelidir.
+  4. Değişiklikler sonrası her iki butonun da işlevselliği (dil değiştirme ve onboarding ekranını açma) eksiksiz çalışmalıdır.
+* **Çözüm:** E-posta ve Telefon ile giriş ekranlarındaki Dil Seçici ve Uygulama Tanıtımı (onboarding) butonlarının konumları ve tasarımsal sınıfları (w-full border'lı block butonu ile küçük alt link görünümü) yer değiştirilerek kabul kriterlerine uygun şekilde güncellendi.
+
+---
+
+### ✅ MS-208: PDF Tek Sayfa Formatına Geri Dönüş Çalışmasının Yenilenmesi ve Düzeltilmesi (Bug / UX)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** PDF Üretim Modülü
+* **Hedef Dosya:** [pdfGenerator.ts](file:///Users/elifterzi/antigravity/MadameSoul/src/utils/pdfGenerator.ts)
+* **Açıklama:**  
+  Tarot okuma sonuçlarını PDF olarak indiren modüldeki çoklu sayfa sayfalandırma (pagination) yapısının kaldırılıp tek bir uzun sayfa (continuous single-page canvas) formatına geri döndürülmesi çalışması (MS-191) başarısız olmuştur. PDF indirme fonksiyonunun hatasız bir şekilde tek bir uzun sayfa olacak şekilde yeniden düzenlenmesi ve link koordinatlarının bu yapıya göre düzeltilmesi gerekmektedir.
+* **Kabul Kriterleri:**
+  1. `src/utils/pdfGenerator.ts` dosyasında yer alan element ölçme (`measureElementHeight`), sayfalandırma hesaplamaları (`pages.push`) ve birden fazla sayfa oluşturma (`pdf.addPage`) mantığı tamamen kaldırılmalıdır.
+  2. PDF çıktısı, tek bir geniş ve dinamik uzunluğa sahip canvas üzerinden tek sayfa olarak çizilmelidir. Canvas'ın yüksekliği, içeriklerin (Header, Kartlar, Yorum Metni, Reklamlar ve Footer) toplam yüksekliğine göre dinamik olarak hesaplanmalıdır.
+  3. Tıklanabilir reklam ve footer linklerinin koordinatları, tek sayfa yapısına uygun olacak şekilde dinamik olarak ayarlanmalı ve jsPDF `pdf.link(...)` ile doğru yerlere yerleştirilmelidir.
+  4. PDF çıktısının dikeyde tek ve kesintisiz bir akış sunduğu, taşma veya dikey hizalama boşlukları içermediği, tarayıcılarda ve mobil cihazlarda sorunsuz indirildiği doğrulanmalıdır.
+* **Çözüm:** Tek sayfalık canvas'ın toplam yüksekliği (`totalHeight`) dinamik olarak ölçüldükten sonra jsPDF belgesi [800, totalHeight] formatında kurulup html2canvas çıktısı tek sayfaya çizilecek şekilde güncellendi. Reklam ve footer linklerinin tıklanabilir koordinatları (pdf.link) bu tek sayfanın dinamik koordinat yapısına uyacak şekilde düzeltildi.
 
 ---
 

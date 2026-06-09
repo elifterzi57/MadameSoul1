@@ -19,8 +19,11 @@ export async function gatherUserMetadata(): Promise<UserMetadata> {
   let location = 'Unknown';
 
   try {
-    // Using a free, reliable IP and location API
-    const response = await fetch('https://ipapi.co/json/');
+    // Using a free, reliable IP and location API with 1.5s timeout to prevent hanging the login flow
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (response.ok) {
       const data = await response.json();
       ip = data.ip || 'Unknown';

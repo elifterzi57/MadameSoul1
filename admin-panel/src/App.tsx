@@ -221,6 +221,16 @@ export default function App() {
     totalRequests: 0
   });
 
+  // YZ Diagnostic Connection Test States (MS-207)
+  const [isTestingGemini, setIsTestingGemini] = useState(false);
+  const [testGeminiResult, setTestGeminiResult] = useState<{
+    status: 'success' | 'error';
+    model: string;
+    latencyMs: number;
+    message?: string;
+    error?: string;
+  } | null>(null);
+
   // Role Assignment State
   const [targetEmail, setTargetEmail] = useState('');
   const [targetRole, setTargetRole] = useState<'user' | 'employee' | 'admin'>('employee');
@@ -243,13 +253,15 @@ export default function App() {
         try {
           const tokenResult = await u.getIdTokenResult(true);
           let role = (tokenResult.claims.role as 'user' | 'employee' | 'admin') || 'user';
-          if ((import.meta as any).env.DEV) {
+          // @ts-ignore
+          if (import.meta.env.DEV) {
             role = 'admin';
           }
           setUserRole(role);
         } catch (err) {
           console.error("Error reading custom claims:", err);
-          setUserRole((import.meta as any).env.DEV ? 'admin' : 'user');
+          // @ts-ignore
+          setUserRole(import.meta.env.DEV ? 'admin' : 'user');
         }
       } else {
         setUser(null);
@@ -327,7 +339,8 @@ export default function App() {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const tokenResult = await cred.user.getIdTokenResult(true);
       let role = (tokenResult.claims.role as 'user' | 'employee' | 'admin') || 'user';
-      if ((import.meta as any).env.DEV) {
+      // @ts-ignore
+      if (import.meta.env.DEV) {
         role = 'admin';
       }
       setUserRole(role);
@@ -351,7 +364,8 @@ export default function App() {
       const cred = await signInWithPopup(auth, provider);
       const tokenResult = await cred.user.getIdTokenResult(true);
       let role = (tokenResult.claims.role as 'user' | 'employee' | 'admin') || 'user';
-      if ((import.meta as any).env.DEV) {
+      // @ts-ignore
+      if (import.meta.env.DEV) {
         role = 'admin';
       }
       setUserRole(role);
@@ -679,6 +693,47 @@ export default function App() {
       showStatus("Sistem ayarları kaydedilemedi.", 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 7.1. Test Gemini Connection (Admin/Employee only) (MS-207)
+  const handleTestGemini = async () => {
+    setIsTestingGemini(true);
+    setTestGeminiResult(null);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch(`/api/admin/test-gemini`, {
+        headers: { Authorization: `Bearer ${idToken}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setTestGeminiResult({
+          status: 'success',
+          model: data.model,
+          latencyMs: data.latencyMs,
+          message: data.message
+        });
+        showStatus("YZ Modeli bağlantı testi başarılı.", 'success');
+      } else {
+        setTestGeminiResult({
+          status: 'error',
+          model: data.model || geminiModel,
+          latencyMs: data.latencyMs || 0,
+          error: data.error || "Sunucudan hata yanıtı alındı."
+        });
+        showStatus("YZ Modeli bağlantı testi başarısız.", 'error');
+      }
+    } catch (err: any) {
+      console.error("Gemini test connection failed:", err);
+      setTestGeminiResult({
+        status: 'error',
+        model: geminiModel,
+        latencyMs: 0,
+        error: err.message || "Ağ hatası nedeniyle bağlantı kurulamadı."
+      });
+      showStatus("Bağlantı testi yapılamadı.", 'error');
+    } finally {
+      setIsTestingGemini(false);
     }
   };
 
@@ -1453,6 +1508,72 @@ export default function App() {
                                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-4 h-4" />}
                                   SİSTEM AYARLARINI KAYDET
                                 </button>
+                              </div>
+
+                              {/* YZ Bağlantı Testi (Health Check) (MS-207) */}
+                              <div className="pt-4 border-t border-[#ecd8a6]/10 space-y-4">
+                                <div className="flex items-center justify-between flex-wrap gap-3">
+                                  <div className="space-y-0.5">
+                                    <h5 className="font-serif text-[9px] text-[#ecd8a6] uppercase tracking-wider font-bold">
+                                      {highlightText("YZ Canlı Bağlantı Denetimi", globalSearchQuery)}
+                                    </h5>
+                                    <p className="text-[10px] text-[#ecd8a6]/40 max-w-sm">
+                                      Sistemdeki aktif YZ modeliyle canlı bağlantı ve gecikme testi gerçekleştirir.
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={handleTestGemini}
+                                    disabled={isTestingGemini || loading}
+                                    className="px-4 py-2 bg-[#1a1025] border border-[#ecd8a6]/30 text-[#ecd8a6] hover:bg-[#ecd8a6] hover:text-[#0a0512] rounded-xl text-[10px] font-serif font-bold tracking-widest uppercase transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                                  >
+                                    {isTestingGemini ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Activity className="w-3 h-3" />
+                                    )}
+                                    BAĞLANTIYI TEST ET
+                                  </button>
+                                </div>
+
+                                {/* Test Result Display */}
+                                {testGeminiResult && (
+                                  <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className={`p-4 rounded-xl border text-xs leading-relaxed font-sans ${
+                                      testGeminiResult.status === 'success'
+                                        ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'
+                                        : 'bg-red-500/5 border-red-500/20 text-red-400'
+                                    }`}
+                                  >
+                                    <div className="flex items-start gap-2.5">
+                                      {testGeminiResult.status === 'success' ? (
+                                        <CheckCircle className="w-4.5 h-4.5 shrink-0 text-emerald-400 mt-0.5" />
+                                      ) : (
+                                        <AlertCircle className="w-4.5 h-4.5 shrink-0 text-red-400 mt-0.5" />
+                                      )}
+                                      <div className="space-y-1 w-full">
+                                        <div className="font-serif uppercase tracking-wider font-bold text-[10px]">
+                                          {testGeminiResult.status === 'success' ? "BAĞLANTI BAŞARILI" : "BAĞLANTI HATASI"}
+                                        </div>
+                                        <div>
+                                          {testGeminiResult.status === 'success'
+                                            ? `Sistemdeki aktif model (${testGeminiResult.model}) başarıyla yanıt verdi.`
+                                            : `Aktif YZ modeli (${testGeminiResult.model}) ile bağlantı kurulamadı. Hata Ayrıntısı:`}
+                                        </div>
+                                        {testGeminiResult.error && (
+                                          <pre className="mt-2 p-2.5 bg-black/40 rounded border border-red-500/10 text-[10px] leading-normal font-mono text-red-300 overflow-x-auto whitespace-pre-wrap max-w-full">
+                                            {testGeminiResult.error}
+                                          </pre>
+                                        )}
+                                        <div className="text-[10px] text-[#ecd8a6]/40 pt-1">
+                                          Gecikme Süresi: <span className="font-bold">{testGeminiResult.latencyMs} ms</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
                               </div>
                             </div>
                           </div>
