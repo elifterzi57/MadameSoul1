@@ -35,6 +35,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'motion/react';
+import ActivityStream from './components/ActivityStream';
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -234,6 +235,8 @@ export default function App() {
   // Role Assignment State
   const [targetEmail, setTargetEmail] = useState('');
   const [targetRole, setTargetRole] = useState<'user' | 'employee' | 'admin'>('employee');
+  const [targetPassword, setTargetPassword] = useState('');
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
   const [roleLoading, setRoleLoading] = useState(false);
 
   // Authorized Users List States
@@ -530,6 +533,18 @@ export default function App() {
         },
         timestamp: serverTimestamp()
       });
+
+      // Write Activity Stream log document
+      const activityRef = doc(collection(db, 'activity_stream'));
+      batch.set(activityRef, {
+        userId: selectedUser.userId,
+        eventType: 'purchase',
+        status: 'success',
+        message: `Admin bakiye güncellemesi: ${amount > 0 ? '+' : ''}${amount} Katina Moons (${finalDesc})`,
+        email: selectedUser.email || null,
+        details: { amount, operatorEmail, finalDesc },
+        createdAt: serverTimestamp()
+      });
       
       await batch.commit();
       
@@ -742,7 +757,7 @@ export default function App() {
     setIsLoadingRoles(true);
     try {
       const q = query(
-        collection(db, 'users'),
+        collection(db, 'admin_users'),
         where('role', 'in', ['admin', 'employee'])
       );
       const snap = await getDocs(q);
@@ -757,7 +772,7 @@ export default function App() {
   };
 
   // 9. Update/Revoke User Role
-  const handleUpdateRole = async (emailToUpdate: string, newRole: 'user' | 'employee' | 'admin') => {
+  const handleUpdateRole = async (emailToUpdate: string, newRole: 'user' | 'employee' | 'admin', passwordVal?: string) => {
     setRoleLoading(true);
     try {
       const idToken = await auth.currentUser?.getIdToken();
@@ -767,12 +782,21 @@ export default function App() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`
         },
-        body: JSON.stringify({ email: emailToUpdate, role: newRole })
+        body: JSON.stringify({ email: emailToUpdate, role: newRole, password: passwordVal })
       });
 
       if (res.ok) {
-        showStatus(`'${emailToUpdate}' kullanıcısının yetkisi '${newRole}' olarak güncellendi.`);
-        fetchUsersWithRoles();
+        const data = await res.json();
+        if (data.status === 'password_required') {
+          showStatus(data.message, 'error');
+          setShowPasswordInput(true);
+        } else {
+          showStatus(`'${emailToUpdate}' kullanıcısının yetkisi '${newRole}' olarak güncellendi.`);
+          setShowPasswordInput(false);
+          setTargetPassword('');
+          setTargetEmail('');
+          fetchUsersWithRoles();
+        }
       } else {
         const errorData = await res.json();
         throw new Error(errorData.error || 'Rol güncellenemedi.');
@@ -785,11 +809,18 @@ export default function App() {
     }
   };
 
+  const handleEmailChange = (val: string) => {
+    setTargetEmail(val);
+    if (showPasswordInput) {
+      setShowPasswordInput(false);
+      setTargetPassword('');
+    }
+  };
+
   const handleAssignRoleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetEmail.trim()) return;
-    await handleUpdateRole(targetEmail, targetRole);
-    setTargetEmail('');
+    await handleUpdateRole(targetEmail, targetRole, showPasswordInput ? targetPassword : undefined);
   };
 
   const toggleSection = (section: string) => {
@@ -968,6 +999,9 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Canlı İşlem Akışı */}
+          <ActivityStream db={db} />
 
           {/* Sticky Search bar floating at the top of content (MS-188) */}
           <div className="sticky top-0 z-30 bg-[#0a0512]/95 backdrop-blur-md py-4 border-b border-[#ecd8a6]/10 mb-6 flex-shrink-0">
@@ -1640,10 +1674,29 @@ export default function App() {
                                   required
                                   placeholder="Örn: test@madamesoul.com"
                                   value={targetEmail}
-                                  onChange={(e) => setTargetEmail(e.target.value)}
+                                  onChange={(e) => handleEmailChange(e.target.value)}
                                   className="w-full bg-[#1a1025] border border-[#ecd8a6]/25 rounded-lg px-3 py-2 text-xs text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/50 transition-all font-sans"
                                 />
                               </div>
+
+                              {showPasswordInput && (
+                                <div className="space-y-1.5">
+                                  <label className="block text-[9px] text-[#ecd8a6]/50 uppercase tracking-widest font-serif">
+                                    {highlightText("Yeni Kullanıcı İçin Giriş Şifresi", globalSearchQuery)}
+                                  </label>
+                                  <input 
+                                    type="password" 
+                                    required
+                                    placeholder="En az 6 karakterli bir şifre belirleyin"
+                                    value={targetPassword}
+                                    onChange={(e) => setTargetPassword(e.target.value)}
+                                    className="w-full bg-[#1a1025] border border-red-500/40 rounded-lg px-3 py-2 text-xs text-[#ecd8a6] focus:outline-none focus:border-red-500/60 transition-all font-sans"
+                                  />
+                                  <p className="text-[10px] text-red-400 mt-1 leading-relaxed">
+                                    Bu e-posta adresiyle sistemde kayıtlı bir kullanıcı bulunamadı. Lütfen yeni personelin panele giriş yapabilmesi için bir şifre belirleyin.
+                                  </p>
+                                </div>
+                              )}
 
                               <div className="space-y-1.5">
                                 <label className="block text-[9px] text-[#ecd8a6]/50 uppercase tracking-widest font-serif">

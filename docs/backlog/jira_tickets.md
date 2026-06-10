@@ -6,7 +6,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **80** | Açık: **0** | Tamamlanan: **80**
+Toplam Bilet: **86** | Açık: **0** | Tamamlanan: **86**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
