@@ -139,3 +139,10 @@ git push origin ticket/MS-[ID]
 
 ### Pull Request (PR) Oluşturma
 PR açılırken GitHub Issue ile ilişkilendirilmeli (`Closes #[issue-no]`) ve Kanban kartı otomatik olarak "Done" sütununa taşınmalıdır.
+
+### 🧪 Test ve Geliştirme Süreci Kuralları (Developer Agent Amelia & QA Süreci)
+- **Bilet Geliştirme Akışı:** Developer Agent Amelia, **MadameSoul Kanban** projesinde "Backlog" statüsünde yer alan biletleri geliştirecektir.
+- **Test Muafiyeti:** Amelia, geliştirdiği biletler için münferit test koşmayacaktır. Geliştirme bittiğinde bilet durumu doğrudan **"Untested"** statüsüne çekilecektir.
+- **Canlıya Alma (Deployment):** Geliştirmesi biten biletler bekletilmeden canlıya (production ortamına) alınacaktır.
+- **Toplu Test Koşumu:** Canlıya alınan ve **"Untested"** statüsüne çekilen tüm biletlerin test süreçleri, daha sonra toplu olarak insan yönetici/kullanıcı tarafından manuel/otomatik olarak koşulup doğrulanacaktır.
+
