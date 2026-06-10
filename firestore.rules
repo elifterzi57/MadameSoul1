@@ -94,11 +94,27 @@ service cloud.firestore {
              data.createdAt == request.time;
     }
 
+    function isValidActivityStream(data) {
+      return (data.userId == null || data.userId == request.auth.uid || isEmployee()) &&
+             data.eventType in ['auth', 'generation', 'purchase', 'error'] &&
+             data.status in ['success', 'pending', 'failed'] &&
+             data.message is string && data.message.size() <= 1000 &&
+             (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 200)) &&
+             (!('details' in data) || data.details == null || data.details is map) &&
+             data.createdAt == request.time;
+    }
+
+
     match /users/{userId} {
       allow get: if request.auth != null && (request.auth.uid == userId || isEmployee());
       allow list: if request.auth != null && isEmployee();
       allow create, update: if request.auth != null && (request.auth.uid == userId || isEmployee()) && isValidUser(request.resource.data);
       allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    match /admin_users/{userId} {
+      allow read: if request.auth != null && isEmployee();
+      allow write: if false;
     }
 
     match /user_moons/{userId} {
@@ -266,6 +282,17 @@ service cloud.firestore {
     match /config_logs/{logId} {
       allow read: if request.auth != null && (isEmployee() || isAdmin());
       allow write: if false;
+    }
+
+    match /activity_stream/{logId} {
+      allow read: if request.auth != null && isEmployee();
+      allow create: if request.auth != null && 
+                    (
+                      isEmployee() || 
+                      (request.auth.uid == request.resource.data.userId && 
+                       isValidActivityStream(request.resource.data))
+                    );
+      allow update, delete: if false;
     }
   }
 }

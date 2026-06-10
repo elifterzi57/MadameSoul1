@@ -166,6 +166,25 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
       await setDoc(userRef, profileData, { merge: true });
 
+      // Log auth activity to activity_stream collection
+      try {
+        const activityRef = doc(collection(db, 'activity_stream'));
+        const providerName = user.providerData?.[0]?.providerId || user.providerId || 'email/password';
+        const method = providerName.includes('google') ? 'Google' : providerName.includes('phone') ? 'Telefon' : 'E-posta';
+        
+        await setDoc(activityRef, {
+          userId: user.uid,
+          eventType: 'auth',
+          status: 'success',
+          message: `Kullanıcı giriş yaptı (${method})`,
+          email: user.email || null,
+          details: { providerId: providerName, method },
+          createdAt: serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("Failed to write auth activity log:", logErr);
+      }
+
       // Save to phones collection for marketing/tracking if phone exists
       if (user.phoneNumber) {
         const phoneRef = doc(db, 'phones', user.phoneNumber);

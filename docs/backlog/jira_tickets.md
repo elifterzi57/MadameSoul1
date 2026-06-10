@@ -6,13 +6,17 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **86** | Açık: **0** | Tamamlanan: **86**
+Toplam Bilet: **90** | Açık: **4** | Tamamlanan: **86**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Atanan (Assignee) | Hedef Dosya |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-210**](#-ms-210) | Feature / PM | Admin Paneli Canlı İşlem Akışı - Ürün ve Operasyonel İzleme | Yüksek | John | `admin-panel/src/App.tsx` |
+| [**MS-211**](#-ms-211) | UX / UI | Admin Paneli Canlı İşlem Akışı Arayüzü, Durum Göstergeleri ve Limit Ayarları | Yüksek | Sally | `admin-panel/src/App.tsx` |
+| [**MS-212**](#-ms-212) | Architecture / DB | Canlı İşlem Akışı Veri Şeması, Firestore `activity_stream` Koleksiyonu ve Güvenlik Kuralları | Yüksek | Winston | `firestore.rules`, `server.ts` |
+| [**MS-213**](#-ms-213) | Feature / Dev | Canlı İşlem Akışı Olay Tetikleyicileri, Express Logger ve Frontend Snapshot Entegrasyonu | Yüksek | Amelia | `server.ts`, `admin-panel/src/App.tsx` |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
@@ -112,6 +116,74 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ## 🎫 Bilet Detayları (Ticket Details)
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
+
+### ⏳ MS-210: Admin Paneli Canlı İşlem Akışı (Real-time Activity Stream) - Ürün ve Operasyonel İzleme Gereksinimleri (Feature / PM)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ⏳ Test Edilmedi (QA/Kullanıcı doğrulaması bekleniyor)
+* **Oluşturan (Reporter):** John (📋 Product Manager / `bmad-agent-pm`)
+* **Atanan (Assignee):** John (📋 Product Manager / `bmad-agent-pm`)
+* **Bileşen:** Operasyonel İzleme ve Analiz
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  MadameSoul sahiplerinin/yöneticilerinin uygulama içindeki anlık kullanıcı hareketlerini, ödeme işlemlerini, tarot açılımlarını ve kritik YZ hatalarını canlı olarak izleyebilmesi için bir "Canlı İşlem Akışı" (borsa ekranı mantığında) ürün gereksinimleri tanımlanmalı ve bu veri akışı takip edilmelidir.
+* **Kabul Kriterleri:**
+  1. Akışta gösterilecek olay türleri belirlenmelidir: Üye Girişleri/Kayıtlar, Kart Çekme / Yorumlama İstekleri (pending/success/failed), Kredi Alımları (success/failed), Hediye Bakiye Tanımlamaları ve Kritik Sistem Hataları (Örn: Gemini Token limit aşımı).
+  2. Akıştaki log satırlarının filtreleme gereksinimleri belirlenmeli, her olay tipi için benzersiz açıklayıcı metinler (Örn: "X kullanıcısı Google ile kaydoldu", "Y kullanıcısının falı YZ hatası nedeniyle iade edildi") yasal KVKK gizliliğine (e-postalar maskelenmeli veya tam gösterilmeli seçeneği gibi) dikkat edilerek hazırlanmalıdır.
+  3. Admin panelinde bu akışın en üstte, ana karşılama ekranı (dashboard) olarak yer alması sağlanmalıdır.
+
+---
+
+### ⏳ MS-211: Admin Paneli Canlı İşlem Akışı Arayüzü, Yanıp Sönen Durum Göstergeleri ve Limit Ayarları (UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ⏳ Test Edilmedi (QA/Kullanıcı doğrulaması bekleniyor)
+* **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Atanan (Assignee):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Bileşen:** Admin Paneli Arayüz Tasarımı
+* **Hedef Dosya:** [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  Yöneticilere "borsa ekranı" hissiyatını yaşatacak, dinamik olarak güncellenen, modern, glassmorphic ve animasyonlu bir Canlı İşlem Akışı (Activity Stream) arayüz bileşeni tasarlanmalıdır.
+* **Kabul Kriterleri:**
+  1. Arayüzün en solunda anlık olay durumlarını gösteren ve yanıp sönen (pulsing) renk kodlu noktalar yer almalıdır (Yeşil: Başarılı, Turuncu: Pending, Kırmızı: Failed/Hata).
+  2. Her olay türü için ayırt edici mistik ikonlar (🔮, 🪙, ⚠️, 🔑) kullanılmalı ve satır bazında şık bir grid yerleşimi sunulmalıdır.
+  3. Yeni log satırları düştüğünde liste başına yumuşak bir kayma ve solma efektiyle (fade-in & slide-down) eklenmelidir.
+  4. Sağ üst köşede satır limitini seçmeyi sağlayan şık bir toggle/dropdown bulunmalıdır (50 Satır / 100 Satır). Bu ayar değiştikçe tablo boyutları bozulmadan dinamik olarak güncellenmelidir.
+
+---
+
+### ⏳ MS-212: Canlı İşlem Akışı Veri Şeması, Firestore `activity_stream` Koleksiyonu ve TTL Temizlik Altyapısı (Architecture / DB)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ⏳ Test Edilmedi (QA/Kullanıcı doğrulaması bekleniyor)
+* **Oluşturan (Reporter):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Atanan (Assignee):** Winston (🏗️ System Architect / `bmad-agent-architect`)
+* **Bileşen:** Veri Tabanı ve Performans Altyapısı
+* **Hedef Dosya:** [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules), [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts)
+* **Açıklama:**  
+  Uygulamadaki dağınık koleksiyonları sorgulamadan, performanslı bir gerçek zamanlı veri akışı besleyebilmek için Firestore'da müstakil bir `activity_stream` şeması kurulmalı ve veri büyümesini önleyecek TTL temizlik altyapısı tasarlanmalıdır.
+* **Kabul Kriterleri:**
+  1. Firestore `activity_stream` koleksiyonu veri şeması oluşturulmalıdır. Alanlar: `userId`, `email`, `eventType` (auth, generation, purchase, error), `status` (success, pending, failed), `message`, `details` ve `createdAt`.
+  2. `firestore.rules` kuralları güncellenerek bu koleksiyona yazma yetkisi sadece sistem API'sine ve yetkili istemcilere verilmeli, okuma izni ise sadece `isAdmin()` / `isEmployee()` yetkisine sahip kullanıcılarla sınırlandırılmalıdır.
+  3. Koleksiyonda aşırı veri birikmesini ve faturalandırma maliyetlerini önlemek için eski logların (Örn: 7 günden eski) otomatik temizlenmesi için TTL indeksleri veya sunucu tarafında periyodik temizlik mekanizması planlanmalıdır.
+
+---
+
+### ⏳ MS-213: Canlı İşlem Akışı Olay Tetikleyicileri, Express Logger ve Firestore Snapshot Entegrasyonu (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ⏳ Test Edilmedi (QA/Kullanıcı doğrulaması bekleniyor)
+* **Oluşturan (Reporter):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Backend Rotaları & Admin Panel Kodlaması
+* **Hedef Dosya:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx)
+* **Açıklama:**  
+  PM, UX ve mimari gereksinimleri birleştirerek; sunucuda/istemcide olay tetikleyicilerini kurmak, bunları `activity_stream` koleksiyonuna yazmak ve admin panelinde Firestore limitli dynamic `onSnapshot` dinleyicisiyle gerçek zamanlı olarak listelemek üzere geliştirmeler yapılmalıdır.
+* **Kabul Kriterleri:**
+  1. `server.ts` içinde reusable `logActivityToFirestore(data)` yardımcı fonksiyonu yazılmalıdır.
+  2. `/api/generate` API rotasında fal YZ işlemleri başladığında (status: pending), bittiğinde (status: success) veya hata oluştuğunda (token exhaustion, timeout vb.) log Firestore'a kaydedilmelidir.
+  3. Stripe webhook ödeme ve bakiye ekleme/düşürme işlemlerinde log tetiklenmelidir.
+  4. Admin panelinde `ActivityStream.tsx` bileşeni oluşturulmalı, Zustand veya yerel limit durumuna (50/100) göre Firestore dinleyicisi kurulmalı ve veriler anlık güncellenmelidir.
 
 ---
 
@@ -1896,4 +1968,25 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   2. Kullanıcı sosyal giriş yaptığında eğer hesapta `password` sağlayıcısı silinmişse, Firestore'da korunan şifre kullanılarak `linkWithCredential` ile sağlayıcı otomatik olarak geri bağlanmalıdır (auto-restore).
 
 * **Çözüm:** `saveUserToFirestore` içinde, şifresiz girişlerde önce veritabanındaki şifre okunarak korundu. Eğer hesaptaki `password` sağlayıcısı silinmişse, korunan bu şifre değeriyle arka planda `linkWithCredential` üzerinden e-posta/şifre sağlayıcısı otomatik olarak geri bağlanarak her iki giriş yöntemi de kullanılabilir hale getirildi.
+
+---
+
+### ✅ MS-214: Yönetici Personel Ayrı Koleksiyon ve Şifreli Kayıt Entegrasyonu (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Paneli Arayüzü / Yetkilendirme Modülü
+* **Hedef Dosyalar:** [server.ts](file:///Users/elifterzi/antigravity/MadameSoul/server.ts), [App.tsx](file:///Users/elifterzi/antigravity/MadameSoul/admin-panel/src/App.tsx), [firestore.rules](file:///Users/elifterzi/antigravity/MadameSoul/firestore.rules)
+* **Açıklama:**  
+  Uygulamada kayıtlı olmayan bir kullanıcıya admin panelinden yetki tanımlanırken hata alınması engellenmeli; bu durumda sistem yöneticiye şifre belirleme imkanı sunmalı, kullanıcı Firebase Auth ve `admin_users` koleksiyonuna kaydedilerek direkt giriş yapabilmesi sağlanmalıdır. Ayrıca yetkili personel listesi `admin_users` koleksiyonundan beslenmelidir.
+* **Kabul Kriterleri:**
+  1. Sunucu tarafında `/api/admin/set-role` API'si girilen e-postayı Firebase Auth'ta arayacaktır. Eğer kullanıcı yoksa ve istek gövdesinde şifre (`password`) bulunmuyorsa istemciye şifre gereksinim durumunu (`password_required`) dönecektir.
+  2. Gönderilen şifre mevcutsa sunucu kullanıcıyı Firebase Auth üzerinde yaratıp custom claim yetkilerini atayacak; `users`, `user_moons` ve `admin_users` belgelerini oluşturacaktır.
+  3. Yetkili personeller `admin_users` adında ayrı bir koleksiyonda tutulacaktır. Yetki kaldırıldığında bu belgeden silinecektir.
+  4. Yetkili personel listesi `admin_users` koleksiyonunu sorgulayacak, böylece yeni eklenen personeller kayıt tamamlanır tamamlanmaz listede görüntülenecektir.
+
+* **Çözüm:** `firestore.rules` dosyasına `admin_users` kuralları eklendi. `server.ts` içerisindeki `/api/admin/set-role` rotası güncellenerek Firebase Auth'ta olmayan e-postalar için `password_required` dönüşü yapıldı. Şifre sağlandığında `admin.auth().createUser` ile kullanıcı yaratılıp yetkilendirmeleri ve `admin_users` koleksiyonu kaydı gerçekleştirildi. Yönetici paneli `App.tsx` dosyasında `showPasswordInput` durumuna göre şifre alanı gösterildi ve liste sorgusu `admin_users` koleksiyonuna uyarlandı.
+
 

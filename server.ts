@@ -125,6 +125,35 @@ function getTranslation(lang: string, key: string, params: Record<string, any> =
   }
 }
 
+function formatGeminiError(error: any): string {
+  if (!error) return "Unknown error occurred";
+  
+  const msg = error.message || String(error);
+  
+  if (typeof msg === 'string' && (msg.trim().startsWith('{') || msg.trim().startsWith('['))) {
+    try {
+      const parsed = JSON.parse(msg);
+      if (parsed && parsed.error && parsed.error.message) {
+        return parsed.error.message;
+      }
+      if (parsed && parsed.message) {
+        return parsed.message;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  if (error.error && typeof error.error === 'object' && error.error.message) {
+    return error.error.message;
+  }
+  
+  if (error.status && error.statusText) {
+    return `${error.status}: ${error.statusText}`;
+  }
+
+  return msg;
+}
 
 async function startServer() {
   console.log("[Server] Starting MadameSoul server...");
@@ -175,8 +204,72 @@ async function startServer() {
     }
   }
 
+  async function logActivityToFirestore(data: {
+    userId?: string | null;
+    eventType: 'auth' | 'generation' | 'purchase' | 'error';
+    status: 'success' | 'pending' | 'failed';
+    message: string;
+    email?: string | null;
+    details?: Record<string, any> | null;
+  }) {
+    if (!useFirebaseAdmin) {
+      console.log("[Server Activity Log - Dev Mode]", data);
+      return;
+    }
+    try {
+      await adminDb.collection("activity_stream").add({
+        userId: data.userId || null,
+        eventType: data.eventType,
+        status: data.status,
+        message: data.message.substring(0, 1000),
+        email: data.email || null,
+        details: data.details || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (err) {
+      console.error("Failed to log activity to Firestore:", err);
+    }
+  }
+
+  function startCleanActivityStreamCron() {
+    if (!useFirebaseAdmin) return;
+    
+    const cleanLogs = async () => {
+      console.log("[Cron] Cleaning up activity logs older than 7 days...");
+      try {
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const snapshot = await adminDb.collection("activity_stream")
+          .where("createdAt", "<", admin.firestore.Timestamp.fromDate(sevenDaysAgo))
+          .get();
+        
+        if (snapshot.empty) {
+          console.log("[Cron] No old activity logs to delete.");
+          return;
+        }
+        
+        console.log(`[Cron] Found ${snapshot.size} old activity logs to delete. Executing batch delete...`);
+        const batch = adminDb.batch();
+        snapshot.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+        console.log("[Cron] Clean up of old activity logs completed successfully.");
+      } catch (err) {
+        console.error("[Cron] Failed to clean up old activity logs:", err);
+      }
+    };
+    
+    // Run once on startup
+    cleanLogs();
+    
+    // Set 24 hour interval
+    setInterval(cleanLogs, 24 * 60 * 60 * 1000);
+  }
+
   // Helper function to complete payment
   async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string) {
+    let attemptData: any = null;
+    let userEmail: string | null = null;
     try {
       const attemptDoc = await adminDb.collection("checkout_attempts").doc(sessionId).get();
       if (!attemptDoc.exists) {
@@ -184,7 +277,7 @@ async function startServer() {
         return false;
       }
       
-      const attemptData = attemptDoc.data()!;
+      attemptData = attemptDoc.data()!;
       if (attemptData.status === "completed") {
         console.log(`[Server] Payment already completed for session: ${sessionId}`);
         return true;
@@ -192,6 +285,15 @@ async function startServer() {
       
       const userId = attemptData.userId;
       const amount = attemptData.amount;
+
+      try {
+        const userDoc = await adminDb.collection("users").doc(userId).get();
+        if (userDoc.exists) {
+          userEmail = userDoc.data()?.email || null;
+        }
+      } catch (e) {
+        console.error("Failed to fetch user email for payment log:", e);
+      }
       
       await adminDb.collection("checkout_attempts").doc(sessionId).update({
         status: "completed",
@@ -266,9 +368,29 @@ async function startServer() {
       });
       
       console.log(`[Server] Payment successfully completed. UserId: ${userId}, Amount: ${amount}`);
+      
+      await logActivityToFirestore({
+        userId,
+        eventType: 'purchase',
+        status: 'success',
+        message: `${amount} Katina Moons satın alma işlemi başarıyla tamamlandı.`,
+        email: userEmail,
+        details: { amount, sessionId, invoiceId }
+      });
+
       return true;
-    } catch (err) {
+    } catch (err: any) {
       await logServerError(err, `completePayment sessionId=${sessionId}`);
+      
+      await logActivityToFirestore({
+        userId: attemptData?.userId || null,
+        eventType: 'purchase',
+        status: 'failed',
+        message: `Ödeme tamamlama işlemi başarısız oldu: ${err.message || String(err)}`,
+        email: userEmail,
+        details: { sessionId, error: err.message || String(err) }
+      });
+
       return false;
     }
   }
@@ -453,7 +575,15 @@ async function startServer() {
         return res.status(400).json({ error: "transactionId is required" });
       }
 
-
+      // Log activity as pending
+      await logActivityToFirestore({
+        userId: uid,
+        eventType: 'generation',
+        status: 'pending',
+        message: `${userName} (${focus}) için tarot falı analizi beklemede.`,
+        email: req.user?.email || null,
+        details: { transactionId, focus, cards }
+      });
 
       if (useFirebaseAdmin) {
         // Fetch transaction and validate ownership
@@ -602,21 +732,22 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
             lastError = err;
           }
         }
-
-        // If all models fail, and we are not in production, use a mock fallback reading (MS-187/MS-207 robust fallback)
-        if (process.env.NODE_ENV !== 'production') {
-          console.warn("[Server] Bypassing Gemini API failure with mock tarot response for development/testing");
-          return {
-            response: { text: mockText, usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 50 } },
-            usedModel: "mock-fallback"
-          };
-        }
         throw lastError || new Error("All model generation attempts failed");
       };
 
       if (!useFirebaseAdmin) {
         // Run synchronously/directly for local development when credentials are bypass
         const { response } = await generateWithFallback(modelName, promptText);
+        
+        await logActivityToFirestore({
+          userId: uid,
+          eventType: 'generation',
+          status: 'success',
+          message: `${userName} için tarot falı analizi başarıyla tamamlandı (Bypass mod).`,
+          email: req.user?.email || null,
+          details: { model: 'bypass-local' }
+        });
+        
         return res.json({ text: response.text });
       }
 
@@ -659,7 +790,15 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
             console.error("[Server Background] Failed to log AI telemetry:", telemetryErr);
           }
 
-
+          // Log activity as success
+          await logActivityToFirestore({
+            userId: uid,
+            eventType: 'generation',
+            status: 'success',
+            message: `${userName} için tarot falı analizi başarıyla tamamlandı.`,
+            email: req.user?.email || null,
+            details: { transactionId, model: usedModel, latencyMs }
+          });
 
           // Fetch user's push token and send FCM notification
           try {
@@ -688,8 +827,19 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           }
 
         } catch (error: any) {
-          console.error("[Server Background] Gemini API Error:", error.message);
+          const cleanMessage = formatGeminiError(error);
+          console.error("[Server Background] Gemini API Error:", cleanMessage);
           await logServerError(error, "Background Gemini text generation", uid);
+
+          // Log activity as failed
+          await logActivityToFirestore({
+            userId: uid,
+            eventType: 'error',
+            status: 'failed',
+            message: `${userName} için tarot falı analizi başarısız oldu: ${cleanMessage}`,
+            email: req.user?.email || null,
+            details: { transactionId, error: cleanMessage }
+          });
 
           // Atomic refund of moon balance on failure
           try {
@@ -758,9 +908,21 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       })();
 
     } catch (error: any) {
-      console.error("[Server] Gemini API Error:", error.message);
+      const cleanMessage = formatGeminiError(error);
+      console.error("[Server] Gemini API Error:", cleanMessage);
       await logServerError(error, "Gemini text generation", uid);
-      res.status(500).json({ error: error.message || "Failed to generate content" });
+      
+      // Log activity as failed (outer catch)
+      await logActivityToFirestore({
+        userId: uid,
+        eventType: 'error',
+        status: 'failed',
+        message: `Tarot falı analizi başlatılamadı: ${cleanMessage}`,
+        email: req.user?.email || null,
+        details: { error: cleanMessage }
+      });
+      
+      res.status(500).json({ error: cleanMessage });
     }
   });
 
@@ -806,6 +968,15 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           userLanguage: userLanguage || "en",
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
+
+        await logActivityToFirestore({
+          userId: uid,
+          eventType: 'purchase',
+          status: 'pending',
+          message: `${amount} Katina Moons satın alımı için ödeme adımı başlatıldı.`,
+          email: req.user?.email || null,
+          details: { amount, price: priceCents / 100, provider: 'stripe', sessionId: session.id }
+        });
         
         res.json({ url: session.url });
       } else {
@@ -818,11 +989,30 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           userLanguage: userLanguage || "en",
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
+
+        await logActivityToFirestore({
+          userId: uid,
+          eventType: 'purchase',
+          status: 'pending',
+          message: `${amount} Katina Moons satın alımı için mock ödeme adımı başlatıldı.`,
+          email: req.user?.email || null,
+          details: { amount, price: priceCents / 100, provider: 'mock', sessionId: mockSessionId }
+        });
         
         res.json({ url: `${req.headers.origin}/?payment=success&session_id=${mockSessionId}&mock=true` });
       }
     } catch (err: any) {
       await logServerError(err, "create-checkout-session", req.user?.uid);
+
+      await logActivityToFirestore({
+        userId: req.user?.uid || null,
+        eventType: 'error',
+        status: 'failed',
+        message: `Ödeme adımı başlatılamadı: ${err.message || String(err)}`,
+        email: req.user?.email || null,
+        details: { error: err.message || String(err) }
+      });
+
       res.status(500).json({ error: err.message || "Failed to create checkout session" });
     }
   });
@@ -1069,7 +1259,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
   // Assign Custom Claim Role (Admin only) (MS-173)
   app.post("/api/admin/set-role", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
     try {
-      const { email, role } = req.body;
+      const { email, role, password } = req.body;
       if (!email || !role) {
         return res.status(400).json({ error: "Email and role are required" });
       }
@@ -1078,17 +1268,92 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       }
 
       let targetUid = null;
-      if (useFirebaseAdmin) {
-        const userRecord = await admin.auth().getUserByEmail(email);
-        targetUid = userRecord.uid;
-        await admin.auth().setCustomUserClaims(userRecord.uid, { role });
-        
-        await adminDb.collection("users").doc(userRecord.uid).update({
-          role,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
+      let userRecord: any = null;
+      let userExists = false;
 
-        console.log(`[Admin] Assigned role ${role} to user ${email} (${userRecord.uid})`);
+      if (useFirebaseAdmin) {
+        try {
+          userRecord = await admin.auth().getUserByEmail(email);
+          targetUid = userRecord.uid;
+          userExists = true;
+        } catch (err: any) {
+          if (err.code === "auth/user-not-found") {
+            userExists = false;
+          } else {
+            throw err;
+          }
+        }
+
+        if (!userExists) {
+          // If we are setting role to 'user' (revoking) but the user doesn't exist, we just return success
+          if (role === 'user') {
+            return res.json({ status: "success", message: "User not found, nothing to revoke." });
+          }
+
+          if (!password) {
+            return res.json({ 
+              status: "password_required", 
+              message: "Kullanıcı sistemde kayıtlı değil. Lütfen admin paneline erişebilmesi için bir şifre belirleyin." 
+            });
+          }
+
+          // Create new user in Firebase Auth
+          const newUser = await admin.auth().createUser({
+            email,
+            password,
+            emailVerified: true,
+            displayName: email.split("@")[0]
+          });
+          targetUid = newUser.uid;
+          
+          await admin.auth().setCustomUserClaims(newUser.uid, { role });
+
+          // Create doc in 'users'
+          await adminDb.collection("users").doc(newUser.uid).set({
+            userId: newUser.uid,
+            email,
+            name: email.split("@")[0],
+            role,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Create doc in 'user_moons'
+          await adminDb.collection("user_moons").doc(newUser.uid).set({
+            userId: newUser.uid,
+            balance: 1,
+            dailyFreeBalance: 0,
+            purchasedBalance: 1,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          console.log(`[Admin] Created user ${email} (${newUser.uid}) with role ${role}`);
+        } else {
+          // User exists, set claims
+          await admin.auth().setCustomUserClaims(targetUid, { role });
+
+          // Update doc in 'users'
+          await adminDb.collection("users").doc(targetUid).set({
+            role,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
+          console.log(`[Admin] Updated existing user ${email} (${targetUid}) role to ${role}`);
+        }
+
+        // Manage 'admin_users' collection
+        if (role === 'admin' || role === 'employee') {
+          await adminDb.collection("admin_users").doc(targetUid).set({
+            userId: targetUid,
+            email,
+            name: userRecord?.displayName || email.split("@")[0],
+            role,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        } else {
+          await adminDb.collection("admin_users").doc(targetUid).delete();
+        }
+
       } else {
         console.log(`[Admin] Local Dev Mode: Mocked set-role call for ${email} to ${role}`);
       }
@@ -1105,7 +1370,8 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           actionType: "role_change",
           details: {
             email,
-            role
+            role,
+            createdNewUser: !userExists && role !== 'user'
           },
           timestamp: admin.firestore.FieldValue.serverTimestamp()
         });
@@ -1264,6 +1530,10 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         console.error("[Cron] Daily renewal cron error:", cronErr);
       }
     }, 60 * 60 * 1000);
+  }
+
+  if (useFirebaseAdmin) {
+    startCleanActivityStreamCron();
   }
 
   app.listen(PORT, "0.0.0.0", () => {
