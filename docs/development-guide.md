@@ -105,18 +105,9 @@ Sponsorlu içerikler ve video reklamları dinamik olarak `public/ads/ads_config.
 
 Projede geliştirilen tüm biletler (tickets) ve özellikler (features) için aşağıdaki Git standartları uygulanmalıdır. Bu kurallara hem insan geliştiriciler hem de yapay zeka ajanları (Amelia, Winston, Sally, John, Paige vb.) uymak zorundadır.
 
-> [!IMPORTANT]
-> **Zorunlu Kural:** Her geliştirici ve yapay zeka ajanı, herhangi bir geliştirme çalışmasına başlamadan önce mutlaka **GitHub Project "MadameSoul Kanban"** üzerinde bir bilet (issue) oluşturmalıdır. `docs/backlog/jira_tickets.md` dosyası artık kullanılmamaktadır. Tüm iş takibi yalnızca GitHub Kanban üzerinden yürütülür.
-
-### GitHub Project Kanban
-Projenin iş takibi **GitHub Project: MadameSoul Kanban** üzerinden yönetilir:
-- Tüm yeni özellikler, hatalar ve görevler GitHub Issues olarak açılmalıdır.
-- Her Issue ilgili Milestone ve Label ile etiketlenmelidir.
-- Issue açmadan önce mevcut Kanban'a bakarak çakışma olmadığından emin olunmalıdır.
-
 ### Bilet Bazlı Dal (Branch) Oluşturma
-Her GitHub Issue için `main` dalından yeni bir dal oluşturulmalıdır:
-- **Dal Adı Biçimi:** `ticket/MS-[ID]` (Örn: `ticket/MS-210`, `ticket/MS-214`)
+Her bilet için `main` dalından yeni bir dal oluşturulmalıdır:
+- **Dal Adı Biçimi:** `ticket/MS-[ID]` (Örn: `ticket/MS-101`, `ticket/MS-124`)
 - **Dal Oluşturma Komutu:**
   ```bash
   git checkout main
@@ -137,13 +128,5 @@ Geliştirme ve test adımları tamamlandıktan sonra, dalınızı uzaktaki depoy
 git push origin ticket/MS-[ID]
 ```
 
-### Pull Request (PR) Oluşturma
-PR açılırken GitHub Issue ile ilişkilendirilmeli (`Closes #[issue-no]`) ve Kanban kartı otomatik olarak "Done" sütununa taşınmalıdır.
-
-### 🧪 Test ve Geliştirme Süreci Kuralları (Geliştirici Ajanlar & QA Süreci)
-- **Bilet Oluşturma:** Tüm yeni biletler (tickets) ilk olarak **MadameSoul Kanban** projesinde **"Open"** statüsüne açılacaktır.
-- **Bilet Geliştirme ve Test Muafiyeti:** Amelia veya diğer yapay zeka ajanları biletleri geliştirirken kendileri bağımsız test koşmayacaktır. Geliştirme tamamlandığında biletin durumu doğrudan **"Untested"** yapılacaktır.
-- **Canlıya Alma ve Çalıştırma:** **"Untested"** statüsündeki biletler doğrudan uygulamaya uygulanacak (canlıya alınacaktır).
-- **Test ve Kapanış:** Canlıya uygulanan ve **"Untested"** statüsünde bekleyen bu biletlerin test süreçleri sonradan koşulacaktır. Testler başarıyla koşulduktan sonra ilgili biletin statüsü **"Done"** olarak güncellenecektir.
 
 

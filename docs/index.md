@@ -37,13 +37,10 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 
 ---
 
-## Mevcut Dokümantasyonlar & İş Takibi (Existing Documentation & Issue Tracking)
+## Mevcut Dokümantasyonlar & İş Listeleri (Existing Documentation & Backlog)
 
 - [README.md](../README.md) - Projenin temel geliştirici tanıtımı ve gereksinimleri.
-- [GitHub Kanban](https://github.com/elifterzi57/MadameSoulStudio/projects) - **MadameSoul Kanban** - Tüm aktif ve tamamlanan iş biletlerinin takip edildiği resmi platform.
-
-> [!IMPORTANT]
-> **Zorunlu Kural:** Tüm geliştiriciler ve yapay zeka ajanları, herhangi bir özellik geliştirmeye veya hata düzeltmeye başlamadan önce **GitHub Project "MadameSoul Kanban"** üzerinde bir Issue açmak zorundadır. `docs/backlog/jira_tickets.md` kaldırılmıştır.
+- [jira_tickets.md](./backlog/jira_tickets.md) - Tespit edilen eksikler, hatalar ve güvenlik biletleri listesi (Jira Backlog).
 
 ---
 
@@ -86,14 +83,12 @@ Bu dokümantasyon, AI ajanlarının kod tabanını hızla anlaması ve güvenli 
 
 ### Yeni Özellik Planlarken:
 
-1. **İlk adım her zaman GitHub Kanban'dır:** [MadameSoul Kanban](https://github.com/elifterzi57/MadameSoulStudio/projects) üzerinde bir Issue açın veya mevcut bir Issue'ya atanın.
-2. Referans dokümanları seçin:
-   - **Sadece UI/Arayüz Değişiklikleri:**  
-     → [architecture.md](./architecture/architecture.md) ve [component-inventory.md](./architecture/component-inventory.md)
-   - **Sadece API/Backend Değişiklikleri:**  
-     → [architecture.md](./architecture/architecture.md), [api-contracts.md](./architecture/api-contracts.md) ve [data-models.md](./architecture/data-models.md)
-   - **Full-Stack (Uçtan Uca) Değişiklikler:**  
-     → Yukarıdaki tüm dokümantasyonlar.
+- **Sadece UI/Arayüz Değişiklikleri:**  
+  → Referans belgeleri: [architecture.md](./architecture/architecture.md) ve [component-inventory.md](./architecture/component-inventory.md)
+- **Sadece API/Backend Değişiklikleri:**  
+  → Referans belgeleri: [architecture.md](./architecture/architecture.md), [api-contracts.md](./architecture/api-contracts.md) ve [data-models.md](./architecture/data-models.md)
+- **Full-Stack (Uçtan Uca) Değişiklikler:**  
+  → Referans belgeleri: Yukarıdaki tüm dokümantasyonlar.
 
 ---
 
