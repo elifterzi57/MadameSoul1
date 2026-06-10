@@ -6,12 +6,29 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ## 📋 Bilet Özeti (Backlog Summary)
 
-Toplam Bilet: **91** | Açık: **0** | Tamamlanan: **91**
+Toplam Bilet: **107** | Açık: **16** | Tamamlanan: **91**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
-*Şu anda açık bilet bulunmamaktadır.*
+| Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-215**](#-ms-215) | Feature / UX | Admin Paneli Gelir ve Satın Alma İstatistikleri - Ürün Gereksinimleri | Yüksek | Untested | John |
+| [**MS-216**](#-ms-216) | UX / UI | [MS-216] Admin Paneli Gelir ve Satın Alma İstatistikleri Ekranı | Yüksek | Untested | Sally |
+| [**MS-217**](#-ms-217) | UX / UI | [MS-217] Admin Paneli Moon İşlem Geçmişi ve Denetim Kaydı Ekranı | Yüksek | Untested | Sally |
+| [**MS-218**](#-ms-218) | Feature / Dev | [MS-218] Admin Paneli Gelir ve Satın Alma İstatistikleri Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-219**](#-ms-219) | Feature / Dev | [MS-219] Admin Paneli Moon İşlem Geçmişi ve Denetim Kaydı Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-220**](#-ms-220) | Feature / Dev | [MS-220] Gelir ve Satın Alma İstatistikleri Backend API Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-221**](#-ms-221) | Feature / Dev | [MS-221] Moon İşlem Geçmişi ve Denetim Kaydı Backend API Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-222**](#-ms-222) | Feature / Dev | [MS-222] Gelir ve Satın Alma İstatistikleri Grafikleri Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-223**](#-ms-223) | Feature / Dev | [MS-223] Moon İşlem Geçmişi ve Denetim Kaydı Filtreleme ve Arama Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-224**](#-ms-224) | Feature / Dev | [MS-224] Admin Paneli Gelir ve Satın Alma İstatistikleri CSV İndirme Entegrasyonu | Yüksek | Untested | Amelia |
+| [**MS-225**](#-ms-225) | Feature / Dev | [MS-225] Admin Paneli Moon İşlem Geçmişi ve Denetim Kaydı CSV İndirme Entegrasyonu | Yüksek | Open | Amelia |
+| [**MS-226**](#-ms-226) | Feature / Dev | [MS-226] Gelir ve Satın Alma İstatistikleri Tarih Aralığı Filtresi Entegrasyonu | Yüksek | Open | Amelia |
+| [**MS-227**](#-ms-227) | Feature / Dev | [MS-227] Moon İşlem Geçmişi ve Denetim Kaydı Tarih Aralığı Filtresi Entegrasyonu | Yüksek | Open | Amelia |
+| [**MS-228**](#-ms-228) | Feature / Dev | [MS-228] Gelir ve Satın Alma İstatistikleri Detaylı Tablo Görünümü Entegrasyonu | Yüksek | Open | Amelia |
+| [**MS-229**](#-ms-229) | Feature / Dev | [MS-229] Moon İşlem Geçmişi ve Denetim Kaydı Detaylı Tablo Görünümü Entegrasyonu | Yüksek | Open | Amelia |
+| [**MS-230**](#-ms-230) | Feature / Dev | [MS-230] FCM Push Notification Entegrasyonu | Yüksek | Open | Amelia |*
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
