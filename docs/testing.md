@@ -3,7 +3,8 @@
 Bu belgede, MadameSoul uygulamasında kurulan test altyapısı, mevcut testler, bu testlerin nasıl çalıştırılacağı ve sonuçlarının nasıl izleneceği açıklanmıştır.
 
 > [!IMPORTANT]
-> **Önemli Test Süreci Kuralı:** Developer Agent Amelia, bilet geliştirmeleri esnasında test koşmayacaktır. Geliştirmesi biten biletler "Backlog" statüsünden doğrudan **"Untested"** statüsüne çekilecek ve canlıya alınacaktır. Test süreçleri daha sonra yönetici tarafından toplu olarak koşularak doğrulanacaktır.
+> **Önemli Test Süreci Kuralı:** Yeni biletler önce "Open" statüsüne açılır. Amelia veya diğer ajanlar bilet geliştirmeleri esnasında test koşmayacaktır. Geliştirmesi biten biletler doğrudan **"Untested"** statüsüne çekilecek, uygulamaya uygulanacak (canlıya alınacak) ve testler bu aşamadan sonra koşulacaktır. Test edilen biletler başarı durumuna göre **"Done"** statüsüne alınacaktır.
+
 
 Uygulamada iki tür test altyapısı bulunmaktadır:
 1. **Birim Testleri (Unit Tests)**: Fonksiyonel bazda mantıksal doğrulamalar yapar (Vitest).
