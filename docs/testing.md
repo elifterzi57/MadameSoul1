@@ -17,7 +17,6 @@ Birim testleri, uygulamanın arayüzünden bağımsız olarak çalışan küçü
 * **Test Klasörü:** [tests/unit/](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/)
 * **Mevcut Testler:**
   - [helpers.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/helpers.test.ts): Tarih formatlama (`formatDate`) ve doğum tarihi doğrulama (`isValidDob`) mantığını test eder.
-  - [rbac.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/rbac.test.ts): Rol tabanlı erişim kontrolünü (Role-Based Access Control) test eder; çalışan (employee), yönetici (admin) ve standart kullanıcı yetkilerinin API katmanındaki davranışını doğrular.
 
 ### Komutlar ve Çalıştırma
 

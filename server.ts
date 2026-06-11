@@ -706,6 +706,60 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           };
         }
 
+        // Local AI Integration via LM Studio
+        if (process.env.LOCAL_AI_BASE_URL) {
+          const baseUrl = process.env.LOCAL_AI_BASE_URL.replace(/\/$/, ""); // Trim trailing slash
+          const modelName = process.env.LOCAL_AI_MODEL || "google/gemma-4-12b";
+          console.log(`[Server] Generating content using Local LLM at ${baseUrl} with model ${modelName}`);
+
+          try {
+            // Local inference can be slow, using 45-second timeout race
+            const fetchPromise = fetch(`${baseUrl}/chat/completions`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: modelName,
+                messages: [
+                  { role: "user", content: prompt }
+                ],
+                temperature: 0.7,
+              }),
+            }).then(async (res) => {
+              if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`Local AI server returned status ${res.status}: ${errText}`);
+              }
+              return res.json();
+            });
+
+            const timeoutPromise = new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error("Local AI generation timed out after 45 seconds")), 45000)
+            );
+
+            const data = await Promise.race([fetchPromise, timeoutPromise]);
+            const text = data.choices?.[0]?.message?.content;
+            if (!text) {
+              throw new Error("Empty response from Local AI model");
+            }
+
+            return {
+              response: {
+                text,
+                usageMetadata: {
+                  promptTokenCount: data.usage?.prompt_tokens || 0,
+                  candidatesTokenCount: data.usage?.completion_tokens || 0
+                }
+              },
+              usedModel: modelName
+            };
+          } catch (err: any) {
+            console.error("[Server] Local AI generation failed:", err);
+            throw new Error(`Yerel yapay zeka sunucusuna (LM Studio) bağlanılamadı. Lütfen LM Studio'nun açık ve ${modelName} modelinin yüklü olduğunu doğrulayın. Detay: ${err.message}`);
+          }
+        }
+
         const fallbacks = [model, "gemini-2.0-flash", "gemini-1.5-flash"];
         const uniqueModels = Array.from(new Set(fallbacks));
         let lastError: any = null;

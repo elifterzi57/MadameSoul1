@@ -41,6 +41,7 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 
 - [README.md](../README.md) - Projenin temel geliştirici tanıtımı ve gereksinimleri.
 - [jira_tickets.md](./backlog/jira_tickets.md) - Tespit edilen eksikler, hatalar ve güvenlik biletleri listesi (Jira Backlog).
+- [admin_tickets.md](./backlog/admin_tickets.md) - Projeden kaldırılan admin paneli geliştirmelerine ait geçmiş biletler listesi (Admin Backlog).
 
 ---
 

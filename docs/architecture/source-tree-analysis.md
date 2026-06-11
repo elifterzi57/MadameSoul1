@@ -54,9 +54,7 @@ MadameSoul/
 │   ├── e2e/                     # Playwright uçtan uca testler klasörü
 │   │   └── app.spec.ts          # E2E kullanıcı senaryoları testi
 │   └── unit/                    # Vitest birim testleri klasörü
-│       ├── helpers.test.ts      # Yardımcı fonksiyonlar birim testi
-│       └── rbac.test.ts         # Rol yetkilendirme kuralları birim testi
-├── admin-panel/                 # Arayüz yöneticisi/çalışan yönetim paneli projesi
+│       └── helpers.test.ts      # Yardımcı fonksiyonlar birim testi
 ├── .env                         # Geliştirme ortamı değişkenleri (API anahtarları vb.)
 ├── .env.example                 # Ortam değişkenleri için şablon dosya
 ├── .gitignore                   # Git tarafından yoksayılacak dosyalar

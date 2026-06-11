@@ -15,8 +15,8 @@ Koleksiyon listesi:
 7. `checkout_attempts` - Ödeme hunisi başlatma ve terk etme kayıtları.
 8. `error_logs` - Sunucu/istemci çalışma zamanı hataları.
 9. `ai_telemetry` - Yapay zeka token/latency maliyet analizi.
-10. `config_logs` - Sistem ve reklam yapılandırma değişikliklerinin takibi.
-11. `admin_audit_logs` - Yönetim paneli denetim ve izlenebilirlik günlükleri.
+10. `config_logs` - [PASİF / DECOMMISSIONED] Sistem ve reklam yapılandırma değişikliklerinin takibi (MS-242 ile kaldırıldı).
+11. `admin_audit_logs` - [PASİF / DECOMMISSIONED] Yönetim paneli denetim ve izlenebilirlik günlükleri (MS-242 ile kaldırıldı).
 
 ---
 
@@ -214,12 +214,12 @@ Gemini API'sine yapılan içerik üretme isteklerinin maliyetlerini kontrol etme
 
 ---
 
-## 10. `config_logs` Koleksiyonu (Yeni - MS-189)
+## 10. `config_logs` Koleksiyonu [PASİF / DECOMMISSIONED] (MS-242 ile kaldırıldı)
 
-Yönetim panelinde sistem veya arayüz konfigürasyonlarının (Gemini model parametreleri, reklam afiş bağlantıları vb.) ne zaman, kimin tarafından ve ne şekilde değiştirildiğini takip eder.
+Yönetim panelinin kaldırılmasıyla birlikte bu koleksiyon kullanımdan kaldırılmıştır. Eski sistemde sistem veya arayüz konfigürasyonlarının ne zaman, kimin tarafından ve ne şekilde değiştirildiğini takip etmekteydi.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
-- **Güvenlik Kuralları:** Yalnızca çalışanlar ve yöneticiler (`isEmployee() || isAdmin()`) okuyabilir. İstemciler doğrudan yazamaz, yazma işlemi backend API katmanı tarafından gerçekleştirilir.
+- **Güvenlik Kuralları:** Deaktif.
 
 ### Şema (Schema)
 
@@ -233,12 +233,12 @@ Yönetim panelinde sistem veya arayüz konfigürasyonlarının (Gemini model par
 
 ---
 
-## 11. `admin_audit_logs` Koleksiyonu (Yeni - MS-193)
+## 11. `admin_audit_logs` Koleksiyonu [PASİF / DECOMMISSIONED] (MS-242 ile kaldırıldı)
 
-Yönetim panelinden yapılan bakiye düzenlemeleri (credit dusting), rol atamaları ve konfigürasyon güncellemeleri gibi kritik sistem işlemlerini denetim (audit) amacıyla detaylı olarak saklar.
+Yönetim panelinin kaldırılmasıyla birlikte bu koleksiyon kullanımdan kaldırılmıştır. Eski sistemde bakiye düzenlemeleri, rol atamaları ve konfigürasyon güncellemeleri gibi kritik işlemleri denetim (audit) amacıyla saklamaktı.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
-- **Güvenlik Kuralları:** Okuma yetkisi sadece adminlere (`isAdmin()`) açıktır. Çalışanlar (`isEmployee()`) ve adminler (`isAdmin()`) yeni log belgesi ekleyebilir (`create`). Normal kullanıcılar erişemez.
+- **Güvenlik Kuralları:** Deaktif.
 
 ### Şema (Schema)
 
