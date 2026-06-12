@@ -22,25 +22,10 @@ createRoot(document.getElementById('root')!).render(
 );
 
 if ('serviceWorker' in navigator) {
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    // Unregister service worker on localhost to prevent caching/HMR issues (white screens)
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      let unregistered = false;
-      for (const registration of registrations) {
-        registration.unregister();
-        unregistered = true;
-      }
-      if (unregistered) {
-        console.log('Unregistered active service workers on localhost to resolve caching/HMR issues.');
-        window.location.reload();
-      }
-    });
-  } else {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then((reg) => console.log('ServiceWorker registration successful with scope: ', reg.scope))
-        .catch((err) => console.error('ServiceWorker registration failed: ', err));
-    });
-  }
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((reg) => console.log('ServiceWorker registration successful with scope: ', reg.scope))
+      .catch((err) => console.error('ServiceWorker registration failed: ', err));
+  });
 }
 
