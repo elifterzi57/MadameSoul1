@@ -1,13 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const token = "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";
+const token = process.env.GITHUB_TOKEN || "";
 const owner = "elifterzi57";
-const repo = "MadameSoulStudio";
+const repo = "MadameSoul1";
 const projectName = "MadameSoulKanban";
 
 // Helper to send GraphQL requests
