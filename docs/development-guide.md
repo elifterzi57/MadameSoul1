@@ -115,6 +115,15 @@ Her bilet için `main` dalından yeni bir dal oluşturulmalıdır:
   git checkout -b ticket/MS-[ID]
   ```
 
+### Kullanıcı Tarafından Talep Edilen İşler İçin Özel Akış (Yeni)
+Kullanıcının doğrudan ajanlara talep ettiği işler (ad-hoc görevler) için aşağıdaki adımlar izlenmelidir:
+1. **Bilet Oluşturma**: İşleme başlamadan önce GitHub deposunda yeni bir Issue (Bilet) açılmalı, bu bilet `MadameSoulKanban` projesine eklenmeli ve `docs/backlog/jira_tickets.md` dosyası içerisindeki aktif biletler tablosuna kaydedilmelidir.
+2. **Dal Adı Biçimi**: Bu tür işler için dal (branch) adı `YYYYMMDD_TicketNo` formatında olmalıdır (Örn: `20260612_1` - buradaki `1` GitHub Issue numarasıdır).
+3. **Kapatma ve Push**: Geliştirme tamamlandığında, bilet hem GitHub Issue/Project board üzerinde hem de `docs/backlog/jira_tickets.md` dosyasında "Tamamlandı" olarak kapatılmalıdır. Ardından dal GitHub'a push edilmelidir:
+   ```bash
+   git push origin YYYYMMDD_TicketNo
+   ```
+
 ### İşleme (Commit) Mesaj Standartları
 Commit mesajları her zaman ilgili bilet ID'si ile başlamalı ve köşeli parantez içinde belirtilmelidir:
 - **Biçim:** `[MS-[ID]] kısa_açıklama`
