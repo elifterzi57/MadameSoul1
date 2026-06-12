@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **96** | Açık: **0** | Tamamlanan: **93** | İptal Edilen: **3**
+Toplam Bilet: **97** | Açık: **0** | Tamamlanan: **94** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-265**](#-ms-265) | Bug / Dev / UX | Fal Tamamlandığında Ekrana Bildirim Gönderilmesi | Yüksek | Fal başarıyla tamamlandığında ekranda Toast bildirim gösterimi ve tarayıcı izin verdiyse yerel tarayıcı bildirim gönderimi entegre edildi. | Elif |
 | [**MS-264**](#-ms-264) | Feature / Dev | Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması | Yüksek | Yerel yapay zeka (LM Studio) istek gövdesine, kartları YAML dosyalarındaki resmi tanımlara göre yorumlamasını zorunlu kılan 'system' mesajı başarıyla eklendi. | Elif |
 | [**MS-263**](#-ms-263) | Bug / Dev | Web Push Bildirim Ayarları Hatalarının Düzeltilmesi | Yüksek | Localhost üzerinde service worker unregister mantığı kaldırılarak FCM ve Web Push bildirim desteği localhost ve production ortamlarında sorunsuz hale getirildi. | Elif |
 | [**MS-262**](#-ms-262) | Revert / Cleanup | MS-245 Sonrası Tüm Geliştirmelerin Geri Alınması ve Kod Temizliği | En Yüksek | Git deposu MS-244 sürümüne (71df6d3) geri döndürüldü; MS-246 ile MS-261 arasındaki tüm biletlerin geliştirmeleri silindi ve kod temizlendi. | Elif |
@@ -127,6 +128,8 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
+*(Şu an aktif açık bilet bulunmamaktadır.)*
+
 ---
 
 ## 🚫 İptal Edilen Bilet Detayları (Cancelled Ticket Details)
@@ -183,6 +186,21 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-265: Fal Tamamlandığında Ekrana Bildirim Gönderilmesi (Bug / Dev / UX)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Frontend Arayüzü / Yükleme Deneyimi / Toast Bildirimleri
+* **Açıklama:**  
+  Fal başarıyla tamamlandığında ekranda Toast bildirim gösterimi ve tarayıcı izin verdiyse yerel tarayıcı bildirim gönderimi entegre edildi.
+* **Kabul Kriterleri:**
+  1. Fal yorumu başarıyla üretilip tamamlandığında ekranda Türkçe "Falınız hazır!" veya İngilizce "Your reading is ready!" Toast bildirimi gösterilmelidir.
+  2. Kullanıcı tarayıcı bildirimlerine izin verdiyse, fal hazır olduğunda bir native Notification tetiklenmelidir.
+
+---
 
 ### 📋 MS-264: Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması (Feature / Dev)
 
