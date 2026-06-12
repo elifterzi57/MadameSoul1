@@ -14,7 +14,7 @@ async function run() {
     console.log("Listing models...");
     const response = await ai.models.list();
     console.log("Available models:");
-    response.models?.forEach(m => {
+    (response as any).models?.forEach((m: any) => {
       console.log(`- Name: ${m.name} | Supported Actions: ${m.supportedGenerationMethods?.join(", ")}`);
     });
   } catch (err: any) {

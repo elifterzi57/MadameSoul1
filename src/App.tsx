@@ -130,7 +130,7 @@ function AppContent() {
 
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isUserDataLoading, setIsUserDataLoading] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [drawnCards, setDrawnCards] = useState<any[]>([]);
   const [shuffledDeck, setShuffledDeck] = useState<any[]>([]);
   const [reading, setReading] = useState<string | null>(null);
@@ -394,6 +394,15 @@ function AppContent() {
               termsVersion: data.termsVersion || ''
             });
 
+            // Onboarding Check (MS-257)
+            const localOb = localStorage.getItem(`madamesoul_onboarding_completed_${u.uid}`);
+            const fireOb = data.onboardingCompleted || false;
+            if (!localOb && !fireOb) {
+              setShowOnboarding(true);
+            } else {
+              setShowOnboarding(false);
+            }
+
             // Silent update of metadata/appVersion (MS-186)
             await updateDoc(userRef, {
               timezone,
@@ -418,6 +427,7 @@ function AppContent() {
               metadata
             });
             setUserInfo({ name: u.displayName || '' });
+            setShowOnboarding(true); // New user, show onboarding
           }
           setIsUserDataLoading(false);
         }).catch((err) => {
@@ -1097,7 +1107,7 @@ function AppContent() {
         await disablePushNotifications(user.uid);
       }
       await signOut(auth);
-      setShowOnboarding(true);
+      setShowOnboarding(false);
     } catch (err) {
       console.error("Sign out error:", err);
     }
@@ -1144,20 +1154,6 @@ function AppContent() {
     );
   }
 
-  if (showOnboarding) {
-    return (
-      <Onboarding 
-        language={userInfo.language} 
-        t={t}
-        onComplete={() => {
-          setShowOnboarding(false);
-          // Funnel Analytics: onboarding_complete (MS-134)
-          logAnalyticsEvent('onboarding_complete', { language: userInfo.language });
-        }} 
-      />
-    );
-  }
-
   if (!user || isSocialLoginInProgress) {
     return (
       <Login 
@@ -1166,6 +1162,27 @@ function AppContent() {
         onLanguageChange={(lang) => setUserInfo({ language: lang })}
         onShowOnboarding={() => setShowOnboarding(true)}
         t={t}
+      />
+    );
+  }
+
+  if (showOnboarding) {
+    return (
+      <Onboarding 
+        language={userInfo.language} 
+        t={t}
+        onComplete={async () => {
+          setShowOnboarding(false);
+          localStorage.setItem(`madamesoul_onboarding_completed_${user.uid}`, 'true');
+          try {
+            const userRef = doc(db, 'users', user.uid);
+            await updateDoc(userRef, { onboardingCompleted: true });
+          } catch (err) {
+            console.error("Error updating onboardingCompleted in Firestore:", err);
+          }
+          // Funnel Analytics: onboarding_complete (MS-134)
+          logAnalyticsEvent('onboarding_complete', { language: userInfo.language });
+        }} 
       />
     );
   }
@@ -1262,6 +1279,10 @@ function AppContent() {
             translations={locales[userInfo.language]}
             onDownloadPastReading={handleDownload}
             showToast={showToast}
+            onShowOnboarding={() => {
+              setIsProfileOpen(false);
+              setShowOnboarding(true);
+            }}
           />
         )}
       </AnimatePresence>

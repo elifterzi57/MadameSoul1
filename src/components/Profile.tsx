@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Bell,
-  RotateCcw
+  RotateCcw,
+  HelpCircle
 } from 'lucide-react';
 import { db, auth, requestPushNotificationPermission, disablePushNotifications } from '../lib/firebase';
 import { collection, query, where, getDocs, getDoc, setDoc, orderBy, limit, Timestamp, doc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
@@ -1033,6 +1034,37 @@ export const Profile: React.FC<ProfileProps> = ({
                     </div>
                   </div>
                 </section>
+
+                <hr className="border-[#ecd8a6]/10 my-6" />
+
+                {/* Onboarding Intro Replay Settings (MS-257) */}
+                {onShowOnboarding && (
+                  <section className="space-y-4">
+                    <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      {userInfo.language === 'tr' ? "Tanıtım Sihirbazı" : "App Intro Wizard"}
+                    </h3>
+                    <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex justify-between items-center gap-4">
+                      <div>
+                        <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
+                          {userInfo.language === 'tr' ? "Tanıtım Sihirbazını İzle" : "Watch App Intro"}
+                        </h4>
+                        <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
+                          {userInfo.language === 'tr' 
+                            ? "Uygulamanın özelliklerini ve nasıl çalıştığını gösteren tanıtım sihirbazını yeniden başlatın." 
+                            : "Restart the onboarding wizard that shows how the application features work."}
+                        </p>
+                      </div>
+                      <button
+                        onClick={onShowOnboarding}
+                        type="button"
+                        className="px-5 py-2.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6] text-[#ecd8a6] hover:text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all duration-300 border border-[#ecd8a6]/20 active:scale-95 font-bold"
+                      >
+                        {userInfo.language === 'tr' ? "Tanıtımı Başlat" : "Start Intro"}
+                      </button>
+                    </div>
+                  </section>
+                )}
 
                 <hr className="border-[#ecd8a6]/10 my-6" />
 

@@ -204,67 +204,7 @@ async function startServer() {
     }
   }
 
-  async function logActivityToFirestore(data: {
-    userId?: string | null;
-    eventType: 'auth' | 'generation' | 'purchase' | 'error';
-    status: 'success' | 'pending' | 'failed';
-    message: string;
-    email?: string | null;
-    details?: Record<string, any> | null;
-  }) {
-    if (!useFirebaseAdmin) {
-      console.log("[Server Activity Log - Dev Mode]", data);
-      return;
-    }
-    try {
-      await adminDb.collection("activity_stream").add({
-        userId: data.userId || null,
-        eventType: data.eventType,
-        status: data.status,
-        message: data.message.substring(0, 1000),
-        email: data.email || null,
-        details: data.details || null,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    } catch (err) {
-      console.error("Failed to log activity to Firestore:", err);
-    }
-  }
 
-  function startCleanActivityStreamCron() {
-    if (!useFirebaseAdmin) return;
-    
-    const cleanLogs = async () => {
-      console.log("[Cron] Cleaning up activity logs older than 7 days...");
-      try {
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        const snapshot = await adminDb.collection("activity_stream")
-          .where("createdAt", "<", admin.firestore.Timestamp.fromDate(sevenDaysAgo))
-          .get();
-        
-        if (snapshot.empty) {
-          console.log("[Cron] No old activity logs to delete.");
-          return;
-        }
-        
-        console.log(`[Cron] Found ${snapshot.size} old activity logs to delete. Executing batch delete...`);
-        const batch = adminDb.batch();
-        snapshot.docs.forEach(doc => {
-          batch.delete(doc.ref);
-        });
-        await batch.commit();
-        console.log("[Cron] Clean up of old activity logs completed successfully.");
-      } catch (err) {
-        console.error("[Cron] Failed to clean up old activity logs:", err);
-      }
-    };
-    
-    // Run once on startup
-    cleanLogs();
-    
-    // Set 24 hour interval
-    setInterval(cleanLogs, 24 * 60 * 60 * 1000);
-  }
 
   // Helper function to complete payment
   async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string) {
@@ -369,27 +309,13 @@ async function startServer() {
       
       console.log(`[Server] Payment successfully completed. UserId: ${userId}, Amount: ${amount}`);
       
-      await logActivityToFirestore({
-        userId,
-        eventType: 'purchase',
-        status: 'success',
-        message: `${amount} Katina Moons satın alma işlemi başarıyla tamamlandı.`,
-        email: userEmail,
-        details: { amount, sessionId, invoiceId }
-      });
+
 
       return true;
     } catch (err: any) {
       await logServerError(err, `completePayment sessionId=${sessionId}`);
       
-      await logActivityToFirestore({
-        userId: attemptData?.userId || null,
-        eventType: 'purchase',
-        status: 'failed',
-        message: `Ödeme tamamlama işlemi başarısız oldu: ${err.message || String(err)}`,
-        email: userEmail,
-        details: { sessionId, error: err.message || String(err) }
-      });
+
 
       return false;
     }
@@ -575,15 +501,7 @@ async function startServer() {
         return res.status(400).json({ error: "transactionId is required" });
       }
 
-      // Log activity as pending
-      await logActivityToFirestore({
-        userId: uid,
-        eventType: 'generation',
-        status: 'pending',
-        message: `${userName} (${focus}) için tarot falı analizi beklemede.`,
-        email: req.user?.email || null,
-        details: { transactionId, focus, cards }
-      });
+
 
       if (useFirebaseAdmin) {
         // Fetch transaction and validate ownership
@@ -713,12 +631,18 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           console.log(`[Server] Generating content using Local LLM at ${baseUrl} with model ${modelName}`);
 
           try {
+            const headers: Record<string, string> = {
+              "Content-Type": "application/json",
+            };
+            const token = process.env.LOCAL_AI_API_KEY || process.env.LM_API_TOKEN;
+            if (token) {
+              headers["Authorization"] = `Bearer ${token}`;
+            }
+
             // Local inference can be slow, using 45-second timeout race
             const fetchPromise = fetch(`${baseUrl}/chat/completions`, {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers,
               body: JSON.stringify({
                 model: modelName,
                 messages: [
@@ -734,11 +658,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
               return res.json();
             });
 
-            const timeoutPromise = new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error("Local AI generation timed out after 45 seconds")), 45000)
-            );
-
-            const data = await Promise.race([fetchPromise, timeoutPromise]);
+            const data = await fetchPromise;
             const text = data.choices?.[0]?.message?.content;
             if (!text) {
               throw new Error("Empty response from Local AI model");
@@ -793,14 +713,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         // Run synchronously/directly for local development when credentials are bypass
         const { response } = await generateWithFallback(modelName, promptText);
         
-        await logActivityToFirestore({
-          userId: uid,
-          eventType: 'generation',
-          status: 'success',
-          message: `${userName} için tarot falı analizi başarıyla tamamlandı (Bypass mod).`,
-          email: req.user?.email || null,
-          details: { model: 'bypass-local' }
-        });
+
         
         return res.json({ text: response.text });
       }
@@ -844,15 +757,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
             console.error("[Server Background] Failed to log AI telemetry:", telemetryErr);
           }
 
-          // Log activity as success
-          await logActivityToFirestore({
-            userId: uid,
-            eventType: 'generation',
-            status: 'success',
-            message: `${userName} için tarot falı analizi başarıyla tamamlandı.`,
-            email: req.user?.email || null,
-            details: { transactionId, model: usedModel, latencyMs }
-          });
+
 
           // Fetch user's push token and send FCM notification
           try {
@@ -885,15 +790,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           console.error("[Server Background] Gemini API Error:", cleanMessage);
           await logServerError(error, "Background Gemini text generation", uid);
 
-          // Log activity as failed
-          await logActivityToFirestore({
-            userId: uid,
-            eventType: 'error',
-            status: 'failed',
-            message: `${userName} için tarot falı analizi başarısız oldu: ${cleanMessage}`,
-            email: req.user?.email || null,
-            details: { transactionId, error: cleanMessage }
-          });
+
 
           // Atomic refund of moon balance on failure
           try {
@@ -966,15 +863,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       console.error("[Server] Gemini API Error:", cleanMessage);
       await logServerError(error, "Gemini text generation", uid);
       
-      // Log activity as failed (outer catch)
-      await logActivityToFirestore({
-        userId: uid,
-        eventType: 'error',
-        status: 'failed',
-        message: `Tarot falı analizi başlatılamadı: ${cleanMessage}`,
-        email: req.user?.email || null,
-        details: { error: cleanMessage }
-      });
+
       
       res.status(500).json({ error: cleanMessage });
     }
@@ -1023,14 +912,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        await logActivityToFirestore({
-          userId: uid,
-          eventType: 'purchase',
-          status: 'pending',
-          message: `${amount} Katina Moons satın alımı için ödeme adımı başlatıldı.`,
-          email: req.user?.email || null,
-          details: { amount, price: priceCents / 100, provider: 'stripe', sessionId: session.id }
-        });
+
         
         res.json({ url: session.url });
       } else {
@@ -1044,28 +926,14 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
 
-        await logActivityToFirestore({
-          userId: uid,
-          eventType: 'purchase',
-          status: 'pending',
-          message: `${amount} Katina Moons satın alımı için mock ödeme adımı başlatıldı.`,
-          email: req.user?.email || null,
-          details: { amount, price: priceCents / 100, provider: 'mock', sessionId: mockSessionId }
-        });
+
         
         res.json({ url: `${req.headers.origin}/?payment=success&session_id=${mockSessionId}&mock=true` });
       }
     } catch (err: any) {
       await logServerError(err, "create-checkout-session", req.user?.uid);
 
-      await logActivityToFirestore({
-        userId: req.user?.uid || null,
-        eventType: 'error',
-        status: 'failed',
-        message: `Ödeme adımı başlatılamadı: ${err.message || String(err)}`,
-        email: req.user?.email || null,
-        details: { error: err.message || String(err) }
-      });
+
 
       res.status(500).json({ error: err.message || "Failed to create checkout session" });
     }
@@ -1586,9 +1454,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }, 60 * 60 * 1000);
   }
 
-  if (useFirebaseAdmin) {
-    startCleanActivityStreamCron();
-  }
+
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`[Server] MadameSoul running at http://0.0.0.0:${PORT}`);

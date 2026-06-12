@@ -94,15 +94,6 @@ service cloud.firestore {
              data.createdAt == request.time;
     }
 
-    function isValidActivityStream(data) {
-      return (data.userId == null || data.userId == request.auth.uid || isEmployee()) &&
-             data.eventType in ['auth', 'generation', 'purchase', 'error'] &&
-             data.status in ['success', 'pending', 'failed'] &&
-             data.message is string && data.message.size() <= 1000 &&
-             (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 200)) &&
-             (!('details' in data) || data.details == null || data.details is map) &&
-             data.createdAt == request.time;
-    }
 
 
     match /users/{userId} {
@@ -284,15 +275,5 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    match /activity_stream/{logId} {
-      allow read: if request.auth != null && isEmployee();
-      allow create: if request.auth != null && 
-                    (
-                      isEmployee() || 
-                      (request.auth.uid == request.resource.data.userId && 
-                       isValidActivityStream(request.resource.data))
-                    );
-      allow update, delete: if false;
-    }
   }
 }

@@ -89,6 +89,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
   const [error, setError] = useState('');
   const [showLangs, setShowLangs] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(true);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Account Linking states (MS-196)
   const {
@@ -166,24 +167,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
 
       await setDoc(userRef, profileData, { merge: true });
 
-      // Log auth activity to activity_stream collection
-      try {
-        const activityRef = doc(collection(db, 'activity_stream'));
-        const providerName = user.providerData?.[0]?.providerId || user.providerId || 'email/password';
-        const method = providerName.includes('google') ? 'Google' : providerName.includes('phone') ? 'Telefon' : 'E-posta';
-        
-        await setDoc(activityRef, {
-          userId: user.uid,
-          eventType: 'auth',
-          status: 'success',
-          message: `Kullanıcı giriş yaptı (${method})`,
-          email: user.email || null,
-          details: { providerId: providerName, method },
-          createdAt: serverTimestamp()
-        });
-      } catch (logErr) {
-        console.error("Failed to write auth activity log:", logErr);
-      }
+
 
       // Save to phones collection for marketing/tracking if phone exists
       if (user.phoneNumber) {
@@ -287,6 +271,33 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
         setError(t('login.errorWeakPassword'));
       } else if (errorCode === 'auth/too-many-requests') {
         setError(t('login.errorTooManyRequests'));
+      } else {
+        setError(err.message || t('login.error'));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError(language === 'tr' ? 'Lütfen önce e-posta adresinizi girin.' : 'Please enter your email address first.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+    try {
+      const { sendPasswordResetEmail } = await import('firebase/auth');
+      await sendPasswordResetEmail(auth, email);
+      setSuccessMessage(language === 'tr' ? 'Şifre sıfırlama e-postası başarıyla gönderildi.' : 'Password reset email successfully sent.');
+    } catch (err: any) {
+      console.error("Forgot password error:", err);
+      const errorCode = err.code || (err.message?.includes('auth/') ? err.message.match(/auth\/[a-z-]+/)?.[0] : null);
+      if (errorCode === 'auth/user-not-found') {
+        setError(language === 'tr' ? 'Bu e-posta adresine kayıtlı bir kullanıcı bulunamadı.' : 'No user found with this email address.');
+      } else if (errorCode === 'auth/invalid-email') {
+        setError(language === 'tr' ? 'Geçersiz e-posta adresi.' : 'Invalid email address.');
       } else {
         setError(err.message || t('login.error'));
       }
@@ -635,9 +646,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                         className="w-full bg-black/40 border border-[#ecd8a6]/10 rounded-xl py-3.5 pl-11 pr-4 text-[#ecd8a6] text-sm focus:border-[#ecd8a6]/40 outline-none transition-all"
                       />
                     </div>
+                    {!isSignUp && (
+                      <div className="flex justify-end pr-1">
+                        <button
+                          type="button"
+                          onClick={handleForgotPassword}
+                          disabled={loading}
+                          className="text-[10px] sm:text-xs text-[#ecd8a6]/60 hover:text-[#ecd8a6] transition-all font-serif italic cursor-pointer outline-none"
+                        >
+                          {language === 'tr' ? 'Şifremi Unuttum' : 'Forgot Password?'}
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {error && <p className="text-red-400 text-[10px] sm:text-xs text-center bg-red-400/5 py-2 rounded-lg border border-red-400/10">{error}</p>}
+                  {successMessage && <p className="text-green-400 text-[10px] sm:text-xs text-center bg-green-400/5 py-2 rounded-lg border border-green-400/10">{successMessage}</p>}
 
                   <div className="flex flex-col gap-3 pt-2">
                     <button 
