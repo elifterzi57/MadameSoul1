@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **99** | Açık: **0** | Tamamlanan: **96** | İptal Edilen: **3**
+Toplam Bilet: **100** | Açık: **0** | Tamamlanan: **97** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -27,6 +27,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-268**](#-ms-268) | Documentation | Test Rehberi Dokümantasyonunun Güncellenmesi | Orta | Mevcut birim testleri (RBAC, Transactions) ve E2E testleri (Admin Panel) eklenerek testing.md güncel uygulamaya göre revize edildi. | Paige |
 | [**MS-267**](#-ms-267) | Feature / Dev | Fal Yorumları Sistem Promptu Optimizasyonu | Yüksek | Yerel yapay zeka sistem promptu veri sadakati, kartlar arası bağlam ve bütünlük, mistik tonlama ve gereksiz token kısıtlaması gibi optimizasyonlarla güncellendi. | Elif |
 | [**MS-266**](#-ms-266) | Feature / UX / UI | Bildirimlerin Sağ Üstte Gösterilmesi ve Ses Efekti Eklenmesi | Yüksek | Tüm Toast bildirimleri ekranın sağ üst köşesine konumlandırıldı ve her bildirim tetiklendiğinde çalmak üzere mistik bir chime ses efekti (reveal.wav) entegre edildi. | Elif |
 | [**MS-265**](#-ms-265) | Bug / Dev / UX | Fal Tamamlandığında Ekrana Bildirim Gönderilmesi | Yüksek | Fal başarıyla tamamlandığında ekranda Toast bildirim gösterimi ve tarayıcı izin verdiyse yerel tarayıcı bildirim gönderimi entegre edildi. | Elif |
