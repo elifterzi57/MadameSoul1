@@ -12,6 +12,8 @@ Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
+
+
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 
@@ -54,7 +56,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-204**](#-ms-204) | Architecture / DB | KVKK/Sözleşme Onay Durumu Firestore Veri Şeması ve Güvenlik Kuralları Güncellemesi | Yüksek | `users` belgesinde yasal onay alanları tanımlandı; `firestore.rules` kuralları güncellenerek bu alanların güvenli şekilde güncellenebilmesi sağlandı. | Winston |
 | [**MS-203**](#-ms-203) | UX / UI | Giriş Sonrası KVKK/Sözleşme Onay Modalı Tasarımı ve Örtük Onay Altbilgisi | Yüksek | Giriş ekranı butonlarının altına örtük onay metni eklendi; başarılı giriş sonrasında gösterilen mor-siyah glassmorphic, kaydırılabilir ve animasyonlu sözleşme onay modalı tasarlandı. | Sally |
 | [**MS-202**](#-ms-202) | Legal / PM | Giriş Sonrası KVKK/Sözleşme Onayı - Yasal ve Ürün Gereksinimleri | Yüksek | Girişteki zorunlu onay kutusu kaldırıldı, oturum açtıktan sonra ilk girişte onay modalı üzerinden yasal onay alınacak şekilde akış güncellendi. | John |
-| [**MS-201**](#-ms-201) | Bug / Security | Sosyal Girişlerde unverified E-posta/Şifre Sağlayıcısının Silinmesi ve Şifre Kaybı Hatası | Yüksek | Firebase Auth'un unverified e-posta üzerine sosyal giriş yapıldığında şifre sağlayıcısını silmesini önlemek için Firestore'daki şifre korundu ve otomatik geri bağlama (auto-restore) sağlandı. | Elif |
+| [**MS-201**](#-ms-201) | Bug / Security | Sosyal Girişlerde unverified E-posta/Şifre Sağlayıcısının Silinmesi ve Şifre Kaybı Hatası | Yüksek | Firebase Auth'un unverified e-posta üzerine sosyal giriş yapıldığında şifre sağlayıcısının silinmesini önlemek için auto-restore esnasında oluşabilecek linking çakışma hataları (email-already-in-use/credential-already-in-use) ele alındı ve loglama yapılarak sürecin takibi sağlandı. | Elif |
 | [**MS-200**](#-ms-200) | Bug / UX | Hesap Birleştirme (Account Linking) Esnasında 2 Saniyelik Sayfa Parlaması / Yönlendirme Hatası | Yüksek | Geçici oturum açma ve silme sırasında kullanıcının 2 saniyeliğine uygulamayı görüp ardından çıkış yapmasını engellemek amacıyla `isSocialLoginInProgress` global durum kontrolü eklendi. | Elif |
 | [**MS-199**](#-ms-199) | Feature / UX / UI | Notification Settings Bildirimleri Kapatabilme Desteği | Yüksek | Bildirimleri kapatabilmek için çift yönlü toggle yapısı eklendi, disablePushNotifications metodunda FCM token ve Firestore silme işlemleri sağlamlaştırıldı. | Elif |
 | [**MS-198**](#-ms-198) | Feature / UX / UI | Geçmiş Açılımlar (Past Readings) Hata Gösterim ve Detay Entegrasyonu | Orta | Başarısız fallara 'Sistem Hatası' rozeti eklendi, genişletildiğinde hatayı açıklayan detay metni gösterildi. | Elif |
@@ -769,7 +771,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   1. Sosyal girişlerde (şifresiz girişlerde) Firestore'daki mevcut kullanıcı şifresinin `null` ile ezilmesi önlenmeli, korunmalıdır.
   2. Kullanıcı sosyal giriş yaptığında eğer hesapta `password` sağlayıcısı silinmişse, Firestore'da korunan şifre kullanılarak `linkWithCredential` ile sağlayıcı otomatik olarak geri bağlanmalıdır (auto-restore).
 
-* **Çözüm:** `saveUserToFirestore` içinde, şifresiz girişlerde önce veritabanındaki şifre okunarak korundu. Eğer hesaptaki `password` sağlayıcısı silinmişse, korunan bu şifre değeriyle arka planda `linkWithCredential` üzerinden e-posta/şifre sağlayıcısı otomatik olarak geri bağlanarak her iki giriş yöntemi de kullanılabilir hale getirildi.
+* **Çözüm:** `saveUserToFirestore` içinde, şifresiz girişlerde önce veritabanındaki şifre okunarak korundu. Eğer hesaptaki `password` sağlayıcısı silinmişse, korunan bu şifre değeriyle arka planda `linkWithCredential` üzerinden e-posta/şifre sağlayıcısı otomatik olarak geri bağlanmaya çalışılır. Bu esnada ortaya çıkabilecek `auth/email-already-in-use` ve `auth/credential-already-in-use` çakışma hataları yakalanarak temiz ve bilgilendirici bir şekilde loglandı, böylece hata üretilmesi önlendi ve akışın sürekliliği sağlandı.
 
 
 
