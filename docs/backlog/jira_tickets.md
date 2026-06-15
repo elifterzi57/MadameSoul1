@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **95** | Açık: **0** | Tamamlanan: **92** | İptal Edilen: **3**
+Toplam Bilet: **96** | Açık: **0** | Tamamlanan: **93** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,8 +25,9 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-264**](#-ms-264) | Feature / Dev | Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması | Yüksek | Yerel yapay zeka (LM Studio) istek gövdesine, kartları YAML dosyalarındaki resmi tanımlara göre yorumlamasını zorunlu kılan 'system' mesajı başarıyla eklendi. | Elif |
+| [**MS-263**](#-ms-263) | Bug / Dev | Web Push Bildirim Ayarları Hatalarının Düzeltilmesi | Yüksek | Localhost üzerinde service worker unregister mantığı kaldırılarak FCM ve Web Push bildirim desteği localhost ve production ortamlarında sorunsuz hale getirildi. | Elif |
 | [**MS-262**](#-ms-262) | Revert / Cleanup | MS-245 Sonrası Tüm Geliştirmelerin Geri Alınması ve Kod Temizliği | En Yüksek | Git deposu MS-244 sürümüne (71df6d3) geri döndürüldü; MS-246 ile MS-261 arasındaki tüm biletlerin geliştirmeleri silindi ve kod temizlendi. | Elif |
-| [**MS-258**](#-ms-258) | Cleanup / Dev | Admin Paneli ve Canlı Akış Kalıntılarının Temizlenmesi | Yüksek | Backend, frontend ve firestore.rules dosyalarındaki activity_stream ve admin referansları tamamen temizlendi, eski E2E testi silindi. | Elif |
 | [**MS-257**](#-ms-257) | Feature / Dev | Onboarding Giriş Akışının Düzenlenmesi | Yüksek | İlk açılışta doğrudan login ekranı, giriş sonrasında onboarding ve ardından sözleşme modalı gösterimi sağlandı. Sonraki girişler için atlama eklendi. | Elif |
 | [**MS-256**](#-ms-256) | Feature / Dev | E-posta Giriş Ekranı Şifre Sıfırlama (Forgot Password) Desteği | Yüksek | Firebase sendPasswordResetEmail API entegrasyonu tamamlandı, hata ve başarı durum göstergeleriyle arayüze buton eklendi. | Elif |
 | [**MS-255**](#-ms-255) | Feature / Dev | Fal Yorumları İçin Dinamik Çok Dilli System Prompt ve Kart Çeviri Entegrasyonu | Yüksek | Lokasyon YAML dosyalarındaki resmi kart isim ve açıklamalarına sadık kalarak 5 farklı dilde dinamik prompt oluşturma desteği sağlandı. | Paige |
@@ -126,8 +127,6 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-*(Şu an aktif açık bilet bulunmamaktadır.)*
-
 ---
 
 ## 🚫 İptal Edilen Bilet Detayları (Cancelled Ticket Details)
@@ -185,6 +184,38 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
 
+### 📋 MS-264: Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Backend / Local LLM / LM Studio
+* **Açıklama:**  
+  Yerel yapay zeka (LM Studio) istek gövdesine, kartları YAML dosyalarındaki resmi tanımlara göre yorumlamasını zorunlu kılan 'system' mesajı başarıyla eklendi.
+* **Kabul Kriterleri:**
+  1. `server.ts` içerisindeki yerel LLM istek gövdesine `role: "system"` içeren mesaj eklenmelidir.
+  2. Sistem mesajı, modelin kartları YAML dosyalarındaki resmi tanımlara göre yorumlamasını zorunlu kılmalıdır.
+  3. Yapılan değişikliklerin sistem çalışmasını bozmadığı doğrulanmalıdır.
+
+---
+
+### 📋 MS-263: Web Push Bildirim Ayarları Hatalarının Düzeltilmesi (Bug / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Web Push Bildirimleri / FCM / Service Worker
+* **Açıklama:**  
+  Web push bildirim ayarlarında hata alınması sorununun çözülmesi ve FCM/Service worker entegrasyonunun düzeltilmesi.
+* **Kabul Kriterleri:**
+  1. İstemci tarafında FCM push izni istendiğinde ve token alındığında Firestore'a güncel şekilde yazılması sağlanmalıdır.
+  2. `/sw.js` (veya `firebase-messaging-sw.js` entegrasyonu) hem localhost'ta hem de production'da arka plan bildirimlerini sorunsuz yakalamalıdır.
+  3. Sunucu tarafında fal bittiğinde Firebase Admin SDK üzerinden push bildirimi başarıyla tetiklenmelidir.
+
+---
+
 ### 📋 MS-262: MS-245 Sonrası Tüm Geliştirmelerin Geri Alınması ve Kod Temizliği (Revert / Cleanup)
 
 * **Öncelik:** En Yüksek (Highest)
@@ -200,45 +231,24 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   3. Yerel AI token bilgisi `.env` dosyasında güncellenmiş olmalıdır.
   4. `server.ts` içerisindeki 45 saniyelik timeout kaldırılmış olmalıdır.
 * **Geri Alınan Biletler:**
-  - **MS-246:** Fal Yorumları İçin System Prompt Tasarımı ve Token Sınırlandırması
-  - **MS-247:** Mistik Bekleme Ekranı ve Yükleme Animasyonları
-  - **MS-248:** Asenkron & Event-Driven Fal Yorumlama Backend Altyapısı
-  - **MS-249:** Fal Yorumlama Süreci Streaming (Akış) Entegrasyonu
-  - **MS-250:** Local LLM Entegrasyonu Mock ve Entegrasyon Test Kapsamı
-  - **MS-251:** Local LLM Entegrasyonu Error Handling ve Fallback Mekanizması
-  - **MS-252:** Local LLM Entegrasyonu Response Validation ve Sanitization
-  - **MS-253:** Asenkron Fal Yorumları İçin E-posta Bildirim Altyapısı
-  - **MS-254:** Asenkron Fal Yorumları İçin Push Bildirim Altyapısı
-  - **MS-255:** Fal Yorumları İçin Dinamik Çok Dilli System Prompt ve Kart Çeviri Entegrasyonu
-  - **MS-256:** E-posta Giriş Ekranı Şifre Sıfırlama (Forgot Password) Desteği
-  - **MS-257:** Onboarding Giriş Akışının Düzenlenmesi
-  - **MS-258:** Admin Paneli ve Canlı Akış Kalıntılarının Temizlenmesi
-  - **MS-259:** FCM Push Bildirim Altyapısı Hatalarının Düzeltilmesi (Geliştirme aşamasındayken geri alındı)
-  - **MS-260:** Premium Mistik Şarj ve Göksel Yükleme Ritüeli Ekranı (Geliştirme aşamasındayken geri alındı)
   - **MS-261:** E-posta Bildirim Gönderim Hatalarının Düzeltilmesi (Geliştirme aşamasındayken geri alındı)
+  - **MS-260:** Premium Mistik Şarj ve Göksel Yükleme Ritüeli Ekranı (Geliştirme aşamasındayken geri alındı)
+  - **MS-259:** FCM Push Bildirim Altyapısı Hatalarının Düzeltilmesi (Geliştirme aşamasındayken geri alındı)
+  - **MS-257:** Onboarding Giriş Akışının Düzenlenmesi
+  - **MS-256:** E-posta Giriş Ekranı Şifre Sıfırlama (Forgot Password) Desteği
+  - **MS-255:** Fal Yorumları İçin Dinamik Çok Dilli System Prompt ve Kart Çeviri Entegrasyonu
+  - **MS-254:** Asenkron Fal Yorumları İçin Push Bildirim Altyapısı
+  - **MS-253:** Asenkron Fal Yorumları İçin E-posta Bildirim Altyapısı
+  - **MS-252:** Local LLM Entegrasyonu Response Validation ve Sanitization
+  - **MS-251:** Local LLM Entegrasyonu Error Handling ve Fallback Mekanizması
+  - **MS-250:** Local LLM Entegrasyonu Mock ve Entegrasyon Test Kapsamı
+  - **MS-249:** Fal Yorumlama Süreci Streaming (Akış) Entegrasyonu
+  - **MS-248:** Asenkron & Event-Driven Fal Yorumlama Backend Altyapısı
+  - **MS-247:** Mistik Bekleme Ekranı ve Yükleme Animasyonları
+  - **MS-246:** Fal Yorumları İçin System Prompt Tasarımı ve Token Sınırlandırması
 * **Çözüm:**
   Kod tabanı başarıyla MS-244/245 sürümüne sıfırlandı, belirtilen tüm biletlerin geliştirmeleri kaldırıldı, `.env` token tanımlandı, API zaman aşımı sınırı kaldırıldı ve sistemin sorunsuz çalıştığı doğrulandı.
 
----
-
-### 📋 MS-258: Admin Paneli ve Canlı Akış Kalıntılarının Temizlenmesi (Cleanup / Dev)
-
-* **Öncelik:** Yüksek (High)
-* **Durum:** ✅ Tamamlandı (Completed)
-* **Oluşturan (Reporter):** Elif (USER)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Sunucu / İstemci / Güvenlik Kuralları / Testler
-* **Açıklama:**  
-  Daha önce arayüzü geri alınan admin panelinin backend (`server.ts`), frontend (`Login.tsx`), güvenlik kuralları (`firestore.rules`) ve testler (`admin.spec.ts`) içerisindeki tüm kalıntılarının temizlenmesi gerekmektedir.
-* **Kabul Kriterleri:**
-  1. Sunucudaki `logActivityToFirestore` ve `startCleanActivityStreamCron` fonksiyonları ve çağrıları tamamen silinmelidir.
-  2. İstemcideki `activity_stream` koleksiyonuna yapılan yazma istekleri (`Login.tsx`) kaldırılmalıdır.
-  3. `firestore.rules` üzerindeki `activity_stream` kuralları ve `isValidActivityStream` fonksiyonu kaldırılmalıdır.
-  4. Artık işlevsel olmayan `tests/e2e/admin.spec.ts` test dosyası silinmelidir.
-* **Çözüm:**
-  Backend, frontend, firestore.rules ve testler üzerindeki tüm admin kalıntıları ve activity_stream entegrasyonu tamamen kaldırıldı.
-
----
 
 ---
 
@@ -709,11 +719,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 * **Çözüm:** `saveUserToFirestore` içinde, şifresiz girişlerde önce veritabanındaki şifre okunarak korundu. Eğer hesaptaki `password` sağlayıcısı silinmişse, korunan bu şifre değeriyle arka planda `linkWithCredential` üzerinden e-posta/şifre sağlayıcısı otomatik olarak geri bağlanarak her iki giriş yöntemi de kullanılabilir hale getirildi.
 
----
 
-* **Çözüm:** `firestore.rules` dosyasına `admin_users` kuralları eklendi. `server.ts` içerisindeki `/api/admin/set-role` rotası güncellenerek Firebase Auth'ta olmayan e-postalar için `password_required` dönüşü yapıldı. Şifre sağlandığında `admin.auth().createUser` ile kullanıcı yaratılıp yetkilendirmeleri ve `admin_users` koleksiyonu kaydı gerçekleştirildi. Yönetici paneli `App.tsx` dosyasında `showPasswordInput` durumuna göre şifre alanı gösterildi ve liste sorgusu `admin_users` koleksiyonuna uyarlandı.
-
----
 
 ---
 

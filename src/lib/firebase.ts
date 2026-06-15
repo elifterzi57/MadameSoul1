@@ -31,6 +31,11 @@ export const requestPushNotificationPermission = async (userId: string): Promise
       return null;
     }
 
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      console.warn("Notifications are not supported in this browser.");
+      return null;
+    }
+
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       console.warn("Notification permission was not granted:", permission);

@@ -639,6 +639,8 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
               headers["Authorization"] = `Bearer ${token}`;
             }
 
+            const systemPrompt = "Sen bilge ve mistik bir Katina tarot uzmanı olan 'MadameSoul'sun. Fal yorumlarında açılan kartları mutlaka resmi YAML dosyalarında yer alan resmi kart açıklamalarına ve anlamlarına sadık kalarak, bu bilgileri eğip bükmeden yorumlamalısın. Yorumlarında resmi tanımlara (kart açıklamalarına) bağlı kalmak zorunludur.";
+
             // Local inference can be slow, using 45-second timeout race
             const fetchPromise = fetch(`${baseUrl}/chat/completions`, {
               method: "POST",
@@ -646,6 +648,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
               body: JSON.stringify({
                 model: modelName,
                 messages: [
+                  { role: "system", content: systemPrompt },
                   { role: "user", content: prompt }
                 ],
                 temperature: 0.7,
