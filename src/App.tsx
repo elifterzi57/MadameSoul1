@@ -871,6 +871,19 @@ function AppContent() {
       setReading(data.text);
       setIsGenerating(false);
 
+      showToast(userInfo.language === 'tr' ? "Falınız hazır!" : "Your reading is ready!", 'success');
+
+      if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification("MadameSoul", {
+            body: userInfo.language === 'tr' ? "Falınız hazır!" : "Your reading is ready!",
+            icon: '/icon.svg'
+          });
+        } catch (e) {
+          console.warn("Failed to trigger native Notification:", e);
+        }
+      }
+
       if (pendingTxId.current) {
         try {
           await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
