@@ -188,8 +188,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
             const emailCred = EmailAuthProvider.credential(user.email, finalPassword);
             await linkWithCredential(user, emailCred);
             console.log("Successfully restored email/password provider via auto-linking.");
-          } catch (linkErr) {
-            console.error("Failed to auto-restore email/password provider:", linkErr);
+          } catch (linkErr: any) {
+            if (linkErr.code === 'auth/email-already-in-use' || linkErr.code === 'auth/credential-already-in-use') {
+              console.log("Auto-restore: Email/credential is already in use by this account or already linked. Restored state verified.");
+            } else {
+              console.error("Failed to auto-restore email/password provider:", linkErr);
+            }
           }
         }
       }

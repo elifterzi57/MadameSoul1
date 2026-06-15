@@ -17,6 +17,8 @@ Birim testleri, uygulamanın arayüzünden bağımsız olarak çalışan küçü
 * **Test Klasörü:** [tests/unit/](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/)
 * **Mevcut Testler:**
   - [helpers.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/helpers.test.ts): Tarih formatlama (`formatDate`) ve doğum tarihi doğrulama (`isValidDob`) mantığını test eder.
+  - [rbac.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/rbac.test.ts): RBAC (Role-Based Access Control) `requireRole` middleware mantığını (admin, employee, user rollerine göre erişim yetkilerini ve engellemelerini) test eder.
+  - [transactions.test.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/unit/transactions.test.ts): MS-192 kapsamında `moon_transactions` koleksiyonuna eklenen güvenli işlem takibi alanlarının (`userId`, `amount`, `type`, `paymentProvider`, `idempotencyKey` ve `clientMetadata` / `userAgent`, `os`, `appVersion`) girdi doğrulama mantığını test eder.
 
 ### Komutlar ve Çalıştırma
 
@@ -44,9 +46,12 @@ Uçtan uca testler, uygulamayı gerçek bir tarayıcıda (Chromium) açarak buto
 * **Kullanılan Kütüphane:** [Playwright](https://playwright.dev/)
 * **Test Klasörü:** [tests/e2e/](file:///Users/elifterzi/antigravity/MadameSoul/tests/e2e/)
 * **Mevcut Testler:**
-  - [app.spec.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/e2e/app.spec.ts): 
-    - **Onboarding ve Giriş Akışı:** Kullanıcının onboarding ekranındaki slaytları tek tek geçip giriş ekranına ulaşabildiğini test eder.
-    - **Onboarding Atlatma:** Kullanıcının onboarding'i "Atla" butonuyla geçip doğrudan giriş formunu görebildiğini doğrular.
+  - [app.spec.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/e2e/app.spec.ts):
+    - **Onboarding ve Giriş/Kayıt Akışı:** Kullanıcının onboarding slaytlarını geçmesini, yeni kayıt (Sign Up) olmasını ve başarılı giriş sonrası sözleşme onay modalını (`TermsModal`) kabul etmesini doğrular.
+    - **Form Doldurma ve Kart Çekimi:** Fal başlatmayı, isim, doğum tarihi, şehir bilgilerini doldurmayı, interaktif kart destesinden 3 kart seçmeyi ve Gemini API tabanlı yorumlamanın tamamlanmasını doğrular.
+    - **Profil ve Kişiselleştirme Günlüğü:** Profil sayfasındaki geçmiş falları listelemeyi, favorilere eklemeyi, özel başlık tanımlamayı, yansıma/gerçekleşme notu yazıp kaydetmeyi doğrular.
+  - [admin.spec.ts](file:///Users/elifterzi/antigravity/MadameSoul/tests/e2e/admin.spec.ts):
+    - **MadameSoul Yönetici Paneli Akışı:** Ana uygulamada yeni kayıt olan kullanıcının yönetici paneline (`http://localhost:3001`) giriş yapabilmesini, "Sistem Ayarları" akordeon bölümünü genişletmesini, Gemini bağlantısını test etmesini ve sağlık taraması sonucunun ("BAĞLANTI BAŞARILI" veya "BAĞLANTI HATASI") ekranda görünmesini doğrular.
 
 ### Komutlar ve Çalıştırma
 
