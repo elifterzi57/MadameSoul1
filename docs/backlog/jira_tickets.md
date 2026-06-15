@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **96** | Açık: **0** | Tamamlanan: **93** | İptal Edilen: **3**
+Toplam Bilet: **99** | Açık: **0** | Tamamlanan: **96** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,9 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-267**](#-ms-267) | Feature / Dev | Fal Yorumları Sistem Promptu Optimizasyonu | Yüksek | Yerel yapay zeka sistem promptu veri sadakati, kartlar arası bağlam ve bütünlük, mistik tonlama ve gereksiz token kısıtlaması gibi optimizasyonlarla güncellendi. | Elif |
+| [**MS-266**](#-ms-266) | Feature / UX / UI | Bildirimlerin Sağ Üstte Gösterilmesi ve Ses Efekti Eklenmesi | Yüksek | Tüm Toast bildirimleri ekranın sağ üst köşesine konumlandırıldı ve her bildirim tetiklendiğinde çalmak üzere mistik bir chime ses efekti (reveal.wav) entegre edildi. | Elif |
+| [**MS-265**](#-ms-265) | Bug / Dev / UX | Fal Tamamlandığında Ekrana Bildirim Gönderilmesi | Yüksek | Fal başarıyla tamamlandığında ekranda Toast bildirim gösterimi ve tarayıcı izin verdiyse yerel tarayıcı bildirim gönderimi entegre edildi. | Elif |
 | [**MS-264**](#-ms-264) | Feature / Dev | Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması | Yüksek | Yerel yapay zeka (LM Studio) istek gövdesine, kartları YAML dosyalarındaki resmi tanımlara göre yorumlamasını zorunlu kılan 'system' mesajı başarıyla eklendi. | Elif |
 | [**MS-263**](#-ms-263) | Bug / Dev | Web Push Bildirim Ayarları Hatalarının Düzeltilmesi | Yüksek | Localhost üzerinde service worker unregister mantığı kaldırılarak FCM ve Web Push bildirim desteği localhost ve production ortamlarında sorunsuz hale getirildi. | Elif |
 | [**MS-262**](#-ms-262) | Revert / Cleanup | MS-245 Sonrası Tüm Geliştirmelerin Geri Alınması ve Kod Temizliği | En Yüksek | Git deposu MS-244 sürümüne (71df6d3) geri döndürüldü; MS-246 ile MS-261 arasındaki tüm biletlerin geliştirmeleri silindi ve kod temizlendi. | Elif |
@@ -127,6 +130,8 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
+*(Şu an aktif açık bilet bulunmamaktadır.)*
+
 ---
 
 ## 🚫 İptal Edilen Bilet Detayları (Cancelled Ticket Details)
@@ -183,6 +188,53 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-267: Fal Yorumları Sistem Promptu Optimizasyonu (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Backend / Local LLM / System Prompt
+* **Açıklama:**  
+  Yerel yapay zeka (LM Studio) Katina Tarot yorumlama performansını, veri sadaketini ve mistik ton bütünlüğünü artırmak için sistem promptunun optimize edilmesi başarıyla sağlandı.
+* **Kabul Kriterleri:**
+  1. `server.ts` içerisindeki yerel LLM sistem promptu güncellenmelidir.
+  2. Yeni prompt, resmi tanımlara bağlılığı ("veri sadakati"), kartlar arası ilişkilendirmeyi ("bağlam ve bütünlük"), mistik dili ve gereksiz token tasarrufunu içermelidir.
+  3. Güvenlik sınırı kuralı kaldırılmalıdır.
+
+---
+
+### 📋 MS-266: Bildirimlerin Sağ Üstte Gösterilmesi ve Ses Efekti Eklenmesi (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Frontend Arayüzü / Toast Bildirimleri / Ses Efektleri
+* **Açıklama:**  
+  Uygulamadaki tüm Toast bildirimlerinin ekranın sağ üst köşesinde gösterilmesi ve her bildirim tetiklendiğinde mistik bir chime ses efektinin (`reveal.wav`) çalınması başarıyla sağlandı.
+* **Kabul Kriterleri:**
+  1. Toast bildirim bileşeni (Toast container) konumlandırması ekranın sağ üst köşesine (`fixed top-6 left-6 right-6 md:left-auto md:right-6`) alınmalıdır.
+  2. Sağ üst konumlandırmaya uygun olarak giriş/çıkış animasyonları (motion) yukarıdan aşağıya doğru süzülecek şekilde (`y: -50`) güncellenmelidir.
+  3. `showToast` fonksiyonu tetiklendiğinde `/assets/audio/reveal.wav` ses dosyası çalınmalıdır.
+
+---
+
+### 📋 MS-265: Fal Tamamlandığında Ekrana Bildirim Gönderilmesi (Bug / Dev / UX)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Frontend Arayüzü / Yükleme Deneyimi / Toast Bildirimleri
+* **Açıklama:**  
+  Fal başarıyla tamamlandığında ekranda Toast bildirim gösterimi ve tarayıcı izin verdiyse yerel tarayıcı bildirim gönderimi entegre edildi.
+* **Kabul Kriterleri:**
+  1. Fal yorumu başarıyla üretilip tamamlandığında ekranda Türkçe "Falınız hazır!" veya İngilizce "Your reading is ready!" Toast bildirimi gösterilmelidir.
+  2. Kullanıcı tarayıcı bildirimlerine izin verdiyse, fal hazır olduğunda bir native Notification tetiklenmelidir.
+
+---
 
 ### 📋 MS-264: Local LLM Tutarlı Yorumlar İçin System Prompt Hazırlanması (Feature / Dev)
 

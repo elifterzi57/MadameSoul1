@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const token = process.env.GITHUB_TOKEN || "";
 const owner = "elifterzi57";
 const repo = "MadameSoul1";
-const projectName = "MadameSoulKanban";
+const projectName = "MadameSoulKanban1";
 
 // Helper to send GraphQL requests
 async function graphql(query, variables = {}) {
