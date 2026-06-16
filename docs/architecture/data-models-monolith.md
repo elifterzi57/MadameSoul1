@@ -30,7 +30,7 @@ Koleksiyon listesi:
 Kullanıcıların temel hesap bilgileri, kabul edilen yasal sözleşmeler ve cihaz/oturum meta verilerini içerir.
 
 - **Belge ID (Document ID):** Kullanıcının Firebase Auth benzersiz ID'si (`userId` veya `uid`).
-- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi belgesini okuyabilir, oluşturabilir veya güncelleyebilir.
+- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi belgesini okuyabilir/yazabilir; `viewer`, `employee` veya `admin` rolündeki panel kullanıcıları tüm belgeleri okuyabilir ve listeleyebilir.
 
 ### Şema (Schema)
 
@@ -62,7 +62,7 @@ Kullanıcıların temel hesap bilgileri, kabul edilen yasal sözleşmeler ve cih
 Kullanıcının tarot okumaları yapmak için kullanacağı sanal bakiye ("Moon") miktarını tutar.
 
 - **Belge ID (Document ID):** Kullanıcının Firebase Auth benzersiz ID'si (`userId`).
-- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi bakiyesini görebilir ve güncelleyebilir.
+- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi bakiyesini görebilir ve güncelleyebilir; `viewer`, `employee` veya `admin` rolündeki çalışanlar tüm bakiyeleri görebilir.
 
 ### Şema (Schema)
 
@@ -81,7 +81,7 @@ Kullanıcının tarot okumaları yapmak için kullanacağı sanal bakiye ("Moon"
 Kullanıcının yaptığı tüm bakiye işlemlerini (satın alma, harcama, hoş geldin bonusu) ve gerçekleştirilen tarot okumalarını (seçilen kartlar ve Gemini tarafından oluşturulan metin dahil) saklar.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz işlem ID'si.
-- **Güvenlik Kuralları:** Kullanıcılar yalnızca kendi `userId` değerleriyle eşleşen işlem belgelerini okuyabilir, oluşturabilir ve güncelleyebilir.
+- **Güvenlik Kuralları:** Kullanıcılar yalnızca kendi `userId` değerleriyle eşleşen işlem belgelerini okuyabilir, oluşturabilir ve güncelleyebilir; `viewer`, `employee` veya `admin` rolündeki çalışanlar tüm işlemleri listeleyebilir ve okuyabilir.
 
 ### Şema (Schema)
 
@@ -197,7 +197,7 @@ Kullanıcıların ödeme sayfasına (Stripe Checkout) tıkladığı ancak işlem
 Uygulamanın hem istemci (React) hem de sunucu (Express) tarafında karşılaştığı teknik hataları (Gemini API çökmeleri, veri yazma hataları, Stripe webhook gecikmeleri) merkezi olarak saklar.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz hata ID'si.
-- **Güvenlik Kuralları:** İstemciler sadece yazabilir (`create`), okuma ve güncelleme kesinlikle engellenmiştir (`if false`).
+- **Güvenlik Kuralları:** İstemciler sadece yazabilir (`create`); `viewer`, `employee` veya `admin` rolündeki çalışanlar hataları okuyabilir; güncelleme ve silme tamamen engellenmiştir.
 
 ### Şema (Schema)
 
@@ -258,7 +258,7 @@ Kullanıcıların aldıkları tarot okumalarını derecelendirmelerini ve yorum 
 Kullanıcılara asenkron fal yorumları bittiğinde ve kampanyalarda anlık bildirim (FCM Push Notification) göndermek için kullanılan cihaz kayıtlarını saklar.
 
 - **Belge ID (Document ID):** Kullanıcının Firebase Auth ID'si (`userId`).
-- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi belgesini okuyabilir/yazabilir. Çalışanlar da okuma yapabilir.
+- **Güvenlik Kuralları:** Yalnızca kimliği doğrulanmış kullanıcı kendi belgesini okuyabilir/yazabilir; `viewer`, `employee` veya `admin` rolündeki çalışanlar da okuyabilir.
 
 ### Şema (Schema)
 
@@ -292,7 +292,7 @@ Uygulamanın görsel temasını, promosyon banner metinlerini veya dinamik kampa
 Backend veya API entegrasyon ayarlarını (örneğin rate limit limitleri, Gemini model parametreleri vb.) veritabanı üzerinden dinamik yönetmek için kullanılır.
 
 - **Belge ID (Document ID):** Parametre grubu adı (örn: `gemini_settings`).
-- **Güvenlik Kuralları:** Yalnızca çalışanlar okuyabilir, sadece yöneticiler (admin) yazabilir.
+- **Güvenlik Kuralları:** `viewer`, `employee` veya `admin` rolündeki çalışanlar okuyabilir, sadece yöneticiler (admin) yazabilir.
 
 ### Şema (Schema)
 
@@ -309,14 +309,14 @@ Backend veya API entegrasyon ayarlarını (örneğin rate limit limitleri, Gemin
 Yönetim panelinde veya çalışan odaklı API'lerde rol bazlı yetkilendirme (RBAC) sağlamak için kullanılan kullanıcı yetki listesi.
 
 - **Belge ID (Document ID):** Kullanıcının Firebase Auth ID'si (`userId`).
-- **Güvenlik Kuralları:** Sadece çalışanlar okuyabilir, yazma işlemleri tamamen deaktiftir.
+- **Güvenlik Kuralları:** `viewer`, `employee` veya `admin` rolündeki çalışanlar okuyabilir; yalnızca `admin` rolündeki yöneticiler yazabilir.
 
 ### Şema (Schema)
 
 | Alan Adı (Field) | Tip (Type) | Zorunlu (Req) | Açıklama / Kısıtlama |
 | :--- | :--- | :--- | :--- |
 | `userId` | String | Evet | Firebase Auth UID ile eşleşmelidir. |
-| `role` | String | Evet | Kullanıcının rolü: `employee` (çalışan) veya `admin` (yönetici). |
+| `role` | String | Evet | Kullanıcının rolü: `viewer` (görüntüleyen), `employee` (çalışan) veya `admin` (yönetici). |
 
 ---
 
@@ -325,7 +325,7 @@ Yönetim panelinde veya çalışan odaklı API'lerde rol bazlı yetkilendirme (R
 Yönetim panelinin kaldırılmasıyla birlikte bu koleksiyon kullanımdan kaldırılmıştır. Eski sistemde sistem veya arayüz konfigürasyonlarının ne zaman, kimin tarafından ve ne şekilde değiştirildiğini takip etmekteydi.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
-- **Güvenlik Kuralları:** Deaktif.
+- **Güvenlik Kuralları:** `viewer`, `employee` veya `admin` rolündeki çalışanlar okuyabilir; yazma yasaktır.
 
 ### Şema (Schema)
 
@@ -344,7 +344,7 @@ Yönetim panelinin kaldırılmasıyla birlikte bu koleksiyon kullanımdan kaldı
 Yönetim panelinin kaldırılmasıyla birlikte bu koleksiyon kullanımdan kaldırılmıştır. Eski sistemde bakiye düzenlemeleri, rol atamaları ve konfigürasyon güncellemeleri gibi kritik işlemleri denetim (audit) amacıyla saklamaktı.
 
 - **Belge ID (Document ID):** Rastgele oluşturulan benzersiz log ID'si.
-- **Güvenlik Kuralları:** Deaktif.
+- **Güvenlik Kuralları:** `viewer`, `employee` veya `admin` rolündeki çalışanlar okuyabilir; `employee` ve `admin` rolündekiler yeni log oluşturabilir; güncelleme ve silme yasaktır.
 
 ### Şema (Schema)
 

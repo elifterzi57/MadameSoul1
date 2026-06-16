@@ -4,13 +4,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **102** | Açık: **0** | Tamamlanan: **99** | İptal Edilen: **3**
+Toplam Bilet: **108** | Açık: **0** | Tamamlanan: **105** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+
 
 
 
@@ -27,6 +28,12 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-276**](#-ms-276) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | Görüntüleyici (viewer) rolü yetkileri ve güncellenen firestore.rules kuralları doğrultusunda data-models.md ve data-models-monolith.md güncellendi. | Paige |
+| [**MS-271**](#-ms-271) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Entegrasyonu | En Yüksek | Vite+React projesi `/admin` dizininde kurularak Firebase Auth claim'lerine göre ProtectedRoute yönlendirmeleri tamamlandı. | Elif |
+| [**MS-272**](#-ms-272) | Feature / Dev | İlk Admin Seed Script'inin Yazılması ve Custom Claims Yetkilendirmesi | En Yüksek | CLI token'ı dinamik olarak okuyarak ilk admin kullanıcısını yetkilendiren seed-admin.ts scripti başarıyla çalıştırıldı. | Elif |
+| [**MS-273**](#-ms-273) | Feature / UX / UI / Dev | Firestore Koleksiyon Görselleştirme ve Bakiye Yönetimi (Sekme 1 & 2) | Yüksek | Koleksiyon listeleme arayüzü ile çift onaylı ve gerekçe bildirimli Moon bakiye güncelleme arayüzü `admin_audit_logs` entegrasyonuyla geliştirildi. | Elif |
+| [**MS-274**](#-ms-274) | Feature / UX / UI / Dev | Stripe Ödeme Takibi, Finansal Tablolar ve Sistem Logları Ekranı (Sekme 3 & 4) | Orta | Stripe satış istatistikleri, trend grafikleri ile `error_logs` Canlı İzleme terminal arayüzü tamamlandı. | Elif |
+| [**MS-275**](#-ms-275) | Feature / UX / UI / Dev | Çalışan Rolleri ve Yetki Yönetim Ekranı (Sekme 5) | Düşük | Admin, Çalışan ve Görüntüleyen rollerinin yetki matrisi arayüzde ve rules kurallarında sınırlandırılarak tamamlandı. | Elif |
 | [**MS-270**](#-ms-270) | Bug / Security | Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi | Yüksek | Firestore test modu erişim uyarısını gidermek amacıyla firestore.rules güvenlik kuralları Firebase sunucusuna yüklendi. App.tsx üzerindeki setDoc/updateDoc işlemlerine rules ile uyumlu olacak şekilde lastLogin alanı eklenerek yetki hataları (permission denied) düzeltildi. | Elif |
 | [**MS-269**](#-ms-269) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | `data-models.md` ve `data-models-monolith.md` dosyaları yeni eklenen `ai_feedback`, `user_push_tokens`, `ui_configs` vb. koleksiyonları ve kullanıcı/bakiye şemalarındaki yeni alanları içerecek şekilde güncellendi. | Paige |
 | [**MS-268**](#-ms-268) | Documentation | Test Rehberi Dokümantasyonunun Güncellenmesi | Orta | Mevcut birim testleri (RBAC, Transactions) ve E2E testleri (Admin Panel) eklenerek testing.md güncel uygulamaya göre revize edildi. | Paige |
@@ -131,11 +138,104 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ---
 
-## 🎫 Bilet Detayları (Ticket Details)
+## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
 
-## 📋 Açık Bilet Detayları (Active Ticket Details)
+### 📋 MS-276: Veritabanı Modelleri Dokümantasyonunun Güncellenmesi (Documentation)
 
-*(Şu an aktif açık bilet bulunmamaktadır.)*
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Paige (📚 Technical Writer / `bmad-agent-tech-writer`)
+* **Bileşen:** Database / Documentation
+* **Açıklama:**  
+  Görüntüleyici (`viewer`) rolü yetkileri ve güncellenen `firestore.rules` kuralları doğrultusunda veritabanı şema dokümantasyonunun (`data-models.md` ve `data-models-monolith.md`) güncellenmesi.
+* **Kabul Kriterleri:**
+  1. `viewer` rolü yetkileri ilgili tüm koleksiyon açıklamalarına eklenmelidir.
+  2. `admin_users` şemasında deaktif olan yazma yetkisi `admin` rolü için güncellenmelidir.
+  3. `config_logs` ve `admin_audit_logs` gibi decommissioned logların `viewer` okuma izinleri eklenmelidir.
+
+---
+
+### ✅ MS-271: Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu (Feature / Dev)
+
+* **Öncelik:** En Yüksek (Highest)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / React / Vite / Routing
+* **Açıklama:**  
+  MadameSoul ana deposu altında bağımsız çalışan bir admin paneli uygulaması oluşturulması. `/admin` dizininde React v19, Vite ve Tailwind CSS v4 tabanlı bir mimari kurulacaktır. Firebase Client SDK kurulacak ve `/admin/login` ile `/admin/dashboard` arası `ProtectedRoute` yetki kontrolleri (admin/employee) eklenecektir.
+* **Kabul Kriterleri:**
+  1. `/admin` dizini altında Vite+React projesi kurulup `npm run dev` ile `3001` portunda sorunsuz çalışmalı.
+  2. Firebase Client SDK entegrasyonu tamamlanıp `/admin/login` sayfasında giriş yapabilmeli.
+  3. Kullanıcının Custom Claims rol bilgisine göre (`role === 'admin'` veya `'employee'`) admin sayfalarına erişim izinleri ve `ProtectedRoute` kontrol edilmeli.
+
+---
+
+### ✅ MS-272: İlk Admin Seed Script'inin Yazılması ve Custom Claims Yetkilendirmesi (Feature / Dev)
+
+* **Öncelik:** En Yüksek (Highest)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Security / Firebase Auth / DB Seed
+* **Açıklama:**  
+  İlk admin kullanıcısı `elifterzi@yandex.com` (şifre: `613415`) için Firebase Auth üzerinde kayıt oluşturulması, `admin` yetki Custom Claims kaydının Firebase Admin SDK aracılığıyla atanması ve `admin_users` koleksiyonuna yazılması için `scripts/seed-admin.ts` script'inin kodlanması ve çalıştırılması.
+* **Kabul Kriterleri:**
+  1. `seed-admin.ts` scripti `ts-node` or `tsx` ile çalıştırılabilir olmalı.
+  2. Belirtilen e-posta ve şifreye sahip kullanıcı Firebase Auth'a eklenmeli.
+  3. Kullanıcıya `admin` custom claim'i atanmalı ve `admin_users` koleksiyonunda doğru yetki (role: 'admin') ve id ile kayıt oluşturulmalı.
+
+---
+
+### ✅ MS-273: Firestore Koleksiyon Görselleştirme ve Bakiye Yönetimi (Sekme 1 & 2) (Feature / UX / UI / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / UX / UI / Firestore / Moon Balance
+* **Açıklama:**  
+  Admin Panelinin 1. ve 2. sekmelerinin geliştirilmesi. 
+  - **Sekme 1 (Firestore Görselleştirme):** Veritabanındaki koleksiyonları listeleyen, günlük/aylık/yıllık filtreleyebilen ve A-Z sıralayabilen bir arayüz tasarlanması.
+  - **Sekme 2 (Moon Bakiye Yönetimi):** Kullanıcı arama, mevcut bakiye listeleme ve manuel olarak bakiye artırma/azaltma işlemlerini gerçekleştiren, çift onaylı güvenlik modalına sahip ekran. Her bakiye değişikliği `admin_audit_logs` koleksiyonuna loglanacaktır.
+* **Kabul Kriterleri:**
+  1. Sekme 1'de veritabanı koleksiyonları tarihe göre filtreli ve A-Z sıralı listelenebilmeli.
+  2. Sekme 2'de kullanıcıların Moon bakiyeleri manuel artırılıp azaltılabilmeli.
+  3. Bakiye değişikliklerinde "Neden" bilgisi zorunlu kılınmalı ve bu işlem `admin_audit_logs` koleksiyonuna kaydedilmeli.
+
+---
+
+### ✅ MS-274: Stripe Ödeme Takibi, Finansal Tablolar ve Sistem Logları Ekranı (Sekme 3 & 4) (Feature / UX / UI / Dev)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Stripe / Financial Reports / System Logs
+* **Açıklama:**  
+  Admin Panelinin 3. ve 4. sekmelerinin geliştirilmesi.
+  - **Sekme 3 (Stripe & Finans):** Stripe satın almalarını listeleyen, aylık/yıllık gelir grafiklerini ve metrikleri gösteren finansal tablolar arayüzü.
+  - **Sekme 4 (Sistem Logları):** Uygulamadaki api veya ekran hatalarının (error_logs koleksiyonunun) günlük/aylık/yıllık filtreleme ve A-Z sıralama ile listelendiği, Canlı İzle modu içeren konsol ekranı.
+* **Kabul Kriterleri:**
+  1. Sekme 3'te Stripe ciro ve ödeme durumu bilgileri grafikler ve metrik kartları ile sunulmalı.
+  2. Sekme 4'te `error_logs` koleksiyonundaki sistem hataları günlük/aylık/yıllık filtrelenebilmeli, arama yapılabilmeli.
+
+---
+
+### ✅ MS-275: Çalışan Rolleri ve Yetki Yönetim Ekranı (Sekme 5) (Feature / UX / UI / Dev)
+
+* **Öncelik:** Düşük (Low)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Security / Permissions / RBAC
+* **Açıklama:**  
+  Admin Panelinin 5. sekmesi. Çalışanların listelenmesi ve onlara 3 farklı rolden (Admin, Çalışan, Görüntüleyen) birinin atanması. Yetki seviyelerine göre ekranlardaki işlevlerin kısıtlanması (Örn: Çalışan değişiklik yapabilir ama silemez ve her değişikliği loglanır. Görüntüleyen hiçbir değişiklik yapamaz, salt okunurdur).
+* **Kabul Kriterleri:**
+  1. Sekme 5 üzerinden çalışanların rolleri değiştirilebilmeli.
+  2. Rol değişiklikleri Firebase Custom Claims ve `admin_users` belgesi üzerinde güncellenmeli.
+  3. Arayüz yetki sınırlarına göre dinamik olarak butonları/ekranları gizlemeli veya kısıtlamalı.
 
 ---
 
