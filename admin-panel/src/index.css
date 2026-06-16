@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-admin-bg: #f8fafc;
+  --color-admin-sidebar: #1e293b;
+  --color-admin-accent: #3b82f6;
+  --color-admin-text: #0f172a;
+}
+
+body {
+  background-color: var(--color-admin-bg);
+  color: var(--color-admin-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}

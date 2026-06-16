@@ -5,16 +5,32 @@ service cloud.firestore {
       allow read, write: if false;
     }
     
+    function getAdminData() {
+      return get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data;
+    }
+
     function isEmployee() {
       return request.auth != null && 
-             ('role' in request.auth.token) &&
-             (request.auth.token.role == 'employee' || request.auth.token.role == 'admin');
+             (
+               (('role' in request.auth.token) && (request.auth.token.role == 'employee' || request.auth.token.role == 'admin')) ||
+               exists(/databases/$(database)/documents/admin_users/$(request.auth.uid))
+             );
     }
 
     function isAdmin() {
       return request.auth != null && 
-             ('role' in request.auth.token) &&
-             request.auth.token.role == 'admin';
+             (
+               (('role' in request.auth.token) && request.auth.token.role == 'admin') ||
+               (exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) && getAdminData().role == 'admin')
+             );
+    }
+
+    function isStaff() {
+      return request.auth != null && 
+             (
+               (('role' in request.auth.token) && (request.auth.token.role == 'employee' || request.auth.token.role == 'admin')) ||
+               (exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) && getAdminData().role in ['admin', 'çalışan'])
+             );
     }
 
     function isValidMessage(data) {
@@ -99,13 +115,15 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if request.auth != null && (request.auth.uid == userId || isEmployee());
       allow list: if request.auth != null && isEmployee();
-      allow create, update: if request.auth != null && (request.auth.uid == userId || isEmployee()) && isValidUser(request.resource.data);
+      allow create, update: if request.auth != null && (request.auth.uid == userId || isStaff()) && isValidUser(request.resource.data);
       allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
     match /admin_users/{userId} {
-      allow read: if request.auth != null && isEmployee();
-      allow write: if false;
+      allow read: if request.auth != null && (request.auth.uid == userId || isEmployee());
+      allow create: if isAdmin() || (request.auth != null && request.auth.uid == userId && request.resource.data.email.lower() == "elifterzi57@gmail.com" && request.resource.data.role == 'admin');
+      allow update: if isAdmin(); 
+      allow delete: if isAdmin();
     }
 
     match /user_moons/{userId} {
@@ -122,7 +140,7 @@ service cloud.firestore {
                          (request.resource.data.balance == 5)
                        ))
                       ||
-                      isEmployee()
+                      isStaff()
                     );
       allow update: if request.auth != null && 
                     (
@@ -175,20 +193,20 @@ service cloud.firestore {
                          )
                        ))
                       ||
-                      isEmployee()
+                       isStaff()
                     );
       allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
-    match /moon_transactions/{transactionId} {
+     match /moon_transactions/{transactionId} {
       allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
       allow create: if request.auth != null && 
-                    (request.resource.data.userId == request.auth.uid || isEmployee()) && 
+                    (request.resource.data.userId == request.auth.uid || isStaff()) && 
                     isValidMoonTransaction(request.resource.data, transactionId) &&
                     request.resource.data.paymentProvider is string &&
                     request.resource.data.idempotencyKey is string &&
                     request.resource.data.clientMetadata is map;
-      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee()) && isValidMoonTransaction(request.resource.data, transactionId);
+      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || isStaff()) && isValidMoonTransaction(request.resource.data, transactionId);
       allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
@@ -201,27 +219,33 @@ service cloud.firestore {
 
     match /messages_en/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
     match /messages_tr/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
     match /messages_es/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
     match /messages_fr/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
     match /messages_zh/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
     match /messages_ko/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
 
     match /phones/{phoneNumber} {
@@ -241,7 +265,8 @@ service cloud.firestore {
     match /error_logs/{logId} {
       allow create: if request.resource.data.source == 'client' &&
                     (request.resource.data.userId == null || (request.auth != null && request.resource.data.userId == request.auth.uid));
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
 
     match /ai_telemetry/{telemetryId} {

@@ -1320,6 +1320,18 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
 
   // Serve static files
   if (process.env.NODE_ENV === "production") {
+    // Admin Panel serving (MS-271)
+    const adminDistPath = path.resolve(process.cwd(), "admin-panel/dist");
+    app.use("/admin", express.static(adminDistPath));
+    app.get("/admin*", (req, res) => {
+      res.sendFile(path.join(adminDistPath, "index.html"), (err) => {
+        if (err) {
+          console.error(`[Server] Error sending admin index.html:`, err);
+          res.status(500).send("Error loading admin application");
+        }
+      });
+    });
+
     const distPath = path.resolve(process.cwd(), "dist");
     console.log(`[Server] Production mode: serving from ${distPath}`);
     
