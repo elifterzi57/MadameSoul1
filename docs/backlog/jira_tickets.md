@@ -4,13 +4,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **103** | Açık: **0** | Tamamlanan: **100** | İptal Edilen: **3**
+Toplam Bilet: **104** | Açık: **1** | Tamamlanan: **100** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-273**](#-ms-273) | Feature / Dev | Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması | Yüksek | Active | Elif |
 
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
@@ -135,7 +136,20 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-*(Şu an aktif açık bilet bulunmamaktadır.)*
+### 📋 MS-273: Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** 📋 Açık (Active)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / UI / UX Redesign
+* **Açıklama:**  
+  `docs/architecture/admin-design-spec.md` dokümanındaki spesifikasyonlara göre admin panelinin UI/UX kodlaması tamamlanmalıdır. Mevcut 5 sekmenin (Collections, Users, Finance, Logs, Employees) ve giriş/login ekranının tasarımı mistik mor-siyah-altın temasına, glassmorphism kart efektlerine, Lucide ikon setine ve Cinzel/Inter tipografi hiyerarşisine uygun olarak güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. Tailwind/CSS ile dark theme/mistik renkler (`#05000a`, `#0a0512`, `#ecd8a6`) panele uygulanmalı.
+  2. Giriş ekranı ve 5 temel sekme yeni tasarıma göre güncellenmeli.
+  3. Butonlar, veri tabloları ve girdiler (inputs) spesifikasyondaki gibi kodlanmalı.
+  4. Okunabilirliği korumak için Cinzel (başlıklar) ve Inter (tablo/gövde) yazı tipleri entegre edilmeli.
 
 ---
 
@@ -208,6 +222,9 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
   2. Lucide ikonları ve mistik semboller panel genelinde estetik bir şekilde kullanılmalıdır.
   3. Butonlar, tablolar, kartlar ve form alanları glassmorphism efektleri ve yumuşak micro-animation'lar ile premium bir his vermelidir.
   4. Tasarım spesifikasyonları ve stil kılavuzu (Tailwind/CSS konfigürasyonları) bir doküman (`admin-design-spec.md`) olarak hazırlanmalıdır.
+
+---
+
 ### ✅ MS-271: Admin Paneli MVP Altyapısı (Feature / Epic)
 
 * **Öncelik:** En Yüksek (Highest)
