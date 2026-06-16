@@ -4,14 +4,13 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **103** | Açık: **1** | Tamamlanan: **99** | İptal Edilen: **3**
+Toplam Bilet: **103** | Açık: **0** | Tamamlanan: **100** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-272**](#-ms-272) | Feature / UX / UI | Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması | Yüksek | Active | Elif |
 
 
 
@@ -28,6 +27,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-272**](#-ms-272) | Feature / UX / UI | Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması | Yüksek | Admin panelinin MadameSoul mistik temasına (mor, siyah, altın) ve ikon setine göre yeni UI/UX spesifikasyonu hazırlandı ve belgelendi. | Elif |
 | [**MS-270**](#-ms-270) | Bug / Security | Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi | Yüksek | Firestore test modu erişim uyarısını gidermek amacıyla firestore.rules güvenlik kuralları Firebase sunucusuna yüklendi. App.tsx üzerindeki setDoc/updateDoc işlemlerine rules ile uyumlu olacak şekilde lastLogin alanı eklenerek yetki hataları (permission denied) düzeltildi. | Elif |
 | [**MS-269**](#-ms-269) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | `data-models.md` ve `data-models-monolith.md` dosyaları yeni eklenen `ai_feedback`, `user_push_tokens`, `ui_configs` vb. koleksiyonları ve kullanıcı/bakiye şemalarındaki yeni alanları içerecek şekilde güncellendi. | Paige |
 | [**MS-268**](#-ms-268) | Documentation | Test Rehberi Dokümantasyonunun Güncellenmesi | Orta | Mevcut birim testleri (RBAC, Transactions) ve E2E testleri (Admin Panel) eklenerek testing.md güncel uygulamaya göre revize edildi. | Paige |
@@ -136,20 +136,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-### 📋 MS-272: Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması (Feature / UX / UI)
-
-* **Öncelik:** Yüksek (High)
-* **Durum:** 📋 Açık (Active)
-* **Oluşturan (Reporter):** Elif (USER)
-* **Atanan (Assignee):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
-* **Bileşen:** Admin Panel / UX / UI
-* **Açıklama:**  
-  Admin panelinin tasarımı, MadameSoul ana uygulamasının mistik (mor, siyah, altın) temasına, modern glassmorphism efektlerine ve ikon setine uygun olarak yeniden tasarlanmalıdır. Mevcut sade MVP arayüzünün yerine, kullanıcıyı wowed edecek premium ve mistik bir arayüz oluşturulmalı, tüm bileşenler, renk paletleri ve ikonlar bu doğrultuda güncellenmelidir.
-* **Kabul Kriterleri:**
-  1. Arayüzün renk paleti ve tipografisi MadameSoul ana uygulamasıyla (mor, siyah ve altın tonları) uyumlu hale getirilmelidir.
-  2. Lucide ikonları ve mistik semboller panel genelinde estetik bir şekilde kullanılmalıdır.
-  3. Butonlar, tablolar, kartlar ve form alanları glassmorphism efektleri ve yumuşak micro-animation'lar ile premium bir his vermelidir.
-  4. Tasarım spesifikasyonları ve stil kılavuzu (Tailwind/CSS konfigürasyonları) bir doküman (`admin-design-spec.md`) olarak hazırlanmalıdır.
+*(Şu an aktif açık bilet bulunmamaktadır.)*
 
 ---
 
@@ -207,6 +194,23 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-272: Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Bileşen:** Admin Panel / UX / UI
+* **Açıklama:**  
+  Admin panelinin tasarımı, MadameSoul ana uygulamasının mistik (mor, siyah, altın) temasına, modern glassmorphism efektlerine ve ikon setine uygun olarak yeniden tasarlanmalıdır. Mevcut sade MVP arayüzünün yerine, kullanıcıyı wowed edecek premium ve mistik bir arayüz oluşturulmalı, tüm bileşenler, renk paletleri ve ikonlar bu doğrultuda güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. Arayüzün renk paleti ve tipografisi MadameSoul ana uygulamasıyla (mor, siyah ve altın tonları) uyumlu hale getirilmelidir.
+  2. Lucide ikonları ve mistik semboller panel genelinde estetik bir şekilde kullanılmalıdır.
+  3. Butonlar, tablolar, kartlar ve form alanları glassmorphism efektleri ve yumuşak micro-animation'lar ile premium bir his vermelidir.
+  4. Tasarım spesifikasyonları ve stil kılavuzu (Tailwind/CSS konfigürasyonları) bir doküman (`admin-design-spec.md`) olarak hazırlanmalıdır.
+
+---
 
 ### 📋 MS-270: Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi (Bug / Security)
 
