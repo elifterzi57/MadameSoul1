@@ -1,0 +1,165 @@
+import React, { useState, useEffect } from 'react';
+import { auth } from '../firebase';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { 
+  Database, 
+  Coins, 
+  CreditCard, 
+  Terminal, 
+  ShieldAlert, 
+  LogOut, 
+  User as UserIcon 
+} from 'lucide-react';
+import { CollectionsTab } from '../components/CollectionsTab';
+import { BalanceTab } from '../components/BalanceTab';
+import { FinanceTab } from '../components/FinanceTab';
+import { LogsTab } from '../components/LogsTab';
+import { PermissionsTab } from '../components/PermissionsTab';
+
+export const Dashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'collections' | 'balance' | 'finance' | 'logs' | 'permissions'>('collections');
+  const [userRole, setUserRole] = useState<'admin' | 'employee' | 'viewer' | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUserEmail(user.email);
+        const tokenResult = await user.getIdTokenResult(true);
+        setUserRole((tokenResult.claims.role as 'admin' | 'employee' | 'viewer') || 'viewer');
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleSignOut = () => {
+    signOut(auth);
+  };
+
+  const getRoleLabel = () => {
+    switch (userRole) {
+      case 'admin': return 'Süper Admin';
+      case 'employee': return 'Çalışan (Moderatör)';
+      case 'viewer': return 'Görüntüleyen (Salt Okunur)';
+      default: return 'Görüntüleyen';
+    }
+  };
+
+  const getRoleBadgeColor = () => {
+    switch (userRole) {
+      case 'admin': return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+      case 'employee': return 'bg-purple-500/20 text-purple-300 border-purple-500/40';
+      case 'viewer': return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+      default: return 'bg-gray-500/20 text-gray-300 border-gray-500/40';
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen bg-[#07040e] text-[#ecd8a6]">
+      {/* Sidebar */}
+      <aside className="w-64 border-r border-[#ecd8a6]/10 bg-[#0c081a] p-6 flex flex-col justify-between">
+        <div>
+          {/* Logo */}
+          <div className="mb-8 text-center border-b border-[#ecd8a6]/10 pb-6">
+            <h1 className="font-serif text-2xl tracking-widest text-[#ecd8a6]">MADAME SOUL</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#ecd8a6]/50">Yönetici Paneli</p>
+          </div>
+
+          {/* Navigation Menu */}
+          <nav className="space-y-2">
+            <button
+              onClick={() => setActiveTab('collections')}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                activeTab === 'collections'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <Database className="h-4 w-4" />
+              Veritabanı Koleksiyonları
+            </button>
+
+            <button
+              onClick={() => setActiveTab('balance')}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                activeTab === 'balance'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <Coins className="h-4 w-4" />
+              Moon Bakiye Yönetimi
+            </button>
+
+            <button
+              onClick={() => setActiveTab('finance')}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                activeTab === 'finance'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <CreditCard className="h-4 w-4" />
+              Stripe Finans & Satış
+            </button>
+
+            <button
+              onClick={() => setActiveTab('logs')}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                activeTab === 'logs'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <Terminal className="h-4 w-4" />
+              Sistem Hata Logları
+            </button>
+
+            <button
+              onClick={() => setActiveTab('permissions')}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                activeTab === 'permissions'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <ShieldAlert className="h-4 w-4" />
+              Çalışan Yetkileri
+            </button>
+          </nav>
+        </div>
+
+        {/* User Info & Signout */}
+        <div className="border-t border-[#ecd8a6]/10 pt-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="rounded-full bg-purple-900/30 p-2 border border-[#ecd8a6]/20">
+              <UserIcon className="h-4 w-4 text-[#ecd8a6]" />
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-xs font-semibold truncate text-[#ecd8a6]">{userEmail}</p>
+              <span className={`inline-block mt-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border ${getRoleBadgeColor()}`}>
+                {getRoleLabel()}
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
+          >
+            <LogOut className="h-4 w-4" />
+            Çıkış Yap
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-8 overflow-y-auto">
+        {activeTab === 'collections' && <CollectionsTab userRole={userRole} />}
+        {activeTab === 'balance' && <BalanceTab userRole={userRole} />}
+        {activeTab === 'finance' && <FinanceTab userRole={userRole} />}
+        {activeTab === 'logs' && <LogsTab userRole={userRole} />}
+        {activeTab === 'permissions' && <PermissionsTab userRole={userRole} />}
+      </main>
+    </div>
+  );
+};
