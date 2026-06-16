@@ -4,13 +4,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **102** | Açık: **0** | Tamamlanan: **99** | İptal Edilen: **3**
+Toplam Bilet: **103** | Açık: **1** | Tamamlanan: **99** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-272**](#-ms-272) | Feature / UX / UI | Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması | Yüksek | Active | Elif |
 
 
 
@@ -135,7 +136,20 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-*(Şu an aktif açık bilet bulunmamaktadır.)*
+### 📋 MS-272: Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması (Feature / UX / UI)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** 📋 Açık (Active)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Bileşen:** Admin Panel / UX / UI
+* **Açıklama:**  
+  Admin panelinin tasarımı, MadameSoul ana uygulamasının mistik (mor, siyah, altın) temasına, modern glassmorphism efektlerine ve ikon setine uygun olarak yeniden tasarlanmalıdır. Mevcut sade MVP arayüzünün yerine, kullanıcıyı wowed edecek premium ve mistik bir arayüz oluşturulmalı, tüm bileşenler, renk paletleri ve ikonlar bu doğrultuda güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. Arayüzün renk paleti ve tipografisi MadameSoul ana uygulamasıyla (mor, siyah ve altın tonları) uyumlu hale getirilmelidir.
+  2. Lucide ikonları ve mistik semboller panel genelinde estetik bir şekilde kullanılmalıdır.
+  3. Butonlar, tablolar, kartlar ve form alanları glassmorphism efektleri ve yumuşak micro-animation'lar ile premium bir his vermelidir.
+  4. Tasarım spesifikasyonları ve stil kılavuzu (Tailwind/CSS konfigürasyonları) bir doküman (`admin-design-spec.md`) olarak hazırlanmalıdır.
 
 ---
 
