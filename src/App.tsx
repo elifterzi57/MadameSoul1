@@ -419,6 +419,7 @@ function AppContent() {
               timezone,
               deviceInfo,
               appVersion,
+              lastLogin: serverTimestamp(),
               updatedAt: serverTimestamp()
             });
           } else {
@@ -432,6 +433,7 @@ function AppContent() {
               focus: 'general',
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
+              lastLogin: serverTimestamp(),
               timezone,
               deviceInfo,
               appVersion,

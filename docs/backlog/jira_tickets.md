@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **101** | Açık: **0** | Tamamlanan: **98** | İptal Edilen: **3**
+Toplam Bilet: **102** | Açık: **0** | Tamamlanan: **99** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -27,6 +27,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-270**](#-ms-270) | Bug / Security | Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi | Yüksek | Firestore test modu erişim uyarısını gidermek amacıyla firestore.rules güvenlik kuralları Firebase sunucusuna yüklendi. App.tsx üzerindeki setDoc/updateDoc işlemlerine rules ile uyumlu olacak şekilde lastLogin alanı eklenerek yetki hataları (permission denied) düzeltildi. | Elif |
 | [**MS-269**](#-ms-269) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | `data-models.md` ve `data-models-monolith.md` dosyaları yeni eklenen `ai_feedback`, `user_push_tokens`, `ui_configs` vb. koleksiyonları ve kullanıcı/bakiye şemalarındaki yeni alanları içerecek şekilde güncellendi. | Paige |
 | [**MS-268**](#-ms-268) | Documentation | Test Rehberi Dokümantasyonunun Güncellenmesi | Orta | Mevcut birim testleri (RBAC, Transactions) ve E2E testleri (Admin Panel) eklenerek testing.md güncel uygulamaya göre revize edildi. | Paige |
 | [**MS-267**](#-ms-267) | Feature / Dev | Fal Yorumları Sistem Promptu Optimizasyonu | Yüksek | Yerel yapay zeka sistem promptu veri sadakati, kartlar arası bağlam ve bütünlük, mistik tonlama ve gereksiz token kısıtlaması gibi optimizasyonlarla güncellendi. | Elif |
@@ -192,6 +193,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-270: Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi (Bug / Security)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Database / Security / Firebase Firestore
+* **Açıklama:**  
+  Firestore veritabanı istemci erişiminin test modu süresinin dolması sebebiyle oluşan erişim kesintisi uyarısı ve kullanıcı dokümanlarına yazma/güncelleme esnasında oluşan yetki hataları (permission denied) çözülmüştür.
+* **Kabul Kriterleri:**
+  1. Yerel `firestore.rules` kuralları Firebase sunucusuna başarıyla deploy edilmelidir.
+  2. Kullanıcıların giriş akışında ve onboarding sürecinde aldıkları yetki (Missing or insufficient permissions) hataları giderilmelidir.
+  3. `users` koleksiyonu veri şeması kurallarına (lastLogin alanı kontrolü) uygun olarak istemci tarafındaki `setDoc` ve `updateDoc` çağrıları düzenlenmelidir.
+
+---
 
 ### 📋 MS-267: Fal Yorumları Sistem Promptu Optimizasyonu (Feature / Dev)
 
