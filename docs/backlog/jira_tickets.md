@@ -4,15 +4,13 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **102** | Açık: **0** | Tamamlanan: **99** | İptal Edilen: **3**
+Toplam Bilet: **103** | Açık: **0** | Tamamlanan: **100** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-
-
 
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
@@ -27,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-271**](#-ms-271) | Feature / Epic | Admin Paneli MVP Altyapısı (Firestore Listeleri, Bakiye, Finans, Loglar, RBAC) | En Yüksek | 5 sekmeli bağımsız React/Vite/Tailwind Admin Paneli geliştirildi; Koleksiyon listesi, Moon bakiye yönetimi, Stripe finansal tablosu, sistem logları ve RBAC (admin/çalışan/görüntüleyen) desteği eklendi, Express sunucusuna entegre edildi. | Elif |
 | [**MS-270**](#-ms-270) | Bug / Security | Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi | Yüksek | Firestore test modu erişim uyarısını gidermek amacıyla firestore.rules güvenlik kuralları Firebase sunucusuna yüklendi. App.tsx üzerindeki setDoc/updateDoc işlemlerine rules ile uyumlu olacak şekilde lastLogin alanı eklenerek yetki hataları (permission denied) düzeltildi. | Elif |
 | [**MS-269**](#-ms-269) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | `data-models.md` ve `data-models-monolith.md` dosyaları yeni eklenen `ai_feedback`, `user_push_tokens`, `ui_configs` vb. koleksiyonları ve kullanıcı/bakiye şemalarındaki yeni alanları içerecek şekilde güncellendi. | Paige |
 | [**MS-268**](#-ms-268) | Documentation | Test Rehberi Dokümantasyonunun Güncellenmesi | Orta | Mevcut birim testleri (RBAC, Transactions) ve E2E testleri (Admin Panel) eklenerek testing.md güncel uygulamaya göre revize edildi. | Paige |
@@ -193,6 +192,29 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-271: Admin Paneli MVP Altyapısı (Feature / Epic)
+
+* **Öncelik:** En Yüksek (Highest)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Security / RBAC
+* **Açıklama:**  
+  MadameSoul çalışanları ve yöneticilerinin uygulamanın veri, bakiye, finansal tablolar, loglar ve çalışan yetkilerini bağımsız bir panel üzerinden yönetebilmesi için 5 sekmeli, güvenli ve izole bir React/Vite/Tailwind admin uygulaması geliştirilmiştir.
+* **Kabul Kriterleri:**
+  1. `admin-panel` dizini altında izole, modüler, Tailwind v4 tabanlı bir arayüze sahip bağımsız uygulama geliştirilmelidir.
+  2. Tab 1: Veri Tabanı Koleksiyon Listesi (arama, sıralama ve günlük/aylık/yıllık filtreleme desteği).
+  3. Tab 2: Moon Bakiye Yönetimi (manuel olarak artırıp azaltabilme/eşitleme, tüm işlemlerin `moon_transactions` ve `admin_audit_logs` koleksiyonlarına otomatik loglanması).
+  4. Tab 3: Stripe finansal tablolarını takip edebilme (satış listesi, gelir, sepet ortalaması analitiği).
+  5. Tab 4: Sistem ve hata loglarının detaylı (stack trace ve cihaz metadatası dahil) takip edilmesi.
+  6. Tab 5: Rol tabanlı yetki kontrolü (Admin, Çalışan, Sadece Görüntüleyen; Admin tüm haklara sahipken çalışan silme yetkisine sahip değildir, görüntüleyen ise sadece salt okunur işlem yapar).
+  7. `elifterzi57@gmail.com` kullanıcısının ilk girişinde otomatik `admin` olarak yetkilendirilmesini sağlayan bootstrapping mekanizması oluşturulmalıdır.
+  8. Express sunucusu (/admin) statik rota üzerinden admin panelinin dist çıktısını sunacak şekilde güncellenmelidir.
+
+* **Çözüm:** Admin paneli `admin-panel` klasöründe Vite+TS+Tailwind v4 ile geliştirildi. `firestore.rules` güncellenerek `admin_users` tabanlı RBAC korumaları eklendi. Tüm sekmeler (Veritabanı Tarayıcı, Moon Bakiye Yönetimi, Stripe Finans Ekranı, Sistem Hata Logları, Çalışan Rol Yönetimi) başarıyla tamamlandı. Express sunucusuna `/admin` statik rota entegrasyonu yapıldı ve derleme testleri tamamlandı.
+
+---
 
 ### 📋 MS-270: Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi (Bug / Security)
 
