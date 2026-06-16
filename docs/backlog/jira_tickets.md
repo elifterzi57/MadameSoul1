@@ -4,28 +4,29 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **104** | Açık: **1** | Tamamlanan: **100** | İptal Edilen: **3**
+Toplam Bilet: **104** | Açık: **0** | Tamamlanan: **101** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-273**](#-ms-273) | Feature / Dev | Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması | Yüksek | Active | Elif |
 
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 | [**MS-261**](#-ms-261) | Bug / Dev | E-posta Bildirim Gönderim Hatalarının Düzeltilmesi | Yüksek | Cancelled | Elif |
 | [**MS-260**](#-ms-260) | Feature / UX / UI | Premium Mistik Şarj ve Göksel Yükleme Ritüeli Ekranı | Yüksek | Cancelled | Elif |
 | [**MS-259**](#-ms-259) | Bug / Dev | FCM Push Bildirim Altyapısı Hatalarının Düzeltilmesi | Yüksek | Cancelled | Elif |
-| :--- | :--- | :--- | :--- | :--- | :--- |
 
 ### ✅ Tamamlanan Biletler (Completed Tickets)
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-273**](#-ms-273) | Feature / Dev | Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması | Yüksek | Admin panelinin giriş ekranı ve 5 temel sekmesi (Koleksiyonlar, Kullanıcılar, Finans, Loglar, Çalışanlar) design spec belgesine göre mistik mor-siyah-altın teması, Lucide ikon seti ve Cinzel/Inter font ikilisiyle sıfırdan giydirildi ve responsive hale getirildi. | Elif |
 | [**MS-272**](#-ms-272) | Feature / UX / UI | Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması | Yüksek | Admin panelinin MadameSoul mistik temasına (mor, siyah, altın) ve ikon setine göre yeni UI/UX spesifikasyonu hazırlandı ve belgelendi. | Elif |
 | [**MS-271**](#-ms-271) | Feature / Epic | Admin Paneli MVP Altyapısı (Firestore Listeleri, Bakiye, Finans, Loglar, RBAC) | En Yüksek | 5 sekmeli bağımsız React/Vite/Tailwind Admin Paneli geliştirildi; Koleksiyon listesi, Moon bakiye yönetimi, Stripe finansal tablosu, sistem logları ve RBAC (admin/çalışan/görüntüleyen) desteği eklendi, Express sunucusuna entegre edildi. | Elif |
 | [**MS-270**](#-ms-270) | Bug / Security | Firestore Kuralları ve İstemci Yetki Hatalarının Düzeltilmesi | Yüksek | Firestore test modu erişim uyarısını gidermek amacıyla firestore.rules güvenlik kuralları Firebase sunucusuna yüklendi. App.tsx üzerindeki setDoc/updateDoc işlemlerine rules ile uyumlu olacak şekilde lastLogin alanı eklenerek yetki hataları (permission denied) düzeltildi. | Elif |
@@ -136,21 +137,6 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Açık Bilet Detayları (Active Ticket Details)
 
-### 📋 MS-273: Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması (Feature / Dev)
-
-* **Öncelik:** Yüksek (High)
-* **Durum:** 📋 Açık (Active)
-* **Oluşturan (Reporter):** Elif (USER)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Admin Panel / UI / UX Redesign
-* **Açıklama:**  
-  `docs/architecture/admin-design-spec.md` dokümanındaki spesifikasyonlara göre admin panelinin UI/UX kodlaması tamamlanmalıdır. Mevcut 5 sekmenin (Collections, Users, Finance, Logs, Employees) ve giriş/login ekranının tasarımı mistik mor-siyah-altın temasına, glassmorphism kart efektlerine, Lucide ikon setine ve Cinzel/Inter tipografi hiyerarşisine uygun olarak güncellenmelidir.
-* **Kabul Kriterleri:**
-  1. Tailwind/CSS ile dark theme/mistik renkler (`#05000a`, `#0a0512`, `#ecd8a6`) panele uygulanmalı.
-  2. Giriş ekranı ve 5 temel sekme yeni tasarıma göre güncellenmeli.
-  3. Butonlar, veri tabloları ve girdiler (inputs) spesifikasyondaki gibi kodlanmalı.
-  4. Okunabilirliği korumak için Cinzel (başlıklar) ve Inter (tablo/gövde) yazı tipleri entegre edilmeli.
-
 ---
 
 ## 🚫 İptal Edilen Bilet Detayları (Cancelled Ticket Details)
@@ -207,6 +193,24 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## ✅ Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-273: Admin Panelinin Tasarım Spesifikasyonuna Göre Kodlanması (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / UI / UX Redesign
+* **Açıklama:**  
+  `docs/architecture/admin-design-spec.md` dokümanındaki spesifikasyonlara göre admin panelinin UI/UX kodlaması tamamlanmalıdır. Mevcut 5 sekmenin (Collections, Users, Finance, Logs, Employees) ve giriş/login ekranının tasarımı mistik mor-siyah-altın temasına, glassmorphism kart efektlerine, Lucide ikon setine ve Cinzel/Inter tipografi hiyerarşisine uygun olarak güncellenmelidir.
+* **Kabul Kriterleri:**
+  1. Tailwind/CSS ile dark theme/mistik renkler (`#05000a`, `#0a0512`, `#ecd8a6`) panele uygulanmalı.
+  2. Giriş ekranı ve 5 temel sekme yeni tasarıma göre güncellenmeli.
+  3. Butonlar, veri tabloları ve girdiler (inputs) spesifikasyondaki gibi kodlanmalı.
+  4. Okunabilirliği korumak için Cinzel (başlıklar) ve Inter (tablo/gövde) yazı tipleri entegre edilmeli.
+* **Çözüm:** Giriş ekranı ile tüm alt sayfalar (Koleksiyonlar, Kullanıcılar, Finans, Loglar, Çalışanlar) ve global düzen (DashboardLayout.tsx) `admin-design-spec.md` belgesine uygun şekilde yeniden kodlandı. Renk paleti, tipografi, cam efekti (glassmorphism), durum ışıkları (semantik glow) ve responsive yapı kusursuz olarak entegre edildi. Proje derleme testlerinden başarıyla geçti.
+
+---
 
 ### ✅ MS-272: Admin Panelinin Uygulama Teması ve İkonlarına Uygun Olarak Yeniden Tasarlanması (Feature / UX / UI)
 

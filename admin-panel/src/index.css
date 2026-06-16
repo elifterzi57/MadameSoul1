@@ -1,14 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  --color-admin-bg: #f8fafc;
-  --color-admin-sidebar: #1e293b;
-  --color-admin-accent: #3b82f6;
-  --color-admin-text: #0f172a;
+  --color-admin-bg: #05000a;
+  --color-admin-card: #0a0512;
+  --color-admin-accent: #ecd8a6;
+  --color-admin-hover: #1e1332;
+  --color-admin-border: rgba(236, 216, 166, 0.2);
+  --color-admin-text: #ecd8a6;
+  --font-serif: "Cinzel", Georgia, Cambria, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
 }
 
 body {
   background-color: var(--color-admin-bg);
   color: var(--color-admin-text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
 }

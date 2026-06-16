@@ -195,93 +195,97 @@ export default function Users() {
   return (
     <div className="max-w-4xl space-y-6">
       {/* Search Bar */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-800 mb-4">Kullanıcı Ara</h2>
+      <div className="bg-[#0a0512]/80 backdrop-blur-md p-6 rounded-xl border border-[#ecd8a6]/20 shadow-[0_0_30px_rgba(236,216,166,0.03)]">
+        <h2 className="text-lg font-serif tracking-widest text-[#ecd8a6] mb-4 uppercase">Kullanıcı Ara</h2>
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1">
-            <Search className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-5 h-5 text-[#ecd8a6]/40 absolute left-3 top-2.5" />
             <input
               type="email"
               placeholder="Kullanıcı e-posta adresi girin..."
               required
               value={emailQuery}
               onChange={(e) => setEmailQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/60 transition-all placeholder:text-[#ecd8a6]/30 font-sans"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm font-semibold transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#ecd8a6] hover:bg-white text-[#0a0512] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,216,166,0.1)]"
           >
-            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Ara'}
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin text-[#0a0512]" /> : 'Ara'}
           </button>
         </form>
       </div>
 
       {message && (
         <div className={`p-4 rounded-lg border text-sm flex items-start gap-3 ${
-          message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'
+          message.type === 'success' 
+            ? 'bg-emerald-950/20 border border-emerald-500/30 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.08)]' 
+            : 'bg-red-950/20 border border-red-500/30 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.08)]'
         }`}>
-          <AlertTriangle className="w-5 h-5 shrink-0" />
-          <div>{message.text}</div>
+          <AlertTriangle className={`w-5 h-5 shrink-0 ${message.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`} />
+          <div className="font-sans">{message.text}</div>
         </div>
       )}
 
       {/* Target User Status & Actions */}
       {targetUser && userMoon && (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm divide-y divide-slate-100">
+        <div className="bg-[#0a0512]/80 backdrop-blur-md border border-[#ecd8a6]/20 rounded-xl overflow-hidden shadow-[0_0_40px_rgba(236,216,166,0.03)] divide-y divide-[#ecd8a6]/10">
           {/* User Details */}
           <div className="p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">Kullanıcı Bilgileri</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <h3 className="font-serif tracking-widest text-[#ecd8a6] text-sm mb-4 uppercase">Kullanıcı Bilgileri</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
               <div>
-                <span className="block text-xs font-semibold text-slate-400 uppercase">Ad Soyad</span>
-                <span className="text-slate-800 text-sm font-medium">{targetUser.fullName}</span>
+                <span className="block text-xs font-serif font-semibold text-[#ecd8a6]/50 uppercase tracking-widest mb-1">Ad Soyad</span>
+                <span className="text-[#ecd8a6] text-sm font-medium">{targetUser.fullName}</span>
               </div>
               <div>
-                <span className="block text-xs font-semibold text-slate-400 uppercase">E-posta</span>
-                <span className="text-slate-800 text-sm font-medium">{targetUser.email}</span>
+                <span className="block text-xs font-serif font-semibold text-[#ecd8a6]/50 uppercase tracking-widest mb-1">E-posta</span>
+                <span className="text-[#ecd8a6] text-sm font-medium">{targetUser.email}</span>
               </div>
               <div>
-                <span className="block text-xs font-semibold text-slate-400 uppercase">Kullanıcı ID</span>
-                <span className="text-slate-800 text-sm font-mono text-xs select-all">{targetUser.id}</span>
+                <span className="block text-xs font-serif font-semibold text-[#ecd8a6]/50 uppercase tracking-widest mb-1">Kullanıcı ID</span>
+                <span className="text-[#ecd8a6] text-xs font-mono select-all bg-[#120a1c]/60 px-2 py-1 rounded border border-[#ecd8a6]/10 inline-block mt-0.5">
+                  {targetUser.id}
+                </span>
               </div>
             </div>
           </div>
 
           {/* Current Moon Balances */}
-          <div className="p-6 bg-slate-50/50">
-            <h3 className="font-semibold text-slate-800 mb-4">Mevcut Moon Durumu</h3>
+          <div className="p-6 bg-[#120a1c]/20">
+            <h3 className="font-serif tracking-widest text-[#ecd8a6] text-sm mb-4 uppercase">Mevcut Moon Durumu</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
-                <span className="block text-sm text-slate-500 font-medium">Toplam Bakiye</span>
-                <span className="block text-3xl font-extrabold text-blue-600 mt-2">{userMoon.balance} 🌙</span>
+              <div className="bg-[#0a0512]/80 border border-[#ecd8a6]/15 p-4 rounded-xl shadow-[0_0_15px_rgba(236,216,166,0.02)] text-center">
+                <span className="block text-xs text-[#ecd8a6]/60 font-serif tracking-wider uppercase mb-1">Toplam Bakiye</span>
+                <span className="block text-3xl font-extrabold text-[#ecd8a6] mt-2 drop-shadow-[0_0_8px_rgba(236,216,166,0.2)]">{userMoon.balance} 🌙</span>
               </div>
-              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
-                <span className="block text-sm text-slate-500 font-medium">Satın Alınan</span>
-                <span className="block text-2xl font-bold text-slate-700 mt-2">{userMoon.purchasedBalance}</span>
+              <div className="bg-[#0a0512]/80 border border-[#ecd8a6]/15 p-4 rounded-xl shadow-[0_0_15px_rgba(236,216,166,0.02)] text-center">
+                <span className="block text-xs text-[#ecd8a6]/60 font-serif tracking-wider uppercase mb-1">Satın Alınan</span>
+                <span className="block text-2xl font-bold text-[#ecd8a6]/95 mt-2">{userMoon.purchasedBalance}</span>
               </div>
-              <div className="bg-white border border-slate-200 p-4 rounded-xl shadow-sm text-center">
-                <span className="block text-sm text-slate-500 font-medium">Günlük Ücretsiz</span>
-                <span className="block text-2xl font-bold text-slate-700 mt-2">{userMoon.dailyFreeBalance}</span>
+              <div className="bg-[#0a0512]/80 border border-[#ecd8a6]/15 p-4 rounded-xl shadow-[0_0_15px_rgba(236,216,166,0.02)] text-center">
+                <span className="block text-xs text-[#ecd8a6]/60 font-serif tracking-wider uppercase mb-1">Günlük Ücretsiz</span>
+                <span className="block text-2xl font-bold text-[#ecd8a6]/95 mt-2">{userMoon.dailyFreeBalance}</span>
               </div>
             </div>
           </div>
 
           {/* Action Box */}
           <div className="p-6">
-            <h3 className="font-semibold text-slate-800 mb-4">Moon Bakiyesini Değiştir</h3>
+            <h3 className="font-serif tracking-widest text-[#ecd8a6] text-sm mb-4 uppercase">Moon Bakiyesini Değiştir</h3>
             
             {!canModify && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-lg text-sm mb-4">
+              <div className="bg-amber-950/20 border border-amber-500/30 text-amber-200 px-4 py-3 rounded-lg text-sm mb-4 font-sans shadow-[0_0_15px_rgba(245,158,11,0.08)]">
                 Hesabınız "Sadece Görüntüleyen" yetkisine sahiptir. Değişiklik yapamazsınız.
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex flex-col sm:flex-row gap-4 items-end font-sans">
               <div className="w-full sm:w-48">
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Moon Miktarı</label>
+                <label className="block text-xs font-serif font-semibold text-[#ecd8a6]/50 uppercase tracking-widest mb-2">Moon Miktarı</label>
                 <input
                   type="number"
                   min="0"
@@ -289,34 +293,34 @@ export default function Users() {
                   value={amount === 0 ? '' : amount}
                   onChange={(e) => setAmount(Number(e.target.value))}
                   placeholder="Miktar girin"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-3 py-2 text-sm text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/60 outline-none transition-all placeholder:text-[#ecd8a6]/30"
                 />
               </div>
 
-              <div className="flex gap-2 w-full sm:w-auto">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 <button
                   type="button"
                   disabled={!canModify || actionLoading || amount <= 0}
                   onClick={() => handleAdjustBalance('add')}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-lg text-sm font-semibold transition-colors"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-900/30 disabled:opacity-40 text-emerald-300 rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer"
                 >
-                  <UserPlus className="w-4 h-4" />
+                  <UserPlus className="w-3.5 h-3.5" />
                   Ekle
                 </button>
                 <button
                   type="button"
                   disabled={!canModify || actionLoading || amount <= 0}
                   onClick={() => handleAdjustBalance('subtract')}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-lg text-sm font-semibold transition-colors"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-950/40 border border-rose-500/30 hover:border-rose-500/60 hover:bg-rose-900/30 disabled:opacity-40 text-rose-300 rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer"
                 >
-                  <UserMinus className="w-4 h-4" />
+                  <UserMinus className="w-3.5 h-3.5" />
                   Eksilt
                 </button>
                 <button
                   type="button"
                   disabled={!canModify || actionLoading}
                   onClick={() => handleAdjustBalance('set')}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 bg-slate-700 hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-lg text-sm font-semibold transition-colors"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#120a1c] border border-[#ecd8a6]/20 hover:border-[#ecd8a6]/50 hover:bg-[#1e1332]/40 disabled:opacity-40 text-[#ecd8a6]/80 rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer"
                 >
                   Eşitle (Set)
                 </button>

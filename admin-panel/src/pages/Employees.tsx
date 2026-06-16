@@ -188,68 +188,70 @@ export default function Employees() {
     <div className="space-y-6 max-w-5xl">
       {message && (
         <div className={`p-4 rounded-lg border text-sm flex items-start gap-3 ${
-          message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'
+          message.type === 'success' 
+            ? 'bg-emerald-950/20 border border-emerald-500/30 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.08)]' 
+            : 'bg-red-950/20 border border-red-500/30 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.08)]'
         }`}>
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <div>{message.text}</div>
+          <AlertCircle className={`w-5 h-5 shrink-0 ${message.type === 'success' ? 'text-emerald-400' : 'text-red-400'}`} />
+          <div className="font-sans">{message.text}</div>
         </div>
       )}
 
       {/* Add Employee Form */}
       {isAdminUser && (
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-blue-600" />
+        <div className="bg-[#0a0512]/80 backdrop-blur-md p-6 rounded-xl border border-[#ecd8a6]/20 shadow-[0_0_30px_rgba(236,216,166,0.03)] space-y-4">
+          <h2 className="text-lg font-serif tracking-widest text-[#ecd8a6] flex items-center gap-2 uppercase">
+            <UserPlus className="w-5 h-5 text-[#ecd8a6]" />
             Yeni Çalışan / Yetkili Ekle
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#ecd8a6]/60 font-sans">
             Kullanıcının admin paneline erişebilmesi için önce MadameSoul uygulamasında bir hesabı bulunmalıdır. E-posta adresiyle arayarak yetki tanımlayabilirsiniz.
           </p>
 
           <form onSubmit={handleSearchUser} className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="w-5 h-5 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-5 h-5 text-[#ecd8a6]/40 absolute left-3 top-2.5" />
               <input
                 type="email"
                 placeholder="E-posta adresi girin..."
                 required
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg pl-10 pr-4 py-2.5 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/60 transition-all placeholder:text-[#ecd8a6]/30 font-sans"
               />
             </div>
             <button
               type="submit"
               disabled={searchLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#ecd8a6] hover:bg-white text-[#0a0512] disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer shadow-[0_0_10px_rgba(236,216,166,0.1)]"
             >
-              {searchLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : 'Ara'}
+              {searchLoading ? <RefreshCw className="w-4 h-4 animate-spin text-[#0a0512]" /> : 'Ara'}
             </button>
           </form>
 
           {foundUser && (
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex flex-wrap gap-4 items-center justify-between">
+            <div className="bg-[#120a1c]/60 p-4 rounded-lg border border-[#ecd8a6]/15 flex flex-wrap gap-4 items-center justify-between font-sans">
               <div>
-                <span className="block text-xs text-slate-400 font-semibold uppercase">Bulunan Kullanıcı</span>
-                <span className="text-slate-800 text-sm font-medium">{foundUser.email}</span>
-                <span className="block text-[10px] text-slate-400 font-mono">{foundUser.id}</span>
+                <span className="block text-xs text-[#ecd8a6]/50 font-serif tracking-wider uppercase mb-1">Bulunan Kullanıcı</span>
+                <span className="text-[#ecd8a6] text-sm font-medium">{foundUser.email}</span>
+                <span className="block text-[10px] text-[#ecd8a6]/40 font-mono mt-0.5">{foundUser.id}</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as any)}
-                  className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none"
+                  className="bg-[#0a0512] border border-[#ecd8a6]/20 text-[#ecd8a6] rounded-lg px-3 py-1.5 text-sm focus:outline-none cursor-pointer"
                 >
-                  <option value="görüntüleyen">Sadece Görüntüleyen</option>
-                  <option value="çalışan">Çalışan</option>
-                  <option value="admin">Admin</option>
+                  <option value="görüntüleyen" className="bg-[#0a0512]">Sadece Görüntüleyen</option>
+                  <option value="çalışan" className="bg-[#0a0512]">Çalışan</option>
+                  <option value="admin" className="bg-[#0a0512]">Admin</option>
                 </select>
 
                 <button
                   type="button"
                   onClick={handleAddEmployee}
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                  className="px-5 py-2 bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-900/30 text-emerald-300 rounded-lg text-xs font-serif uppercase tracking-wider font-bold transition-all cursor-pointer"
                 >
                   Yetkilendir
                 </button>
@@ -260,58 +262,65 @@ export default function Employees() {
       )}
 
       {/* Employees List */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-slate-100 flex justify-between items-center">
-          <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-slate-600" />
+      <div className="bg-[#0a0512]/80 backdrop-blur-md border border-[#ecd8a6]/20 rounded-xl overflow-hidden shadow-[0_0_30px_rgba(236,216,166,0.02)]">
+        <div className="p-5 border-b border-[#ecd8a6]/15 flex justify-between items-center bg-[#120a1c]/40">
+          <h2 className="font-serif tracking-widest text-sm text-[#ecd8a6] flex items-center gap-2 uppercase">
+            <Shield className="w-5 h-5 text-[#ecd8a6]" />
             Çalışan Yetkileri ve Rolleri ({employees.length})
           </h2>
           <button
             onClick={fetchEmployees}
             disabled={loading}
-            className="p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-1.5 text-[#ecd8a6]/60 hover:text-[#ecd8a6] hover:bg-[#1e1332]/40 rounded-lg transition-colors cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-slate-500">Yükleniyor...</div>
+          <div className="p-12 text-center text-[#ecd8a6]/60 font-sans font-light">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-3 text-[#ecd8a6]/70" />
+            Loglar yükleniyor...
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-              <thead className="bg-slate-50 font-semibold text-slate-700">
+            <table className="min-w-full divide-y divide-[#ecd8a6]/10 text-left text-sm">
+              <thead className="bg-[#120a1c] font-serif font-bold text-[#ecd8a6] tracking-wider text-xs uppercase border-b border-[#ecd8a6]/20">
                 <tr>
-                  <th className="px-6 py-3">E-posta</th>
-                  <th className="px-6 py-3">UID</th>
-                  <th className="px-6 py-3">Rol / Yetki</th>
-                  <th className="px-6 py-3">İşlemler</th>
+                  <th className="px-6 py-4">E-posta</th>
+                  <th className="px-6 py-4">UID</th>
+                  <th className="px-6 py-4">Rol / Yetki</th>
+                  <th className="px-6 py-4">İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 text-slate-600">
+              <tbody className="divide-y divide-[#ecd8a6]/10 text-[#ecd8a6]/80 font-sans">
                 {employees.map(emp => {
                   const isSelf = emp.id === auth.currentUser?.uid;
                   return (
-                    <tr key={emp.id} className="hover:bg-slate-50">
-                      <td className="px-6 py-4 font-medium text-slate-900">
-                        {emp.email} {isSelf && <span className="text-xs text-blue-500 font-normal">(Siz)</span>}
+                    <tr key={emp.id} className="hover:bg-[#1e1332]/20 transition-colors">
+                      <td className="px-6 py-4 font-medium text-[#ecd8a6]">
+                        {emp.email} {isSelf && <span className="text-xs text-indigo-400 font-normal ml-1">(Siz)</span>}
                       </td>
-                      <td className="px-6 py-4 font-mono text-xs text-slate-400 select-all">{emp.id}</td>
+                      <td className="px-6 py-4 font-mono text-xs text-[#ecd8a6]/40 select-all">
+                        <span className="bg-[#120a1c]/40 px-2 py-1 rounded border border-[#ecd8a6]/10 select-all">
+                          {emp.id}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">
                         {isAdminUser && !isSelf ? (
                           <select
                             value={emp.role}
                             onChange={(e) => handleUpdateRole(emp.id, emp.email, e.target.value as any)}
-                            className="bg-white border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none"
+                            className="bg-[#0a0512] border border-[#ecd8a6]/20 text-[#ecd8a6] rounded px-2 py-1.5 text-xs focus:outline-none cursor-pointer"
                           >
-                            <option value="görüntüleyen">Sadece Görüntüleyen</option>
-                            <option value="çalışan">Çalışan</option>
-                            <option value="admin">Admin</option>
+                            <option value="görüntüleyen" className="bg-[#0a0512]">Sadece Görüntüleyen</option>
+                            <option value="çalışan" className="bg-[#0a0512]">Çalışan</option>
+                            <option value="admin" className="bg-[#0a0512]">Admin</option>
                           </select>
                         ) : (
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase ${
-                            emp.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                            emp.role === 'çalışan' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-serif font-bold uppercase border ${
+                            emp.role === 'admin' ? 'bg-purple-950/40 border-purple-500/25 text-purple-300' :
+                            emp.role === 'çalışan' ? 'bg-indigo-950/40 border-indigo-500/25 text-indigo-300' : 'bg-[#120a1c] border border-[#ecd8a6]/15 text-[#ecd8a6]/60'
                           }`}>
                             {emp.role}
                           </span>
@@ -321,13 +330,13 @@ export default function Employees() {
                         {isAdminUser && !isSelf ? (
                           <button
                             onClick={() => handleRemoveEmployee(emp.id, emp.email)}
-                            className="text-rose-600 hover:text-rose-800 p-1.5 hover:bg-rose-50 rounded-lg transition-colors"
+                            className="text-rose-400 hover:text-rose-200 p-1.5 bg-rose-950/20 border border-rose-500/20 hover:border-rose-500/50 hover:bg-rose-900/30 rounded-lg transition-colors cursor-pointer"
                             title="Yetkiyi Kaldır"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         ) : (
-                          <span className="text-xs text-slate-400">-</span>
+                          <span className="text-xs text-[#ecd8a6]/30">-</span>
                         )}
                       </td>
                     </tr>

@@ -25,19 +25,22 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-[#05000a] text-[#ecd8a6] flex overflow-hidden relative">
+      {/* Background ambient glows */}
+      <div className="absolute top-10 right-10 w-96 h-96 bg-[#1e1332]/30 rounded-full filter blur-[120px] pointer-events-none"></div>
+
       {/* Sidebar */}
-      <div className="w-64 bg-slate-900 text-white flex flex-col">
-        <div className="p-4 bg-slate-800 flex items-center justify-center font-bold text-xl tracking-wider">
+      <div className="w-64 bg-[#0a0512] border-r border-[#ecd8a6]/20 flex flex-col z-10">
+        <div className="p-5 bg-[#120a1c] border-b border-[#ecd8a6]/20 flex items-center justify-center font-serif font-bold text-lg tracking-widest text-[#ecd8a6]">
           MadameSoul Admin
         </div>
         
-        <div className="p-4 text-xs text-slate-400 border-b border-slate-700">
-          <div className="truncate">{user.email}</div>
-          <div className="mt-1 capitalize text-blue-400">{adminData.role}</div>
+        <div className="p-4 text-xs text-[#ecd8a6]/50 border-b border-[#ecd8a6]/10">
+          <div className="truncate font-sans font-light">{user.email}</div>
+          <div className="mt-1 capitalize text-[#ecd8a6] font-serif font-semibold tracking-wider">{adminData.role}</div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href || (location.pathname.startsWith(item.href) && item.href !== '/');
@@ -46,36 +49,42 @@ export default function DashboardLayout() {
                 key={item.name}
                 to={item.href}
                 className={clsx(
-                  'flex items-center gap-3 px-3 py-2 rounded-md transition-colors',
-                  isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-sans tracking-wide border',
+                  isActive 
+                    ? 'bg-[#1e1332] text-[#ecd8a6] border-[#ecd8a6]/30 shadow-[0_0_15px_rgba(236,216,166,0.05)] font-semibold' 
+                    : 'text-[#ecd8a6]/60 border-transparent hover:bg-[#1e1332]/40 hover:text-[#ecd8a6]/90'
                 )}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={clsx("w-4 h-4 transition-colors", isActive ? "text-[#ecd8a6]" : "text-[#ecd8a6]/60")} />
                 {item.name}
               </Link>
             )
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
+        <div className="p-4 border-t border-[#ecd8a6]/10">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 w-full text-left text-slate-300 hover:bg-slate-800 hover:text-white rounded-md transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 w-full text-left text-[#ecd8a6]/60 hover:bg-red-950/20 hover:text-red-300 rounded-lg transition-all text-sm cursor-pointer"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-4 h-4 text-red-400" />
             Çıkış Yap
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-slate-200 h-16 flex items-center px-6 shadow-sm">
-          <h1 className="text-xl font-semibold text-slate-800">
+      <div className="flex-1 flex flex-col overflow-hidden z-10">
+        <header className="bg-[#0a0512]/60 backdrop-blur-md border-b border-[#ecd8a6]/10 h-16 flex items-center px-6 justify-between">
+          <h1 className="text-lg font-serif tracking-widest text-[#ecd8a6] uppercase">
             {navItems.find(item => item.href === location.pathname)?.name || 'Dashboard'}
           </h1>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-xs text-[#ecd8a6]/60 font-sans font-light uppercase tracking-widest">Sistem Aktif</span>
+          </div>
         </header>
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-6 bg-[#05000a]/40">
           <Outlet />
         </main>
       </div>

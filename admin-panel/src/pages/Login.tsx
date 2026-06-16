@@ -54,51 +54,57 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-[#05000a] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background ambient glows */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1e1332]/40 rounded-full filter blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#0a0512]/60 rounded-full filter blur-[120px] pointer-events-none"></div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md z-10">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <Lock className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 bg-[#1e1332]/80 border border-[#ecd8a6]/30 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(236,216,166,0.1)]">
+            <Lock className="w-8 h-8 text-[#ecd8a6]" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
+        <h2 className="mt-6 text-center text-3xl font-serif tracking-wider text-[#ecd8a6]">
           MadameSoul Admin Paneli
         </h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
+        <p className="mt-2 text-center text-sm text-[#ecd8a6]/60 font-sans">
           Sadece yetkili personel girişi içindir.
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-slate-200">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 px-4 sm:px-0">
+        <div className="bg-[#0a0512]/80 backdrop-blur-md py-8 px-4 shadow-2xl sm:rounded-xl sm:px-10 border border-[#ecd8a6]/20 shadow-[0_0_50px_rgba(236,216,166,0.03)]">
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+              <div className="bg-red-950/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg text-sm shadow-[0_0_15px_rgba(239,68,68,0.1)]">
                 {error}
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-slate-700">E-posta Adresi</label>
+              <label className="block text-sm font-sans font-medium text-[#ecd8a6]/80 mb-2">E-posta Adresi</label>
               <div className="mt-1">
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 text-[#ecd8a6] transition-all placeholder:text-[#ecd8a6]/30 sm:text-sm"
+                  placeholder="admin@madamesoul.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700">Şifre</label>
+              <label className="block text-sm font-sans font-medium text-[#ecd8a6]/80 mb-2">Şifre</label>
               <div className="mt-1">
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 text-[#ecd8a6] transition-all placeholder:text-[#ecd8a6]/30 sm:text-sm"
+                  placeholder="••••••"
                 />
               </div>
             </div>
@@ -107,7 +113,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
+                className="w-full flex justify-center py-3 px-4 rounded-xl text-xs font-serif uppercase tracking-widest font-bold text-[#0a0512] bg-[#ecd8a6] hover:bg-white focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_15px_rgba(236,216,166,0.1)]"
               >
                 {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
               </button>
