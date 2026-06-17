@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **112** | Açık: **0** | Tamamlanan: **109** | İptal Edilen: **3**
+Toplam Bilet: **119** | Açık: **0** | Tamamlanan: **116** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,13 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-287**](#-ms-287) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu | Yüksek | Done | Elif |
+| [**MS-286**](#-ms-286) | Feature / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | Done | Elif |
+| [**MS-285**](#-ms-285) | Feature / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Done | Elif |
+| [**MS-284**](#-ms-284) | Feature / Dev | Backlog Biletlerinin GitHub Kanban Panosuna Taşınması | Yüksek | Done | Elif |
+| [**MS-283**](#-ms-283) | Feature / Dev | Profil Bilgisi Durum Senkronizasyon Hatası | Yüksek | Done | Elif |
+| [**MS-282**](#-ms-282) | Feature / Dev | Okuma Paragrafları ve Uzun Metinler İçin Okunabilir Tipografi Hiyerarşisi | Yüksek | Done | Elif |
+| [**MS-281**](#-ms-281) | Feature / Dev | İnteraktif Kart Seçim Ritüelinin Geliştirilmesi | Yüksek | Done | Elif |
 | [**MS-280**](#-ms-280) | Feature / Dev | Express Log Buffer (Toplu Hata Yazma) Mimarisi | Yüksek | Sunucu/istemci hatalarını bellekte tamponlayıp (batch) toplu olarak yazan LogBuffer ve API endpoint'i kuruldu. | Elif |
 | [**MS-279**](#-ms-279) | Feature / Dev / Test | Firestore Güvenlik Kuralları Birim Test Altyapısının Kurulması | Yüksek | `@firebase/rules-unit-testing` ile Firestore kurallarını emülatör üzerinde test eden Vitest entegrasyonu tamamlandı. | Elif |
 | [**MS-278**](#-ms-278) | Feature / UX / UI / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Sol menü butonları sola hizalandı, moon_transactions tablosu sütunları özelleştirildi ve sütunlara göre A-Z sıralama özelliği eklendi. | Elif |
@@ -143,6 +150,111 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-287: Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Elif (USER)
+* **Kabul Kriterleri:**
+  1. Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-286: Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Elif (USER)
+* **Kabul Kriterleri:**
+  1. Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-285: Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Elif (USER)
+* **Kabul Kriterleri:**
+  1. Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-284: Backlog Biletlerinin GitHub Kanban Panosuna Taşınması (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Kabul Kriterleri:**
+  1. Backlog Biletlerinin GitHub Kanban Panosuna Taşınması gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-283: Profil Bilgisi Durum Senkronizasyon Hatası (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Kabul Kriterleri:**
+  1. Profil Bilgisi Durum Senkronizasyon Hatası gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-282: Okuma Paragrafları ve Uzun Metinler İçin Okunabilir Tipografi Hiyerarşisi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Kabul Kriterleri:**
+  1. Okuma Paragrafları ve Uzun Metinler İçin Okunabilir Tipografi Hiyerarşisi gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
+
+### ✅ MS-281: İnteraktif Kart Seçim Ritüelinin Geliştirilmesi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend
+* **Açıklama:**  
+  * **Oluşturan (Reporter):** Sally (🎨 UX Designer / `bmad-agent-ux-designer`)
+* **Kabul Kriterleri:**
+  1. İnteraktif Kart Seçim Ritüelinin Geliştirilmesi gerçekleştirildi.
+  2. Proje hatasız derlendi.
+
+---
 
 ### ✅ MS-280: Express Log Buffer (Toplu Hata Yazma) Mimarisi (Feature / Dev)
 
