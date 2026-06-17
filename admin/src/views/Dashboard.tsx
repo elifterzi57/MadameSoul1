@@ -8,7 +8,8 @@ import {
   Terminal, 
   ShieldAlert, 
   LogOut, 
-  User as UserIcon 
+  User as UserIcon,
+  ChevronDown
 } from 'lucide-react';
 import { CollectionsTab } from '../components/CollectionsTab';
 import { BalanceTab } from '../components/BalanceTab';
@@ -18,8 +19,17 @@ import { PermissionsTab } from '../components/PermissionsTab';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'collections' | 'balance' | 'finance' | 'logs' | 'permissions'>('collections');
+  const [selectedCollection, setSelectedCollection] = useState<string>('users');
+  const [isCollectionsOpen, setIsCollectionsOpen] = useState(true);
   const [userRole, setUserRole] = useState<'admin' | 'employee' | 'viewer' | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  const collectionsList = [
+    { id: 'users', label: 'Kullanıcı Listesi' },
+    { id: 'moon_transactions', label: 'Moon İşlemleri' },
+    { id: 'error_logs', label: 'Sistem Hataları' },
+    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' }
+  ];
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -67,17 +77,46 @@ export const Dashboard: React.FC = () => {
 
           {/* Navigation Menu */}
           <nav className="space-y-2">
-            <button
-              onClick={() => setActiveTab('collections')}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
-                activeTab === 'collections'
-                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
-                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
-              }`}
-            >
-              <Database className="h-4 w-4 shrink-0" />
-              <span className="text-left">Veritabanı Koleksiyonları</span>
-            </button>
+            <div className="space-y-1">
+              <button
+                onClick={() => {
+                  setActiveTab('collections');
+                  setIsCollectionsOpen(!isCollectionsOpen);
+                }}
+                className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+                  activeTab === 'collections'
+                    ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                    : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Database className="h-4 w-4 shrink-0" />
+                  <span className="text-left">Veritabanı Koleksiyonları</span>
+                </div>
+                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isCollectionsOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isCollectionsOpen && (
+                <div className="mt-1 ml-4 space-y-1 border-l border-[#ecd8a6]/15 pl-3">
+                  {collectionsList.map((col) => (
+                    <button
+                      key={col.id}
+                      onClick={() => {
+                        setActiveTab('collections');
+                        setSelectedCollection(col.id);
+                      }}
+                      className={`flex w-full items-center justify-start rounded-md px-3 py-2 text-xs font-medium text-left transition ${
+                        activeTab === 'collections' && selectedCollection === col.id
+                          ? 'bg-purple-900/50 text-[#ecd8a6] border border-[#ecd8a6]/10'
+                          : 'text-[#ecd8a6]/50 hover:bg-purple-950/10 hover:text-[#ecd8a6]/80'
+                      }`}
+                    >
+                      {col.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <button
               onClick={() => setActiveTab('balance')}
@@ -154,7 +193,12 @@ export const Dashboard: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto">
-        {activeTab === 'collections' && <CollectionsTab userRole={userRole} />}
+        {activeTab === 'collections' && (
+          <CollectionsTab 
+            userRole={userRole} 
+            selectedCollection={selectedCollection} 
+          />
+        )}
         {activeTab === 'balance' && <BalanceTab userRole={userRole} />}
         {activeTab === 'finance' && <FinanceTab userRole={userRole} />}
         {activeTab === 'logs' && <LogsTab userRole={userRole} />}

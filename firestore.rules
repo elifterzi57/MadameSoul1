@@ -104,7 +104,7 @@ service cloud.firestore {
     }
 
     match /admin_users/{userId} {
-      allow read: if request.auth != null && isEmployee();
+      allow read: if request.auth != null && (request.auth.uid == userId || request.auth.token.role == 'admin' || request.auth.token.role == 'employee');
       allow write: if false;
     }
 
@@ -194,6 +194,7 @@ service cloud.firestore {
 
     match /ai_feedback/{feedbackId} {
       allow get: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
+      allow list: if request.auth != null && (request.auth.token.role == 'admin' || request.auth.token.role == 'employee' || resource.data.userId == request.auth.uid);
       allow create, update: if request.auth != null && (request.auth.uid == request.resource.data.userId) && isValidAiFeedback(request.resource.data);
       allow delete: if request.auth != null && isEmployee();
     }
@@ -241,7 +242,8 @@ service cloud.firestore {
     match /error_logs/{logId} {
       allow create: if request.resource.data.source == 'client' &&
                     (request.resource.data.userId == null || (request.auth != null && request.resource.data.userId == request.auth.uid));
-      allow read, update, delete: if false;
+      allow read: if request.auth != null && isEmployee();
+      allow update, delete: if false;
     }
 
     match /ai_telemetry/{telemetryId} {

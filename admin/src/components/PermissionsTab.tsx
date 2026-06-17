@@ -70,10 +70,18 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
         })
       });
 
-      const data = await response.json();
+      let data: any = {};
+      const responseText = await response.text();
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          throw new Error(`Geçersiz sunucu yanıtı: ${responseText.slice(0, 100)}`);
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'İşlem başarısız oldu.');
+        throw new Error(data.error || `Sunucu hatası: Status ${response.status}`);
       }
 
       if (data.status === 'password_required') {

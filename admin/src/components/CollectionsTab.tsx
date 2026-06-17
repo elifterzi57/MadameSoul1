@@ -1,29 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, query, limit } from 'firebase/firestore';
-import { ArrowUpDown, RefreshCw, FileText } from 'lucide-react';
+import { ArrowUpDown, RefreshCw, FileText, Download } from 'lucide-react';
 
 interface CollectionsTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
+  selectedCollection: string;
 }
 
-export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userRole }) => {
-  const [selectedCollection, setSelectedCollection] = useState<string>('users');
+export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userRole, selectedCollection }) => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string }>>({});
+  const [moonsMap, setMoonsMap] = useState<Record<string, any>>({});
   
   // Filters & Sorting state
-  const [dateFilter, setDateFilter] = useState<'all' | 'daily' | 'monthly' | 'yearly'>('all');
+  const [startDate, setStartDate] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [sortByField, setSortByField] = useState<string>('id');
 
-  const collectionsList = [
-    { id: 'users', label: 'Kullanıcılar (users)' },
-    { id: 'moon_transactions', label: 'Moon Harcama Geçmişi (moon_transactions)' },
-    { id: 'admin_audit_logs', label: 'Yönetim Denetim Kayıtları (admin_audit_logs)' },
-    { id: 'error_logs', label: 'Sistem Hata Günlükleri (error_logs)' }
-  ];
+  useEffect(() => {
+    const fetchUsersMap = async () => {
+      try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const mapping: Record<string, { email: string; displayName?: string }> = {};
+        usersSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          mapping[docSnap.id] = {
+            email: data.email || '',
+            displayName: data.displayName || data.name || ''
+          };
+        });
+        setUsersMap(mapping);
+      } catch (err) {
+        console.error("Kullanıcı haritası yüklenirken hata oluştu:", err);
+      }
+    };
+    fetchUsersMap();
+  }, []);
 
   const fetchCollectionData = async () => {
     setLoading(true);
@@ -37,6 +53,18 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       querySnapshot.forEach((docSnap) => {
         docsData.push({ id: docSnap.id, ...docSnap.data() });
       });
+      if (selectedCollection === 'users') {
+        try {
+          const moonsSnap = await getDocs(collection(db, 'user_moons'));
+          const mMapping: Record<string, any> = {};
+          moonsSnap.forEach((docSnap) => {
+            mMapping[docSnap.id] = docSnap.data();
+          });
+          setMoonsMap(mMapping);
+        } catch (mErr) {
+          console.error("user_moons fetch failed:", mErr);
+        }
+      }
       setDocuments(docsData);
     } catch (err: any) {
       console.error(err);
@@ -67,22 +95,18 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   // Filter logic
   const getFilteredDocs = () => {
-    const now = new Date();
     return documents.filter((doc) => {
-      if (dateFilter === 'all') return true;
       const docDate = getDocDate(doc);
-      if (!docDate) return false;
-
-      const diffTime = Math.abs(now.getTime() - docDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (dateFilter === 'daily') {
-        return diffDays <= 1;
-      } else if (dateFilter === 'monthly') {
-        return diffDays <= 30;
-      } else if (dateFilter === 'yearly') {
-        return diffDays <= 365;
+      if (!docDate) {
+        if (startDate || endDate) return false;
+        return true;
       }
+
+      const docDateStr = docDate.toISOString().split('T')[0];
+
+      if (startDate && docDateStr < startDate) return false;
+      if (endDate && docDateStr > endDate) return false;
+
       return true;
     });
   };
@@ -97,14 +121,25 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       'Cards': 'cards',
       'status': 'status',
       'type': 'type',
+      'amount': 'amount',
+      'paymentprovider': 'paymentProvider',
       'userbrithplace': 'userBirthplace',
       'userbirhthdate': 'userDob',
       'userlanguage': 'userLanguage',
       'userrelationship': 'userRelationship',
-      'pdfdowlanded': 'pdfDownloaded'
+      'pdfdowlanded': 'pdfDownloaded',
+      'clientmetadata': 'clientMetadata'
     };
     const dbKey = fieldMapping[col] || col;
     const val = doc[dbKey];
+
+    if (col === 'Username') {
+      return val || usersMap[doc.userId]?.displayName || '-';
+    }
+
+    if (col === 'Mail') {
+      return usersMap[doc.userId]?.email || doc.userEmail || '-';
+    }
 
     // Format cards array nicely
     if (col === 'Cards') {
@@ -114,7 +149,94 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return val || '-';
     }
 
+    if (col === 'clientmetadata') {
+      const meta = val;
+      if (meta && typeof meta === 'object') {
+        const parts = [];
+        if (meta.os) parts.push(meta.os);
+        if (meta.appVersion) parts.push(`v${meta.appVersion}`);
+        return parts.length > 0 ? parts.join(' - ') : '-';
+      }
+      return meta || '-';
+    }
+
     return val;
+  };
+
+  // Helper to get value of user fields mapped
+  const getUserValue = (doc: any, col: string): any => {
+    const fieldMapping: Record<string, string> = {
+      'ID': 'id',
+      'NAME': 'displayName',
+      'EMAIL': 'email',
+      'PHONENUMBER': 'phoneNumber',
+      'BIRTHDAY': 'dob',
+      'BIRTHPLACE': 'birthplace',
+      'RELATIONSHIP': 'relationship',
+      'FoCUS': 'focus',
+      'CREATEDAT': 'createdAt',
+      'UPDATEDAT': 'updatedAt',
+      'CONSENTACCEPTEDAT': 'consentsAcceptedAt',
+      'TERMSACCEPTEDAT': 'termsAcceptedAt',
+      'ONBOARDINGCOMPLETED': 'onboardingCompleted',
+      'TIMEZONE': 'timezone',
+      'LASTLOGIN': 'lastLogin',
+      'DEVICEINFo': 'deviceInfo',
+      'PROVIDERID': 'providerId'
+    };
+
+    if (col === 'NAME') {
+      return doc.displayName || doc.name || '-';
+    }
+    if (col === 'TERMSACCEPTEDAT') {
+      return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
+    }
+    if (col === 'ONBOARDINGCOMPLETED') {
+      return doc.onboardingCompleted !== undefined ? (doc.onboardingCompleted ? 'Evet' : 'Hayır') : '-';
+    }
+    if (col === 'METADATA BROWSER') {
+      return doc.metadata?.browser || '-';
+    }
+    if (col === 'METADATA LOCATION') {
+      return doc.metadata?.location || '-';
+    }
+
+    if (col === 'BALANCE') {
+      return moonsMap[doc.id]?.balance !== undefined ? moonsMap[doc.id].balance : '-';
+    }
+    if (col === 'PURCHASEDBALANCE') {
+      return moonsMap[doc.id]?.purchasedBalance !== undefined ? moonsMap[doc.id].purchasedBalance : '-';
+    }
+    if (col === 'DAILYFREEBALANCE') {
+      return moonsMap[doc.id]?.dailyFreeBalance !== undefined ? moonsMap[doc.id].dailyFreeBalance : '-';
+    }
+    if (col === 'LASTDAILYCLAIMEDAT') {
+      const val = moonsMap[doc.id]?.lastDailyClaimedAt;
+      if (!val) return '-';
+      if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
+      return new Date(val).toLocaleString('tr-TR');
+    }
+
+    const dbKey = fieldMapping[col] || col;
+    return doc[dbKey];
+  };
+
+  // Helper to get value of ai_feedback fields mapped
+  const getFeedbackValue = (doc: any, col: string): any => {
+    const fieldMapping: Record<string, string> = {
+      'USERID': 'userId',
+      'RATING': 'rating',
+      'TRANSACTIONID': 'id',
+      'CREATEDAT': 'createdAt',
+      'COMMENT': 'comment'
+    };
+
+    if (col === 'USERNAME') {
+      return usersMap[doc.userId]?.displayName || '-';
+    }
+
+    const dbKey = fieldMapping[col] || col;
+    return doc[dbKey];
   };
 
   // Sort logic (sorting dynamically by selected sortByField)
@@ -127,6 +249,12 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       if (selectedCollection === 'moon_transactions') {
         aVal = getMoonTxValue(a, sortByField);
         bVal = getMoonTxValue(b, sortByField);
+      } else if (selectedCollection === 'users') {
+        aVal = getUserValue(a, sortByField);
+        bVal = getUserValue(b, sortByField);
+      } else if (selectedCollection === 'ai_feedback') {
+        aVal = getFeedbackValue(a, sortByField);
+        bVal = getFeedbackValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -171,22 +299,105 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return val.toString();
   };
 
+  const exportToExcel = () => {
+    if (sortedAndFilteredDocs.length === 0) {
+      alert(selectedCollection === 'users' ? 'İndirilecek kullanıcı verisi bulunamadı.' : 'İndirilecek veri bulunamadı.');
+      return;
+    }
+
+    // Prepare headers
+    const csvHeaders = columns.map(col => col.toUpperCase()).join(';');
+
+    // Prepare rows
+    const csvRows = sortedAndFilteredDocs.map(doc => {
+      return columns.map(col => {
+        let val = '';
+        if (selectedCollection === 'moon_transactions') {
+          val = renderValue(getMoonTxValue(doc, col));
+        } else if (selectedCollection === 'users') {
+          val = renderValue(getUserValue(doc, col));
+        } else if (selectedCollection === 'ai_feedback') {
+          val = renderValue(getFeedbackValue(doc, col));
+        } else {
+          val = renderValue(doc[col]);
+        }
+        
+        // Clean value for CSV (replace double quotes, semicolons, and newlines)
+        const cleaned = val.replace(/"/g, '""').replace(/;/g, ',').replace(/\n/g, ' ');
+        return `"${cleaned}"`;
+      }).join(';');
+    });
+
+    const csvContent = '\uFEFF' + [csvHeaders, ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `${selectedCollection}_export_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Dynamically extract columns from documents, except for moon_transactions
   const getColumns = () => {
     if (selectedCollection === 'moon_transactions') {
       return [
         'ID',
         'Username',
+        'Mail',
         'createdat',
         'Description',
         'Cards',
         'status',
         'type',
+        'amount',
+        'paymentprovider',
         'userbrithplace',
         'userbirhthdate',
         'userlanguage',
         'userrelationship',
-        'pdfdowlanded'
+        'pdfdowlanded',
+        'clientmetadata'
+      ];
+    }
+    if (selectedCollection === 'users') {
+      return [
+        'ID',
+        'NAME',
+        'EMAIL',
+        'PHONENUMBER',
+        'BIRTHDAY',
+        'BIRTHPLACE',
+        'RELATIONSHIP',
+        'FoCUS',
+        'CREATEDAT',
+        'UPDATEDAT',
+        'CONSENTACCEPTEDAT',
+        'TERMSACCEPTEDAT',
+        'ONBOARDINGCOMPLETED',
+        'TIMEZONE',
+        'LASTLOGIN',
+        'DEVICEINFo',
+        'METADATA BROWSER',
+        'METADATA LOCATION',
+        'PROVIDERID',
+        'BALANCE',
+        'PURCHASEDBALANCE',
+        'DAILYFREEBALANCE',
+        'LASTDAILYCLAIMEDAT'
+      ];
+    }
+    if (selectedCollection === 'ai_feedback') {
+      return [
+        'USERID',
+        'USERNAME',
+        'RATING',
+        'TRANSACTIONID',
+        'CREATEDAT',
+        'COMMENT'
       ];
     }
     const cols = new Set<string>();
@@ -208,61 +419,57 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           <h2 className="font-serif text-3xl text-[#ecd8a6]">Veritabanı Görselleştirme</h2>
           <p className="text-sm text-[#ecd8a6]/60">Koleksiyonlar içerisindeki belgeleri izleyin ve filtreleyin.</p>
         </div>
-        <button
-          onClick={fetchCollectionData}
-          className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Yenile
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={exportToExcel}
+            className="flex items-center gap-2 rounded-lg bg-[#ecd8a6]/10 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-[#ecd8a6]/20 transition text-sm text-[#ecd8a6]"
+          >
+            <Download className="h-4 w-4" />
+            Excel İndir
+          </button>
+          <button
+            onClick={fetchCollectionData}
+            className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Yenile
+          </button>
+        </div>
       </div>
 
       {/* Control Bar */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
-        {/* Collection Selector */}
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Koleksiyon Seçin</label>
-          <select
-            value={selectedCollection}
-            onChange={(e) => setSelectedCollection(e.target.value)}
-            className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none"
-          >
-            {collectionsList.map((col) => (
-              <option key={col.id} value={col.id}>{col.label}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Date Filter */}
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Zaman Filtresi</label>
-          <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] p-0.5">
-            {(['all', 'daily', 'monthly', 'yearly'] as const).map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setDateFilter(filter)}
-                className={`flex-1 rounded-md py-1.5 text-xs font-medium capitalize transition ${
-                  dateFilter === filter
-                    ? 'bg-purple-900/40 text-[#ecd8a6]'
-                    : 'text-[#ecd8a6]/60 hover:text-[#ecd8a6]'
-                }`}
-              >
-                {filter === 'all' ? 'Tümü' : filter === 'daily' ? 'Günlük' : filter === 'monthly' ? 'Aylık' : 'Yıllık'}
-              </button>
-            ))}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
+        {/* Date Filter Range */}
+        <div className="flex-1 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Başlangıç Tarihi</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
+            />
           </div>
-        </div>
-
-        {/* Sort Order */}
-        <div>
-          <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">A-Z Sıralama</label>
-          <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="flex w-full items-center justify-between rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-4 py-2 text-sm text-[#ecd8a6]"
-          >
-            <span>{sortOrder === 'asc' ? 'A\'dan Z\'ye' : 'Z\'den A\'ya'}</span>
-            <ArrowUpDown className="h-4 w-4" />
-          </button>
+          <div className="flex-1">
+            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Bitiş Tarihi</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
+            />
+          </div>
+          {(startDate || endDate) && (
+            <button
+              onClick={() => {
+                setStartDate('');
+                setEndDate('');
+              }}
+              className="mt-6 sm:mt-auto rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2 text-xs text-red-400 hover:bg-red-950/40 transition h-[38px] flex items-center justify-center"
+            >
+              Filtreleri Temizle
+            </button>
+          )}
         </div>
       </div>
 
@@ -304,7 +511,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           }}
                           className="flex items-center gap-1 hover:text-[#ecd8a6] transition-colors focus:outline-none"
                         >
-                          <span>{col}</span>
+                          <span>{col.toUpperCase()}</span>
                           <ArrowUpDown className={`h-3.5 w-3.5 ${isSorted ? 'text-[#ecd8a6]' : 'opacity-30'}`} />
                         </button>
                       </th>
@@ -319,6 +526,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                       <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate">
                         {selectedCollection === 'moon_transactions'
                           ? renderValue(getMoonTxValue(doc, col))
+                          : selectedCollection === 'users'
+                          ? renderValue(getUserValue(doc, col))
+                          : selectedCollection === 'ai_feedback'
+                          ? renderValue(getFeedbackValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}

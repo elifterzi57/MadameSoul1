@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { db, auth } from '../firebase';
-import { doc, getDoc, runTransaction, serverTimestamp, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, runTransaction, serverTimestamp, collection, getDocs, query, limit } from 'firebase/firestore';
 import { Search, ShieldAlert, Award, Coins, HelpCircle } from 'lucide-react';
 
 interface BalanceTabProps {
@@ -13,6 +13,7 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [foundUser, setFoundUser] = useState<any | null>(null);
   const [moonData, setMoonData] = useState<any | null>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   // Adjustment state
   const [adjustAmount, setAdjustAmount] = useState<number>(0);
@@ -23,6 +24,35 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
+  const handleSelectUser = async (user: any) => {
+    setLoading(true);
+    setSearchError(null);
+    setFoundUser(user);
+    setMoonData(null);
+    setActionSuccess(null);
+    setActionError(null);
+
+    try {
+      const moonRef = doc(db, 'user_moons', user.id);
+      const moonSnap = await getDoc(moonRef);
+      if (moonSnap.exists()) {
+        setMoonData(moonSnap.data());
+      } else {
+        setMoonData({
+          balance: 0,
+          dailyFreeBalance: 0,
+          purchasedBalance: 0,
+          userId: user.id
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+      setSearchError(`Kullanıcı bakiye bilgileri alınamadı: ${err.message || err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -31,48 +61,48 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
     setSearchError(null);
     setFoundUser(null);
     setMoonData(null);
+    setSearchResults([]);
     setActionSuccess(null);
     setActionError(null);
 
     try {
-      let userId = searchQuery.trim();
-      let userDoc = null;
+      let queryVal = searchQuery.trim();
 
-      // Check if query is an email
-      if (userId.includes('@')) {
+      // 1. First try exact match by Document ID (User ID)
+      const docRef = doc(db, 'users', queryVal);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const user = { id: docSnap.id, ...docSnap.data() };
+        setSearchResults([user]);
+        await handleSelectUser(user);
+      } else {
+        // 2. Fetch users and filter client-side for fuzzy/partial matches
         const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('email', '==', userId));
-        const qSnap = await getDocs(q);
-        if (!qSnap.empty) {
-          userDoc = qSnap.docs[0];
-          userId = userDoc.id;
-        }
-      } else {
-        const docRef = doc(db, 'users', userId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          userDoc = docSnap;
-        }
-      }
+        const qSnap = await getDocs(query(usersRef, limit(500)));
+        const queryLower = queryVal.toLowerCase();
 
-      if (userDoc) {
-        setFoundUser({ id: userDoc.id, ...userDoc.data() });
-        // Fetch Moon data
-        const moonRef = doc(db, 'user_moons', userId);
-        const moonSnap = await getDoc(moonRef);
-        if (moonSnap.exists()) {
-          setMoonData(moonSnap.data());
+        const matches = qSnap.docs.filter(d => {
+          const data = d.data();
+          const email = (data.email || '').toLowerCase();
+          const displayName = (data.displayName || '').toLowerCase();
+          const name = (data.name || '').toLowerCase();
+          const uId = d.id.toLowerCase();
+
+          return email.includes(queryLower) ||
+                 displayName.includes(queryLower) ||
+                 name.includes(queryLower) ||
+                 uId.includes(queryLower);
+        }).map(d => ({ id: d.id, ...d.data() }));
+
+        setSearchResults(matches);
+
+        if (matches.length === 1) {
+          await handleSelectUser(matches[0]);
+        } else if (matches.length > 1) {
+          setSearchError(`${matches.length} kullanıcı bulundu. Lütfen işlem yapmak istediğinizi seçin.`);
         } else {
-          // If no moon doc exists, set default
-          setMoonData({
-            balance: 0,
-            dailyFreeBalance: 0,
-            purchasedBalance: 0,
-            userId: userId
-          });
+          setSearchError('Kullanıcı bulunamadı.');
         }
-      } else {
-        setSearchError('Kullanıcı bulunamadı.');
       }
     } catch (err: any) {
       console.error(err);
@@ -133,8 +163,20 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
 
         // Add transaction record to moon_transactions
         const txRef = doc(collection(db, 'moon_transactions'));
+        const clientMetadata = {
+          userAgent: navigator.userAgent,
+          os: navigator.userAgent.includes("Mac") ? "macOS" :
+              navigator.userAgent.includes("Win") ? "Windows" :
+              navigator.userAgent.includes("Linux") ? "Linux" :
+              navigator.userAgent.includes("Android") ? "Android" :
+              navigator.userAgent.includes("like Mac") ? "iOS" : "Unknown",
+          appVersion: "1.0.0"
+        };
+        const idempotencyKey = `admin_adjust_${userId}_${Date.now()}`;
+
         transaction.set(txRef, {
           userId,
+          transactionId: txRef.id,
           amount: delta,
           type: delta > 0 ? 'bonus' : 'spend',
           description: `Admin düzenlemesi: ${reason}`,
@@ -142,6 +184,8 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
           status: 'success',
           performedBy: auth.currentUser?.email || 'system',
           paymentProvider: 'admin_dusting',
+          idempotencyKey,
+          clientMetadata,
           createdAt: serverTimestamp()
         });
 
@@ -212,6 +256,40 @@ export const BalanceTab: React.FC<BalanceTabProps> = ({ userRole }) => {
 
         {searchError && (
           <p className="mt-3 text-sm text-red-400">{searchError}</p>
+        )}
+
+        {searchResults.length > 1 && (
+          <div className="mt-4 border-t border-[#ecd8a6]/10 pt-4 space-y-3">
+            <h4 className="text-sm font-semibold text-[#ecd8a6]/80">Eşleşen Kullanıcılar:</h4>
+            <div className="overflow-hidden rounded-lg border border-[#ecd8a6]/10 bg-[#07040e]/40 divide-y divide-[#ecd8a6]/10 max-h-60 overflow-y-auto">
+              {searchResults.map((user) => (
+                <div 
+                  key={user.id} 
+                  onClick={() => handleSelectUser(user)}
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 cursor-pointer transition text-xs ${
+                    foundUser?.id === user.id 
+                      ? 'bg-purple-900/20 text-[#ecd8a6]' 
+                      : 'hover:bg-purple-950/10 text-[#ecd8a6]/70 hover:text-[#ecd8a6]'
+                  }`}
+                >
+                  <div className="space-y-1">
+                    <span className="font-semibold block">{user.name || user.displayName || 'Belirtilmemiş'}</span>
+                    <span className="text-[10px] text-[#ecd8a6]/50 block break-all">{user.email || 'Sosyal Giriş'}</span>
+                  </div>
+                  <div className="mt-2 sm:mt-0 flex items-center gap-3">
+                    <span className="font-mono text-[10px] text-[#ecd8a6]/40">{user.id}</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] border ${
+                      foundUser?.id === user.id 
+                        ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' 
+                        : 'bg-purple-900/10 text-[#ecd8a6]/60 border-[#ecd8a6]/20'
+                    }`}>
+                      {foundUser?.id === user.id ? 'Seçildi' : 'Seç'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
