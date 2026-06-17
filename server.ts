@@ -155,6 +155,68 @@ function formatGeminiError(error: any): string {
   return msg;
 }
 
+class LogBuffer {
+  private queue: any[] = [];
+  private db: admin.firestore.Firestore;
+  private useFirebaseAdmin: boolean;
+  private limit: number;
+  private timeoutMs: number;
+  private timer: NodeJS.Timeout | null = null;
+
+  constructor(db: admin.firestore.Firestore, useFirebaseAdmin: boolean, limit = 10, timeoutMs = 5000) {
+    this.db = db;
+    this.useFirebaseAdmin = useFirebaseAdmin;
+    this.limit = limit;
+    this.timeoutMs = timeoutMs;
+  }
+
+  public push(log: any) {
+    this.queue.push(log);
+    console.log(`[LogBuffer] Log added. Queue size: ${this.queue.length}/${this.limit}`);
+
+    if (this.queue.length >= this.limit) {
+      this.flush();
+    } else if (!this.timer) {
+      this.timer = setTimeout(() => this.flush(), this.timeoutMs);
+    }
+  }
+
+  public async flush() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    if (this.queue.length === 0) return;
+
+    const batchToFlush = [...this.queue];
+    this.queue = [];
+
+    console.log(`[LogBuffer] Flushing ${batchToFlush.length} logs to Firestore...`);
+
+    if (this.useFirebaseAdmin) {
+      try {
+        const batch = this.db.batch();
+        batchToFlush.forEach((log) => {
+          const docRef = this.db.collection("error_logs").doc();
+          batch.set(docRef, {
+            ...log,
+            createdAt: log.createdAt || admin.firestore.FieldValue.serverTimestamp()
+          });
+        });
+        await batch.commit();
+        console.log(`[LogBuffer] Successfully flushed ${batchToFlush.length} logs.`);
+      } catch (err) {
+        console.error("[LogBuffer] Failed to flush logs to Firestore:", err);
+        // Put logs back in queue if write failed
+        this.queue = [...batchToFlush, ...this.queue];
+      }
+    } else {
+      console.log("[LogBuffer] Local bypass: Logs simulated flush:", batchToFlush);
+    }
+  }
+}
+
 async function startServer() {
   console.log("[Server] Starting MadameSoul server...");
   
@@ -178,6 +240,13 @@ async function startServer() {
     }
   }
 
+  const logBuffer = new LogBuffer(adminDb, useFirebaseAdmin);
+
+  // Setup process exit triggers to flush buffer safely
+  process.on("exit", () => {
+    logBuffer.flush();
+  });
+  
   const stripe = process.env.STRIPE_SECRET_KEY
     ? new Stripe(process.env.STRIPE_SECRET_KEY, {
         apiVersion: "2023-10-16" as any,
@@ -186,22 +255,15 @@ async function startServer() {
 
   async function logServerError(error: any, context: string, userId?: string) {
     console.error(`[Server Error] ${context}:`, error);
-    if (useFirebaseAdmin) {
-      try {
-        const message = error instanceof Error ? error.message : String(error);
-        const stack = error instanceof Error ? error.stack : "";
-        await adminDb.collection("error_logs").add({
-          source: "server",
-          userId: userId || null,
-          context,
-          message,
-          stack,
-          createdAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-      } catch (logErr) {
-        console.error("Failed to log server error to Firestore:", logErr);
-      }
-    }
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : "";
+    logBuffer.push({
+      source: "server",
+      userId: userId || null,
+      context,
+      message,
+      stack
+    });
   }
 
 
@@ -431,6 +493,27 @@ async function startServer() {
   // Health check - MUST be early
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  app.post("/api/logs", async (req: any, res: any) => {
+    try {
+      const { source, userId, operationType, path, message, stack, componentStack } = req.body;
+      
+      logBuffer.push({
+        source: source || "client",
+        userId: userId || null,
+        operationType: operationType || null,
+        path: path || null,
+        message: message || "Unknown client error",
+        stack: stack || null,
+        componentStack: componentStack || null
+      });
+
+      res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("[Server] Error receiving client log:", err);
+      res.status(500).json({ error: "Failed to process log" });
+    }
   });
 
   const decodeTokenUnverified = (token: string) => {

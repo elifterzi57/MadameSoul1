@@ -228,17 +228,24 @@ function AppContent() {
     const errMessage = error instanceof Error ? error.message : String(error);
     console.error('Firestore Error: ', { error: errMessage, operationType, path });
     try {
-      addDoc(collection(db, 'error_logs'), {
-        source: 'client',
-        userId: auth.currentUser?.uid || null,
-        operationType,
-        path,
-        message: errMessage,
-        stack: error instanceof Error ? error.stack || null : null,
-        createdAt: serverTimestamp()
+      fetch('/api/logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          source: 'client',
+          userId: auth.currentUser?.uid || null,
+          operationType,
+          path,
+          message: errMessage,
+          stack: error instanceof Error ? error.stack || null : null
+        })
+      }).catch(err => {
+        console.error("Failed to send error log to server:", err);
       });
     } catch (logErr) {
-      console.error("Failed to log error to Firestore:", logErr);
+      console.error("Failed to log error:", logErr);
     }
   };
 
