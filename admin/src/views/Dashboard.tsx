@@ -69,62 +69,62 @@ export const Dashboard: React.FC = () => {
           <nav className="space-y-2">
             <button
               onClick={() => setActiveTab('collections')}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
                 activeTab === 'collections'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
-              <Database className="h-4 w-4" />
-              Veritabanı Koleksiyonları
+              <Database className="h-4 w-4 shrink-0" />
+              <span className="text-left">Veritabanı Koleksiyonları</span>
             </button>
 
             <button
               onClick={() => setActiveTab('balance')}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
                 activeTab === 'balance'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
-              <Coins className="h-4 w-4" />
-              Moon Bakiye Yönetimi
+              <Coins className="h-4 w-4 shrink-0" />
+              <span className="text-left">Moon Bakiye Yönetimi</span>
             </button>
 
             <button
               onClick={() => setActiveTab('finance')}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
                 activeTab === 'finance'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
-              <CreditCard className="h-4 w-4" />
-              Stripe Finans & Satış
+              <CreditCard className="h-4 w-4 shrink-0" />
+              <span className="text-left">Stripe Finans & Satış</span>
             </button>
 
             <button
               onClick={() => setActiveTab('logs')}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
                 activeTab === 'logs'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
-              <Terminal className="h-4 w-4" />
-              Sistem Hata Logları
+              <Terminal className="h-4 w-4 shrink-0" />
+              <span className="text-left">Sistem Hata Logları</span>
             </button>
 
             <button
               onClick={() => setActiveTab('permissions')}
-              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
                 activeTab === 'permissions'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
-              <ShieldAlert className="h-4 w-4" />
-              Çalışan Yetkileri
+              <ShieldAlert className="h-4 w-4 shrink-0" />
+              <span className="text-left">Çalışan Yetkileri</span>
             </button>
           </nav>
         </div>
