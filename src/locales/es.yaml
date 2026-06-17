@@ -1179,6 +1179,24 @@ profile:
   history:
     downloadPdf: Descargar PDF
     viewReading: Ver Lectura
+  purchaseHistory: "Historial de compras"
+  noPurchases: "Aún no se han realizado compras."
+  receipt: "Recibo"
+  notificationSettings: "Configuración de notificaciones"
+  webPushNotifications: "Notificaciones Web Push"
+  webPushDesc: "Reciba notificaciones instantáneas cuando se renueven sus créditos o cuando su lectura esté lista."
+  enabled: "Habilitado"
+  disabled: "Deshabilitado"
+  appIntroWizard: "Asistente de introducción"
+  watchAppIntro: "Ver introducción de la aplicación"
+  appIntroDesc: "Reinicie el asistente de introducción que muestra cómo funcionan las características de la aplicación."
+  startIntro: "Iniciar introducción"
+  accountManagement: "Gestión de cuenta"
+  deleteAccount: "Eliminar cuenta"
+  deleteAccountDesc: "Eliminar su cuenta borrará permanentemente su saldo, historial y datos personales."
+  deleteConfirmMessage: "¿Está seguro de que desea eliminar permanentemente su cuenta y todos los datos asociados (incluido su saldo e historial de lectura)? ¡Esta acción no se puede deshacer!"
+  deleteConfirmBtn: "Sí, eliminar mi cuenta"
+  cancelBtn: "Cancelar"
   readingCount: "Lecturas"
   mysticRank: "Rango Místico"
   rankNames:
@@ -1239,6 +1257,8 @@ login:
   loading: "Cargando..."
   showIntro: "Ver Introducción"
   kvkkConsent: "He leído y acepto el Acuerdo de Usuario, la Política de Privacidad y el Consentimiento Explícito de RGPD/KVKK."
+  forgotPassword: "¿Olvidó su contraseña?"
+  implicitConsent: "Al iniciar sesión o registrarse, acepta el Acuerdo de usuario, la Política de privacidad y el Consentimiento explícito de GDPR/KVKK."
   quote: "Descubre los susurros de las estrellas y las profundidades de tu alma."
   errorWrongCredentials: "Correo electrónico o contraseña incorrectos."
   errorEmailInUse: "El correo electrónico ya está en uso."
@@ -1264,3 +1284,42 @@ profileDiary:
   closeBtn: "Cerrar"
   saveSuccess: "¡Lectura actualizada con éxito!"
   saveError: "Error al actualizar la lectura."
+
+termsConsent:
+  title: "Términos Legales y Consentimiento de RGPD"
+  subtitle: "Antes de continuar, revise y acepte el Acuerdo de Usuario, la Política de Privacidad y los términos de RGPD."
+  accept: "Aceptar y Continuar"
+  error: "Ocurrió un error durante la verificación. Por favor, inténtelo de nuevo."
+
+drawing:
+  title: "Selecciona las Cartas de Tu Destino"
+  subtitle: "Despeja tu mente, concéntrate en tu pregunta y selecciona 3 cartas para Pasado, Presente y Futuro."
+  selected: "Seleccionadas: {count} / 3"
+  nextPresent: "Siguiente: Presente"
+  nextFuture: "Siguiente: Futuro"
+  selectionComplete: "¡Selección completa!"
+  drawCard: "Elegir Carta"
+  interpretSpread: "Interpretar Tirada"
+
+pushPrompt:
+  title: "No Te Pierdas Tu Destino"
+  description: "Habilite las notificaciones del navegador para recibir actualizaciones místicas cuando se carguen sus créditos gratuitos de Katina Moon o cuando se preparen sus lecturas."
+  enable: "Activar Notificaciones"
+  later: "Quizás Más Tarde"
+
+notification:
+  paymentSuccess: "¡Pago completado con éxito!"
+  paymentError: "Error al validar el pago."
+  paymentCancelled: "Pago cancelado."
+  readingReady: "¡Tu lectura está lista!"
+  loadedFromCache: "¡Cargado desde el caché, saldo de lunas reembolsado!"
+  pushEnabled: "¡Notificaciones activadas con éxito!"
+  pushError: "No se pudo obtener el permiso de notificación."
+
+feedback:
+  header: "¿Cómo estuvo tu Lectura?"
+  placeholder: "Tu comentario (opcional)..."
+  submitBtn: "Enviar Comentarios"
+  successMsg: "¡Gracias por sus comentarios!"
+  submitBtnShort: "Enviar"
+  submitError: "No se pudo enviar el comentario."

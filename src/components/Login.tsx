@@ -658,7 +658,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                           disabled={loading}
                           className="text-[10px] sm:text-xs text-[#ecd8a6]/60 hover:text-[#ecd8a6] transition-all font-serif italic cursor-pointer outline-none"
                         >
-                          {language === 'tr' ? 'Şifremi Unuttum' : 'Forgot Password?'}
+                          {t('login.forgotPassword')}
                         </button>
                       </div>
                     )}
@@ -684,9 +684,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                     </button>
 
                     <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-1 mb-2 font-sans max-w-xs mx-auto">
-                      {language === 'tr' 
-                        ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
-                        : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                      {t('login.implicitConsent')}
                     </p>
 
                     <button 
@@ -772,17 +770,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       </AnimatePresence>
                     </div>
 
-                    {/* Show Intro Under Button */}
-                    <div className="flex flex-col items-center pt-2">
-                      <button 
-                        type="button"
-                        onClick={onShowOnboarding}
-                        className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest"
-                      >
-                        <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                        <span>{t('login.showIntro')}</span>
-                      </button>
-                    </div>
+
                   </div>
                 </motion.form>
               ) : (
@@ -867,9 +855,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       </button>
 
                       <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-2 font-sans max-w-xs mx-auto">
-                        {language === 'tr' 
-                          ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
-                          : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                        {t('login.implicitConsent')}
                       </p>
                     </form>
                   ) : (
@@ -902,9 +888,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       </button>
 
                       <p className="text-[9px] sm:text-[10px] text-[#ecd8a6]/40 leading-normal text-center mt-2 font-sans max-w-xs mx-auto">
-                        {language === 'tr' 
-                          ? "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
-                          : "By logging in or signing up, you agree to the User Agreement, Privacy Policy, and GDPR/KVKK Explicit Consent."}
+                        {t('login.implicitConsent')}
                       </p>
                     </form>
                   )}
@@ -986,17 +970,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       </AnimatePresence>
                     </div>
 
-                    {/* Show Intro Under Button */}
-                    <div className="flex flex-col items-center pt-2">
-                      <button 
-                        type="button"
-                        onClick={onShowOnboarding}
-                        className="flex items-center gap-2 text-[#ecd8a6]/40 hover:text-[#ecd8a6]/80 transition-colors group px-4 py-2 text-[10px] sm:text-xs font-serif uppercase tracking-widest"
-                      >
-                        <RefreshCw className="w-3 h-3 group-hover:rotate-180 transition-transform duration-700" />
-                        <span>{t('login.showIntro')}</span>
-                      </button>
-                    </div>
+
                   </div>
                 </motion.div>
               )}

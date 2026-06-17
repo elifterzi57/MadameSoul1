@@ -1109,6 +1109,24 @@ profile:
   history:
     downloadPdf: "PDF İndir"
     viewReading: "Falı Görüntüle"
+  purchaseHistory: "Satın Alım Geçmişi"
+  noPurchases: "Henüz satın alım yapılmadı."
+  receipt: "Makbuz"
+  notificationSettings: "Bildirim Ayarları"
+  webPushNotifications: "Web Push Bildirimleri"
+  webPushDesc: "Kredileriniz yenilendiğinde ve falınız hazır olduğunda anında bildirim alın."
+  enabled: "Açık"
+  disabled: "Kapalı"
+  appIntroWizard: "Tanıtım Sihirbazı"
+  watchAppIntro: "Tanıtım Sihirbazını İzle"
+  appIntroDesc: "Uygulamanın özelliklerini ve nasıl çalıştığını gösteren tanıtım sihirbazını yeniden başlatın."
+  startIntro: "Tanıtımı Başlat"
+  accountManagement: "Hesap Yönetimi"
+  deleteAccount: "Hesabımı Sil"
+  deleteAccountDesc: "Hesabınızı silmek tüm bakiyenizi, fal geçmişinizi ve kişisel verilerinizi kalıcı olarak temizler."
+  deleteConfirmMessage: "Hesabınızı ve tüm verilerinizi (bakiyeniz ve fal geçmişiniz dahil) kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!"
+  deleteConfirmBtn: "Evet, Hesabımı Sil"
+  cancelBtn: "Vazgeç"
 rateLimitError: "Çok fazla istek gönderdiniz. Lütfen bir saat sonra tekrar deneyin."
 cookieConsent:
   text: "Gezinti deneyiminizi geliştirmek, kişiselleştirilmiş içerik sunmak ve fal analizlerinizi güvenle kaydetmek için çerezleri kullanıyoruz."
@@ -1160,6 +1178,8 @@ login:
   loading: "Yükleniyor..."
   showIntro: "Uygulama Tanıtımını Gör"
   kvkkConsent: "Kullanıcı Sözleşmesini, Gizlilik Politikasını ve KVKK/GDPR Açık Rıza Metnini okudum, onaylıyorum."
+  forgotPassword: "Şifremi Unuttum"
+  implicitConsent: "Giriş veya kayıt yaparak Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK Açık Rıza Metnini onaylamış olursunuz."
   quote: "Yıldızların fısıltısını ve ruhunuzun derinliklerini keşfedin."
   errorWrongCredentials: "E-posta adresi veya şifre hatalı."
   errorEmailInUse: "Bu e-posta adresi zaten kullanımda."
@@ -1185,3 +1205,42 @@ profileDiary:
   closeBtn: "Kapat"
   saveSuccess: "Fal başarıyla güncellendi!"
   saveError: "Fal güncellenirken hata oluştu."
+
+termsConsent:
+  title: "Yasal Onay ve Açık Rıza"
+  subtitle: "Devam etmeden önce Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK metinlerini onaylamanız gerekmektedir."
+  accept: "Onayla ve Devam Et"
+  error: "Onay işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin."
+
+drawing:
+  title: "Kaderinizin Kartlarını Seçin"
+  subtitle: "Zihninizi boşaltın, sorunuza odaklanın ve sırasıyla Geçmiş, Şimdiki Zaman ve Gelecek için 3 kart seçin."
+  selected: "Seçilen: {count} / 3"
+  nextPresent: "Sıradaki: Şimdiki Zaman"
+  nextFuture: "Sıradaki: Gelecek"
+  selectionComplete: "Seçim tamamlandı!"
+  drawCard: "Kart Seç"
+  interpretSpread: "Açılımı Yorumla"
+
+pushPrompt:
+  title: "Kehanetlerinizi Kaçırmayın"
+  description: "Günlük ücretsiz Katina Moon kredileriniz yüklendiğinde ve falınız hazır olduğunda mistik bildirimler almak için tarayıcı bildirimlerini etkinleştirin."
+  enable: "Bildirimleri Aç"
+  later: "Daha Sonra"
+
+notification:
+  paymentSuccess: "Ödeme başarıyla tamamlandı!"
+  paymentError: "Ödeme onaylanırken bir hata oluştu."
+  paymentCancelled: "Ödeme iptal edildi."
+  readingReady: "Falınız hazır!"
+  loadedFromCache: "Önbellekten yüklendi, bakiyeniz iade edildi!"
+  pushEnabled: "Bildirimleriniz başarıyla etkinleştirildi!"
+  pushError: "Bildirim izni alınamadı."
+
+feedback:
+  header: "Açılımı Nasıl Buldunuz?"
+  placeholder: "Yorumunuz (isteğe bağlı)..."
+  submitBtn: "Geri Bildirimi Gönder"
+  successMsg: "Geri bildiriminiz için teşekkür ederiz!"
+  submitBtnShort: "Gönder"
+  submitError: "Geri bildirim gönderilemedi."
