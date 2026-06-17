@@ -144,7 +144,7 @@ export const Dashboard: React.FC = () => {
           </div>
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
+            className="flex w-full items-center justify-start gap-3 rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
           >
             <LogOut className="h-4 w-4" />
             Çıkış Yap

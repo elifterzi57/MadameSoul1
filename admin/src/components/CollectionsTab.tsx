@@ -16,6 +16,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Filters & Sorting state
   const [dateFilter, setDateFilter] = useState<'all' | 'daily' | 'monthly' | 'yearly'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortByField, setSortByField] = useState<string>('id');
 
   const collectionsList = [
     { id: 'users', label: 'Kullanıcılar (users)' },
@@ -46,6 +47,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   };
 
   useEffect(() => {
+    if (selectedCollection === 'moon_transactions') {
+      setSortByField('createdat');
+      setSortOrder('desc');
+    } else {
+      setSortByField('id');
+      setSortOrder('asc');
+    }
     fetchCollectionData();
   }, [selectedCollection]);
 
@@ -79,17 +87,71 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     });
   };
 
-  // Sort logic (sorting by ID, or email, or main text field A-Z)
+  // Helper to get value of moon transaction fields mapped
+  const getMoonTxValue = (doc: any, col: string): any => {
+    const fieldMapping: Record<string, string> = {
+      'ID': 'id',
+      'Username': 'userName',
+      'createdat': 'createdAt',
+      'Description': 'description',
+      'Cards': 'cards',
+      'status': 'status',
+      'type': 'type',
+      'userbrithplace': 'userBirthplace',
+      'userbirhthdate': 'userDob',
+      'userlanguage': 'userLanguage',
+      'userrelationship': 'userRelationship',
+      'pdfdowlanded': 'pdfDownloaded'
+    };
+    const dbKey = fieldMapping[col] || col;
+    const val = doc[dbKey];
+
+    // Format cards array nicely
+    if (col === 'Cards') {
+      if (Array.isArray(val)) {
+        return val.map((c: any) => c.name || c.id || '').join(', ');
+      }
+      return val || '-';
+    }
+
+    return val;
+  };
+
+  // Sort logic (sorting dynamically by selected sortByField)
   const getSortedDocs = (docs: any[]) => {
+    if (!sortByField) return docs;
     return [...docs].sort((a, b) => {
-      // Find a suitable field to sort (email, name, or id as fallback)
-      const aVal = (a.email || a.name || a.id || '').toString().toLowerCase();
-      const bVal = (b.email || b.name || b.id || '').toString().toLowerCase();
+      let aVal = a[sortByField];
+      let bVal = b[sortByField];
+
+      if (selectedCollection === 'moon_transactions') {
+        aVal = getMoonTxValue(a, sortByField);
+        bVal = getMoonTxValue(b, sortByField);
+      }
+
+      let aCompare = aVal;
+      let bCompare = bVal;
+
+      if (aCompare && aCompare.seconds) aCompare = aCompare.seconds;
+      if (bCompare && bCompare.seconds) bCompare = bCompare.seconds;
+
+      if (aCompare instanceof Date) aCompare = aCompare.getTime();
+      if (bCompare instanceof Date) bCompare = bCompare.getTime();
+
+      const aNum = Number(aCompare);
+      const bNum = Number(bCompare);
+
+      if (!isNaN(aNum) && !isNaN(bNum) && aCompare !== null && aCompare !== undefined && bCompare !== null && bCompare !== undefined && typeof aCompare !== 'string' && typeof bCompare !== 'string') {
+        return sortOrder === 'asc' ? aNum - bNum : bNum - aNum;
+      }
+
+      const aStr = (aCompare === null || aCompare === undefined ? '' : aCompare).toString().toLowerCase();
+      const bStr = (bCompare === null || bCompare === undefined ? '' : bCompare).toString().toLowerCase();
 
       if (sortOrder === 'asc') {
-        return aVal.localeCompare(bVal);
+        return aStr.localeCompare(bStr);
       } else {
-        return bVal.localeCompare(aVal);
+        return bStr.localeCompare(aStr);
       }
     });
   };
@@ -109,8 +171,24 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return val.toString();
   };
 
-  // Dynamically extract columns from documents
+  // Dynamically extract columns from documents, except for moon_transactions
   const getColumns = () => {
+    if (selectedCollection === 'moon_transactions') {
+      return [
+        'ID',
+        'Username',
+        'createdat',
+        'Description',
+        'Cards',
+        'status',
+        'type',
+        'userbrithplace',
+        'userbirhthdate',
+        'userlanguage',
+        'userrelationship',
+        'pdfdowlanded'
+      ];
+    }
     const cols = new Set<string>();
     cols.add('id'); // always show id first
     sortedAndFilteredDocs.forEach(doc => {
@@ -211,9 +289,27 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
             <table className="w-full border-collapse text-left text-sm text-[#ecd8a6]/80">
               <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
                 <tr>
-                  {columns.map((col) => (
-                    <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10">{col}</th>
-                  ))}
+                  {columns.map((col) => {
+                    const isSorted = sortByField === col;
+                    return (
+                      <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10">
+                        <button
+                          onClick={() => {
+                            if (sortByField === col) {
+                              setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                            } else {
+                              setSortByField(col);
+                              setSortOrder('asc');
+                            }
+                          }}
+                          className="flex items-center gap-1 hover:text-[#ecd8a6] transition-colors focus:outline-none"
+                        >
+                          <span>{col}</span>
+                          <ArrowUpDown className={`h-3.5 w-3.5 ${isSorted ? 'text-[#ecd8a6]' : 'opacity-30'}`} />
+                        </button>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#ecd8a6]/10">
@@ -221,7 +317,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                   <tr key={doc.id || idx} className="hover:bg-purple-950/10 transition">
                     {columns.map((col) => (
                       <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate">
-                        {renderValue(doc[col])}
+                        {selectedCollection === 'moon_transactions'
+                          ? renderValue(getMoonTxValue(doc, col))
+                          : renderValue(doc[col])}
                       </td>
                     ))}
                   </tr>
