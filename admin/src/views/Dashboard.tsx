@@ -9,16 +9,18 @@ import {
   ShieldAlert, 
   LogOut, 
   User as UserIcon,
-  ChevronDown
+  ChevronDown,
+  LayoutDashboard
 } from 'lucide-react';
 import { CollectionsTab } from '../components/CollectionsTab';
 import { BalanceTab } from '../components/BalanceTab';
 import { FinanceTab } from '../components/FinanceTab';
 import { LogsTab } from '../components/LogsTab';
 import { PermissionsTab } from '../components/PermissionsTab';
+import { OverviewTab } from '../components/OverviewTab';
 
 export const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'collections' | 'balance' | 'finance' | 'logs' | 'permissions'>('collections');
+  const [activeTab, setActiveTab] = useState<'overview' | 'collections' | 'balance' | 'finance' | 'logs' | 'permissions'>('overview');
   const [selectedCollection, setSelectedCollection] = useState<string>('users');
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(true);
   const [userRole, setUserRole] = useState<'admin' | 'employee' | 'viewer' | null>(null);
@@ -77,6 +79,21 @@ export const Dashboard: React.FC = () => {
 
           {/* Navigation Menu */}
           <nav className="space-y-2">
+            <button
+              onClick={() => {
+                setActiveTab('overview');
+                setIsCollectionsOpen(false);
+              }}
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+                activeTab === 'overview'
+                  ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
+                  : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
+              }`}
+            >
+              <LayoutDashboard className="h-4 w-4 shrink-0" />
+              <span className="text-left">Genel Bakış</span>
+            </button>
+
             <div className="space-y-1">
               <button
                 onClick={() => {
@@ -193,6 +210,7 @@ export const Dashboard: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto">
+        {activeTab === 'overview' && <OverviewTab userRole={userRole} />}
         {activeTab === 'collections' && (
           <CollectionsTab 
             userRole={userRole} 
