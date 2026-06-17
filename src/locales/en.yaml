@@ -1266,3 +1266,42 @@ profileDiary:
   closeBtn: "Close"
   saveSuccess: "Reading updated successfully!"
   saveError: "Failed to update reading."
+
+termsConsent:
+  title: "Legal Terms & GDPR Consent"
+  subtitle: "Before continuing, please review and accept the User Agreement, Privacy Policy, and GDPR terms."
+  accept: "Accept & Continue"
+  error: "An error occurred during verification. Please try again."
+
+drawing:
+  title: "Select the Cards of Your Destiny"
+  subtitle: "Clear your mind, focus on your question, and select 3 cards for Past, Present, and Future."
+  selected: "Selected: {count} / 3"
+  nextPresent: "Next: Present"
+  nextFuture: "Next: Future"
+  selectionComplete: "Selection complete!"
+  drawCard: "Draw Card"
+  interpretSpread: "Interpret Spread"
+
+pushPrompt:
+  title: "Don't Miss Your Destiny"
+  description: "Enable browser notifications to receive mystic updates when your daily free Katina Moon credits are loaded or when your readings are prepared."
+  enable: "Enable Notifications"
+  later: "Maybe Later"
+
+notification:
+  paymentSuccess: "Payment completed successfully!"
+  paymentError: "Error validating payment."
+  paymentCancelled: "Payment cancelled."
+  readingReady: "Your reading is ready!"
+  loadedFromCache: "Loaded from cache, moon balance refunded!"
+  pushEnabled: "Notifications enabled successfully!"
+  pushError: "Failed to get notification permission."
+
+feedback:
+  header: "How was your Reading?"
+  placeholder: "Your comment (optional)..."
+  submitBtn: "Submit Feedback"
+  successMsg: "Thank you for your feedback!"
+  submitBtnShort: "Submit"
+  submitError: "Failed to submit feedback."

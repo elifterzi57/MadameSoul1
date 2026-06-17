@@ -40,9 +40,7 @@ export const TermsModal: React.FC<TermsModalProps> = ({ userId, language, onAcce
       onAccept();
     } catch (err: any) {
       console.error('Failed to accept terms:', err);
-      setError(language === 'tr' 
-        ? 'Onay işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.' 
-        : 'An error occurred during verification. Please try again.');
+      setError(t('termsConsent.error'));
     } finally {
       setLoading(false);
     }
@@ -68,12 +66,10 @@ export const TermsModal: React.FC<TermsModalProps> = ({ userId, language, onAcce
             <ShieldCheck className="w-6 h-6 text-[#ecd8a6]" />
           </div>
           <h2 className="text-xl sm:text-2xl font-serif text-[#ecd8a6] tracking-wider uppercase text-center">
-            {language === 'tr' ? 'Yasal Onay ve Açık Rıza' : 'Legal Terms & GDPR Consent'}
+            {t('termsConsent.title')}
           </h2>
           <p className="text-[#ecd8a6]/50 text-xs sm:text-sm font-sans mt-1 text-center max-w-md">
-            {language === 'tr' 
-              ? 'Devam etmeden önce Kullanıcı Sözleşmesi, Gizlilik Politikası ve KVKK metinlerini onaylamanız gerekmektedir.' 
-              : 'Before continuing, please review and accept the User Agreement, Privacy Policy, and GDPR terms.'}
+            {t('termsConsent.subtitle')}
           </p>
         </div>
 
@@ -101,7 +97,7 @@ export const TermsModal: React.FC<TermsModalProps> = ({ userId, language, onAcce
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>
-                <span>{language === 'tr' ? 'Onayla ve Devam Et' : 'Accept & Continue'}</span>
+                <span>{t('termsConsent.accept')}</span>
               </>
             )}
           </button>

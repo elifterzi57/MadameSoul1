@@ -1264,3 +1264,42 @@ profileDiary:
   closeBtn: "Cerrar"
   saveSuccess: "¡Lectura actualizada con éxito!"
   saveError: "Error al actualizar la lectura."
+
+termsConsent:
+  title: "Términos Legales y Consentimiento de RGPD"
+  subtitle: "Antes de continuar, revise y acepte el Acuerdo de Usuario, la Política de Privacidad y los términos de RGPD."
+  accept: "Aceptar y Continuar"
+  error: "Ocurrió un error durante la verificación. Por favor, inténtelo de nuevo."
+
+drawing:
+  title: "Selecciona las Cartas de Tu Destino"
+  subtitle: "Despeja tu mente, concéntrate en tu pregunta y selecciona 3 cartas para Pasado, Presente y Futuro."
+  selected: "Seleccionadas: {count} / 3"
+  nextPresent: "Siguiente: Presente"
+  nextFuture: "Siguiente: Futuro"
+  selectionComplete: "¡Selección completa!"
+  drawCard: "Elegir Carta"
+  interpretSpread: "Interpretar Tirada"
+
+pushPrompt:
+  title: "No Te Pierdas Tu Destino"
+  description: "Habilite las notificaciones del navegador para recibir actualizaciones místicas cuando se carguen sus créditos gratuitos de Katina Moon o cuando se preparen sus lecturas."
+  enable: "Activar Notificaciones"
+  later: "Quizás Más Tarde"
+
+notification:
+  paymentSuccess: "¡Pago completado con éxito!"
+  paymentError: "Error al validar el pago."
+  paymentCancelled: "Pago cancelado."
+  readingReady: "¡Tu lectura está lista!"
+  loadedFromCache: "¡Cargado desde el caché, saldo de lunas reembolsado!"
+  pushEnabled: "¡Notificaciones activadas con éxito!"
+  pushError: "No se pudo obtener el permiso de notificación."
+
+feedback:
+  header: "¿Cómo estuvo tu Lectura?"
+  placeholder: "Tu comentario (opcional)..."
+  submitBtn: "Enviar Comentarios"
+  successMsg: "¡Gracias por sus comentarios!"
+  submitBtnShort: "Enviar"
+  submitError: "No se pudo enviar el comentario."

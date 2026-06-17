@@ -530,3 +530,42 @@ profileDiary:
   closeBtn: "关闭"
   saveSuccess: "读数更新成功！"
   saveError: "更新读数失败。"
+
+termsConsent:
+  title: "法律条款与 GDPR 同意"
+  subtitle: "在继续之前，请阅读并接受用户协议、隐私政策以及 GDPR 条款。"
+  accept: "同意并继续"
+  error: "验证过程中发生错误。请重试。"
+
+drawing:
+  title: "选择您的命运卡牌"
+  subtitle: "清空思绪，专注于您的问题，并分别为过去、现在和未来选择 3 张卡牌。"
+  selected: "已选择: {count} / 3"
+  nextPresent: "下一步：现在"
+  nextFuture: "下一步：未来"
+  selectionComplete: "选择完成！"
+  drawCard: "抽卡"
+  interpretSpread: "解读开牌"
+
+pushPrompt:
+  title: "不要错过您的命运"
+  description: "启用浏览器通知，在您每日免费的 Katina Moon 积分充值或您的占卜报告准备就绪时，接收神秘的消息通知。"
+  enable: "开启通知"
+  later: "稍后再说"
+
+notification:
+  paymentSuccess: "付款成功完成！"
+  paymentError: "验证付款时出错。"
+  paymentCancelled: "付款已取消。"
+  readingReady: "您的占卜报告已准备就绪！"
+  loadedFromCache: "已从缓存加载，月光石余额已退还！"
+  pushEnabled: "通知已成功启用！"
+  pushError: "未能获取通知权限。"
+
+feedback:
+  header: "您的占卜结果如何？"
+  placeholder: "您的评论（可选）..."
+  submitBtn: "提交反馈"
+  successMsg: "感谢您的反馈！"
+  submitBtnShort: "提交"
+  submitError: "提交反馈失败。"

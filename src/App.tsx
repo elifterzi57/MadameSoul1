@@ -645,9 +645,9 @@ function AppContent() {
               body: JSON.stringify({ sessionId })
             });
             if (res.ok) {
-              showToast(userInfo.language === 'tr' ? "Ödeme başarıyla tamamlandı!" : "Payment completed successfully!", 'success');
+              showToast(t('notification.paymentSuccess'), 'success');
             } else {
-              showToast(userInfo.language === 'tr' ? "Ödeme onaylanırken bir hata oluştu." : "Error validating payment.", 'error');
+              showToast(t('notification.paymentError'), 'error');
             }
           } catch (err) {
             console.error("Error completing mock payment:", err);
@@ -656,11 +656,11 @@ function AppContent() {
         };
         completeMockPayment();
       } else {
-        showToast(userInfo.language === 'tr' ? "Ödeme başarıyla tamamlandı!" : "Payment completed successfully!", 'success');
+        showToast(t('notification.paymentSuccess'), 'success');
       }
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'cancel') {
-      showToast(userInfo.language === 'tr' ? "Ödeme iptal edildi." : "Payment cancelled.", 'info');
+      showToast(t('notification.paymentCancelled'), 'info');
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [user]);
@@ -690,19 +690,9 @@ function AppContent() {
     try {
       const token = await requestPushNotificationPermission(user.uid);
       if (token) {
-        showToast(
-          userInfo.language === 'tr' 
-            ? "Bildirimleriniz başarıyla etkinleştirildi!" 
-            : "Notifications enabled successfully!", 
-          'success'
-        );
+        showToast(t('notification.pushEnabled'), 'success');
       } else {
-        showToast(
-          userInfo.language === 'tr' 
-            ? "Bildirim izni alınamadı." 
-            : "Failed to get notification permission.", 
-          'error'
-        );
+        showToast(t('notification.pushError'), 'error');
       }
     } catch (e) {
       console.error("Error enabling push notifications:", e);
@@ -884,12 +874,12 @@ function AppContent() {
       setReading(data.text);
       setIsGenerating(false);
 
-      showToast(userInfo.language === 'tr' ? "Falınız hazır!" : "Your reading is ready!", 'success');
+      showToast(t('notification.readingReady'), 'success');
 
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
         try {
           new Notification("MadameSoul", {
-            body: userInfo.language === 'tr' ? "Falınız hazır!" : "Your reading is ready!",
+            body: t('notification.readingReady'),
             icon: '/icon.svg'
           });
         } catch (e) {
@@ -937,7 +927,7 @@ function AppContent() {
             }
           });
           setReadingCount(prev => Math.max(0, prev - 1));
-          showToast(userInfo.language === 'tr' ? "Önbellekten yüklendi, bakiyeniz iade edildi!" : "Loaded from cache, moon balance refunded!", 'success');
+          showToast(t('notification.loadedFromCache'), 'success');
         } catch (refundError) {
           console.error("Error refunding cached moon balance:", refundError);
         }
@@ -1113,13 +1103,13 @@ function AppContent() {
       });
       setHasSubmittedFeedback(true);
       showToast(
-        userInfo.language === 'tr' ? "Geri bildiriminiz başarıyla iletildi." : "Feedback submitted successfully.",
+        t('feedback.successMsg'),
         'success'
       );
     } catch (err) {
       console.error("Error submitting main feedback:", err);
       showToast(
-        userInfo.language === 'tr' ? "Geri bildirim gönderilemedi." : "Failed to submit feedback.",
+        t('feedback.submitError'),
         'error'
       );
     } finally {
@@ -1336,13 +1326,11 @@ function AppContent() {
               </div>
               
               <h3 className="text-xl font-serif text-[#ecd8a6] tracking-widest uppercase mb-4 relative z-10">
-                {userInfo.language === 'tr' ? "Kehanetlerinizi Kaçırmayın" : "Don't Miss Your Destiny"}
+                {t('pushPrompt.title')}
               </h3>
               
               <p className="text-xs text-[#ecd8a6]/70 leading-relaxed font-sans mb-8 px-2 relative z-10">
-                {userInfo.language === 'tr' 
-                  ? "Günlük ücretsiz Katina Moon kredileriniz yüklendiğinde ve falınız hazır olduğunda mistik bildirimler almak için tarayıcı bildirimlerini etkinleştirin." 
-                  : "Enable browser notifications to receive mystic updates when your daily free Katina Moon credits are loaded or when your readings are prepared."}
+                {t('pushPrompt.description')}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 justify-center relative z-10">
@@ -1350,13 +1338,13 @@ function AppContent() {
                   onClick={handleEnablePush}
                   className="w-full sm:w-auto px-6 py-3 bg-[#ecd8a6] hover:bg-white text-[#0a0512] rounded-xl text-xs font-serif tracking-widest uppercase font-bold transition-all cursor-pointer"
                 >
-                  {userInfo.language === 'tr' ? "Bildirimleri Aç" : "Enable Notifications"}
+                  {t('pushPrompt.enable')}
                 </button>
                 <button
                   onClick={handleClosePushPrompt}
                   className="w-full sm:w-auto px-6 py-3 bg-[#120a1c]/80 hover:bg-white/5 text-[#ecd8a6]/70 hover:text-[#ecd8a6] rounded-xl text-xs font-serif tracking-widest uppercase font-bold transition-all border border-[#ecd8a6]/20 cursor-pointer"
                 >
-                  {userInfo.language === 'tr' ? "Daha Sonra" : "Maybe Later"}
+                  {t('pushPrompt.later')}
                 </button>
               </div>
             </motion.div>
@@ -1739,24 +1727,22 @@ function AppContent() {
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-serif text-[#ecd8a6] mb-3 flex items-center justify-center gap-3">
                   <KatinaMoon className="w-8 h-8 text-[#ecd8a6] animate-[spin_15s_linear_infinite] flex-shrink-0" />
-                  <span>{userInfo.language === 'tr' ? "Kaderinizin Kartlarını Seçin" : "Select the Cards of Your Destiny"}</span>
+                  <span>{t('drawing.title')}</span>
                 </h2>
                 <p className="text-[#ecd8a6]/70 max-w-md mx-auto text-sm">
-                  {userInfo.language === 'tr'
-                    ? "Zihninizi boşaltın, sorunuza odaklanın ve sırasıyla Geçmiş, Şimdiki Zaman ve Gelecek için 3 kart seçin."
-                    : "Clear your mind, focus on your question, and select 3 cards for Past, Present, and Future."}
+                  {t('drawing.subtitle')}
                 </p>
                 
                 {/* Progress / Status */}
                 <div className="mt-4 flex items-center justify-center gap-3">
                   <span className="px-3 py-1 bg-[#1e1332] border border-[#ecd8a6]/20 rounded-full text-xs text-[#ecd8a6]">
-                    {userInfo.language === 'tr' ? `Seçilen: ${drawnCards.length} / 3` : `Selected: ${drawnCards.length} / 3`}
+                    {t('drawing.selected', { count: drawnCards.length })}
                   </span>
                   {drawnCards.length > 0 && (
                     <span className="text-xs text-[#ecd8a6]/60 italic font-sans font-medium">
-                      {drawnCards.length === 1 && (userInfo.language === 'tr' ? "Sıradaki: Şimdiki Zaman" : "Next: Present")}
-                      {drawnCards.length === 2 && (userInfo.language === 'tr' ? "Sıradaki: Gelecek" : "Next: Future")}
-                      {drawnCards.length === 3 && (userInfo.language === 'tr' ? "Seçim tamamlandı!" : "Selection complete!")}
+                      {drawnCards.length === 1 && t('drawing.nextPresent')}
+                      {drawnCards.length === 2 && t('drawing.nextFuture')}
+                      {drawnCards.length === 3 && t('drawing.selectionComplete')}
                     </span>
                   )}
                 </div>
@@ -1791,7 +1777,7 @@ function AppContent() {
                           <div className="flex flex-col items-center justify-center p-2 text-center text-[#ecd8a6]/30 text-xs">
                             <Sparkles className="w-4 h-4 mb-1 animate-pulse" />
                             <span className="text-[9px] uppercase tracking-wider font-sans font-medium">
-                              {userInfo.language === 'tr' ? "Kart Seç" : "Draw Card"}
+                              {t('drawing.drawCard')}
                             </span>
                           </div>
                         )}
@@ -1813,7 +1799,7 @@ function AppContent() {
                     className="px-8 py-3.5 bg-gradient-to-br from-[#1e1332] to-[#05000a] border border-[#ecd8a6]/40 hover:border-[#ecd8a6]/80 text-[#ecd8a6] font-sans font-semibold tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <KatinaMoon className="w-5 h-5 text-[#ecd8a6] animate-[spin_6s_linear_infinite]" />
-                    <span>{userInfo.language === 'tr' ? "Açılımı Yorumla" : "Interpret Spread"}</span>
+                    <span>{t('drawing.interpretSpread')}</span>
                   </button>
                 </motion.div>
               )}
@@ -1963,7 +1949,7 @@ function AppContent() {
                       <div className="mt-8 pt-8 border-t border-[#ecd8a6]/10 flex flex-col items-center space-y-4">
                         <div className="w-12 h-px bg-[#ecd8a6]/30 mb-2" />
                         <h4 className="text-sm font-serif tracking-[0.2em] text-[#ecd8a6]/80 uppercase">
-                          {userInfo.language === 'tr' ? "Açılımı Nasıl Buldunuz?" : "How was your Reading?"}
+                          {t('feedback.header')}
                         </h4>
                         {hasSubmittedFeedback ? (
                           <div className="flex flex-col items-center space-y-2">
@@ -1976,7 +1962,7 @@ function AppContent() {
                               ))}
                             </div>
                             <p className="text-xs text-[#ecd8a6]/60 italic font-sans">
-                              {userInfo.language === 'tr' ? "Geri bildiriminiz için teşekkür ederiz!" : "Thank you for your feedback!"}
+                              {t('feedback.successMsg')}
                             </p>
                           </div>
                         ) : (
@@ -2007,7 +1993,7 @@ function AppContent() {
                                   value={mainComment}
                                   onChange={(e) => setMainComment(e.target.value)}
                                   className="w-full h-20 bg-[#160c24] border border-[#ecd8a6]/20 rounded-xl px-4 py-2.5 text-xs text-[#ecd8a6] focus:outline-none focus:border-[#ecd8a6]/40 font-sans resize-none"
-                                  placeholder={userInfo.language === 'tr' ? "Yorumunuz (isteğe bağlı)..." : "Your comment (optional)..."}
+                                  placeholder={t('feedback.placeholder')}
                                   maxLength={1000}
                                 />
                                 <button
@@ -2019,7 +2005,7 @@ function AppContent() {
                                   {submittingMainFeedback ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                   ) : (
-                                    userInfo.language === 'tr' ? "Geri Bildirimi Gönder" : "Submit Feedback"
+                                    t('feedback.submitBtn')
                                   )}
                                 </button>
                               </motion.div>

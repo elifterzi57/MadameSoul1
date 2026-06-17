@@ -810,3 +810,42 @@ profileDiary:
   closeBtn: "닫기"
   saveSuccess: "독서가 성공적으로 업데이트되었습니다!"
   saveError: "독서 업데이트에 실패했습니다."
+
+termsConsent:
+  title: "법적 고지 및 개인정보 동의 (GDPR)"
+  subtitle: "계속하기 전에 이용 약관, 개인정보 처리방침 및 GDPR 동의 내용을 확인하고 승인해주세요."
+  accept: "동의하고 계속하기"
+  error: "인증 과정 중 오류가 발생했습니다. 다시 시도해주세요."
+
+drawing:
+  title: "운명의 카드 선택"
+  subtitle: "마음을 비우고, 질문에 집중한 후 과거, 현재, 미래를 위한 카드 3장을 선택하세요."
+  selected: "선택됨: {count} / 3"
+  nextPresent: "다음: 현재"
+  nextFuture: "다음: 미래"
+  selectionComplete: "선택 완료!"
+  drawCard: "카드 뽑기"
+  interpretSpread: "해석하기"
+
+pushPrompt:
+  title: "당신의 운명을 놓치지 마세요"
+  description: "매일 무료 카티나 문(Katina Moon) 크레딧이 충전되거나 점술 결과가 준비되었을 때 신비로운 알림을 받으려면 브라우저 알림을 설정하세요."
+  enable: "알림 켜기"
+  later: "나중에 하기"
+
+notification:
+  paymentSuccess: "결제가 성공적으로 완료되었습니다!"
+  paymentError: "결제 확인 중 오류가 발생했습니다."
+  paymentCancelled: "결제가 취소되었습니다."
+  readingReady: "점술 결과가 준비되었습니다!"
+  loadedFromCache: "캐시에서 로드됨, 잔액이 환불되었습니다!"
+  pushEnabled: "알림이 성공적으로 활성화되었습니다!"
+  pushError: "알림 권한을 획득하지 못했습니다."
+
+feedback:
+  header: "점술 결과는 어떠셨나요?"
+  placeholder: "의견 (선택 사항)..."
+  submitBtn: "의견 제출"
+  successMsg: "피드백을 보내주셔서 감사합니다!"
+  submitBtnShort: "제출"
+  submitError: "의견을 제출하지 못했습니다."
