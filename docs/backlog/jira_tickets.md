@@ -28,7 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
-| [**MS-277**](#-ms-277) | Feature / UX / UI / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli ve Soft Push Bildirimlerin Yerelleştirilmesi | Yüksek | GDPR sözleşme onay modalı, interaktif kart çekme ritüeli, web push izin penceresi ve tüm toast bildirimleri 6 dilde yerelleştirildi. | Elif |
+| [**MS-277**](#-ms-277) | Feature / UX / UI / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | GDPR sözleşme onay modalı, kart çekme ritüeli, push izinleri, profil ayarları, toast bildirimleri ve Giriş (Login) ekranı (şifremi unuttum, açık rıza metni) 6 dilde yerelleştirildi. Giriş ekranından tanıtım sihirbazı butonu kaldırıldı. | Elif |
 | [**MS-276**](#-ms-276) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | Görüntüleyici (viewer) rolü yetkileri ve güncellenen firestore.rules kuralları doğrultusunda data-models.md and data-models-monolith.md güncellendi. | Paige |
 | [**MS-271**](#-ms-271) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Entegrasyonu | En Yüksek | Vite+React projesi `/admin` dizininde kurularak Firebase Auth claim'lerine göre ProtectedRoute yönlendirmeleri tamamlandı. | Elif |
 | [**MS-272**](#-ms-272) | Feature / Dev | İlk Admin Seed Script'inin Yazılması ve Custom Claims Yetkilendirmesi | En Yüksek | CLI token'ı dinamik olarak okuyarak ilk admin kullanıcısını yetkilendiren seed-admin.ts scripti başarıyla çalıştırıldı. | Elif |
@@ -141,20 +141,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
 
-### ✅ MS-277: Sözleşme Onay Modalı, Kart Seçim Ritüeli ve Soft Push Bildirimlerin Yerelleştirilmesi (Feature / UX / UI / Dev)
+### ✅ MS-277: Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi (Feature / UX / UI / Dev)
 
 * **Öncelik:** Yüksek (High)
 * **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Elif (USER)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Legal Consent / Drawing / Soft Prompt / Locales
+* **Bileşen:** Legal Consent / Drawing / Soft Prompt / Locales / Login
 * **Açıklama:**  
-  GDPR sözleşme onay modalı, interaktif kart çekme ritüeli, web push izin penceresi ve tüm toast bildirimleri (ödeme durumu, okuma hazır vb.) 6 dilde yerelleştirildi.
+  GDPR sözleşme onay modalı, interaktif kart çekme ritüeli, web push izin penceresi, tüm toast bildirimleri, profil sayfası ayarları ve Giriş (Login) ekranı (şifremi unuttum butonu, açık rıza metni) 6 dilde yerelleştirildi. Giriş ekranından tanıtım sihirbazı butonu kaldırıldı.
 * **Kabul Kriterleri:**
   1. GDPR sözleşme onay modalındaki başlıklar, butonlar ve alt başlıklar yerelleştirildi.
   2. Kart çekme ritüeli başlığı, alt başlığı, çekilen kart sayısı ve interprets spread butonu yerelleştirildi.
-  3. Web push izin modalı ve toast bildirimleri yerelleştirildi.
-  4. Proje hatasız derlendi.
+  3. Web push izin modalı, toast bildirimleri ve profil ayarları yerelleştirildi.
+  4. Giriş (Login) ekranındaki şifre sıfırlama (şifremi unuttum) butonu ve alttaki açık rıza onay metni yerelleştirildi.
+  5. Giriş (Login) ekranından uygulama tanıtımını izle/gör butonu kaldırıldı.
+  6. Proje hatasız derlendi.
 
 ---
 
