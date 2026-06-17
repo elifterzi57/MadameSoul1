@@ -1179,6 +1179,24 @@ profile:
   history:
     downloadPdf: Descargar PDF
     viewReading: Ver Lectura
+  purchaseHistory: "Historial de compras"
+  noPurchases: "Aún no se han realizado compras."
+  receipt: "Recibo"
+  notificationSettings: "Configuración de notificaciones"
+  webPushNotifications: "Notificaciones Web Push"
+  webPushDesc: "Reciba notificaciones instantáneas cuando se renueven sus créditos o cuando su lectura esté lista."
+  enabled: "Habilitado"
+  disabled: "Deshabilitado"
+  appIntroWizard: "Asistente de introducción"
+  watchAppIntro: "Ver introducción de la aplicación"
+  appIntroDesc: "Reinicie el asistente de introducción que muestra cómo funcionan las características de la aplicación."
+  startIntro: "Iniciar introducción"
+  accountManagement: "Gestión de cuenta"
+  deleteAccount: "Eliminar cuenta"
+  deleteAccountDesc: "Eliminar su cuenta borrará permanentemente su saldo, historial y datos personales."
+  deleteConfirmMessage: "¿Está seguro de que desea eliminar permanentemente su cuenta y todos los datos asociados (incluido su saldo e historial de lectura)? ¡Esta acción no se puede deshacer!"
+  deleteConfirmBtn: "Sí, eliminar mi cuenta"
+  cancelBtn: "Cancelar"
   readingCount: "Lecturas"
   mysticRank: "Rango Místico"
   rankNames:

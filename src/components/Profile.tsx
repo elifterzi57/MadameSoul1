@@ -44,6 +44,7 @@ interface ProfileProps {
   onClose: () => void;
   onUpdateUserInfo: (info: any) => void;
   translations: any;
+  locales?: any;
   onDownloadPastReading?: (reading: any) => void;
   onShowOnboarding?: () => void;
   showToast?: (message: string, type?: 'info' | 'error' | 'success') => void;
@@ -57,6 +58,7 @@ export const Profile: React.FC<ProfileProps> = ({
   onClose, 
   onUpdateUserInfo,
   translations,
+  locales,
   onDownloadPastReading,
   onShowOnboarding,
   showToast
@@ -83,6 +85,63 @@ export const Profile: React.FC<ProfileProps> = ({
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [feedbackComment, setFeedbackComment] = useState('');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+
+  // Build reverse map of English card names to keys
+  const cardNameToKeyMap: Record<string, string> = {};
+  if (locales && locales['en'] && locales['en'].cards) {
+    Object.entries(locales['en'].cards).forEach(([key, card]: [string, any]) => {
+      if (card && card.name) {
+        cardNameToKeyMap[card.name.toLowerCase()] = key;
+      }
+    });
+  }
+
+  const translateDescription = (desc: string) => {
+    if (!desc) return '';
+    const lang = userInfo.language || 'en';
+    
+    // Check if it matches "Reading with cards: ..."
+    const match = desc.match(/^Reading with cards: (.*)$/i);
+    if (match) {
+      const cardNamesStr = match[1];
+      const cardNames = cardNamesStr.split(', ').map(name => name.trim());
+      
+      const localizedNames = cardNames.map(name => {
+        const key = cardNameToKeyMap[name.toLowerCase()];
+        if (key && locales && locales[lang]?.cards?.[key]?.name) {
+          return locales[lang].cards[key].name;
+        }
+        return name; // fallback
+      });
+      
+      const template = (locales && locales[lang]?.transactionDesc) || (locales?.en?.transactionDesc) || "Reading with cards: {cards}";
+      return template.replace('{cards}', localizedNames.join(', '));
+    }
+    
+    // Also translate system refunds and gifts!
+    if (desc.includes('Timeout Refund') || desc.includes('Zaman Aşımı İadesi')) {
+      return lang === 'tr' ? 'Zaman Aşımı İadesi (Sistem İadesi)' : 'Timeout Refund (System Refund)';
+    }
+    if (desc.includes('Mystical Reading Error Refund') || desc.includes('Mistik Yorum Hatası İadesi')) {
+      return lang === 'tr' ? 'Mistik Yorum Hatası İadesi (Sistem İadesi)' : 'Mystical Reading Error Refund (System Refund)';
+    }
+    if (desc === 'Daily Free Gift' || desc === 'Günlük Ücretsiz Hediye') {
+      return (locales && locales[lang]?.dailyGift) || (locales?.en?.dailyGift) || desc;
+    }
+    if (desc === 'Welcome Bonus' || desc === 'Hoş Geldin Bonusu') {
+      return (locales && locales[lang]?.welcomeBonus) || (locales?.en?.welcomeBonus) || desc;
+    }
+    if (desc.startsWith('Demo purchase of') || desc.includes('Katina Moons satın alımı')) {
+      const amountMatch = desc.match(/\d+/);
+      if (amountMatch) {
+        const amount = amountMatch[0];
+        const template = (locales && locales[lang]?.transactionBuy) || (locales?.en?.transactionBuy) || desc;
+        return template.replace('{amount}', amount);
+      }
+    }
+    
+    return desc;
+  };
 
   useEffect(() => {
     setActiveRating(0);
@@ -321,7 +380,7 @@ export const Profile: React.FC<ProfileProps> = ({
     if (expandedReadingId) {
       const item = history.find(h => h.id === expandedReadingId);
       if (item) {
-        setEditTitle(item.customTitle || item.description);
+        setEditTitle(item.customTitle || translateDescription(item.description));
         setEditNotes(item.reflectionNotes || '');
       }
     }
@@ -474,6 +533,19 @@ export const Profile: React.FC<ProfileProps> = ({
     readingCount: translations?.profile?.readingCount || "Readings",
     mysticRank: translations?.profile?.mysticRank || "Mystic Rank",
     save: translations?.profile?.save || "Save",
+    purchaseHistory: translations?.profile?.purchaseHistory || (userInfo.language === 'tr' ? "Satın Alım Geçmişi" : "Purchase History"),
+    noPurchases: translations?.profile?.noPurchases || (userInfo.language === 'tr' ? "Henüz satın alım yapılmadı." : "No purchases yet."),
+    receipt: translations?.profile?.receipt || (userInfo.language === 'tr' ? "Makbuz" : "Receipt"),
+    notificationSettings: translations?.profile?.notificationSettings || (userInfo.language === 'tr' ? "Bildirim Ayarları" : "Notification Settings"),
+    webPushNotifications: translations?.profile?.webPushNotifications || (userInfo.language === 'tr' ? "Web Push Bildirimleri" : "Web Push Notifications"),
+    webPushDesc: translations?.profile?.webPushDesc || (userInfo.language === 'tr' ? "Kredileriniz yenilendiğinde ve falınız hazır olduğunda anında bildirim alın." : "Get instant notifications when your credits are renewed or when your reading is ready."),
+    enabled: translations?.profile?.enabled || (userInfo.language === 'tr' ? "Açık" : "Enabled"),
+    disabled: translations?.profile?.disabled || (userInfo.language === 'tr' ? "Kapalı" : "Disabled"),
+    appIntroWizard: translations?.profile?.appIntroWizard || (userInfo.language === 'tr' ? "Tanıtım Sihirbazı" : "App Intro Wizard"),
+    watchAppIntro: translations?.profile?.watchAppIntro || (userInfo.language === 'tr' ? "Tanıtım Sihirbazını İzle" : "Watch App Intro"),
+    appIntroDesc: translations?.profile?.appIntroDesc || (userInfo.language === 'tr' ? "Uygulamanın özelliklerini ve nasıl çalıştığını gösteren tanıtım sihirbazını yeniden başlatın." : "Restart the onboarding wizard that shows how the application features work."),
+    startIntro: translations?.profile?.startIntro || (userInfo.language === 'tr' ? "Tanıtımı Başlat" : "Start Intro"),
+    accountManagement: translations?.profile?.accountManagement || (userInfo.language === 'tr' ? "Hesap Yönetimi" : "Account Management"),
     rankNames: {
       novice: translations?.profile?.rankNames?.novice || "Novice",
       apprentice: translations?.profile?.rankNames?.apprentice || "Apprentice",
@@ -491,12 +563,13 @@ export const Profile: React.FC<ProfileProps> = ({
       updatePassword: translations?.profile?.settings?.updatePassword || "Change",
       successPassword: translations?.profile?.settings?.successPassword || "Changed",
       reauthRequired: translations?.profile?.settings?.reauthRequired || "Please login again",
-      deleteAccount: userInfo.language === 'tr' ? "Hesabımı Sil" : "Delete Account",
-      deleteConfirmMessage: userInfo.language === 'tr' 
+      deleteAccount: translations?.profile?.deleteAccount || (userInfo.language === 'tr' ? "Hesabımı Sil" : "Delete Account"),
+      deleteAccountDesc: translations?.profile?.deleteAccountDesc || (userInfo.language === 'tr' ? "Hesabınızı silmek tüm bakiyenizi, fal geçmişinizi ve kişisel verilerinizi kalıcı olarak temizler." : "Deleting your account permanently wipes your balance, history, and personal data."),
+      deleteConfirmMessage: translations?.profile?.deleteConfirmMessage || (userInfo.language === 'tr' 
         ? "Hesabınızı ve tüm verilerinizi (bakiyeniz ve fal geçmişiniz dahil) kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz!" 
-        : "Are you sure you want to permanently delete your account and all associated data (including your balance and reading history)? This action cannot be undone!",
-      deleteConfirmBtn: userInfo.language === 'tr' ? "Evet, Hesabımı Sil" : "Yes, Delete My Account",
-      cancelBtn: userInfo.language === 'tr' ? "Vazgeç" : "Cancel"
+        : "Are you sure you want to permanently delete your account and all associated data (including your balance and reading history)? This action cannot be undone!"),
+      deleteConfirmBtn: translations?.profile?.deleteConfirmBtn || (userInfo.language === 'tr' ? "Evet, Hesabımı Sil" : "Yes, Delete My Account"),
+      cancelBtn: translations?.profile?.cancelBtn || (userInfo.language === 'tr' ? "Vazgeç" : "Cancel")
     },
     history: {
       downloadPdf: translations?.profile?.history?.downloadPdf || "Download PDF",
@@ -674,7 +747,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                 </button>
                                 
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-[#ecd8a6] text-sm font-medium truncate">{item.customTitle || item.description}</div>
+                                  <div className="text-[#ecd8a6] text-sm font-medium truncate">{item.customTitle || translateDescription(item.description)}</div>
                                   <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
                                     <CalendarDays className="w-3 h-3" />
                                     {item.createdAt?.toDate().toLocaleDateString()}
@@ -834,7 +907,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
                                         className="w-full bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-serif"
-                                        placeholder={item.description}
+                                        placeholder={translateDescription(item.description)}
                                       />
                                     </div>
 
@@ -879,7 +952,7 @@ export const Profile: React.FC<ProfileProps> = ({
                 <section>
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-6 flex items-center gap-2">
                     <ShoppingBag className="w-3.5 h-3.5" />
-                    {userInfo.language === 'tr' ? "Satın Alım Geçmişi" : "Purchase History"}
+                    {profileT.purchaseHistory}
                   </h3>
                   
                   {isLoadingPurchases ? (
@@ -901,7 +974,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                 )}
                               </div>
                               <div>
-                                <div className="text-[#ecd8a6] text-sm font-medium">{item.description}</div>
+                                <div className="text-[#ecd8a6] text-sm font-medium">{translateDescription(item.description)}</div>
                                 <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
                                   <CalendarDays className="w-3 h-3" />
                                   {item.createdAt?.toDate().toLocaleDateString()}
@@ -912,7 +985,7 @@ export const Profile: React.FC<ProfileProps> = ({
                             <div className="flex items-center gap-2 font-serif">
                               {isRefund && (
                                 <span className="text-[10px] bg-green-500/10 text-green-400 px-2.5 py-1 rounded-full font-sans font-semibold tracking-wide uppercase mr-2">
-                                  {item.amount !== undefined ? (item.amount > 0 ? `+${item.amount}` : item.amount) : '+1'} {userInfo.language === 'tr' ? "İade" : "Refund"}
+                                  {item.amount !== undefined ? (item.amount > 0 ? `+${item.amount}` : item.amount) : '+1'} {userInfo.language === 'tr' ? "İade" : (userInfo.language === 'es' ? "Reembolso" : (userInfo.language === 'fr' ? "Remboursement" : (userInfo.language === 'ko' ? "환불" : (userInfo.language === 'zh' ? "退款" : "Refund"))))}
                                 </span>
                               )}
                               {item.stripeReceiptUrl && (
@@ -922,7 +995,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                   rel="noopener noreferrer"
                                   className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"
                                 >
-                                  {userInfo.language === 'tr' ? "Makbuz" : "Receipt"}
+                                  {profileT.receipt}
                                 </a>
                               )}
                             </div>
@@ -933,7 +1006,7 @@ export const Profile: React.FC<ProfileProps> = ({
                   ) : (
                     <div className="text-center py-8 rounded-2xl border border-dashed border-[#ecd8a6]/10 bg-[#ecd8a6]/5">
                       <p className="text-xs text-[#ecd8a6]/40 font-serif tracking-widest uppercase">
-                        {userInfo.language === 'tr' ? "Henüz satın alım yapılmadı." : "No purchases yet."}
+                        {profileT.noPurchases}
                       </p>
                     </div>
                   )}
@@ -995,17 +1068,15 @@ export const Profile: React.FC<ProfileProps> = ({
                 <section className="space-y-4">
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
                     <Bell className="w-3.5 h-3.5" />
-                    {userInfo.language === 'tr' ? "Bildirim Ayarları" : "Notification Settings"}
+                    {profileT.notificationSettings}
                   </h3>
                   <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex justify-between items-center gap-4">
                     <div>
                       <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
-                        {userInfo.language === 'tr' ? "Web Push Bildirimleri" : "Web Push Notifications"}
+                        {profileT.webPushNotifications}
                       </h4>
                       <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
-                        {userInfo.language === 'tr' 
-                          ? "Kredileriniz yenilendiğinde ve falınız hazır olduğunda anında bildirim alın." 
-                          : "Get instant notifications when your credits are renewed or when your reading is ready."}
+                        {profileT.webPushDesc}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -1013,9 +1084,7 @@ export const Profile: React.FC<ProfileProps> = ({
                       <span className={`text-[10px] font-sans font-medium tracking-wider uppercase transition-colors duration-300 ${
                         pushEnabled ? 'text-emerald-400' : 'text-[#ecd8a6]/40'
                       }`}>
-                        {pushEnabled 
-                          ? (userInfo.language === 'tr' ? 'Açık' : 'Enabled') 
-                          : (userInfo.language === 'tr' ? 'Kapalı' : 'Disabled')}
+                        {pushEnabled ? profileT.enabled : profileT.disabled}
                       </span>
                       <button
                         onClick={handleTogglePush}
@@ -1042,17 +1111,15 @@ export const Profile: React.FC<ProfileProps> = ({
                   <section className="space-y-4">
                     <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
                       <HelpCircle className="w-3.5 h-3.5" />
-                      {userInfo.language === 'tr' ? "Tanıtım Sihirbazı" : "App Intro Wizard"}
+                      {profileT.appIntroWizard}
                     </h3>
                     <div className="p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10 flex justify-between items-center gap-4">
                       <div>
                         <h4 className="text-sm font-serif font-bold text-[#ecd8a6]">
-                          {userInfo.language === 'tr' ? "Tanıtım Sihirbazını İzle" : "Watch App Intro"}
+                          {profileT.watchAppIntro}
                         </h4>
                         <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
-                          {userInfo.language === 'tr' 
-                            ? "Uygulamanın özelliklerini ve nasıl çalıştığını gösteren tanıtım sihirbazını yeniden başlatın." 
-                            : "Restart the onboarding wizard that shows how the application features work."}
+                          {profileT.appIntroDesc}
                         </p>
                       </div>
                       <button
@@ -1060,7 +1127,7 @@ export const Profile: React.FC<ProfileProps> = ({
                         type="button"
                         className="px-5 py-2.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6] text-[#ecd8a6] hover:text-[#0a0512] rounded-xl text-[10px] font-serif tracking-widest uppercase transition-all duration-300 border border-[#ecd8a6]/20 active:scale-95 font-bold"
                       >
-                        {userInfo.language === 'tr' ? "Tanıtımı Başlat" : "Start Intro"}
+                        {profileT.startIntro}
                       </button>
                     </div>
                   </section>
@@ -1071,7 +1138,7 @@ export const Profile: React.FC<ProfileProps> = ({
                 <section className="space-y-4">
                   <h3 className="text-xs font-serif tracking-[0.2em] text-[#ecd8a6]/50 uppercase mb-2 flex items-center gap-2">
                     <Settings className="w-3.5 h-3.5" />
-                    {userInfo.language === 'tr' ? "Hesap Yönetimi" : "Account Management"}
+                    {profileT.accountManagement}
                   </h3>
                   
                   {!showDeleteConfirm ? (
@@ -1079,9 +1146,7 @@ export const Profile: React.FC<ProfileProps> = ({
                       <div>
                         <h4 className="text-sm font-serif font-bold text-red-400">{profileT.settings.deleteAccount}</h4>
                         <p className="text-xs text-[#ecd8a6]/50 mt-1 leading-relaxed">
-                          {userInfo.language === 'tr' 
-                            ? "Hesabınızı silmek tüm bakiyenizi, fal geçmişinizi ve kişisel verilerinizi kalıcı olarak temizler." 
-                            : "Deleting your account permanently wipes your balance, history, and personal data."}
+                          {profileT.settings.deleteAccountDesc}
                         </p>
                       </div>
                       <button

@@ -1293,6 +1293,7 @@ function AppContent() {
               });
             }}
             translations={locales[userInfo.language]}
+            locales={locales}
             onDownloadPastReading={handleDownload}
             showToast={showToast}
             onShowOnboarding={() => {
