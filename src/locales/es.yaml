@@ -1257,6 +1257,8 @@ login:
   loading: "Cargando..."
   showIntro: "Ver Introducción"
   kvkkConsent: "He leído y acepto el Acuerdo de Usuario, la Política de Privacidad y el Consentimiento Explícito de RGPD/KVKK."
+  forgotPassword: "¿Olvidó su contraseña?"
+  implicitConsent: "Al iniciar sesión o registrarse, acepta el Acuerdo de usuario, la Política de privacidad y el Consentimiento explícito de GDPR/KVKK."
   quote: "Descubre los susurros de las estrellas y las profundidades de tu alma."
   errorWrongCredentials: "Correo electrónico o contraseña incorrectos."
   errorEmailInUse: "El correo electrónico ya está en uso."

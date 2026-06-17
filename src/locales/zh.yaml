@@ -523,6 +523,8 @@ login:
   loading: "加载中..."
   showIntro: "观看应用介绍"
   kvkkConsent: "我已阅读并同意用户协议、隐私政策和 GDPR/KVKK 明确同意书。"
+  forgotPassword: "忘记密码？"
+  implicitConsent: "登录或注册即表示您同意用户协议、隐私政策以及 GDPR/KVKK 明确同意书。"
   quote: "探索星星的耳语和灵魂的深处。"
   errorWrongCredentials: "电子邮件或密码错误。"
   errorEmailInUse: "电子邮件已被使用。"
