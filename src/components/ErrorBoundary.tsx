@@ -34,18 +34,25 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
     
-    // Log client-side error to Firestore (MS-117)
+    // Log client-side error via Express API (MS-117)
     try {
-      addDoc(collection(db, 'error_logs'), {
-        source: 'client',
-        userId: auth.currentUser?.uid || null,
-        message: error.message,
-        stack: error.stack || null,
-        componentStack: errorInfo.componentStack || null,
-        createdAt: serverTimestamp()
+      fetch('/api/logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          source: 'client',
+          userId: auth.currentUser?.uid || null,
+          message: error.message,
+          stack: error.stack || null,
+          componentStack: errorInfo.componentStack || null
+        })
+      }).catch(err => {
+        console.error("Failed to send uncaught error log to server:", err);
       });
     } catch (logErr) {
-      console.error("Failed to log error to Firestore error_logs:", logErr);
+      console.error("Failed to log uncaught error:", logErr);
     }
   }
 

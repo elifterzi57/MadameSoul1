@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **110** | Açık: **0** | Tamamlanan: **107** | İptal Edilen: **3**
+Toplam Bilet: **112** | Açık: **0** | Tamamlanan: **109** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,8 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-280**](#-ms-280) | Feature / Dev | Express Log Buffer (Toplu Hata Yazma) Mimarisi | Yüksek | Sunucu/istemci hatalarını bellekte tamponlayıp (batch) toplu olarak yazan LogBuffer ve API endpoint'i kuruldu. | Elif |
+| [**MS-279**](#-ms-279) | Feature / Dev / Test | Firestore Güvenlik Kuralları Birim Test Altyapısının Kurulması | Yüksek | `@firebase/rules-unit-testing` ile Firestore kurallarını emülatör üzerinde test eden Vitest entegrasyonu tamamlandı. | Elif |
 | [**MS-278**](#-ms-278) | Feature / UX / UI / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Sol menü butonları sola hizalandı, moon_transactions tablosu sütunları özelleştirildi ve sütunlara göre A-Z sıralama özelliği eklendi. | Elif |
 | [**MS-277**](#-ms-277) | Feature / UX / UI / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | GDPR sözleşme onay modalı, kart çekme ritüeli, push izinleri, profil ayarları, toast bildirimleri ve Giriş (Login) ekranı (şifremi unuttum, açık rıza metni) 6 dilde yerelleştirildi. Giriş ekranından tanıtım sihirbazı butonu kaldırıldı. | Elif |
 | [**MS-276**](#-ms-276) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | Görüntüleyici (viewer) rolü yetkileri ve güncellenen firestore.rules kuralları doğrultusunda data-models.md and data-models-monolith.md güncellendi. | Paige |
@@ -141,6 +143,39 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-280: Express Log Buffer (Toplu Hata Yazma) Mimarisi (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Winston (🏗️ System Architect) & Amelia (💻 Dev)
+* **Bileşen:** Backend / API / Error Logging / Buffer
+* **Açıklama:**  
+  Firestore write (yazma) maliyetlerini ve veritabanı üzerindeki anlık yazma baskısını azaltmak amacıyla hem sunucu hem de istemci taraflı hatalar için bellek içi bir tamponlama (`LogBuffer`) ve toplu yazma mimarisi kuruldu.
+* **Kabul Kriterleri:**
+  1. Hataları in-memory buffer'layan ve limit (10) veya süre (5 sn) dolduğunda `writeBatch` ile toplu yazan `LogBuffer` sınıfı oluşturuldu.
+  2. İstemci loglarının post edilmesi için `/api/logs` endpoint'i yazıldı.
+  3. Frontend tarafındaki `addDoc(collection(db, 'error_logs'))` doğrudan yazma çağrıları kaldırıldı ve `/api/logs` endpoint'ine yönlendirildi.
+  4. Sunucu kapanış sinyallerinde (`exit`, `SIGINT`, `SIGTERM`) tamponda kalan logların diske güvenle yazılması sağlandı.
+
+---
+
+### ✅ MS-279: Firestore Güvenlik Kuralları Birim Test Altyapısının Kurulması (Feature / Dev / Test)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Security / Database / Unit Testing / Rules
+* **Açıklama:**  
+  `firestore.rules` güvenlik kurallarını Firestore emülatörü üzerinde test eden, Vitest tabanlı bir birim test altyapısı ve senaryoları entegre edildi.
+* **Kabul Kriterleri:**
+  1. `@firebase/rules-unit-testing` ve `firebase-tools` bağımlılıkları yüklendi.
+  2. `/users`, `/user_moons`, `/error_logs` ve `/admin_audit_logs` gibi kritik yolları kapsayan test paketi (`tests/unit/firestore-rules.test.ts`) oluşturuldu.
+  3. `package.json` dosyasına emülatörü kaldırıp kuralları test eden `test:rules` script'i eklendi.
+
+---
 
 ### ✅ MS-278: Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi (Feature / UX / UI / Dev)
 
