@@ -1268,10 +1268,11 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
 
         // Manage 'admin_users' collection
         if (role === 'admin' || role === 'employee') {
+          const safeEmail = email || userRecord?.email || "";
           await adminDb.collection("admin_users").doc(targetUid).set({
             userId: targetUid,
-            email,
-            name: userRecord?.displayName || email.split("@")[0],
+            email: safeEmail,
+            name: userRecord?.displayName || safeEmail.split("@")[0] || "Unknown",
             role,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
           }, { merge: true });

@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **109** | Açık: **0** | Tamamlanan: **106** | İptal Edilen: **3**
+Toplam Bilet: **110** | Açık: **0** | Tamamlanan: **107** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-278**](#-ms-278) | Feature / UX / UI / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Sol menü butonları sola hizalandı, moon_transactions tablosu sütunları özelleştirildi ve sütunlara göre A-Z sıralama özelliği eklendi. | Elif |
 | [**MS-277**](#-ms-277) | Feature / UX / UI / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | GDPR sözleşme onay modalı, kart çekme ritüeli, push izinleri, profil ayarları, toast bildirimleri ve Giriş (Login) ekranı (şifremi unuttum, açık rıza metni) 6 dilde yerelleştirildi. Giriş ekranından tanıtım sihirbazı butonu kaldırıldı. | Elif |
 | [**MS-276**](#-ms-276) | Documentation | Veritabanı Modelleri Dokümantasyonunun Güncellenmesi | Orta | Görüntüleyici (viewer) rolü yetkileri ve güncellenen firestore.rules kuralları doğrultusunda data-models.md and data-models-monolith.md güncellendi. | Paige |
 | [**MS-271**](#-ms-271) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Entegrasyonu | En Yüksek | Vite+React projesi `/admin` dizininde kurularak Firebase Auth claim'lerine göre ProtectedRoute yönlendirmeleri tamamlandı. | Elif |
@@ -140,6 +141,23 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-278: Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi (Feature / UX / UI / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Navigation / Collections Tab
+* **Açıklama:**  
+  Admin paneli sol menü butonlarının hizalaması düzenlendi, moon_transactions koleksiyonu listelendiğinde gösterilecek sütunlar özelleştirildi ve sütunlar için A-Z sıralama yeteneği eklendi.
+* **Kabul Kriterleri:**
+  1. Admin paneli sol menüdeki yönlendirme butonları sola hizalı hale getirildi (`justify-start`).
+  2. Moon transaction listesinde (moon_transactions koleksiyonu) sütunlar sırasıyla şunlar oldu: ID, Username, createdat, Description, Cards, status, type, userbrithplace, userbirhthdate, userlanguage, userrelationship, pdfdowlanded.
+  3. Her bir sütun başlığına tıklandığında ilgili sütuna göre A-Z / Z-A sıralama yapabilen sütun bazlı sıralama mekanizması eklendi.
+  4. Proje hatasız derlendi.
+
+---
 
 ### ✅ MS-277: Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi (Feature / UX / UI / Dev)
 
