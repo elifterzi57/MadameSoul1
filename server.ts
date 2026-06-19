@@ -221,7 +221,7 @@ async function startServer() {
   console.log("[Server] Starting MadameSoul server...");
   
   // Initialize Firebase Admin SDK
-  const serviceAccountPath = path.join(__dirname, "service-account.json");
+  const serviceAccountPath = path.resolve("service-account.json");
   if (fs.existsSync(serviceAccountPath)) {
     console.log("[Server] Loading Firebase Admin credentials from service-account.json");
     admin.initializeApp({
