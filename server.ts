@@ -702,7 +702,17 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         if (process.env.PLAYWRIGHT_TEST === 'true') {
           console.log("[Server] Playwright E2E test environment detected. Returning mock tarot response immediately.");
           return {
-            response: { text: mockText, usageMetadata: { promptTokenCount: 10, candidatesTokenCount: 50 } },
+            response: { 
+              text: mockText, 
+              usageMetadata: { 
+                promptTokenCount: 10, 
+                candidatesTokenCount: 50,
+                totalTokenCount: 60,
+                candidatesTokenDetails: {
+                  reasoningTokenCount: 0
+                }
+              } 
+            },
             usedModel: "mock-e2e"
           };
         }
@@ -755,7 +765,11 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
                 text,
                 usageMetadata: {
                   promptTokenCount: data.usage?.prompt_tokens || 0,
-                  candidatesTokenCount: data.usage?.completion_tokens || 0
+                  candidatesTokenCount: data.usage?.completion_tokens || 0,
+                  totalTokenCount: data.usage?.total_tokens || 0,
+                  candidatesTokenDetails: {
+                    reasoningTokenCount: data.usage?.completion_tokens_details?.reasoning_tokens || 0
+                  }
                 }
               },
               usedModel: modelName
@@ -797,9 +811,48 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
 
       if (!useFirebaseAdmin) {
         // Run synchronously/directly for local development when credentials are bypass
-        const { response } = await generateWithFallback(modelName, promptText);
+        const { response, usedModel } = await generateWithFallback(modelName, promptText);
         
+        // Log AI Telemetry and Usage to Firestore anyway so it's visible in Admin panel
+        try {
+          const latencyMs = 100; // Estimated/mock for local dev bypass
+          const promptTokens = response.usageMetadata?.promptTokenCount || 0;
+          const completionTokens = response.usageMetadata?.candidatesTokenCount || 0;
+          const totalTokens = response.usageMetadata?.totalTokenCount || (promptTokens + completionTokens);
+          const reasoningTokens = (response.usageMetadata as any)?.candidatesTokenDetails?.reasoningTokenCount || 0;
+          const txId = transactionId || `local-${Date.now()}`;
 
+          await adminDb.collection("ai_telemetry").add({
+            userId: uid,
+            modelName: usedModel,
+            promptTokens,
+            completionTokens,
+            latencyMs,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          await adminDb.collection("ai_usage_logs").add({
+            userId: uid,
+            transactionId: txId,
+            modelName: usedModel,
+            promptTokens,
+            completionTokens,
+            totalTokens,
+            reasoningTokens,
+            usage: {
+              prompt_tokens: promptTokens,
+              completion_tokens: completionTokens,
+              total_tokens: totalTokens,
+              completion_tokens_details: {
+                reasoning_tokens: reasoningTokens
+              }
+            },
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+          console.log("[Server Local Dev] Logged AI telemetry and usage successfully.");
+        } catch (logErr) {
+          console.warn("[Server Local Dev] Bypassed Firestore AI logging:", logErr);
+        }
         
         return res.json({ text: response.text });
       }
@@ -841,6 +894,37 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
             });
           } catch (telemetryErr) {
             console.error("[Server Background] Failed to log AI telemetry:", telemetryErr);
+          }
+
+          // Log Detailed AI Usage to Firestore
+          try {
+            const promptTokens = response.usageMetadata?.promptTokenCount || 0;
+            const completionTokens = response.usageMetadata?.candidatesTokenCount || 0;
+            const totalTokens = response.usageMetadata?.totalTokenCount || (promptTokens + completionTokens);
+            const reasoningTokens = (response.usageMetadata as any)?.candidatesTokenDetails?.reasoningTokenCount || 
+                                    (Array.isArray((response.usageMetadata as any)?.candidatesTokenDetails) 
+                                      ? (response.usageMetadata as any)?.candidatesTokenDetails[0]?.reasoningTokenCount 
+                                      : 0) || 0;
+            await adminDb.collection("ai_usage_logs").add({
+              userId: uid,
+              transactionId,
+              modelName: usedModel,
+              promptTokens,
+              completionTokens,
+              totalTokens,
+              reasoningTokens,
+              usage: {
+                prompt_tokens: promptTokens,
+                completion_tokens: completionTokens,
+                total_tokens: totalTokens,
+                completion_tokens_details: {
+                  reasoning_tokens: reasoningTokens
+                }
+              },
+              createdAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+          } catch (usageLogErr) {
+            console.error("[Server Background] Failed to log AI usage logs:", usageLogErr);
           }
 
 
