@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **119** | Açık: **0** | Tamamlanan: **116** | İptal Edilen: **3**
+Toplam Bilet: **120** | Açık: **0** | Tamamlanan: **116** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -19,6 +19,7 @@ Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
+| [**MS-288**](#-ms-288) | Feature / Dev | Yerel Geliştirme (Bypass) Modunda AI Token Kullanımlarının Kaydedilmesi | Yüksek | Cancelled | Elif |
 | [**MS-261**](#-ms-261) | Bug / Dev | E-posta Bildirim Gönderim Hatalarının Düzeltilmesi | Yüksek | Cancelled | Elif |
 | [**MS-260**](#-ms-260) | Feature / UX / UI | Premium Mistik Şarj ve Göksel Yükleme Ritüeli Ekranı | Yüksek | Cancelled | Elif |
 | [**MS-259**](#-ms-259) | Bug / Dev | FCM Push Bildirim Altyapısı Hatalarının Düzeltilmesi | Yüksek | Cancelled | Elif |
@@ -425,6 +426,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 🚫 İptal Edilen Bilet Detayları (Cancelled Ticket Details)
+
+### 📋 MS-288: Yerel Geliştirme (Bypass) Modunda AI Token Kullanımlarının Kaydedilmesi (Feature / Dev)
+
+* **Öncelik:** Yüksek (High)
+* **Durum:** 🚫 İptal Edildi (Cancelled)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend / Telemetry
+* **Açıklama:**  
+  Yerel geliştirme ve bypass modunda (`useFirebaseAdmin = false`) fal bakıldığında, harcanan prompt/completion/total token verilerinin Firestore'daki `ai_usage_logs` ve `ai_telemetry` koleksiyonlarına düzgünce kaydedilmesi sağlandı. (Kullanıcı talebi doğrultusunda tüm token geliştirmeleri geri alınarak bu bilet iptal edilmiştir).
+* **Kabul Kriterleri:**
+  1. Sunucu local bypass modundayken de token verileri yakalandı.
+  2. `ai_telemetry` ve `ai_usage_logs` koleksiyonlarına yerel emülatör üzerinde başarıyla yazıldı.
+  3. Proje hatasız derlendi.
+
+---
 
 ### 📋 MS-261: Bug / Dev | E-posta Bildirim Gönderim Hatalarının Düzeltilmesi (Bug / Dev)
 
