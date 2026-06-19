@@ -4,13 +4,12 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **120** | Açık: **0** | Tamamlanan: **116** | İptal Edilen: **4**
+Toplam Bilet: **121** | Açık: **0** | Tamamlanan: **117** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
 
 
 
@@ -29,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-290**](#-ms-290) | Feature / Dev | Çalışan Yetkileri Ekranından Şifre Güncelleme/Sıfırlama Desteği | Yüksek | Süper adminlerin çalışan şifrelerini arayüzden güncelleyebilmesi için set-role endpoint'ine ve PermissionsTab bileşenine şifre güncelleme desteği eklendi. | Elif |
 | [**MS-287**](#-ms-287) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu | Yüksek | Done | Elif |
 | [**MS-286**](#-ms-286) | Feature / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | Done | Elif |
 | [**MS-285**](#-ms-285) | Feature / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Done | Elif |
@@ -151,6 +151,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### ✅ MS-290: Çalışan Yetkileri Ekranından Şifre Güncelleme/Sıfırlama Desteği (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / Backend / Security
+* **Açıklama:**  
+  Süper Adminlerin, Çalışan Yetkileri sekmesi üzerinden mevcut çalışan veya yöneticilerin şifrelerini (örneğin unuttuklarında) doğrudan güncelleyebilmesini/sıfırlayabilmesini sağlamak amacıyla `/api/admin/set-role` endpoint'ine ve PermissionsTab arayüzüne şifre güncelleme desteği eklenmiştir.
+* **Kabul Kriterleri:**
+  1. Mevcut bir kullanıcının e-posta adresi yazılıp şifre girildiğinde sunucu bu şifreyi Firebase Auth üzerinde güncellemelidir (`updateUser`).
+  2. Başarılı güncelleme durumunda arayüzde şifrenin güncellendiğine dair başarılı bildirim mesajı gösterilmelidir.
+  3. Proje hatasız derlenmeli ve test edilmelidir.
+
+---
 
 ### ✅ MS-287: Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu (Feature / Dev)
 

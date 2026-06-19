@@ -221,9 +221,18 @@ async function startServer() {
   console.log("[Server] Starting MadameSoul server...");
   
   // Initialize Firebase Admin SDK
-  admin.initializeApp({
-    projectId: "madamesoul-926f6"
-  });
+  const serviceAccountPath = path.resolve("service-account.json");
+  if (fs.existsSync(serviceAccountPath)) {
+    console.log("[Server] Loading Firebase Admin credentials from service-account.json");
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccountPath),
+      projectId: "madamesoul-926f6"
+    });
+  } else {
+    admin.initializeApp({
+      projectId: "madamesoul-926f6"
+    });
+  }
   const adminDb = admin.firestore();
 
   let useFirebaseAdmin = true;
@@ -1339,6 +1348,12 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         } else {
           // User exists, set claims
           await admin.auth().setCustomUserClaims(targetUid, { role });
+
+          // If password is provided, update existing user's password
+          if (password) {
+            await admin.auth().updateUser(targetUid, { password });
+            console.log(`[Admin] Updated password for existing user ${email}`);
+          }
 
           // Update doc in 'users'
           await adminDb.collection("users").doc(targetUid).set({
