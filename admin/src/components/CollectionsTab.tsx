@@ -18,7 +18,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Filters & Sorting state
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [sortByField, setSortByField] = useState<string>('id');
 
@@ -88,66 +87,25 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   // Helper to extract timestamp for filtering
   const getDocDate = (doc: any): Date | null => {
-    try {
-      const val = doc.createdAt || doc.timestamp || doc.updatedAt;
-      if (!val) return null;
-      let date: Date;
-      if (typeof val.toDate === 'function') {
-        date = val.toDate();
-      } else if (val.seconds !== undefined) {
-        date = new Date(val.seconds * 1000);
-      } else {
-        date = new Date(val);
-      }
-      return isNaN(date.getTime()) ? null : date;
-    } catch (e) {
-      console.error("Tarih ayrıştırılırken hata oluştu:", e);
-      return null;
-    }
+    const val = doc.createdAt || doc.timestamp || doc.updatedAt;
+    if (!val) return null;
+    if (val.seconds) return new Date(val.seconds * 1000); // Firebase Timestamp
+    return new Date(val);
   };
 
   // Filter logic
   const getFilteredDocs = () => {
     return documents.filter((doc) => {
-      // Date filter checks
       const docDate = getDocDate(doc);
-      if (docDate) {
-        let docDateStr = '';
-        try {
-          const year = docDate.getFullYear();
-          const month = String(docDate.getMonth() + 1).padStart(2, '0');
-          const day = String(docDate.getDate()).padStart(2, '0');
-          docDateStr = `${year}-${month}-${day}`;
-        } catch (e) {
-          console.error("Tarih formatlanırken hata oluştu:", e);
-          return false;
-        }
-
-        if (startDate && docDateStr < startDate) return false;
-        if (endDate && docDateStr > endDate) return false;
-      } else if (startDate || endDate) {
-        return false;
+      if (!docDate) {
+        if (startDate || endDate) return false;
+        return true;
       }
 
-      // Search Query filter checks (IDs, username, email, modelName, description etc.)
-      if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase().trim();
-        const matchesUserId = doc.userId?.toLowerCase().includes(query);
-        const matchesDocId = doc.id?.toLowerCase().includes(query);
-        
-        // Resolve username & email mappings
-        const username = (usersMap[doc.userId]?.displayName || doc.userName || doc.displayName || doc.name || '').toLowerCase();
-        const email = (usersMap[doc.userId]?.email || doc.userEmail || doc.email || '').toLowerCase();
-        
-        const matchesUser = username.includes(query);
-        const matchesEmail = email.includes(query);
-        const matchesModel = doc.modelName?.toLowerCase().includes(query);
-        const matchesDesc = doc.description?.toLowerCase().includes(query);
+      const docDateStr = docDate.toISOString().split('T')[0];
 
-        if (!matchesUserId && !matchesDocId && !matchesUser && !matchesEmail && !matchesModel && !matchesDesc) {
-          return false;
-        }
-      }
+      if (startDate && docDateStr < startDate) return false;
+      if (endDate && docDateStr > endDate) return false;
 
       return true;
     });
@@ -281,38 +239,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return doc[dbKey];
   };
 
-  // Helper to get value of ai_usage_logs fields mapped
-  const getUsageLogValue = (doc: any, col: string): any => {
-    const fieldMapping: Record<string, string> = {
-      'ID': 'id',
-      'USERID': 'userId',
-      'MODELNAME': 'modelName',
-      'CREATEDAT': 'createdAt'
-    };
-
-    if (col === 'USERNAME') {
-      return usersMap[doc.userId]?.displayName || '-';
-    }
-
-    if (col === 'PROMPT_TOKENS') {
-      return doc.usage?.prompt_tokens !== undefined ? doc.usage.prompt_tokens : (doc.promptTokens !== undefined ? doc.promptTokens : '-');
-    }
-    if (col === 'COMPLETION_TOKENS') {
-      return doc.usage?.completion_tokens !== undefined ? doc.usage.completion_tokens : (doc.completionTokens !== undefined ? doc.completionTokens : '-');
-    }
-    if (col === 'TOTAL_TOKENS') {
-      return doc.usage?.total_tokens !== undefined ? doc.usage.total_tokens : (doc.totalTokens !== undefined ? doc.totalTokens : '-');
-    }
-    if (col === 'REASONING_TOKENS') {
-      return doc.usage?.completion_tokens_details?.reasoning_tokens !== undefined 
-        ? doc.usage.completion_tokens_details.reasoning_tokens 
-        : (doc.reasoningTokens !== undefined ? doc.reasoningTokens : '-');
-    }
-
-    const dbKey = fieldMapping[col] || col;
-    return doc[dbKey];
-  };
-
   // Sort logic (sorting dynamically by selected sortByField)
   const getSortedDocs = (docs: any[]) => {
     if (!sortByField) return docs;
@@ -329,9 +255,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       } else if (selectedCollection === 'ai_feedback') {
         aVal = getFeedbackValue(a, sortByField);
         bVal = getFeedbackValue(b, sortByField);
-      } else if (selectedCollection === 'ai_usage_logs') {
-        aVal = getUsageLogValue(a, sortByField);
-        bVal = getUsageLogValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -368,10 +291,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const renderValue = (val: any): string => {
     if (val === null || val === undefined) return '-';
     if (typeof val === 'object') {
-      if (typeof val.toDate === 'function') {
-        return val.toDate().toLocaleString('tr-TR');
-      }
-      if (val.seconds !== undefined) {
+      if (val.seconds) {
         return new Date(val.seconds * 1000).toLocaleString('tr-TR');
       }
       return JSON.stringify(val);
@@ -398,8 +318,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           val = renderValue(getUserValue(doc, col));
         } else if (selectedCollection === 'ai_feedback') {
           val = renderValue(getFeedbackValue(doc, col));
-        } else if (selectedCollection === 'ai_usage_logs') {
-          val = renderValue(getUsageLogValue(doc, col));
         } else {
           val = renderValue(doc[col]);
         }
@@ -482,19 +400,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'COMMENT'
       ];
     }
-    if (selectedCollection === 'ai_usage_logs') {
-      return [
-        'ID',
-        'USERID',
-        'USERNAME',
-        'MODELNAME',
-        'PROMPT_TOKENS',
-        'COMPLETION_TOKENS',
-        'TOTAL_TOKENS',
-        'REASONING_TOKENS',
-        'CREATEDAT'
-      ];
-    }
     const cols = new Set<string>();
     cols.add('id'); // always show id first
     sortedAndFilteredDocs.forEach(doc => {
@@ -534,20 +439,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
       {/* Control Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
-        {/* Date & Query Filter Range */}
+        {/* Date Filter Range */}
         <div className="flex-1 flex flex-col gap-4 sm:flex-row sm:items-center">
-          {/* Search Box */}
-          <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Ara (UID, E-posta, Ad, Model)</label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ID, e-posta, isim veya model ile ara..."
-              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition placeholder-[#ecd8a6]/30 font-medium"
-            />
-          </div>
-          <div className="w-full sm:w-[150px]">
+          <div className="flex-1">
             <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Başlangıç Tarihi</label>
             <input
               type="date"
@@ -556,7 +450,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
               className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
             />
           </div>
-          <div className="w-full sm:w-[150px]">
+          <div className="flex-1">
             <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Bitiş Tarihi</label>
             <input
               type="date"
@@ -565,14 +459,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
               className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
             />
           </div>
-          {(startDate || endDate || searchQuery) && (
+          {(startDate || endDate) && (
             <button
               onClick={() => {
                 setStartDate('');
                 setEndDate('');
-                setSearchQuery('');
               }}
-              className="mt-6 sm:mt-auto rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2 text-xs text-red-400 hover:bg-red-950/40 transition h-[38px] flex items-center justify-center whitespace-nowrap"
+              className="mt-6 sm:mt-auto rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2 text-xs text-red-400 hover:bg-red-950/40 transition h-[38px] flex items-center justify-center"
             >
               Filtreleri Temizle
             </button>
@@ -637,8 +530,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getUserValue(doc, col))
                           : selectedCollection === 'ai_feedback'
                           ? renderValue(getFeedbackValue(doc, col))
-                          : selectedCollection === 'ai_usage_logs'
-                          ? renderValue(getUsageLogValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}

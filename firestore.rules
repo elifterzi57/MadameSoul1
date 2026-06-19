@@ -251,11 +251,6 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    match /ai_usage_logs/{logId} {
-      allow read: if isEmployee();
-      allow write: if false;
-    }
-
     match /ui_configs/{configId} {
       allow read: if true;
       allow write: if isEmployee();

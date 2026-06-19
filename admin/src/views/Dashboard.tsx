@@ -30,8 +30,7 @@ export const Dashboard: React.FC = () => {
     { id: 'users', label: 'Kullanıcı Listesi' },
     { id: 'moon_transactions', label: 'Moon İşlemleri' },
     { id: 'error_logs', label: 'Sistem Hataları' },
-    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' },
-    { id: 'ai_usage_logs', label: 'AI Token Kullanımları' }
+    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' }
   ];
 
   useEffect(() => {
