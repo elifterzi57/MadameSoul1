@@ -221,9 +221,18 @@ async function startServer() {
   console.log("[Server] Starting MadameSoul server...");
   
   // Initialize Firebase Admin SDK
-  admin.initializeApp({
-    projectId: "madamesoul-926f6"
-  });
+  const serviceAccountPath = path.join(__dirname, "service-account.json");
+  if (fs.existsSync(serviceAccountPath)) {
+    console.log("[Server] Loading Firebase Admin credentials from service-account.json");
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccountPath),
+      projectId: "madamesoul-926f6"
+    });
+  } else {
+    admin.initializeApp({
+      projectId: "madamesoul-926f6"
+    });
+  }
   const adminDb = admin.firestore();
 
   let useFirebaseAdmin = true;
