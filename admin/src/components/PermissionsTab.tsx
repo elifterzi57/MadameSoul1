@@ -87,7 +87,7 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
       if (data.status === 'password_required') {
         setFormError('Kullanıcı sistemde kayıtlı değil. Lütfen admin paneline erişebilmesi için bir şifre belirleyin.');
       } else {
-        setFormSuccess(`Kullanıcı '${selectedRole}' rolüyle başarıyla tanımlandı.`);
+        setFormSuccess(password ? 'Kullanıcı bilgileri ve şifresi başarıyla güncellendi.' : `Kullanıcı '${selectedRole}' rolüyle başarıyla tanımlandı.`);
         setEmail('');
         setPassword('');
         fetchWorkers(); // Refresh list
@@ -222,12 +222,12 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Şifre (Yeni Kullanıcı İse)</label>
+                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Şifre (Yeni Kullanıcı veya Şifre Güncelleme)</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 karakterli şifre"
+                  placeholder="Şifreyi sıfırlamak/belirlemek için girin"
                   className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/40"
                 />
               </div>

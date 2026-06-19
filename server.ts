@@ -1349,6 +1349,12 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           // User exists, set claims
           await admin.auth().setCustomUserClaims(targetUid, { role });
 
+          // If password is provided, update existing user's password
+          if (password) {
+            await admin.auth().updateUser(targetUid, { password });
+            console.log(`[Admin] Updated password for existing user ${email}`);
+          }
+
           // Update doc in 'users'
           await adminDb.collection("users").doc(targetUid).set({
             role,
