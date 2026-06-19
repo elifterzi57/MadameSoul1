@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **120** | Açık: **0** | Tamamlanan: **117** | İptal Edilen: **3**
+Toplam Bilet: **119** | Açık: **0** | Tamamlanan: **116** | İptal Edilen: **3**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,7 +28,6 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
-| [**MS-288**](#-ms-288) | Feature / Dev | Yerel Geliştirme (Bypass) Modunda AI Token Kullanımlarının Kaydedilmesi | Yüksek | Yerel test modunda (useFirebaseAdmin = false) yapılan fal yorumlarında da token kullanımlarının Firestore'a yazılması sağlandı. | Elif |
 | [**MS-287**](#-ms-287) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu | Yüksek | Done | Elif |
 | [**MS-286**](#-ms-286) | Feature / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | Done | Elif |
 | [**MS-285**](#-ms-285) | Feature / Dev | Admin Paneli Sol Menü Hizalama ve Moon Harcamaları Tablosu Geliştirmesi | Yüksek | Done | Elif |
@@ -151,22 +150,6 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
-
-### ✅ MS-288: Yerel Geliştirme (Bypass) Modunda AI Token Kullanımlarının Kaydedilmesi (Feature / Dev)
-
-* **Öncelik:** Yüksek
-* **Durum:** ✅ Tamamlandı (Completed)
-* **Oluşturan (Reporter):** Elif (USER)
-* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
-* **Bileşen:** Admin Panel / Backend / Telemetry
-* **Açıklama:**  
-  Yerel geliştirme ve bypass modunda (`useFirebaseAdmin = false`) fal bakıldığında, harcanan prompt/completion/total token verilerinin Firestore'daki `ai_usage_logs` ve `ai_telemetry` koleksiyonlarına düzgünce kaydedilmesi sağlandı.
-* **Kabul Kriterleri:**
-  1. Sunucu local bypass modundayken de token verileri yakalandı.
-  2. `ai_telemetry` ve `ai_usage_logs` koleksiyonlarına yerel emülatör üzerinde başarıyla yazıldı.
-  3. Proje hatasız derlendi.
-
----
 
 ### ✅ MS-287: Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu (Feature / Dev)
 
