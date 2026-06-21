@@ -1153,6 +1153,10 @@ store:
   save20: "%20 Tasarruf"
   redirecting: "Ödeme sayfasına yönlendiriliyorsunuz..."
   failedSession: "Ödeme oturumu başlatılamadı."
+  benefitsTitle: "PREMİUM MOON AVANTAJLARI"
+  benefitPdf: "Kehanetlerinizi sınırsız PDF olarak indirin ve saklayın"
+  benefitNotes: "Gelecek yansımalarınızı ve gerçekleşme notlarınızı günlüğe kaydedin"
+  benefitHistory: "Parıltılı premium simgelerle günlüğünüzü taçlandırın"
 banner:
   sponsored: "Sponsorlu"
   promoText: "Amazon'da Katina Tarot Kartlarını %20 indirimli alın!"
@@ -1210,6 +1214,8 @@ profileDiary:
   closeBtn: "Kapat"
   saveSuccess: "Mistik yorumunuz kayıt edildi."
   saveError: "Fal güncellenirken hata oluştu."
+  lockedTitle: "Mistik Günlük Kilidi"
+  lockedDesc: "Özel başlık ve yansıma notu ekleme özellikleri sadece premium (satın alınan) fallara özeldir. Mağazadan bakiye yükleyerek kehanet günlüğünüzün kilidini açabilirsiniz!"
 
 termsConsent:
   title: "Yasal Onay ve Açık Rıza"

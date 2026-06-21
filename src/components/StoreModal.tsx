@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { X, Plus, AlertCircle } from 'lucide-react';
+import { X, Plus, AlertCircle, Sparkles } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { KatinaMoon } from './KatinaMoon';
 
@@ -158,6 +158,28 @@ export const StoreModal: React.FC<StoreModalProps> = ({
               </div>
             </div>
           ))}
+
+          {/* Premium Advantages (MS-295) */}
+          <div className="mt-2 pt-5 border-t border-[#ecd8a6]/10 text-left">
+            <h3 className="text-xs font-serif text-[#ecd8a6] tracking-widest uppercase mb-3 flex items-center gap-1.5 opacity-80">
+              <Sparkles className="w-3.5 h-3.5 text-[#ecd8a6] shrink-0 animate-pulse" />
+              {t('store.benefitsTitle')}
+            </h3>
+            <ul className="flex flex-col gap-2.5 text-[11px] text-[#ecd8a6]/70">
+              <li className="flex items-start gap-2.5">
+                <Sparkles className="w-3 h-3 text-[#ecd8a6] shrink-0 mt-0.5 animate-pulse" />
+                <span>{t('store.benefitPdf')}</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Sparkles className="w-3 h-3 text-[#ecd8a6] shrink-0 mt-0.5 animate-pulse" />
+                <span>{t('store.benefitNotes')}</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Sparkles className="w-3 h-3 text-[#ecd8a6] shrink-0 mt-0.5 animate-pulse" />
+                <span>{t('store.benefitHistory')}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </motion.div>
     </motion.div>

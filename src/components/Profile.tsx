@@ -931,44 +931,63 @@ export const Profile: React.FC<ProfileProps> = ({
                                       </div>
                                     )}
 
-                                    {/* Edit Custom Title Form */}
-                                    <div className="space-y-2">
-                                      <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
-                                        {translations?.profileDiary?.customTitleLabel || "Custom Title"}
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={editTitle}
-                                        onChange={(e) => setEditTitle(e.target.value)}
-                                        className="w-full bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-serif"
-                                        placeholder={translateDescription(item.description)}
-                                      />
-                                    </div>
+                                    {item.deductedFrom === 'purchased' ? (
+                                      <>
+                                        {/* Edit Custom Title Form */}
+                                        <div className="space-y-2">
+                                          <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
+                                            {translations?.profileDiary?.customTitleLabel || "Custom Title"}
+                                          </label>
+                                          <input
+                                            type="text"
+                                            value={editTitle}
+                                            onChange={(e) => setEditTitle(e.target.value)}
+                                            className="w-full bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-serif"
+                                            placeholder={translateDescription(item.description)}
+                                          />
+                                        </div>
 
-                                    {/* Reflection / Manifestation Notes */}
-                                    <div className="space-y-2">
-                                      <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
-                                        {translations?.profileDiary?.reflectionTitle || "Reflection & Manifestation Notes"}
-                                      </label>
-                                      <textarea
-                                        value={editNotes}
-                                        onChange={(e) => setEditNotes(e.target.value)}
-                                        className="w-full h-24 bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-sans resize-none"
-                                        placeholder={translations?.profileDiary?.reflectionPlaceholder || "Record notes..."}
-                                      />
-                                    </div>
+                                        {/* Reflection / Manifestation Notes */}
+                                        <div className="space-y-2">
+                                          <label className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase block">
+                                            {translations?.profileDiary?.reflectionTitle || "Reflection & Manifestation Notes"}
+                                          </label>
+                                          <textarea
+                                            value={editNotes}
+                                            onChange={(e) => setEditNotes(e.target.value)}
+                                            className="w-full h-24 bg-[#1a1025] border border-[#ecd8a6]/25 rounded-xl px-4 py-2.5 text-[#ecd8a6] text-xs focus:outline-none focus:border-[#ecd8a6]/60 transition-all font-sans resize-none"
+                                            placeholder={translations?.profileDiary?.reflectionPlaceholder || "Record notes..."}
+                                          />
+                                        </div>
 
-                                    {/* Save Button */}
-                                    <div className="flex justify-end pt-2">
-                                      <button
-                                        onClick={() => handleSaveNotes(item.id, editTitle, editNotes)}
-                                        disabled={isSavingNotes}
-                                        className="px-5 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all font-bold flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                                      >
-                                        {isSavingNotes && <Loader2 className="w-3 h-3 animate-spin" />}
-                                        {translations?.profileDiary?.saveBtn || "Save Notes"}
-                                      </button>
-                                    </div>
+                                        {/* Save Button */}
+                                        <div className="flex justify-end pt-2">
+                                          <button
+                                            onClick={() => handleSaveNotes(item.id, editTitle, editNotes)}
+                                            disabled={isSavingNotes}
+                                            className="px-5 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all font-bold flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                                          >
+                                            {isSavingNotes && <Loader2 className="w-3 h-3 animate-spin" />}
+                                            {translations?.profileDiary?.saveBtn || "Save Notes"}
+                                          </button>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      /* Glassmorphic Locked Card (MS-295) */
+                                      <div className="relative overflow-hidden p-6 rounded-2xl bg-purple-950/20 border border-[#ecd8a6]/10 backdrop-blur-md flex flex-col items-center text-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-[#0a0512] border border-[#ecd8a6]/20 flex items-center justify-center text-[#ecd8a6]/70">
+                                          <Lock className="w-4 h-4 text-amber-400" />
+                                        </div>
+                                        <div>
+                                          <h4 className="text-xs font-serif text-[#ecd8a6] tracking-widest uppercase mb-1">
+                                            {translations?.profileDiary?.lockedTitle || (userInfo.language === 'tr' ? "Mistik Günlük Kilidi" : "Mystical Diary Locked")}
+                                          </h4>
+                                          <p className="text-[10px] leading-relaxed text-[#ecd8a6]/60 max-w-xs mx-auto">
+                                            {translations?.profileDiary?.lockedDesc || (userInfo.language === 'tr' ? "Özel başlık ve yansıma notu ekleme özellikleri sadece premium (satın alınan) fallara özeldir. Mağazadan bakiye yükleyerek kehanet günlüğünüzün kilidini açabilirsiniz!" : "Adding custom titles and reflection notes is exclusive to premium readings. Buy Moons in the store to unlock your mystical diary!")}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </motion.div>
                               )}

@@ -1292,6 +1292,10 @@ store:
   save20: "Économisez 20%"
   redirecting: "Redirection vers le paiement..."
   failedSession: "Échec de la création de la session de paiement."
+  benefitsTitle: "AVANTAGES DE LA LUNE PREMIUM"
+  benefitPdf: "Téléchargez et conservez vos lectures sous forme de PDF illimités"
+  benefitNotes: "Enregistrez vos futures réflexions et notes de manifestation dans votre journal"
+  benefitHistory: "Couronnez votre journal avec des indicateurs premium étincelants"
 banner:
   sponsored: "Sponsorisé"
   promoText: "Obtenez 20% de réduction sur les cartes de tarot Katina sur Amazon !"
@@ -1349,6 +1353,8 @@ profileDiary:
   closeBtn: "Fermer"
   saveSuccess: "Votre note mystique a été enregistrée !"
   saveError: "Échec de la mise à jour de la lecture."
+  lockedTitle: "Journal Mystique Verrouillé"
+  lockedDesc: "L'ajout de titres personnalisés et de notes de manifestation est exclusif aux lectures premium. Achetez des Lunes dans la boutique pour déverrouiller votre journal mystique !"
 
 termsConsent:
   title: "Conditions Légales et Consentement RGPD"

@@ -1231,6 +1231,10 @@ store:
   save20: "Ahorra 20%"
   redirecting: "Redirigiendo al pago..."
   failedSession: "No se pudo crear la sesión de pago."
+  benefitsTitle: "BENEFICIOS DE LUNA PREMIUM"
+  benefitPdf: "Descargue y conserve sus lecturas como PDF ilimitados"
+  benefitNotes: "Registre sus futuras reflexiones y notas de de manifestación en su diario"
+  benefitHistory: "Corone su diario con indicadores premium brillantes"
 banner:
   sponsored: "Patrocinado"
   promoText: "¡Obtenga un 20% de descuento en Cartas de Tarot Katina en Amazon!"
@@ -1288,6 +1292,8 @@ profileDiary:
   closeBtn: "Cerrar"
   saveSuccess: "¡Su nota mística ha sido guardada!"
   saveError: "Error al actualizar la lectura."
+  lockedTitle: "Diario Místico Bloqueado"
+  lockedDesc: "Agregar títulos personalizados y notas de manifestación es exclusivo de las lecturas premium. ¡Compre Lunas en la tienda para desbloquear su diario místico!"
 
 termsConsent:
   title: "Términos Legales y Consentimiento de RGPD"
