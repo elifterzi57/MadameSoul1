@@ -4,13 +4,15 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **124** | Açık: **0** | Tamamlanan: **120** | İptal Edilen: **4**
+Toplam Bilet: **126** | Açık: **2** | Tamamlanan: **120** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-293**](#-ms-293) | Feature / UX / UI | Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi | Orta | Açık | Elif |
+| [**MS-294**](#-ms-294) | Feature / UX / UI | Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması | Yüksek | Açık | Elif |
 
 
 
@@ -2731,6 +2733,44 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 * **Çözüm:**  
   * `server.ts` içinde `fileURLToPath` ve `path.resolve` kullanılarak `service-account.json` yolu güvenli şekilde çözümlendi.
   * Kimlik bilgisi dosyası projede yer almadığında local bypass moduna otomatik geçiş sağlandı.
+
+---
+
+---
+
+### 📋 MS-293: Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** 📋 Açık (Active)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / StoreModal
+* **Açıklama:**  
+  Stripe ödeme paketlerinde yer alan "+X Ücretsiz Moon" hediye metinlerinin kaldırılması, bunun yerine birim fiyat bazındaki tasarruf yüzdelerinin (%10 Tasarruf, %20 Tasarruf) rozetler halinde şık bir şekilde sunulması ve paket isimlerinin mistik temaya göre (Sezgi Tohumu, Dolunay Ritüeli, Göksel Aydınlanma) güncellenmesi gerekmektedir.
+* **Kabul Kriterleri:**
+  1. Hediye Moon ibareleri tüm dillerde arayüzden kaldırılmalıdır.
+  2. Paket isimleri YAML yerelleştirme dosyalarına taşınarak çoklu dil desteği sağlanmalıdır.
+  3. 10 Moon paketinde "%10 Tasarruf", 25 Moon paketinde "%20 Tasarruf" rozetleri şık bir şekilde gösterilmelidir.
+
+---
+
+---
+
+### 📋 MS-294: Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması (Feature / UX / UI)
+
+* **Öncelik:** Yüksek
+* **Durum:** 📋 Açık (Active)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / Profile / Readings History
+* **Açıklama:**  
+  Ücretli satın alınan Moon'lar ile bakılan fallar (Premium Açılımlar) ile günlük ücretsiz hakla bakılan falların (Günlük Açılımlar) profil geçmişinde ayırt edilebilmesi; PDF indirme ve kaydetme özelliğinin yalnızca Premium Açılımlar için geçerli olması, günlük ücretsiz açılımlarda PDF butonunun kilitli/pasif gösterilmesi sağlanmalıdır.
+* **Kabul Kriterleri:**
+  1. Profil geçmişinde (`deductedFrom === 'purchased'`) olan falların yanında altın parıltılı bir premium simgesi gösterilmelidir.
+  2. Yalnızca premium fallar için PDF indirmeye izin verilmeli; günlük ücretsiz fallarda buton tıklandığında bilgilendirici bir uyarı (Satın alıma teşvik eden) gösterilmeli veya buton pasif hale getirilmelidir.
+  3. Değişiklikler veritabanındaki `deductedFrom` alanına göre dinamik olarak yönetilmelidir.
+
+---
 
 ---
 
