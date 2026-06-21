@@ -43,7 +43,8 @@ import {
   LogOut, 
   Loader2,
   User as UserIcon,
-  Star
+  Star,
+  Lock
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -1270,6 +1271,7 @@ function AppContent() {
             t={t}
             showToast={showToast}
             onErrorLog={handleFirestoreError}
+            moonsCount={moonsCount}
             onCheckoutInitiated={(pack) => {
               // Funnel Analytics: checkout_initiated (MS-134)
               logAnalyticsEvent('checkout_initiated', {
@@ -1303,6 +1305,10 @@ function AppContent() {
             locales={locales}
             onDownloadPastReading={handleDownload}
             showToast={showToast}
+            onOpenStore={() => {
+              setIsProfileOpen(false);
+              setIsStoreOpen(true);
+            }}
             onShowOnboarding={() => {
               setIsProfileOpen(false);
               setShowOnboarding(true);
@@ -1493,7 +1499,14 @@ function AppContent() {
 
               <div className="flex flex-col items-center gap-8 relative z-10 w-full">
                 <button
-                  onClick={() => setStep('FORM')}
+                  onClick={() => {
+                    if (moonsCount <= 0) {
+                      showToast(t('store.noMoons'), 'error');
+                      setIsStoreOpen(true);
+                    } else {
+                      setStep('FORM');
+                    }
+                  }}
                   className="group w-full max-w-[320px] h-[58px] justify-center relative flex items-center gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:border-[#ecd8a6]/80 transition-all duration-500 scale-105 hover:scale-110 active:scale-95"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
@@ -2034,11 +2047,26 @@ function AppContent() {
                   className="mt-8 sm:mt-16 flex flex-col w-full sm:flex-row justify-center items-center gap-4 sm:gap-6 flex-wrap relative z-20"
                 >
                   <button 
-                    onClick={() => handleDownload()}
+                    onClick={() => {
+                      if (pendingDeductedFrom.current !== 'purchased') {
+                        showToast(t('profile.history.pdfLocked'), 'info');
+                      } else {
+                        handleDownload();
+                      }
+                    }}
                     disabled={isExportingPDF}
-                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer relative"
                   >
-                    {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    {isExportingPDF ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : pendingDeductedFrom.current === 'purchased' ? (
+                      <Download className="w-4 h-4" />
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <Download className="w-4 h-4 opacity-40" />
+                        <Lock className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                    )}
                     <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
                   </button>
 

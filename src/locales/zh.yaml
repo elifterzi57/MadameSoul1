@@ -445,6 +445,7 @@ profile:
   history:
     downloadPdf: 下载 PDF
     viewReading: 查看结果
+    pdfLocked: "PDF 下载是高级读数的专属功能。请在商店购买月亮来解锁！"
   readingCount: "占卜次数"
   mysticRank: "神秘等级"
   rankNames:
@@ -489,8 +490,11 @@ store:
   paymentPending: "付款整合即将推出..."
   logout: "登出"
   noMoons: "Katina 月亮不足！"
-  bonus1: "1 个免费 Katina 月亮"
-  bonus5: "5 个免费 Katina 月亮"
+  pack3Name: "直觉之种"
+  pack10Name: "满月仪式"
+  pack25Name: "天界启示"
+  save10: "省 10%"
+  save20: "省 20%"
   redirecting: "正在重定向到结账页面..."
   failedSession: "创建结账会话失败。"
 banner:
@@ -548,7 +552,7 @@ profileDiary:
   favoriteBtn: "收藏"
   detailsTitle: "读数详情"
   closeBtn: "关闭"
-  saveSuccess: "读数更新成功！"
+  saveSuccess: "您的神秘笔记已保存！"
   saveError: "更新读数失败。"
 
 termsConsent:

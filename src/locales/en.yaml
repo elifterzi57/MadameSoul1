@@ -1190,6 +1190,7 @@ profile:
   history:
     downloadPdf: "Download PDF"
     viewReading: "View Reading"
+    pdfLocked: "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!"
   purchaseHistory: "Purchase History"
   noPurchases: "No purchases yet."
   receipt: "Receipt"
@@ -1225,8 +1226,12 @@ store:
   paymentPending: "Payment integration coming soon..."
   logout: "Log Out"
   noMoons: "Not enough Katina Moons!"
-  bonus1: "1 Free Katina Moon"
-  bonus5: "5 Free Katina Moons"
+  zeroBalanceWarning: "Your mystical energy (Katina Moon) seems to have run out. Please purchase moons to start a new reading."
+  pack3Name: "Intuition Seed"
+  pack10Name: "Full Moon Ritual"
+  pack25Name: "Celestial Illumination"
+  save10: "Save 10%"
+  save20: "Save 20%"
   redirecting: "Redirecting to checkout..."
   failedSession: "Failed to create checkout session."
 banner:
@@ -1284,7 +1289,7 @@ profileDiary:
   favoriteBtn: "Favorite"
   detailsTitle: "Reading Details"
   closeBtn: "Close"
-  saveSuccess: "Reading updated successfully!"
+  saveSuccess: "Your mystical notes have been saved."
   saveError: "Failed to update reading."
 
 termsConsent:

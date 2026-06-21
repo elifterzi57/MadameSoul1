@@ -725,6 +725,7 @@ profile:
   history:
     downloadPdf: PDF 다운로드
     viewReading: 결과 보기
+    pdfLocked: "PDF 다운로드는 프리미엄 복채 전용입니다. 상점에서 카티나 문을 충전하여 잠금 해제하세요!"
   readingCount: "점술 횟수"
   mysticRank: "신비 등급"
   rankNames:
@@ -769,8 +770,11 @@ store:
   paymentPending: "결제 연동 준비 중..."
   logout: "로그아웃"
   noMoons: "카티나 문이 부족합니다!"
-  bonus1: "무료 카티나 문 1개"
-  bonus5: "무료 카티나 문 5개"
+  pack3Name: "직관의 씨앗"
+  pack10Name: "보름달 리추얼"
+  pack25Name: "천상의 계시"
+  save10: "10% 할인"
+  save20: "20% 할인"
   redirecting: "결제 페이지로 이동 중..."
   failedSession: "결제 세션을 생성하지 못했습니다."
 banner:
@@ -828,7 +832,7 @@ profileDiary:
   favoriteBtn: "즐겨찾기"
   detailsTitle: "독서 상세 정보"
   closeBtn: "닫기"
-  saveSuccess: "독서가 성공적으로 업데이트되었습니다!"
+  saveSuccess: "신비로운 메모가 저장되었습니다!"
   saveError: "독서 업데이트에 실패했습니다."
 
 termsConsent:

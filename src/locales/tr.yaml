@@ -1109,6 +1109,7 @@ profile:
   history:
     downloadPdf: "PDF İndir"
     viewReading: "Falı Görüntüle"
+    pdfLocked: "PDF indirme özelliği premium fallara özeldir. Mağazadan bakiye yükleyerek bu özelliği etkinleştirebilirsiniz!"
   purchaseHistory: "Satın Alım Geçmişi"
   noPurchases: "Henüz satın alım yapılmadı."
   receipt: "Makbuz"
@@ -1144,8 +1145,12 @@ store:
   paymentPending: "Ödeme sistemi entegrasyonu yakında..."
   logout: "Çıkış"
   noMoons: "Yeterli Katina Moon'unuz yok!"
-  bonus1: "1 Ücretsiz Katina Moon"
-  bonus5: "5 Ücretsiz Katina Moon"
+  zeroBalanceWarning: "Mistik enerjiniz (Katina Moon) tükenmiş görünüyor. Yeni bir fal açılımı başlatmak için lütfen bakiye yükleyin."
+  pack3Name: "Sezgi Tohumu"
+  pack10Name: "Dolunay Ritüeli"
+  pack25Name: "Göksel Aydınlanma"
+  save10: "%10 Tasarruf"
+  save20: "%20 Tasarruf"
   redirecting: "Ödeme sayfasına yönlendiriliyorsunuz..."
   failedSession: "Ödeme oturumu başlatılamadı."
 banner:
@@ -1203,7 +1208,7 @@ profileDiary:
   favoriteBtn: "Favori"
   detailsTitle: "Fal Detayı"
   closeBtn: "Kapat"
-  saveSuccess: "Fal başarıyla güncellendi!"
+  saveSuccess: "Mistik yorumunuz kayıt edildi."
   saveError: "Fal güncellenirken hata oluştu."
 
 termsConsent:
