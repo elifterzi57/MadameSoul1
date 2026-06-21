@@ -761,7 +761,9 @@ export const Profile: React.FC<ProfileProps> = ({
                                   <div className="text-[#ecd8a6] text-sm font-medium flex items-center gap-1.5 min-w-0">
                                     <span className="truncate">{item.customTitle || translateDescription(item.description)}</span>
                                     {item.deductedFrom === 'purchased' && (
-                                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20 animate-pulse" title={userInfo.language === 'tr' ? "Premium Açılım" : "Premium Reading"} />
+                                      <span title={userInfo.language === 'tr' ? "Premium Açılım" : "Premium Reading"} className="flex-shrink-0 flex items-center">
+                                        <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20 animate-pulse" />
+                                      </span>
                                     )}
                                   </div>
                                   <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
