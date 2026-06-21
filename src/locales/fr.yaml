@@ -1240,6 +1240,7 @@ profile:
   history:
     downloadPdf: Télécharger PDF
     viewReading: Voir la Lecture
+    pdfLocked: "Le téléchargement PDF est exclusif aux lectures premium. Achetez des Lunes dans la boutique pour le débloquer !"
   readingCount: "Lectures"
   mysticRank: "Rang Mystique"
   rankNames:
@@ -1284,8 +1285,11 @@ store:
   paymentPending: "Intégration du paiement bientôt disponible..."
   logout: "Se déconnecter"
   noMoons: "Pas assez de Lunes Katina !"
-  bonus1: "1 Lune Katina Gratuite"
-  bonus5: "5 Lunes Katina Gratuites"
+  pack3Name: "Graine d'Intuition"
+  pack10Name: "Rituel de Pleine Lune"
+  pack25Name: "Illumination Céleste"
+  save10: "Économisez 10%"
+  save20: "Économisez 20%"
   redirecting: "Redirection vers le paiement..."
   failedSession: "Échec de la création de la session de paiement."
 banner:
@@ -1343,7 +1347,7 @@ profileDiary:
   favoriteBtn: "Favori"
   detailsTitle: "Détails de la Lecture"
   closeBtn: "Fermer"
-  saveSuccess: "Lecture mise à jour avec succès !"
+  saveSuccess: "Votre note mystique a été enregistrée !"
   saveError: "Échec de la mise à jour de la lecture."
 
 termsConsent:

@@ -4,15 +4,12 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **126** | Açık: **2** | Tamamlanan: **120** | İptal Edilen: **4**
+Toplam Bilet: **126** | Açık: **0** | Tamamlanan: **122** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
-| Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-293**](#-ms-293) | Feature / UX / UI | Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi | Orta | Açık | Elif |
-| [**MS-294**](#-ms-294) | Feature / UX / UI | Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması | Yüksek | Açık | Elif |
+*Şu anda açık bilet bulunmamaktadır.*
 
 
 
@@ -31,6 +28,8 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-294**](#-ms-294) | Feature / UX / UI | Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması | Yüksek | Günlük fallarda PDF indirme kısıtlandı, geçmişte premium fallar için altın parıltı (Sparkles) simgesi eklendi. | Elif |
+| [**MS-293**](#-ms-293) | Feature / UX / UI | Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi | Orta | Paket isimleri mistikleştirildi, hediye moon ibareleri kaldırıldı, birim tasarruf rozetleri eklendi. | Elif |
 | [**MS-292**](#-ms-292) | Bug / Dev | Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası | Yüksek | Done | Elif |
 | [**MS-291**](#-ms-291) | Feature / Dev | Admin Paneli Genel Bakış (Overview) Göstergelerinin Filtrelenmesi ve AI Geri Bildirimlerinde E-posta Çözümlemesi | Yüksek | Done | Elif |
 | [**MS-289**](#-ms-289) | Feature / Dev | Firebase Admin Kimlik Bilgilerinin Local Dosyadan Yüklenmesi ve ES Modül __dirname Çakışmasının Giderilmesi | Yüksek | Done | Elif |
@@ -2741,7 +2740,7 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 ### 📋 MS-293: Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi (Feature / UX / UI)
 
 * **Öncelik:** Orta
-* **Durum:** 📋 Açık (Active)
+* **Durum:** ✅ Tamamlandı (Done)
 * **Oluşturan (Reporter):** Elif (USER)
 * **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
 * **Bileşen:** Client App / StoreModal
@@ -2759,7 +2758,7 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 ### 📋 MS-294: Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması (Feature / UX / UI)
 
 * **Öncelik:** Yüksek
-* **Durum:** 📋 Açık (Active)
+* **Durum:** ✅ Tamamlandı (Done)
 * **Oluşturan (Reporter):** Elif (USER)
 * **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
 * **Bileşen:** Client App / Profile / Readings History

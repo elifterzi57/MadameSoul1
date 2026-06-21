@@ -1179,6 +1179,7 @@ profile:
   history:
     downloadPdf: Descargar PDF
     viewReading: Ver Lectura
+    pdfLocked: "La descarga de PDF es exclusiva para lecturas premium. ¡Compre Lunas en la tienda para desbloquearla!"
   purchaseHistory: "Historial de compras"
   noPurchases: "Aún no se han realizado compras."
   receipt: "Recibo"
@@ -1223,8 +1224,11 @@ store:
   paymentPending: "Integración de pago próximamente..."
   logout: "Salir"
   noMoons: "¡No hay suficientes Lunas Katina!"
-  bonus1: "1 Luna Katina Gratis"
-  bonus5: "5 Lunas Katina Gratis"
+  pack3Name: "Semilla de Intuición"
+  pack10Name: "Ritual de Luna Llena"
+  pack25Name: "Iluminación Celestial"
+  save10: "Ahorra 10%"
+  save20: "Ahorra 20%"
   redirecting: "Redirigiendo al pago..."
   failedSession: "No se pudo crear la sesión de pago."
 banner:
@@ -1282,7 +1286,7 @@ profileDiary:
   favoriteBtn: "Favorito"
   detailsTitle: "Detalles de la Lectura"
   closeBtn: "Cerrar"
-  saveSuccess: "¡Lectura actualizada con éxito!"
+  saveSuccess: "¡Su nota mística ha sido guardada!"
   saveError: "Error al actualizar la lectura."
 
 termsConsent:

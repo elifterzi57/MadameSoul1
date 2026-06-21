@@ -48,6 +48,7 @@ interface ProfileProps {
   onDownloadPastReading?: (reading: any) => void;
   onShowOnboarding?: () => void;
   showToast?: (message: string, type?: 'info' | 'error' | 'success') => void;
+  onOpenStore?: () => void;
 }
 
 export const Profile: React.FC<ProfileProps> = ({ 
@@ -61,7 +62,8 @@ export const Profile: React.FC<ProfileProps> = ({
   locales,
   onDownloadPastReading,
   onShowOnboarding,
-  showToast
+  showToast,
+  onOpenStore
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
   const [history, setHistory] = useState<any[]>([]);
@@ -85,6 +87,7 @@ export const Profile: React.FC<ProfileProps> = ({
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [feedbackComment, setFeedbackComment] = useState('');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
 
   // Build reverse map of English card names to keys
   const cardNameToKeyMap: Record<string, string> = {};
@@ -490,18 +493,25 @@ export const Profile: React.FC<ProfileProps> = ({
   };
 
   const handleSaveNotes = async (itemId: string, title: string, notes: string) => {
+    setIsSavingNotes(true);
     try {
       await updateDoc(doc(db, 'moon_transactions', itemId), {
         customTitle: title,
         reflectionNotes: notes
       });
       setHistory(prev => prev.map(item => item.id === itemId ? { ...item, customTitle: title, reflectionNotes: notes } : item));
-      setNotesStatus({ type: 'success', message: translations?.profileDiary?.saveSuccess || "Reading updated successfully!" });
+      const successMsg = translations?.profileDiary?.saveSuccess || "Reading updated successfully!";
+      setNotesStatus({ type: 'success', message: successMsg });
+      showToast?.(successMsg, 'success');
       setTimeout(() => setNotesStatus(null), 3000);
     } catch (err) {
       console.error("Error saving notes:", err);
-      setNotesStatus({ type: 'error', message: translations?.profileDiary?.saveError || "Failed to update reading." });
+      const errorMsg = translations?.profileDiary?.saveError || "Failed to update reading.";
+      setNotesStatus({ type: 'error', message: errorMsg });
+      showToast?.(errorMsg, 'error');
       setTimeout(() => setNotesStatus(null), 3000);
+    } finally {
+      setIsSavingNotes(false);
     }
   };
 
@@ -573,7 +583,8 @@ export const Profile: React.FC<ProfileProps> = ({
     },
     history: {
       downloadPdf: translations?.profile?.history?.downloadPdf || "Download PDF",
-      viewReading: translations?.profile?.history?.viewReading || "View"
+      viewReading: translations?.profile?.history?.viewReading || "View",
+      pdfLocked: translations?.profile?.history?.pdfLocked || (userInfo.language === 'tr' ? "PDF indirme özelliği premium fallara özeldir. Mağazadan bakiye yükleyerek bu özelliği etkinleştirebilirsiniz!" : "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!")
     }
   };
 
@@ -747,7 +758,12 @@ export const Profile: React.FC<ProfileProps> = ({
                                 </button>
                                 
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-[#ecd8a6] text-sm font-medium truncate">{item.customTitle || translateDescription(item.description)}</div>
+                                  <div className="text-[#ecd8a6] text-sm font-medium flex items-center gap-1.5 min-w-0">
+                                    <span className="truncate">{item.customTitle || translateDescription(item.description)}</span>
+                                    {item.deductedFrom === 'purchased' && (
+                                      <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20 animate-pulse" title={userInfo.language === 'tr' ? "Premium Açılım" : "Premium Reading"} />
+                                    )}
+                                  </div>
                                   <div className="text-[10px] text-[#ecd8a6]/40 flex items-center gap-1 mt-1">
                                     <CalendarDays className="w-3 h-3" />
                                     {item.createdAt?.toDate().toLocaleDateString()}
@@ -767,16 +783,32 @@ export const Profile: React.FC<ProfileProps> = ({
                                   </span>
                                 )}
                                 {item.readingText && (
-                                  <button 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      onDownloadPastReading?.(item);
-                                    }}
-                                    className="p-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] transition-all"
-                                    title={profileT.history.downloadPdf}
-                                  >
-                                    <Download className="w-4 h-4" />
-                                  </button>
+                                  item.deductedFrom === 'purchased' ? (
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDownloadPastReading?.(item);
+                                      }}
+                                      className="p-2 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] transition-all"
+                                      title={profileT.history.downloadPdf}
+                                    >
+                                      <Download className="w-4 h-4" />
+                                    </button>
+                                  ) : (
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (showToast) {
+                                          showToast(profileT.history.pdfLocked, 'info');
+                                        }
+                                      }}
+                                      className="p-2 bg-black/40 hover:bg-black/60 rounded-lg text-[#ecd8a6]/30 transition-all cursor-not-allowed flex items-center justify-center relative group"
+                                      title={profileT.history.pdfLocked}
+                                    >
+                                      <Download className="w-4 h-4 opacity-40" />
+                                      <Lock className="w-2.5 h-2.5 text-amber-400 absolute bottom-0.5 right-0.5 bg-[#0a0512] rounded-full p-[0.5px]" />
+                                    </button>
+                                  )
                                 )}
                                 <ChevronRight className={`w-4 h-4 text-[#ecd8a6]/20 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-[#ecd8a6]/60' : ''}`} />
                               </div>
@@ -928,8 +960,10 @@ export const Profile: React.FC<ProfileProps> = ({
                                     <div className="flex justify-end pt-2">
                                       <button
                                         onClick={() => handleSaveNotes(item.id, editTitle, editNotes)}
-                                        className="px-5 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all font-bold"
+                                        disabled={isSavingNotes}
+                                        className="px-5 py-2 bg-[#ecd8a6] text-[#0a0512] rounded-lg text-[10px] font-serif tracking-widest uppercase hover:bg-white transition-all font-bold flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                                       >
+                                        {isSavingNotes && <Loader2 className="w-3 h-3 animate-spin" />}
                                         {translations?.profileDiary?.saveBtn || "Save Notes"}
                                       </button>
                                     </div>

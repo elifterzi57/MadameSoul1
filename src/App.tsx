@@ -43,7 +43,8 @@ import {
   LogOut, 
   Loader2,
   User as UserIcon,
-  Star
+  Star,
+  Lock
 } from 'lucide-react';
 
 const KATINA_DECK = [
@@ -1304,6 +1305,10 @@ function AppContent() {
             locales={locales}
             onDownloadPastReading={handleDownload}
             showToast={showToast}
+            onOpenStore={() => {
+              setIsProfileOpen(false);
+              setIsStoreOpen(true);
+            }}
             onShowOnboarding={() => {
               setIsProfileOpen(false);
               setShowOnboarding(true);
@@ -2042,11 +2047,26 @@ function AppContent() {
                   className="mt-8 sm:mt-16 flex flex-col w-full sm:flex-row justify-center items-center gap-4 sm:gap-6 flex-wrap relative z-20"
                 >
                   <button 
-                    onClick={() => handleDownload()}
+                    onClick={() => {
+                      if (pendingDeductedFrom.current !== 'purchased') {
+                        showToast(t('profile.history.pdfLocked'), 'info');
+                      } else {
+                        handleDownload();
+                      }
+                    }}
                     disabled={isExportingPDF}
-                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full sm:w-auto h-[58px] text-[#ecd8a6] hover:text-[#fff] flex items-center justify-center gap-3 border border-[#ecd8a6]/30 hover:border-[#ecd8a6]/60 px-6 sm:px-8 rounded-full transition-all bg-[#120a1c]/80 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer relative"
                   >
-                    {isExportingPDF ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                    {isExportingPDF ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : pendingDeductedFrom.current === 'purchased' ? (
+                      <Download className="w-4 h-4" />
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <Download className="w-4 h-4 opacity-40" />
+                        <Lock className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                    )}
                     <span className="font-serif tracking-widest text-xs uppercase">{isExportingPDF ? 'Exporting...' : t('downloadBtn')}</span>
                   </button>
 

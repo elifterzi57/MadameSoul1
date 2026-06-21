@@ -116,9 +116,9 @@ export const StoreModal: React.FC<StoreModalProps> = ({
           )}
 
           {[
-            { amount: 3, price: "$2.99", bonusKey: null },
-            { amount: 10, price: "$8.99", bonusKey: "store.bonus1", popular: true },
-            { amount: 25, price: "$19.99", bonusKey: "store.bonus5" }
+            { amount: 3, price: "$2.99", nameKey: "store.pack3Name", saveKey: null },
+            { amount: 10, price: "$8.99", nameKey: "store.pack10Name", saveKey: "store.save10", popular: true },
+            { amount: 25, price: "$19.99", nameKey: "store.pack25Name", saveKey: "store.save20" }
           ].map((pack) => (
             <div 
               key={pack.amount} 
@@ -138,12 +138,15 @@ export const StoreModal: React.FC<StoreModalProps> = ({
                   <KatinaMoon className="w-5 h-5 text-[#ecd8a6]" />
                 </div>
                 <div className="text-left">
+                  <div className="text-[10px] text-[#ecd8a6]/60 font-serif uppercase tracking-widest mb-0.5">{t(pack.nameKey)}</div>
                   <div className="text-[#ecd8a6] font-serif flex items-baseline gap-1">
                     <span className="text-xl font-bold">{pack.amount}</span>
                     <span className="text-sm opacity-80">{t('store.moons')}</span>
                   </div>
-                  {pack.bonusKey && (
-                    <div className="text-xs text-amber-500/90 font-medium">✨ {t(pack.bonusKey)}</div>
+                  {pack.saveKey && (
+                    <span className="inline-block mt-1 text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                      ✨ {t(pack.saveKey)}
+                    </span>
                   )}
                 </div>
               </div>
