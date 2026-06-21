@@ -446,6 +446,7 @@ profile:
     downloadPdf: 下载 PDF
     viewReading: 查看结果
     pdfLocked: "PDF 下载是高级读数的专属功能。请在商店购买月亮来解锁！"
+    evalTitle: "评估您的神秘占卜"
   readingCount: "占卜次数"
   mysticRank: "神秘等级"
   rankNames:
@@ -497,6 +498,10 @@ store:
   save20: "省 20%"
   redirecting: "正在重定向到结账页面..."
   failedSession: "创建结账会话失败。"
+  benefitsTitle: "高级月亮特权"
+  benefitPdf: "无限次下载并保存您的占卜结果为 PDF"
+  benefitNotes: "在您的日记中记录未来的感悟与显现笔记"
+  benefitHistory: "以闪烁的高级标识装点您的占卜日记"
 banner:
   sponsored: "赞助"
   promoText: "在亚马逊上购买 Katina 塔罗牌可享受 20% 折扣！"
@@ -554,6 +559,8 @@ profileDiary:
   closeBtn: "关闭"
   saveSuccess: "您的神秘笔记已保存！"
   saveError: "更新读数失败。"
+  lockedTitle: "神秘日记已锁定"
+  lockedDesc: "添加自定义标题和感悟笔记是高级占卜专属功能。请在商店购买月亮来解锁您的神秘占卜日记！"
 
 termsConsent:
   title: "法律条款与 GDPR 同意"

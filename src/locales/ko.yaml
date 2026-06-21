@@ -726,6 +726,7 @@ profile:
     downloadPdf: PDF 다운로드
     viewReading: 결과 보기
     pdfLocked: "PDF 다운로드는 프리미엄 복채 전용입니다. 상점에서 카티나 문을 충전하여 잠금 해제하세요!"
+    evalTitle: "신비로운 타로 해석 평가하기"
   readingCount: "점술 횟수"
   mysticRank: "신비 등급"
   rankNames:
@@ -777,6 +778,10 @@ store:
   save20: "20% 할인"
   redirecting: "결제 페이지로 이동 중..."
   failedSession: "결제 세션을 생성하지 못했습니다."
+  benefitsTitle: "프리미엄 문 혜택"
+  benefitPdf: "타로 해석 결과를 제한 없이 PDF로 다운로드 및 저장"
+  benefitNotes: "성취 관찰 및 개인적인 성찰 메모를 일기장에 기록"
+  benefitHistory: "반짝이는 프리미엄 아이콘으로 나만의 점술 일기장 장식"
 banner:
   sponsored: "스폰서"
   promoText: "아마존에서 카티나 타로 카드를 20% 할인 받으세요!"
@@ -834,6 +839,8 @@ profileDiary:
   closeBtn: "닫기"
   saveSuccess: "신비로운 메모가 저장되었습니다!"
   saveError: "독서 업데이트에 실패했습니다."
+  lockedTitle: "신비로운 일기장 잠김"
+  lockedDesc: "나만의 타로 제목 및 성찰 메모 추가는 프리미엄 복채 전용입니다. 상점에서 카티나 문을 충전하여 신비로운 일기장을 잠금 해제하세요!"
 
 termsConsent:
   title: "법적 고지 및 개인정보 동의 (GDPR)"

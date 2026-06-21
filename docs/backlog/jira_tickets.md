@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **126** | Açık: **0** | Tamamlanan: **122** | İptal Edilen: **4**
+Toplam Bilet: **127** | Açık: **0** | Tamamlanan: **123** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-295**](#-ms-295) | Feature / UX / UI | Mağaza Ekranında Premium Avantajların Gösterilmesi ve Günlük Fallarda Günlük Kilidi | Yüksek | Mağaza modalına premium moon avantajları eklendi. Günlük fallarda özel başlık ve yansıma notları yazma alanı asma kilit kartıyla kilitlendi. | Elif |
 | [**MS-294**](#-ms-294) | Feature / UX / UI | Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması | Yüksek | Günlük fallarda PDF indirme kısıtlandı, geçmişte premium fallar için altın parıltı (Sparkles) simgesi eklendi. | Elif |
 | [**MS-293**](#-ms-293) | Feature / UX / UI | Mağaza Paketlerinin Yeniden Yapılandırılması ve Birim İndirimlerin Gösterilmesi | Orta | Paket isimleri mistikleştirildi, hediye moon ibareleri kaldırıldı, birim tasarruf rozetleri eklendi. | Elif |
 | [**MS-292**](#-ms-292) | Bug / Dev | Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası | Yüksek | Done | Elif |
@@ -2770,6 +2771,22 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   3. Değişiklikler veritabanındaki `deductedFrom` alanına göre dinamik olarak yönetilmelidir.
 
 ---
+
+---
+
+### 📋 MS-295: Mağaza Ekranında Premium Avantajların Gösterilmesi ve Günlük Fallarda Günlük Kilidi (Feature / UX / UI)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Done)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / StoreModal / Profile / Readings History
+* **Açıklama:**  
+  Kullanıcıların Katina Moon satın aldıklarında elde edecekleri premium avantajları doğrudan Mağaza ekranında (StoreModal) görsel olarak listelemek ve günlük ücretsiz hakla bakılan fallarda Özel Başlık ile Yansıma Notları girilmesini engelleyen kilit kartı eklenmesi gerekmektedir.
+* **Kabul Kriterleri:**
+  1. Mağaza modalında listelenen paketlerin altına premium moon satın alma avantajları (Sınırsız PDF indirme, günlük yansıma notları vb.) altın renkli parıltı simgesiyle listelenmelidir.
+  2. Profil kehanet geçmişinde, günlük ücretsiz fallarda Özel Başlık ve Yansıma Notu giriş alanlarının yerine, bu özelliğin premium avantaj olduğunu açıklayan ve mağazadan satın almaya teşvik eden şık bir glassmorphic kilit kartı gösterilmelidir.
+  3. Tüm metinler 6 dile (`en`, `tr`, `es`, `fr`, `zh`, `ko`) yerelleştirilmelidir.
 
 ---
 

@@ -1191,6 +1191,7 @@ profile:
     downloadPdf: "Download PDF"
     viewReading: "View Reading"
     pdfLocked: "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!"
+    evalTitle: "Evaluate Your Mystical Reading"
   purchaseHistory: "Purchase History"
   noPurchases: "No purchases yet."
   receipt: "Receipt"
@@ -1234,6 +1235,10 @@ store:
   save20: "Save 20%"
   redirecting: "Redirecting to checkout..."
   failedSession: "Failed to create checkout session."
+  benefitsTitle: "PREMIUM MOON BENEFITS"
+  benefitPdf: "Download and keep your readings as unlimited PDFs"
+  benefitNotes: "Record your future reflections and manifestation notes in your diary"
+  benefitHistory: "Crown your diary with sparkling premium indicators"
 banner:
   sponsored: "Sponsored"
   promoText: "Get 20% off Katina Tarot Cards on Amazon!"
@@ -1291,6 +1296,8 @@ profileDiary:
   closeBtn: "Close"
   saveSuccess: "Your mystical notes have been saved."
   saveError: "Failed to update reading."
+  lockedTitle: "Mystical Diary Locked"
+  lockedDesc: "Adding custom titles and reflection notes is exclusive to premium readings. Buy Moons in the store to unlock your mystical diary!"
 
 termsConsent:
   title: "Legal Terms & GDPR Consent"
