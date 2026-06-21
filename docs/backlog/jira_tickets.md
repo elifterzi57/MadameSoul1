@@ -4,12 +4,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **121** | Açık: **0** | Tamamlanan: **117** | İptal Edilen: **4**
+Toplam Bilet: **124** | Açık: **1** | Tamamlanan: **119** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [**MS-292**](#-ms-292) | Bug / Dev | Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası | Yüksek | Açık | Elif |
 
 
 
@@ -28,6 +30,8 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-291**](#-ms-291) | Feature / Dev | Admin Paneli Genel Bakış (Overview) Göstergelerinin Filtrelenmesi ve AI Geri Bildirimlerinde E-posta Çözümlemesi | Yüksek | Done | Elif |
+| [**MS-289**](#-ms-289) | Feature / Dev | Firebase Admin Kimlik Bilgilerinin Local Dosyadan Yüklenmesi ve ES Modül __dirname Çakışmasının Giderilmesi | Yüksek | Done | Elif |
 | [**MS-290**](#-ms-290) | Feature / Dev | Çalışan Yetkileri Ekranından Şifre Güncelleme/Sıfırlama Desteği | Yüksek | Süper adminlerin çalışan şifrelerini arayüzden güncelleyebilmesi için set-role endpoint'ine ve PermissionsTab bileşenine şifre güncelleme desteği eklendi. | Elif |
 | [**MS-287**](#-ms-287) | Feature / Dev | Admin Paneli Altyapısı, Monorepo Dizin Kurulumu ve Firebase Client Entegrasyonu | Yüksek | Done | Elif |
 | [**MS-286**](#-ms-286) | Feature / Dev | Sözleşme Onay Modalı, Kart Seçim Ritüeli, Bildirimler ve Login Ekranı Yerelleştirilmesi | Yüksek | Done | Elif |
@@ -2670,6 +2674,59 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
     2. Profil kaydedildikten sonra yeni açılan fal formunda güncel doğum yeri ve ilişki durumunun otomatik geldiği doğrulanmalı.
 
 * **Çözüm:** `App.tsx` içindeki `onUpdateUserInfo` handler'ı güncellendi ve `birthplace` ile `relationship` değerlerinin de local state'e senkronize edilmesi sağlandı.
+
+---
+
+---
+
+### 📋 MS-292: Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası (Bug / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** 📋 Açık (Active)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Client App / Backend / Payments
+* **Açıklama:**  
+  Kullanıcının bakiyesi tam olarak 1 Moon iken, istemci tarafında bakiye düşüm işlemi yapılıp veritabanı güncellendikten sonra sunucuya `/api/generate` isteği atıldığında; sunucunun kullanıcının güncel bakiyesini veritabanından çekip kontrol etmesi sonucunda bakiye 0 göründüğü için "Not enough Katina Moons! Please purchase more." hatası alınmakta ve fal yorumu müşteriye ulaşmamaktadır.
+* **Kabul Kriterleri:**
+  1. Kullanıcının bakiyesi tam 1 iken fal yorumunun sorunsuz oluşturulması ve sunucudan hata dönülmemesi sağlanmalıdır.
+  2. Bakiye kontrol mantığı istemci-sunucu senkronizasyonunu bozmayacak şekilde düzeltilmelidir.
+  3. Hata durumunda kullanıcıya bilgilendirici hata mesajı gösterilmelidir.
+
+---
+
+---
+
+### ✅ MS-291: Admin Paneli Genel Bakış (Overview) Göstergelerinin Filtrelenmesi ve AI Geri Bildirimlerinde E-posta Çözümlemesi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin panelindeki genel bakış göstergelerinin günlük, haftalık, aylık ve tümü seçenekleriyle filtrelenebilmesi; Moon işlemleri göstergesinin harcanan başarılı moonları sayması ve AI geri bildirimlerinde kullanıcıların mail adreslerinin listelenmesi sağlanmıştır.
+* **Çözüm:**  
+  * `OverviewTab.tsx` üzerinde istemci tarafında veri filtreleme kurgusu yapıldı.
+  * Harcanan moon hesabı `type === 'spend' && status === 'success'` olacak şekilde güncellendi.
+  * `users` koleksiyonu önceden yüklenerek feedback listesinde `userId` e-posta adresine çözümlendi ve kapsül içinde gösterildi.
+
+---
+
+---
+
+### ✅ MS-289: Firebase Admin Kimlik Bilgilerinin Local Dosyadan Yüklenmesi ve ES Modül __dirname Çakışmasının Giderilmesi (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Backend / Credentials
+* **Açıklama:**  
+  Yerel geliştirme ortamında Firebase Admin SDK'sının çalışabilmesi için `service-account.json` dosyasından kimlik bilgilerinin yüklenmesi desteği eklenmiş ve ES Modülleri ile çalışırken Node.js `__dirname` değişkeninin tanımsız olması hatası giderilmiştir.
+* **Çözüm:**  
+  * `server.ts` içinde `fileURLToPath` ve `path.resolve` kullanılarak `service-account.json` yolu güvenli şekilde çözümlendi.
+  * Kimlik bilgisi dosyası projede yer almadığında local bypass moduna otomatik geçiş sağlandı.
 
 ---
 
