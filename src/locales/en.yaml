@@ -1191,6 +1191,7 @@ profile:
     downloadPdf: "Download PDF"
     viewReading: "View Reading"
     pdfLocked: "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!"
+    evalTitle: "Evaluate Your Mystical Reading"
   purchaseHistory: "Purchase History"
   noPurchases: "No purchases yet."
   receipt: "Receipt"

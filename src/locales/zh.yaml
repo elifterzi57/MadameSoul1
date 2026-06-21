@@ -446,6 +446,7 @@ profile:
     downloadPdf: 下载 PDF
     viewReading: 查看结果
     pdfLocked: "PDF 下载是高级读数的专属功能。请在商店购买月亮来解锁！"
+    evalTitle: "评估您的神秘占卜"
   readingCount: "占卜次数"
   mysticRank: "神秘等级"
   rankNames:

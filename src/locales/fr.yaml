@@ -1241,6 +1241,7 @@ profile:
     downloadPdf: Télécharger PDF
     viewReading: Voir la Lecture
     pdfLocked: "Le téléchargement PDF est exclusif aux lectures premium. Achetez des Lunes dans la boutique pour le débloquer !"
+    evalTitle: "Évaluez votre lecture mystique"
   readingCount: "Lectures"
   mysticRank: "Rang Mystique"
   rankNames:

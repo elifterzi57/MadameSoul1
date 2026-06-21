@@ -1180,6 +1180,7 @@ profile:
     downloadPdf: Descargar PDF
     viewReading: Ver Lectura
     pdfLocked: "La descarga de PDF es exclusiva para lecturas premium. ¡Compre Lunas en la tienda para desbloquearla!"
+    evalTitle: "Evalúe su lectura mística"
   purchaseHistory: "Historial de compras"
   noPurchases: "Aún no se han realizado compras."
   receipt: "Recibo"

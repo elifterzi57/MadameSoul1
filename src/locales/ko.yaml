@@ -726,6 +726,7 @@ profile:
     downloadPdf: PDF 다운로드
     viewReading: 결과 보기
     pdfLocked: "PDF 다운로드는 프리미엄 복채 전용입니다. 상점에서 카티나 문을 충전하여 잠금 해제하세요!"
+    evalTitle: "신비로운 타로 해석 평가하기"
   readingCount: "점술 횟수"
   mysticRank: "신비 등급"
   rankNames:

@@ -1110,6 +1110,7 @@ profile:
     downloadPdf: "PDF İndir"
     viewReading: "Falı Görüntüle"
     pdfLocked: "PDF indirme özelliği premium fallara özeldir. Mağazadan bakiye yükleyerek bu özelliği etkinleştirebilirsiniz!"
+    evalTitle: "Mistik Falınızı Değerlendirin"
   purchaseHistory: "Satın Alım Geçmişi"
   noPurchases: "Henüz satın alım yapılmadı."
   receipt: "Makbuz"

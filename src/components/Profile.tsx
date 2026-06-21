@@ -584,7 +584,8 @@ export const Profile: React.FC<ProfileProps> = ({
     history: {
       downloadPdf: translations?.profile?.history?.downloadPdf || "Download PDF",
       viewReading: translations?.profile?.history?.viewReading || "View",
-      pdfLocked: translations?.profile?.history?.pdfLocked || (userInfo.language === 'tr' ? "PDF indirme özelliği premium fallara özeldir. Mağazadan bakiye yükleyerek bu özelliği etkinleştirebilirsiniz!" : "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!")
+      pdfLocked: translations?.profile?.history?.pdfLocked || (userInfo.language === 'tr' ? "PDF indirme özelliği premium fallara özeldir. Mağazadan bakiye yükleyerek bu özelliği etkinleştirebilirsiniz!" : "PDF download is exclusive to premium readings. Buy Moons in the store to unlock!"),
+      evalTitle: translations?.profile?.history?.evalTitle || (userInfo.language === 'tr' ? "Mistik Falınızı Değerlendirin" : "Evaluate Your Mystical Reading")
     }
   };
 
@@ -858,7 +859,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                     {item.readingText && (
                                       <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10">
                                         <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/60 uppercase">
-                                          {userInfo.language === 'tr' ? "Yapay Zeka Yorum Değerlendirmesi" : "AI Reading Feedback"}
+                                          {profileT.history.evalTitle}
                                         </h4>
                                         {feedbacks[item.id] ? (
                                           <div className="space-y-2">
