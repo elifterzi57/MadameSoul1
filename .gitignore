@@ -15,3 +15,4 @@ coverage/
 _bmad/
 docs/bmad-output/
 scratch/
+service-account.json
