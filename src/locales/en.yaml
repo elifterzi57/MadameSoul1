@@ -1225,6 +1225,7 @@ store:
   paymentPending: "Payment integration coming soon..."
   logout: "Log Out"
   noMoons: "Not enough Katina Moons!"
+  zeroBalanceWarning: "Your mystical energy (Katina Moon) seems to have run out. Please purchase moons to start a new reading."
   bonus1: "1 Free Katina Moon"
   bonus5: "5 Free Katina Moons"
   redirecting: "Redirecting to checkout..."

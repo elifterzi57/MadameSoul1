@@ -4,14 +4,13 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **124** | Açık: **1** | Tamamlanan: **119** | İptal Edilen: **4**
+Toplam Bilet: **124** | Açık: **0** | Tamamlanan: **120** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
 | Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [**MS-292**](#-ms-292) | Bug / Dev | Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası | Yüksek | Açık | Elif |
 
 
 
@@ -30,6 +29,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-292**](#-ms-292) | Bug / Dev | Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası | Yüksek | Done | Elif |
 | [**MS-291**](#-ms-291) | Feature / Dev | Admin Paneli Genel Bakış (Overview) Göstergelerinin Filtrelenmesi ve AI Geri Bildirimlerinde E-posta Çözümlemesi | Yüksek | Done | Elif |
 | [**MS-289**](#-ms-289) | Feature / Dev | Firebase Admin Kimlik Bilgilerinin Local Dosyadan Yüklenmesi ve ES Modül __dirname Çakışmasının Giderilmesi | Yüksek | Done | Elif |
 | [**MS-290**](#-ms-290) | Feature / Dev | Çalışan Yetkileri Ekranından Şifre Güncelleme/Sıfırlama Desteği | Yüksek | Süper adminlerin çalışan şifrelerini arayüzden güncelleyebilmesi için set-role endpoint'ine ve PermissionsTab bileşenine şifre güncelleme desteği eklendi. | Elif |
@@ -2679,10 +2679,10 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
 
 ---
 
-### 📋 MS-292: Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası (Bug / Dev)
+### ✅ MS-292: Son 1 Katina Moon Kaldığında Fal Yorumu Gelmeme Hatası (Bug / Dev)
 
 * **Öncelik:** Yüksek
-* **Durum:** 📋 Açık (Active)
+* **Durum:** ✅ Tamamlandı (Completed)
 * **Oluşturan (Reporter):** Elif (USER)
 * **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
 * **Bileşen:** Client App / Backend / Payments
@@ -2692,6 +2692,10 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   1. Kullanıcının bakiyesi tam 1 iken fal yorumunun sorunsuz oluşturulması ve sunucudan hata dönülmemesi sağlanmalıdır.
   2. Bakiye kontrol mantığı istemci-sunucu senkronizasyonunu bozmayacak şekilde düzeltilmelidir.
   3. Hata durumunda kullanıcıya bilgilendirici hata mesajı gösterilmelidir.
+
+* **Çözüm:**  
+  1. Sunucu tarafındaki (`server.ts`) bakiye kontrolü, kullanıcının işlem sonrasındaki bakiyesinin `0` veya daha büyük olmasını (negatif olmamasını) doğrulamak için `balance < 0` olarak güncellendi. Böylece tam 1 Moon'u olup istemci tarafından 0'a düşürülen kullanıcılar engellenmemiş oldu.
+  2. İstemci tarafında (`App.tsx`) "Falına Başla" butonuna tıklandığında, kullanıcının bakiyesi `0` ise form doldurma adımına geçiş engellenerek doğrudan Toast hatası verildi ve altın renkli uyarı kutusu içeren Mağaza ekranı (`StoreModal.tsx`) açıldı.
 
 ---
 

@@ -646,7 +646,7 @@ async function startServer() {
           return res.status(403).json({ error: "No moon balance record found for this user." });
         }
         const balance = moonDoc.data()?.balance || 0;
-        if (balance < 1) {
+        if (balance < 0) {
           return res.status(403).json({ error: "Not enough Katina Moons! Please purchase more." });
         }
       } else {

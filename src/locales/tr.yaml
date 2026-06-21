@@ -1144,6 +1144,7 @@ store:
   paymentPending: "Ödeme sistemi entegrasyonu yakında..."
   logout: "Çıkış"
   noMoons: "Yeterli Katina Moon'unuz yok!"
+  zeroBalanceWarning: "Mistik enerjiniz (Katina Moon) tükenmiş görünüyor. Yeni bir fal açılımı başlatmak için lütfen bakiye yükleyin."
   bonus1: "1 Ücretsiz Katina Moon"
   bonus5: "5 Ücretsiz Katina Moon"
   redirecting: "Ödeme sayfasına yönlendiriliyorsunuz..."

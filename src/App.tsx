@@ -1270,6 +1270,7 @@ function AppContent() {
             t={t}
             showToast={showToast}
             onErrorLog={handleFirestoreError}
+            moonsCount={moonsCount}
             onCheckoutInitiated={(pack) => {
               // Funnel Analytics: checkout_initiated (MS-134)
               logAnalyticsEvent('checkout_initiated', {
@@ -1493,7 +1494,14 @@ function AppContent() {
 
               <div className="flex flex-col items-center gap-8 relative z-10 w-full">
                 <button
-                  onClick={() => setStep('FORM')}
+                  onClick={() => {
+                    if (moonsCount <= 0) {
+                      showToast(t('store.noMoons'), 'error');
+                      setIsStoreOpen(true);
+                    } else {
+                      setStep('FORM');
+                    }
+                  }}
                   className="group w-full max-w-[320px] h-[58px] justify-center relative flex items-center gap-4 bg-gradient-to-br from-[#1e1332] to-[#05000a] overflow-hidden border border-[#ecd8a6]/40 text-[#ecd8a6] font-serif tracking-widest uppercase rounded-full shadow-[0_0_30px_rgba(236,216,166,0.15)] hover:shadow-[0_0_50px_rgba(236,216,166,0.3)] hover:border-[#ecd8a6]/80 transition-all duration-500 scale-105 hover:scale-110 active:scale-95"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ecd8a6]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
