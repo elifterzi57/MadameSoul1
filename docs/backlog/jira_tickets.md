@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **130** | Açık: **0** | Tamamlanan: **126** | İptal Edilen: **4**
+Toplam Bilet: **131** | Açık: **0** | Tamamlanan: **127** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-299**](#-ms-299) | Feature / UX / UI / Dev | Admin Paneli Stripe Ekranı Bekleyen İşlemler ve Manuel Onaylama Butonu | Yüksek | Admin panelinde Stripe Finans sekmesine bekleyen (pending) ödemelerin listelenmesi ve bu ödemeleri manuel olarak onaylayıp bakiyeyi yükleyen "Manuel Onayla" butonu eklendi. | Elif |
 | [**MS-298**](#-ms-298) | Feature / Dev | Stripe Webhook Gecikmeleri İçin İstemci Tarafı Doğrulama ve Fallback Altyapısı | Yüksek | Stripe ödemesi sonrası webhook gecikirse veya başarısız olursa, kullanıcının mağdur olmaması için geri dönüş sayfasında (/api/verify-checkout-session) fallback doğrulama ve bakiye yükleme mekanizması kuruldu. | Elif |
 | [**MS-297**](#-ms-297) | Feature / UX / UI / Dev | Admin Paneli AI Telemetri İyileştirmeleri | Orta | E-posta bulunmayan kullanıcılarda telefon numarası fallback desteği sağlandı. Telemetri listesinin üstüne ortalama prompt, completion ve total token gösterge kartları eklendi. Toplam sütunu TOTALTOKENS olarak isimlendirilip CREATEDAT sütunu MAIL'in yanına taşındı. | Elif |
 | [**MS-296**](#-ms-296) | Feature / Dev | Admin Paneli AI Telemetri Koleksiyonunun Eklenmesi ve Yetkilendirme Düzeltmesi | Yüksek | Admin panelinde AI Telemetri koleksiyonu listelendi, completionTokens+promptTokens sütunu eklendi ve Firestore rules yetki hatası giderildi. | Elif |
@@ -2846,6 +2847,25 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   1. İstemci, Stripe'tan başarıyla döndüğünde (`payment=success` ve `session_id` mevcut olduğunda) backend üzerindeki `/api/verify-checkout-session` endpoint'ini tetiklemelidir.
   2. Backend, checkout deneme kaydı durumunu kontrol etmeli; eğer webhook tarafından henüz tamamlanmadıysa, Stripe API'den oturum durumunu sorgulayıp (`paid`) işlemi güvenli bir şekilde tamamlamalı ve moons yükleme işlemini tetiklemelidir.
   3. Webhook sonradan gelse dahi mükerrer yükleme olmaması için işlem idempotency (completed durumu kontrolü) korunmalıdır.
+  4. Değişiklikler başarılı bir şekilde derlenmeli ve deploy edilmelidir.
+
+---
+
+---
+
+### 📋 MS-299: Admin Paneli Stripe Ekranı Bekleyen İşlemler ve Manuel Onaylama Butonu (Feature / UX / UI / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Done)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / FinanceTab / Backend / Admin API
+* **Açıklama:**  
+  Admin panelinde yer alan "Stripe Finans & Satış" ekranının iyileştirilmesi; beklemede (`pending`) kalmış olan ödeme denemelerinin listelenmesi, bu ödemeleri inceleyerek doğrudan admin panelinden onaylayıp kullanıcının hesabına Moon yüklemesini gerçekleştiren "Manuel Onayla" butonunun eklenmesi.
+* **Kabul Kriterleri:**
+  1. Stripe Finans ekranında "Bekleyen Ödeme Talepleri (Pending)" adında ayrı bir tablo yer almalıdır.
+  2. Tabloda beklemedeki her işlemin yanında "Manuel Onayla" butonu yer almalıdır.
+  3. Butona tıklandığında, arka planda güvenli admin endpoint'i tetiklenmeli, ödeme başarılı sayılmalı, moons bakiyesi yüklenmeli ve `admin_audit_logs` tablosuna işlem loglanmalıdır.
   4. Değişiklikler başarılı bir şekilde derlenmeli ve deploy edilmelidir.
 
 ---
