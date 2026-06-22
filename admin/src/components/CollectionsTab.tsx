@@ -12,7 +12,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string }>>({});
+  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string; phoneNumber?: string }>>({});
   const [moonsMap, setMoonsMap] = useState<Record<string, any>>({});
   
   // Filters & Sorting state
@@ -25,12 +25,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     const fetchUsersMap = async () => {
       try {
         const usersSnap = await getDocs(collection(db, 'users'));
-        const mapping: Record<string, { email: string; displayName?: string }> = {};
+        const mapping: Record<string, { email: string; displayName?: string; phoneNumber?: string }> = {};
         usersSnap.forEach((docSnap) => {
           const data = docSnap.data();
           mapping[docSnap.id] = {
             email: data.email || '',
-            displayName: data.displayName || data.name || ''
+            displayName: data.displayName || data.name || '',
+            phoneNumber: data.phoneNumber || ''
           };
         });
         setUsersMap(mapping);
@@ -251,14 +252,15 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       'CREATEDAT': 'createdAt'
     };
 
-    if (col === 'COMPLETIONTOKENS+PROMPTTOKENS') {
+    if (col === 'TOTALTOKENS') {
       const prompt = Number(doc.promptTokens || 0);
       const completion = Number(doc.completionTokens || 0);
       return prompt + completion;
     }
 
     if (col === 'MAIL') {
-      return usersMap[doc.userId]?.email || doc.userEmail || '-';
+      const uInfo = usersMap[doc.userId];
+      return uInfo?.email || uInfo?.phoneNumber || doc.userEmail || '-';
     }
 
     const dbKey = fieldMapping[col] || col;
@@ -437,7 +439,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'MODELNAME',
         'PROMPTTOKENS',
         'COMPLETIONTOKENS',
-        'COMPLETIONTOKENS+PROMPTTOKENS',
+        'TOTALTOKENS',
         'LATENCYMS',
         'CREATEDAT'
       ];
@@ -453,6 +455,30 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   };
 
   const columns = getColumns();
+
+  const getTelemetryStats = () => {
+    if (selectedCollection !== 'ai_telemetry' || sortedAndFilteredDocs.length === 0) {
+      return null;
+    }
+    let totalPrompt = 0;
+    let totalCompletion = 0;
+    let totalCombined = 0;
+    sortedAndFilteredDocs.forEach(doc => {
+      const prompt = Number(doc.promptTokens || 0);
+      const completion = Number(doc.completionTokens || 0);
+      totalPrompt += prompt;
+      totalCompletion += completion;
+      totalCombined += (prompt + completion);
+    });
+    const count = sortedAndFilteredDocs.length;
+    return {
+      avgPrompt: Math.round(totalPrompt / count),
+      avgCompletion: Math.round(totalCompletion / count),
+      avgTotal: Math.round(totalCombined / count)
+    };
+  };
+
+  const stats = getTelemetryStats();
 
   return (
     <div className="space-y-6">
@@ -478,6 +504,24 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           </button>
         </div>
       </div>
+
+      {/* Telemetry Stats Widgets */}
+      {selectedCollection === 'ai_telemetry' && stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Prompt Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgPrompt}</p>
+          </div>
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Completion Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgCompletion}</p>
+          </div>
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Total Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgTotal}</p>
+          </div>
+        </div>
+      )}
 
       {/* Control Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
