@@ -257,6 +257,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return prompt + completion;
     }
 
+    if (col === 'MAIL') {
+      return usersMap[doc.userId]?.email || doc.userEmail || '-';
+    }
+
     const dbKey = fieldMapping[col] || col;
     return doc[dbKey];
   };
@@ -429,8 +433,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
     if (selectedCollection === 'ai_telemetry') {
       return [
-        'ID',
-        'USERID',
+        'MAIL',
         'MODELNAME',
         'PROMPTTOKENS',
         'COMPLETIONTOKENS',
