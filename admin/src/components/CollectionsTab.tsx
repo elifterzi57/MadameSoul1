@@ -239,6 +239,28 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return doc[dbKey];
   };
 
+  // Helper to get value of ai_telemetry fields mapped
+  const getTelemetryValue = (doc: any, col: string): any => {
+    const fieldMapping: Record<string, string> = {
+      'ID': 'id',
+      'USERID': 'userId',
+      'MODELNAME': 'modelName',
+      'PROMPTTOKENS': 'promptTokens',
+      'COMPLETIONTOKENS': 'completionTokens',
+      'LATENCYMS': 'latencyMs',
+      'CREATEDAT': 'createdAt'
+    };
+
+    if (col === 'COMPLETIONTOKENS+PROMPTTOKENS') {
+      const prompt = Number(doc.promptTokens || 0);
+      const completion = Number(doc.completionTokens || 0);
+      return prompt + completion;
+    }
+
+    const dbKey = fieldMapping[col] || col;
+    return doc[dbKey];
+  };
+
   // Sort logic (sorting dynamically by selected sortByField)
   const getSortedDocs = (docs: any[]) => {
     if (!sortByField) return docs;
@@ -255,6 +277,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       } else if (selectedCollection === 'ai_feedback') {
         aVal = getFeedbackValue(a, sortByField);
         bVal = getFeedbackValue(b, sortByField);
+      } else if (selectedCollection === 'ai_telemetry') {
+        aVal = getTelemetryValue(a, sortByField);
+        bVal = getTelemetryValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -318,6 +343,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           val = renderValue(getUserValue(doc, col));
         } else if (selectedCollection === 'ai_feedback') {
           val = renderValue(getFeedbackValue(doc, col));
+        } else if (selectedCollection === 'ai_telemetry') {
+          val = renderValue(getTelemetryValue(doc, col));
         } else {
           val = renderValue(doc[col]);
         }
@@ -398,6 +425,18 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'TRANSACTIONID',
         'CREATEDAT',
         'COMMENT'
+      ];
+    }
+    if (selectedCollection === 'ai_telemetry') {
+      return [
+        'ID',
+        'USERID',
+        'MODELNAME',
+        'PROMPTTOKENS',
+        'COMPLETIONTOKENS',
+        'COMPLETIONTOKENS+PROMPTTOKENS',
+        'LATENCYMS',
+        'CREATEDAT'
       ];
     }
     const cols = new Set<string>();
@@ -530,6 +569,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getUserValue(doc, col))
                           : selectedCollection === 'ai_feedback'
                           ? renderValue(getFeedbackValue(doc, col))
+                          : selectedCollection === 'ai_telemetry'
+                          ? renderValue(getTelemetryValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}
