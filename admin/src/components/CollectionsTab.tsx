@@ -436,12 +436,12 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (selectedCollection === 'ai_telemetry') {
       return [
         'MAIL',
+        'CREATEDAT',
         'MODELNAME',
         'PROMPTTOKENS',
         'COMPLETIONTOKENS',
         'TOTALTOKENS',
-        'LATENCYMS',
-        'CREATEDAT'
+        'LATENCYMS'
       ];
     }
     const cols = new Set<string>();
