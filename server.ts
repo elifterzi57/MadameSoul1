@@ -1071,6 +1071,64 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }
   });
 
+  // Verify checkout session fallback for slow webhooks
+  app.post("/api/verify-checkout-session", authenticate, async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+
+      const attemptDoc = await adminDb.collection("checkout_attempts").doc(sessionId).get();
+      if (!attemptDoc.exists) {
+        return res.status(404).json({ error: "Checkout session not found" });
+      }
+
+      const attemptData = attemptDoc.data()!;
+      const uid = req.user.uid || req.user.user_id || req.user.sub;
+      if (attemptData.userId !== uid) {
+        return res.status(403).json({ error: "Forbidden: Checkout attempt does not belong to user" });
+      }
+
+      if (attemptData.status === "completed") {
+        return res.json({ status: "success", alreadyCompleted: true });
+      }
+
+      if (stripe) {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (session.payment_status === "paid") {
+          let receiptUrl = "https://stripe.com/mock-receipt";
+          let invoiceId = session.invoice as string || "mock_invoice_" + Date.now();
+          
+          try {
+            const invoiceObj: any = await stripe.invoices.retrieve(invoiceId);
+            receiptUrl = invoiceObj.hosted_invoice_url || receiptUrl;
+            if (invoiceObj.charge) {
+              const chargeObj = await stripe.charges.retrieve(invoiceObj.charge as string);
+              receiptUrl = chargeObj.receipt_url || receiptUrl;
+            }
+          } catch (err) {
+            console.error("[Server] Error retrieving Stripe invoice/charge details in verification:", err);
+          }
+
+          const success = await completePayment(sessionId, invoiceId, receiptUrl);
+          if (success) {
+            return res.json({ status: "success", completedNow: true });
+          } else {
+            return res.status(500).json({ error: "Failed to complete payment during verification" });
+          }
+        } else {
+          return res.json({ status: "pending", message: "Stripe session payment status is not paid" });
+        }
+      } else {
+        return res.status(400).json({ error: "Stripe is not configured" });
+      }
+    } catch (err: any) {
+      await logServerError(err, "verify-checkout-session", req.user?.uid);
+      res.status(500).json({ error: err.message || "Failed to verify checkout session" });
+    }
+  });
+
   // Dynamic Ads Configuration Interceptor (MS-163)
   app.get("/ads/ads_config.json", async (req: any, res: any) => {
     try {

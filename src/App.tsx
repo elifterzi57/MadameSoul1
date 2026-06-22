@@ -640,11 +640,12 @@ function AppContent() {
       // Funnel Analytics: purchase_complete (MS-134)
       logAnalyticsEvent('purchase_complete', { language: userInfo.language });
 
-      if (isMock && sessionId && user) {
-        const completeMockPayment = async () => {
+      if (sessionId && user) {
+        const verifyAndComplete = async () => {
           try {
             const token = await user.getIdToken();
-            const res = await fetch('/api/complete-mock-payment', {
+            const endpoint = isMock ? '/api/complete-mock-payment' : '/api/verify-checkout-session';
+            const res = await fetch(endpoint, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -658,11 +659,11 @@ function AppContent() {
               showToast(t('notification.paymentError'), 'error');
             }
           } catch (err) {
-            console.error("Error completing mock payment:", err);
-            showToast("Mock payment validation failed", 'error');
+            console.error("Error verifying payment:", err);
+            showToast(t('notification.paymentError'), 'error');
           }
         };
-        completeMockPayment();
+        verifyAndComplete();
       } else {
         showToast(t('notification.paymentSuccess'), 'success');
       }
