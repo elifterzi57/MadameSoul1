@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
 import { DollarSign, ShoppingBag, TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 
@@ -9,7 +9,9 @@ interface FinanceTabProps {
 
 export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) => {
   const [sales, setSales] = useState<any[]>([]);
+  const [pendingAttempts, setPendingAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Computed metrics
@@ -46,11 +48,58 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       setTotalSalesCount(salesData.length);
       setTotalRevenue(totalAmount * 1.5); // 1.50 USD per Moon as a realistic metric mapping
       setAvgSaleValue(salesData.length > 0 ? (totalAmount * 1.5) / salesData.length : 0);
+
+      // Query pending checkout attempts
+      const attRef = collection(db, 'checkout_attempts');
+      const attSnap = await getDocs(attRef);
+      const pending: any[] = [];
+      attSnap.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.status === 'pending') {
+          pending.push({ id: docSnap.id, ...data });
+        }
+      });
+      // Sort pending in-memory (descending createdAt)
+      pending.sort((a, b) => {
+        const aTime = a.createdAt?.seconds || 0;
+        const bTime = b.createdAt?.seconds || 0;
+        return bTime - aTime;
+      });
+      setPendingAttempts(pending);
+
     } catch (err: any) {
       console.error(err);
       setError(`Finansal veriler çekilirken hata oluştu: ${err.message || err}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApproveSession = async (sessionId: string) => {
+    if (!auth.currentUser) return;
+    setActionLoading(sessionId);
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/api/admin/approve-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ sessionId })
+      });
+      if (res.ok) {
+        alert("Ödeme başarıyla manuel olarak onaylandı!");
+        fetchSalesData();
+      } else {
+        const errData = await res.json();
+        alert(`Onaylama başarısız oldu: ${errData.error || 'Bilinmeyen hata'}`);
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert(`Hata oluştu: ${err.message || err}`);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -142,6 +191,57 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Pending Checkout Attempts */}
+      <div className="space-y-4">
+        <h3 className="font-serif text-xl text-[#ecd8a6]">Bekleyen Ödeme İstekleri (Pending)</h3>
+        {loading ? (
+          <div className="flex h-32 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
+            <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
+          </div>
+        ) : pendingAttempts.length === 0 ? (
+          <div className="flex h-20 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-xs">
+            Bekleyen (pending) ödeme isteği bulunmamaktadır.
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-[#ecd8a6]/80">
+                <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
+                  <tr>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Tarih</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Oturum ID (Session ID)</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Kullanıcı (UID)</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Moon Miktarı</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Fiyat</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#ecd8a6]/10">
+                  {pendingAttempts.map((attempt, idx) => (
+                    <tr key={attempt.id || idx} className="hover:bg-purple-950/10 transition">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(attempt)}</td>
+                      <td className="px-6 py-4 font-mono text-xs max-w-[150px] truncate">{attempt.id}</td>
+                      <td className="px-6 py-4 font-mono text-xs">{attempt.userId}</td>
+                      <td className="px-6 py-4 font-bold text-amber-300">{attempt.amount} Moon</td>
+                      <td className="px-6 py-4 text-xs font-semibold">${attempt.price}</td>
+                      <td className="px-6 py-4">
+                        <button
+                          disabled={actionLoading !== null}
+                          onClick={() => handleApproveSession(attempt.id)}
+                          className="rounded-lg bg-green-900/40 border border-green-700/50 px-3 py-1 hover:bg-green-900/60 transition text-xs font-semibold text-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {actionLoading === attempt.id ? 'Onaylanıyor...' : 'Onayla'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

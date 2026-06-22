@@ -1129,6 +1129,39 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }
   });
 
+  // Admin Manual Approve Checkout Session
+  app.post("/api/admin/approve-checkout-session", authenticate, requireRole(['admin', 'employee']), async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+
+      const attemptDoc = await adminDb.collection("checkout_attempts").doc(sessionId).get();
+      if (!attemptDoc.exists) {
+        return res.status(404).json({ error: "Checkout session not found" });
+      }
+
+      const attemptData = attemptDoc.data()!;
+      if (attemptData.status === "completed") {
+        return res.status(400).json({ error: "Checkout session is already completed" });
+      }
+
+      const invoiceId = attemptData.stripeInvoiceId || "manual_approved_invoice_" + Date.now();
+      const receiptUrl = attemptData.stripeReceiptUrl || "https://stripe.com/mock-receipt";
+
+      const success = await completePayment(sessionId, invoiceId, receiptUrl);
+      if (success) {
+        res.json({ status: "success" });
+      } else {
+        res.status(500).json({ error: "Failed to complete payment" });
+      }
+    } catch (err: any) {
+      await logServerError(err, "approve-checkout-session", req.user?.uid);
+      res.status(500).json({ error: err.message || "Failed to approve checkout session" });
+    }
+  });
+
   // Dynamic Ads Configuration Interceptor (MS-163)
   app.get("/ads/ads_config.json", async (req: any, res: any) => {
     try {
