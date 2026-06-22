@@ -34,38 +34,44 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
       const qSnap = await getDocs(q);
       const salesData: any[] = [];
-      let totalAmount = 0;
-
       qSnap.forEach((docSnap) => {
         const data = docSnap.data();
         salesData.push({ id: docSnap.id, ...data });
-        // Assume amount is the number of Moon credits, lets map to a nominal dollar amount e.g. 1 Moon = $2.00
-        const moonAmount = Math.abs(data.amount || 0);
-        totalAmount += moonAmount;
       });
 
       setSales(salesData);
-      setTotalSalesCount(salesData.length);
-      setTotalRevenue(totalAmount * 1.5); // 1.50 USD per Moon as a realistic metric mapping
-      setAvgSaleValue(salesData.length > 0 ? (totalAmount * 1.5) / salesData.length : 0);
 
-      // Fetch pending attempts in memory
+      // Fetch all checkout_attempts to group by pending vs completed without index issues
       const attemptsRef = collection(db, 'checkout_attempts');
-      const qAttempts = query(attemptsRef, where('status', '==', 'pending'));
-      const aSnap = await getDocs(qAttempts);
-      const attemptsData: any[] = [];
+      const aSnap = await getDocs(attemptsRef);
+      const pendingData: any[] = [];
+      const completedData: any[] = [];
+      let totalAmountUSD = 0;
+
       aSnap.forEach((docSnap) => {
-        attemptsData.push({ id: docSnap.id, ...docSnap.data() });
+        const data = docSnap.data();
+        const docWithId = { id: docSnap.id, ...data };
+        if (data.status === 'pending') {
+          pendingData.push(docWithId);
+        } else if (data.status === 'completed') {
+          completedData.push(docWithId);
+          totalAmountUSD += Number(data.price || 0);
+        }
       });
 
-      // Sort by createdAt desc in-memory
-      attemptsData.sort((a, b) => {
+      // Sort pending attempts by createdAt desc in-memory
+      pendingData.sort((a, b) => {
         const aTime = a.createdAt?.seconds || 0;
         const bTime = b.createdAt?.seconds || 0;
         return bTime - aTime;
       });
 
-      setPendingAttempts(attemptsData);
+      setPendingAttempts(pendingData);
+
+      // Set actual completed metrics
+      setTotalSalesCount(completedData.length);
+      setTotalRevenue(totalAmountUSD);
+      setAvgSaleValue(completedData.length > 0 ? totalAmountUSD / completedData.length : 0);
     } catch (err: any) {
       console.error(err);
       setError(`Finansal veriler çekilirken hata oluştu: ${err.message || err}`);
@@ -141,7 +147,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
-            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Toplam Tahmini Ciro</span>
+            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Toplam Ciro (Completed)</span>
             <h3 className="mt-2 font-serif text-3xl text-green-400 font-bold">{formatCurrency(totalRevenue)}</h3>
           </div>
           <div className="rounded-full bg-green-500/10 border border-green-500/30 p-3 text-green-400">
