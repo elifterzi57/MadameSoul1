@@ -12,7 +12,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string }>>({});
+  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string; phoneNumber?: string }>>({});
   const [moonsMap, setMoonsMap] = useState<Record<string, any>>({});
   
   // Filters & Sorting state
@@ -25,12 +25,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     const fetchUsersMap = async () => {
       try {
         const usersSnap = await getDocs(collection(db, 'users'));
-        const mapping: Record<string, { email: string; displayName?: string }> = {};
+        const mapping: Record<string, { email: string; displayName?: string; phoneNumber?: string }> = {};
         usersSnap.forEach((docSnap) => {
           const data = docSnap.data();
           mapping[docSnap.id] = {
             email: data.email || '',
-            displayName: data.displayName || data.name || ''
+            displayName: data.displayName || data.name || '',
+            phoneNumber: data.phoneNumber || ''
           };
         });
         setUsersMap(mapping);
@@ -239,6 +240,33 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return doc[dbKey];
   };
 
+  // Helper to get value of ai_telemetry fields mapped
+  const getTelemetryValue = (doc: any, col: string): any => {
+    const fieldMapping: Record<string, string> = {
+      'ID': 'id',
+      'USERID': 'userId',
+      'MODELNAME': 'modelName',
+      'PROMPTTOKENS': 'promptTokens',
+      'COMPLETIONTOKENS': 'completionTokens',
+      'LATENCYMS': 'latencyMs',
+      'CREATEDAT': 'createdAt'
+    };
+
+    if (col === 'TOTALTOKENS') {
+      const prompt = Number(doc.promptTokens || 0);
+      const completion = Number(doc.completionTokens || 0);
+      return prompt + completion;
+    }
+
+    if (col === 'MAIL') {
+      const uInfo = usersMap[doc.userId];
+      return uInfo?.email || uInfo?.phoneNumber || doc.userEmail || '-';
+    }
+
+    const dbKey = fieldMapping[col] || col;
+    return doc[dbKey];
+  };
+
   // Sort logic (sorting dynamically by selected sortByField)
   const getSortedDocs = (docs: any[]) => {
     if (!sortByField) return docs;
@@ -255,6 +283,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       } else if (selectedCollection === 'ai_feedback') {
         aVal = getFeedbackValue(a, sortByField);
         bVal = getFeedbackValue(b, sortByField);
+      } else if (selectedCollection === 'ai_telemetry') {
+        aVal = getTelemetryValue(a, sortByField);
+        bVal = getTelemetryValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -318,6 +349,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           val = renderValue(getUserValue(doc, col));
         } else if (selectedCollection === 'ai_feedback') {
           val = renderValue(getFeedbackValue(doc, col));
+        } else if (selectedCollection === 'ai_telemetry') {
+          val = renderValue(getTelemetryValue(doc, col));
         } else {
           val = renderValue(doc[col]);
         }
@@ -400,6 +433,17 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'COMMENT'
       ];
     }
+    if (selectedCollection === 'ai_telemetry') {
+      return [
+        'MAIL',
+        'CREATEDAT',
+        'MODELNAME',
+        'PROMPTTOKENS',
+        'COMPLETIONTOKENS',
+        'TOTALTOKENS',
+        'LATENCYMS'
+      ];
+    }
     const cols = new Set<string>();
     cols.add('id'); // always show id first
     sortedAndFilteredDocs.forEach(doc => {
@@ -411,6 +455,30 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   };
 
   const columns = getColumns();
+
+  const getTelemetryStats = () => {
+    if (selectedCollection !== 'ai_telemetry' || sortedAndFilteredDocs.length === 0) {
+      return null;
+    }
+    let totalPrompt = 0;
+    let totalCompletion = 0;
+    let totalCombined = 0;
+    sortedAndFilteredDocs.forEach(doc => {
+      const prompt = Number(doc.promptTokens || 0);
+      const completion = Number(doc.completionTokens || 0);
+      totalPrompt += prompt;
+      totalCompletion += completion;
+      totalCombined += (prompt + completion);
+    });
+    const count = sortedAndFilteredDocs.length;
+    return {
+      avgPrompt: Math.round(totalPrompt / count),
+      avgCompletion: Math.round(totalCompletion / count),
+      avgTotal: Math.round(totalCombined / count)
+    };
+  };
+
+  const stats = getTelemetryStats();
 
   return (
     <div className="space-y-6">
@@ -436,6 +504,24 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           </button>
         </div>
       </div>
+
+      {/* Telemetry Stats Widgets */}
+      {selectedCollection === 'ai_telemetry' && stats && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Prompt Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgPrompt}</p>
+          </div>
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Completion Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgCompletion}</p>
+          </div>
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Total Tokens</p>
+            <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgTotal}</p>
+          </div>
+        </div>
+      )}
 
       {/* Control Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
@@ -530,6 +616,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getUserValue(doc, col))
                           : selectedCollection === 'ai_feedback'
                           ? renderValue(getFeedbackValue(doc, col))
+                          : selectedCollection === 'ai_telemetry'
+                          ? renderValue(getTelemetryValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}

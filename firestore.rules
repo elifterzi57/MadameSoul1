@@ -235,7 +235,7 @@ service cloud.firestore {
     }
 
     match /checkout_attempts/{sessionId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
       allow create, update: if false;
     }
 
@@ -247,7 +247,7 @@ service cloud.firestore {
     }
 
     match /ai_telemetry/{telemetryId} {
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
       allow write: if false;
     }
 
