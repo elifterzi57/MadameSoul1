@@ -254,4 +254,43 @@ describe('Firestore Security Rules', () => {
       await assertFails(deleteDoc(ref));
     });
   });
+
+  describe('/ai_telemetry/{telemetryId} rules', () => {
+    it('should allow user to read their own telemetry logs', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const adminDb = context.firestore();
+        await setDoc(doc(adminDb, 'ai_telemetry/tel_1'), { userId: 'user_1', promptTokens: 10 });
+      });
+
+      const db = getAuthenticatedDb('user_1');
+      await assertSucceeds(getDoc(doc(db, 'ai_telemetry/tel_1')));
+    });
+
+    it('should deny user from reading another users telemetry logs', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const adminDb = context.firestore();
+        await setDoc(doc(adminDb, 'ai_telemetry/tel_1'), { userId: 'user_2', promptTokens: 10 });
+      });
+
+      const db = getAuthenticatedDb('user_1');
+      await assertFails(getDoc(doc(db, 'ai_telemetry/tel_1')));
+    });
+
+    it('should allow employee/admin to read any telemetry logs', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const adminDb = context.firestore();
+        await setDoc(doc(adminDb, 'ai_telemetry/tel_1'), { userId: 'user_1', promptTokens: 10 });
+      });
+
+      const empDb = getAuthenticatedDb('emp_1', 'employee');
+      const adminDb = getAuthenticatedDb('admin_1', 'admin');
+      await assertSucceeds(getDoc(doc(empDb, 'ai_telemetry/tel_1')));
+      await assertSucceeds(getDoc(doc(adminDb, 'ai_telemetry/tel_1')));
+    });
+
+    it('should deny writing to telemetry logs from client side', async () => {
+      const db = getAuthenticatedDb('user_1');
+      await assertFails(setDoc(doc(db, 'ai_telemetry/tel_1'), { userId: 'user_1', promptTokens: 10 }));
+    });
+  });
 });
