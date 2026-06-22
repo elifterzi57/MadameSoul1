@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **129** | Açık: **0** | Tamamlanan: **125** | İptal Edilen: **4**
+Toplam Bilet: **130** | Açık: **0** | Tamamlanan: **126** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-298**](#-ms-298) | Feature / Dev | Stripe Webhook Gecikmeleri İçin İstemci Tarafı Doğrulama ve Fallback Altyapısı | Yüksek | Stripe ödemesi sonrası webhook gecikirse veya başarısız olursa, kullanıcının mağdur olmaması için geri dönüş sayfasında (/api/verify-checkout-session) fallback doğrulama ve bakiye yükleme mekanizması kuruldu. | Elif |
 | [**MS-297**](#-ms-297) | Feature / UX / UI / Dev | Admin Paneli AI Telemetri İyileştirmeleri | Orta | E-posta bulunmayan kullanıcılarda telefon numarası fallback desteği sağlandı. Telemetri listesinin üstüne ortalama prompt, completion ve total token gösterge kartları eklendi. Toplam sütunu TOTALTOKENS olarak isimlendirilip CREATEDAT sütunu MAIL'in yanına taşındı. | Elif |
 | [**MS-296**](#-ms-296) | Feature / Dev | Admin Paneli AI Telemetri Koleksiyonunun Eklenmesi ve Yetkilendirme Düzeltmesi | Yüksek | Admin panelinde AI Telemetri koleksiyonu listelendi, completionTokens+promptTokens sütunu eklendi ve Firestore rules yetki hatası giderildi. | Elif |
 | [**MS-295**](#-ms-295) | Feature / UX / UI | Mağaza Ekranında Premium Avantajların Gösterilmesi ve Günlük Fallarda Günlük Kilidi | Yüksek | Mağaza modalına premium moon avantajları eklendi. Günlük fallarda özel başlık ve yansıma notları yazma alanı asma kilit kartıyla kilitlendi. | Elif |
@@ -2827,6 +2828,25 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   2. Tablonun üzerinde Ortalama Prompt, Ortalama Completion ve Ortalama Total Token değerlerini dinamik gösteren kartlar yer almalıdır.
   3. `TOTALTOKENS` adında birleştirilmiş token sütunu olmalı ve sıralama düzgün çalışmalıdır.
   4. `CREATEDAT` sütunu `MAIL` sütununun sağında yer almalıdır.
+
+---
+
+---
+
+### 📋 MS-298: Stripe Webhook Gecikmeleri İçin İstemci Tarafı Doğrulama ve Fallback Altyapısı (Feature / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Done)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Client App / Backend / Stripe / Checkout
+* **Açıklama:**  
+  Canlı ortamda (production) veya test ortamlarında Stripe webhook'larının yavaş çalışması, kaybolması ya da gecikmesi durumunda; kullanıcının başarılı ödeme ekranına yönlendiğinde moons yüklenmeme sorunuyla karşılaşmaması için istemci tarafına güvenli doğrulama fallback'i eklenmiştir.
+* **Kabul Kriterleri:**
+  1. İstemci, Stripe'tan başarıyla döndüğünde (`payment=success` ve `session_id` mevcut olduğunda) backend üzerindeki `/api/verify-checkout-session` endpoint'ini tetiklemelidir.
+  2. Backend, checkout deneme kaydı durumunu kontrol etmeli; eğer webhook tarafından henüz tamamlanmadıysa, Stripe API'den oturum durumunu sorgulayıp (`paid`) işlemi güvenli bir şekilde tamamlamalı ve moons yükleme işlemini tetiklemelidir.
+  3. Webhook sonradan gelse dahi mükerrer yükleme olmaması için işlem idempotency (completed durumu kontrolü) korunmalıdır.
+  4. Değişiklikler başarılı bir şekilde derlenmeli ve deploy edilmelidir.
 
 ---
 
