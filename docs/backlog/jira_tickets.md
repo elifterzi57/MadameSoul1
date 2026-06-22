@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **128** | Açık: **0** | Tamamlanan: **124** | İptal Edilen: **4**
+Toplam Bilet: **129** | Açık: **0** | Tamamlanan: **125** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -28,6 +28,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-297**](#-ms-297) | Feature / UX / UI / Dev | Admin Paneli AI Telemetri İyileştirmeleri | Orta | E-posta bulunmayan kullanıcılarda telefon numarası fallback desteği sağlandı. Telemetri listesinin üstüne ortalama prompt, completion ve total token gösterge kartları eklendi. Toplam sütunu TOTALTOKENS olarak isimlendirilip CREATEDAT sütunu MAIL'in yanına taşındı. | Elif |
 | [**MS-296**](#-ms-296) | Feature / Dev | Admin Paneli AI Telemetri Koleksiyonunun Eklenmesi ve Yetkilendirme Düzeltmesi | Yüksek | Admin panelinde AI Telemetri koleksiyonu listelendi, completionTokens+promptTokens sütunu eklendi ve Firestore rules yetki hatası giderildi. | Elif |
 | [**MS-295**](#-ms-295) | Feature / UX / UI | Mağaza Ekranında Premium Avantajların Gösterilmesi ve Günlük Fallarda Günlük Kilidi | Yüksek | Mağaza modalına premium moon avantajları eklendi. Günlük fallarda özel başlık ve yansıma notları yazma alanı asma kilit kartıyla kilitlendi. | Elif |
 | [**MS-294**](#-ms-294) | Feature / UX / UI | Premium ve Günlük Açılımların Ayrıştırılması ve PDF İndirme Kısıtlaması | Yüksek | Günlük fallarda PDF indirme kısıtlandı, geçmişte premium fallar için altın parıltı (Sparkles) simgesi eklendi. | Elif |
@@ -2807,6 +2808,25 @@ Eğer bir kullanıcı 50'den fazla "buy" veya "bonus" işlemi yapmışsa, in-mem
   2. Listede `completionTokens+promptTokens` toplamını gösteren bir sütun hesaplanıp sunulmalıdır.
   3. Admin ve Employee rolleri tüm telemetri kayıtlarını görebilmeli, standard kullanıcılar ise sadece kendi kayıtlarına erişebilmelidir.
   4. Değişiklikler başarılı bir şekilde derlenmeli ve deploy edilmelidir.
+
+---
+
+---
+
+### 📋 MS-297: Admin Paneli AI Telemetri İyileştirmeleri (Feature / UX / UI / Dev)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Done)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / CollectionsTab / UX
+* **Açıklama:**  
+  AI Telemetri listeleme arayüzünün daha kullanışlı olması amacıyla; kullanıcı e-postası bulunmadığında telefon numarası fallback desteğinin eklenmesi, sayfa üstüne ortalama token gösterge kartlarının yerleştirilmesi, toplam token sütununun `TOTALTOKENS` olarak adlandırılması ve `CREATEDAT` sütununun `MAIL` sütundan hemen sonraya konumlandırılması.
+* **Kabul Kriterleri:**
+  1. E-posta adresi olmayan kullanıcılarda telemetri tablosunun `MAIL` sütununda telefon numarası gösterilmelidir.
+  2. Tablonun üzerinde Ortalama Prompt, Ortalama Completion ve Ortalama Total Token değerlerini dinamik gösteren kartlar yer almalıdır.
+  3. `TOTALTOKENS` adında birleştirilmiş token sütunu olmalı ve sıralama düzgün çalışmalıdır.
+  4. `CREATEDAT` sütunu `MAIL` sütununun sağında yer almalıdır.
 
 ---
 
