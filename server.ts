@@ -277,8 +277,7 @@ async function startServer() {
 
 
 
-  // Helper function to complete payment
-  async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string) {
+  async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string, method = "webhook", operatorUid: string | null = null) {
     let attemptData: any = null;
     let userEmail: string | null = null;
     try {
@@ -310,6 +309,8 @@ async function startServer() {
         status: "completed",
         stripeInvoiceId: invoiceId || null,
         stripeReceiptUrl: receiptUrl || null,
+        completedMethod: method,
+        approvedBy: operatorUid || null,
         completedAt: admin.firestore.FieldValue.serverTimestamp()
       });
       
@@ -1476,7 +1477,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
         return res.status(400).json({ error: "Session ID is required" });
       }
       
-      const success = await completePayment(sessionId, "manual_admin_invoice_" + Date.now(), "https://stripe.com/mock-receipt");
+      const success = await completePayment(sessionId, "manual_admin_invoice_" + Date.now(), "https://stripe.com/mock-receipt", "manual", req.user?.uid);
       if (success) {
         try {
           // Log administrative audit trail

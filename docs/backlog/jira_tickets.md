@@ -4,14 +4,14 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **131** | Açık: **0** | Tamamlanan: **127** | İptal Edilen: **4**
+Toplam Bilet: **135** | Açık: **1** | Tamamlanan: **130** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
-*Şu anda açık bilet bulunmamaktadır.*
-
-
+| Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
+| [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | Open | Elif |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 
 
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
@@ -28,6 +28,9 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-302**](#-ms-302) | Feature / UX / UI | Admin Manuel Onaylama Pop-up Pencerelerinde Kullanıcı İletişim Bilgisi ve Tam Session ID Gösterimi | Yüksek | Onaylama ve başarı modal pencerelerinde UID yerine mail/telefon bilgisi getirildi. Session ID'nin sonunun kesilmemesi için break-all kelime kaydırmalı tam genişlikte blok tasarımı entegre edildi. | Elif |
+| [**MS-301**](#-ms-301) | Feature / Dev / DB | Stripe Ödemelerinde Otomatik Webhook ve Manuel Admin Onay Geçişlerinin Ayırt Edilmesi | Yüksek | checkout_attempts koleksiyonuna completedMethod (webhook/manual) ve onaylayan approvedBy alanları eklendi. "Son Stripe İşlemleri" tablosunun statü sütunu bu duruma göre Auto (Webhook) veya Manual (Admin) rozetlerini gösterecek şekilde uyarlandı. | Elif |
+| [**MS-300**](#-ms-300) | Feature / UX / UI | Stripe Manuel Ödeme Onaylama Pencereleri İçin Özel Glassmorphic Pop-up Tasarımı | Yüksek | Manuel onaylama akışında kullanılan yerel prompt/alert pencereleri tamamen kaldırılarak yerine Sally'nin göz alıcı mor-altın cam-efektli (glassmorphism) onaylama, yükleniyor, başarılı ve başarısız durum modalları eklendi. | Elif |
 | [**MS-299**](#-ms-299) | Feature / UX / UI / Dev | Admin Paneli Stripe Ekranı Bekleyen İşlemler ve Manuel Onaylama Butonu | Yüksek | Admin panelinde Stripe Finans sekmesine bekleyen (pending) ödemelerin listelenmesi ve bu ödemeleri manuel olarak onaylayıp bakiyeyi yükleyen "Manuel Onayla" butonu eklendi. | Elif |
 | [**MS-298**](#-ms-298) | Feature / Dev | Stripe Webhook Gecikmeleri İçin İstemci Tarafı Doğrulama ve Fallback Altyapısı | Yüksek | Stripe ödemesi sonrası webhook gecikirse veya başarısız olursa, kullanıcının mağdur olmaması için geri dönüş sayfasında (/api/verify-checkout-session) fallback doğrulama ve bakiye yükleme mekanizması kuruldu. | Elif |
 | [**MS-297**](#-ms-297) | Feature / UX / UI / Dev | Admin Paneli AI Telemetri İyileştirmeleri | Orta | E-posta bulunmayan kullanıcılarda telefon numarası fallback desteği sağlandı. Telemetri listesinin üstüne ortalama prompt, completion ve total token gösterge kartları eklendi. Toplam sütunu TOTALTOKENS olarak isimlendirilip CREATEDAT sütunu MAIL'in yanına taşındı. | Elif |
