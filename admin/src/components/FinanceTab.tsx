@@ -11,8 +11,8 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const [sales, setSales] = useState<any[]>([]);
   const [pendingAttempts, setPendingAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Computed metrics
   const [totalRevenue, setTotalRevenue] = useState(0);
@@ -49,24 +49,23 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       setTotalRevenue(totalAmount * 1.5); // 1.50 USD per Moon as a realistic metric mapping
       setAvgSaleValue(salesData.length > 0 ? (totalAmount * 1.5) / salesData.length : 0);
 
-      // Query pending checkout attempts
-      const attRef = collection(db, 'checkout_attempts');
-      const attSnap = await getDocs(attRef);
-      const pending: any[] = [];
-      attSnap.forEach((docSnap) => {
-        const data = docSnap.data();
-        if (data.status === 'pending') {
-          pending.push({ id: docSnap.id, ...data });
-        }
+      // Fetch pending attempts in memory
+      const attemptsRef = collection(db, 'checkout_attempts');
+      const qAttempts = query(attemptsRef, where('status', '==', 'pending'));
+      const aSnap = await getDocs(qAttempts);
+      const attemptsData: any[] = [];
+      aSnap.forEach((docSnap) => {
+        attemptsData.push({ id: docSnap.id, ...docSnap.data() });
       });
-      // Sort pending in-memory (descending createdAt)
-      pending.sort((a, b) => {
+
+      // Sort by createdAt desc in-memory
+      attemptsData.sort((a, b) => {
         const aTime = a.createdAt?.seconds || 0;
         const bTime = b.createdAt?.seconds || 0;
         return bTime - aTime;
       });
-      setPendingAttempts(pending);
 
+      setPendingAttempts(attemptsData);
     } catch (err: any) {
       console.error(err);
       setError(`Finansal veriler çekilirken hata oluştu: ${err.message || err}`);
@@ -75,31 +74,35 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
     }
   };
 
-  const handleApproveSession = async (sessionId: string) => {
-    if (!auth.currentUser) return;
-    setActionLoading(sessionId);
+  const handleManualApprove = async (sessionId: string) => {
+    if (!window.confirm("Bu ödemeyi manuel olarak onaylamak ve Moon yüklemek istediğinize emin misiniz?")) return;
+    setActionLoadingId(sessionId);
     try {
-      const token = await auth.currentUser.getIdToken();
-      const res = await fetch('/api/admin/approve-checkout-session', {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("Giriş yapmış bir admin bulunamadı.");
+      const idToken = await currentUser.getIdToken(true);
+
+      const response = await fetch('/api/admin/complete-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${idToken}`
         },
         body: JSON.stringify({ sessionId })
       });
-      if (res.ok) {
-        alert("Ödeme başarıyla manuel olarak onaylandı!");
-        fetchSalesData();
-      } else {
-        const errData = await res.json();
-        alert(`Onaylama başarısız oldu: ${errData.error || 'Bilinmeyen hata'}`);
+
+      if (!response.ok) {
+        const resText = await response.text();
+        throw new Error(`Manuel onaylama başarısız oldu: ${resText}`);
       }
+
+      alert("Ödeme manuel olarak onaylandı ve Moon'lar hesaba yüklendi.");
+      fetchSalesData();
     } catch (err: any) {
       console.error(err);
-      alert(`Hata oluştu: ${err.message || err}`);
+      alert(err.message || "Manuel onaylama esnasında hata oluştu.");
     } finally {
-      setActionLoading(null);
+      setActionLoadingId(null);
     }
   };
 
@@ -195,46 +198,46 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         )}
       </div>
 
-      {/* Pending Checkout Attempts */}
+      {/* Pending Transactions List */}
       <div className="space-y-4">
-        <h3 className="font-serif text-xl text-[#ecd8a6]">Bekleyen Ödeme İstekleri (Pending)</h3>
+        <h3 className="font-serif text-xl text-[#ecd8a6]">Bekleyen Ödeme Talepleri (Pending)</h3>
         {loading ? (
           <div className="flex h-32 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
             <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
           </div>
         ) : pendingAttempts.length === 0 ? (
-          <div className="flex h-20 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-xs">
-            Bekleyen (pending) ödeme isteği bulunmamaktadır.
+          <div className="flex h-24 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-xs">
+            Bekleyen/Tamamlanmamış ödeme kaydı bulunmamaktadır.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
+          <div className="overflow-hidden rounded-xl border border-yellow-500/20 bg-[#0e0a1b]/40">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-[#ecd8a6]/80">
                 <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
                   <tr>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Oturum ID (Session)</th>
                     <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Tarih</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Oturum ID (Session ID)</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Kullanıcı (UID)</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Moon Miktarı</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Fiyat</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Kullanıcı Kimliği (UID)</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Satın Alınacak</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Tutar</th>
                     <th className="px-6 py-4 border-b border-[#ecd8a6]/10">İşlem</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
                   {pendingAttempts.map((attempt, idx) => (
-                    <tr key={attempt.id || idx} className="hover:bg-purple-950/10 transition">
-                      <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(attempt)}</td>
+                    <tr key={attempt.id || idx} className="hover:bg-yellow-950/5 transition">
                       <td className="px-6 py-4 font-mono text-xs max-w-[150px] truncate">{attempt.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(attempt)}</td>
                       <td className="px-6 py-4 font-mono text-xs">{attempt.userId}</td>
-                      <td className="px-6 py-4 font-bold text-amber-300">{attempt.amount} Moon</td>
-                      <td className="px-6 py-4 text-xs font-semibold">${attempt.price}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 font-bold text-yellow-500">{attempt.amount} Moon</td>
+                      <td className="px-6 py-4 text-xs font-bold">${attempt.price || '0.00'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <button
-                          disabled={actionLoading !== null}
-                          onClick={() => handleApproveSession(attempt.id)}
-                          className="rounded-lg bg-green-900/40 border border-green-700/50 px-3 py-1 hover:bg-green-900/60 transition text-xs font-semibold text-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={actionLoadingId === attempt.id}
+                          onClick={() => handleManualApprove(attempt.id)}
+                          className="rounded-lg bg-yellow-500/10 border border-yellow-500/30 px-3 py-1 text-xs text-yellow-400 hover:bg-yellow-500/20 transition disabled:opacity-50"
                         >
-                          {actionLoading === attempt.id ? 'Onaylanıyor...' : 'Onayla'}
+                          {actionLoadingId === attempt.id ? 'Yükleniyor...' : 'Manuel Onayla'}
                         </button>
                       </td>
                     </tr>
