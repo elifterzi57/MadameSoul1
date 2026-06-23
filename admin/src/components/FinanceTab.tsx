@@ -358,7 +358,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             {filteredSales.slice(0, 15).reverse().map((sale, idx) => {
               const heightPct = Math.min(100, Math.max(10, ((sale.amount || 1) / 10) * 100));
               return (
-                <div key={sale.id || idx} className="flex-1 flex flex-col items-center group relative cursor-pointer">
+                <div key={sale.id || idx} className="h-full flex-1 flex flex-col justify-end items-center group relative cursor-pointer">
                   {/* Tooltip */}
                   <span className="absolute bottom-full mb-2 bg-[#07040e] border border-[#ecd8a6]/20 px-2 py-1 text-[10px] rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
                     {sale.amount} Moon ({formatCurrency(sale.amount * 1.5)})
