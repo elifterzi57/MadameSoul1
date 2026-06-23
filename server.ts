@@ -1514,8 +1514,14 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           return res.json({ status: "running", message: "Stripe listener is already running" });
         }
         console.log("[Server] Starting local Stripe CLI webhook listener...");
-        stripeListenerProcess = spawn("npx", ["stripe", "listen", "--forward-to", "localhost:3000/api/stripe-webhook"]);
+        stripeListenerProcess = spawn("npx", ["stripe", "listen", "--forward-to", "localhost:3000/api/stripe-webhook"], { shell: true });
         stripeListenerStatus = "running";
+
+        stripeListenerProcess.on("error", (err: any) => {
+          console.error("[Server] Stripe CLI process error:", err);
+          stripeListenerProcess = null;
+          stripeListenerStatus = "stopped";
+        });
 
         stripeListenerProcess.stdout?.on("data", (data: any) => {
           console.log(`[Stripe CLI] ${data}`);
