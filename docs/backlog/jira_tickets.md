@@ -4,15 +4,12 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **135** | Açık: **1** | Tamamlanan: **130** | İptal Edilen: **4**
+Toplam Bilet: **135** | Açık: **0** | Tamamlanan: **131** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
 
-| Bilet ID | Türü | Özet | Öncelik | Durum | Oluşturan (Reporter) |
-| [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | Open | Elif |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-
+*Şu anda açık bilet bulunmamaktadır.*
 
 ### 🚫 İptal Edilen Biletler (Cancelled Tickets)
 Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
@@ -28,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | stripe-cli devDependency olarak kuruldu, login tamamlandı ve stripe listen arka planda başlatılarak elde edilen signing secret .env dosyasına yazıldı. | Elif |
 | [**MS-302**](#-ms-302) | Feature / UX / UI | Admin Manuel Onaylama Pop-up Pencerelerinde Kullanıcı İletişim Bilgisi ve Tam Session ID Gösterimi | Yüksek | Onaylama ve başarı modal pencerelerinde UID yerine mail/telefon bilgisi getirildi. Session ID'nin sonunun kesilmemesi için break-all kelime kaydırmalı tam genişlikte blok tasarımı entegre edildi. | Elif |
 | [**MS-301**](#-ms-301) | Feature / Dev / DB | Stripe Ödemelerinde Otomatik Webhook ve Manuel Admin Onay Geçişlerinin Ayırt Edilmesi | Yüksek | checkout_attempts koleksiyonuna completedMethod (webhook/manual) ve onaylayan approvedBy alanları eklendi. "Son Stripe İşlemleri" tablosunun statü sütunu bu duruma göre Auto (Webhook) veya Manual (Admin) rozetlerini gösterecek şekilde uyarlandı. | Elif |
 | [**MS-300**](#-ms-300) | Feature / UX / UI | Stripe Manuel Ödeme Onaylama Pencereleri İçin Özel Glassmorphic Pop-up Tasarımı | Yüksek | Manuel onaylama akışında kullanılan yerel prompt/alert pencereleri tamamen kaldırılarak yerine Sally'nin göz alıcı mor-altın cam-efektli (glassmorphism) onaylama, yükleniyor, başarılı ve başarısız durum modalları eklendi. | Elif |
