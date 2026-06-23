@@ -1135,6 +1135,68 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }
   });
 
+  // Retrieve and redirect to Stripe receipt page by checkout session ID
+  app.get("/api/payments/receipt/:sessionId", async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.params;
+      if (!stripe) {
+        return res.status(400).json({ error: "Stripe is not configured" });
+      }
+
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session) {
+        return res.status(404).json({ error: "Checkout session not found" });
+      }
+
+      let receiptUrl = null;
+
+      // 1. Try to get from charge if payment intent exists
+      if (session.payment_intent) {
+        const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent as string);
+        if (paymentIntent.latest_charge) {
+          const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string);
+          receiptUrl = charge.receipt_url;
+        }
+      }
+
+      // 2. Fallback to invoice hosted url if charge receipt not found
+      if (!receiptUrl && session.invoice) {
+        const invoice = await stripe.invoices.retrieve(session.invoice as string);
+        receiptUrl = invoice.hosted_invoice_url || invoice.receipt_url;
+      }
+
+      if (receiptUrl) {
+        return res.redirect(receiptUrl);
+      } else {
+        return res.status(404).json({ error: "Receipt URL not found for this session" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to retrieve receipt" });
+    }
+  });
+
+  // Retrieve and redirect to Stripe receipt page by Payment Intent ID (Payment ID)
+  app.get("/api/payments/receipt-by-intent/:paymentIntentId", async (req: any, res: any) => {
+    try {
+      const { paymentIntentId } = req.params;
+      if (!stripe) {
+        return res.status(400).json({ error: "Stripe is not configured" });
+      }
+
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      if (paymentIntent && paymentIntent.latest_charge) {
+        const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string);
+        if (charge.receipt_url) {
+          return res.redirect(charge.receipt_url);
+        }
+      }
+
+      return res.status(404).json({ error: "Receipt URL not found for this Payment Intent" });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to retrieve receipt" });
+    }
+  });
+
   // Dynamic Ads Configuration Interceptor (MS-163)
   app.get("/ads/ads_config.json", async (req: any, res: any) => {
     try {

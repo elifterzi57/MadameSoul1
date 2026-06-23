@@ -1044,9 +1044,11 @@ export const Profile: React.FC<ProfileProps> = ({
                                   {item.amount !== undefined ? (item.amount > 0 ? `+${item.amount}` : item.amount) : '+1'} {userInfo.language === 'tr' ? "İade" : (userInfo.language === 'es' ? "Reembolso" : (userInfo.language === 'fr' ? "Remboursement" : (userInfo.language === 'ko' ? "환불" : (userInfo.language === 'zh' ? "退款" : "Refund"))))}
                                 </span>
                               )}
-                              {item.stripeReceiptUrl && (
+                              {(item.stripeReceiptUrl || (item.idempotencyKey && item.idempotencyKey.startsWith('cs_'))) && (
                                 <a 
-                                  href={item.stripeReceiptUrl}
+                                  href={item.stripeReceiptUrl && item.stripeReceiptUrl !== 'https://stripe.com/mock-receipt' 
+                                    ? item.stripeReceiptUrl 
+                                    : `/api/payments/receipt/${item.idempotencyKey}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"
