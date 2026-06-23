@@ -148,6 +148,7 @@ function AppContent() {
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -1129,6 +1130,8 @@ function AppContent() {
   };
 
   const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
     try {
       if (user) {
         await disablePushNotifications(user.uid);
@@ -1137,6 +1140,8 @@ function AppContent() {
       setShowOnboarding(false);
     } catch (err) {
       console.error("Sign out error:", err);
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -1251,13 +1256,18 @@ function AppContent() {
 
             <button 
               onClick={handleSignOut}
-              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto"
+              disabled={isSigningOut}
+              className={`h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto ${isSigningOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               title="Sign Out"
             >
               <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
                 {t('store.logout')}
               </span>
-              <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {isSigningOut ? (
+                <Loader2 className="w-3.5 h-3.5 sm:w-4 h-4 animate-spin" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              )}
             </button>
           </>
         )}

@@ -68,27 +68,28 @@ export const requestPushNotificationPermission = async (userId: string): Promise
 };
 
 export const disablePushNotifications = async (userId: string): Promise<void> => {
-  try {
-    const messagingInstance = await initMessaging();
-    if (messagingInstance) {
-      try {
-        await deleteToken(messagingInstance);
-      } catch (tokenErr) {
-        console.warn("FCM deleteToken failed or token already deleted:", tokenErr);
-      }
-    }
-  } catch (err) {
-    console.error("Error initializing messaging during disable:", err);
-  }
-
+  // 1. Delete from Firestore first while still authenticated
   try {
     const tokenRef = doc(db, 'user_push_tokens', userId);
     await deleteDoc(tokenRef);
     console.log("FCM Token successfully removed from Firestore.");
   } catch (firestoreErr) {
     console.error("Error deleting FCM token document from Firestore:", firestoreErr);
-    throw firestoreErr;
   }
+
+  // 2. Clear FCM token from client in the background (does not require Firebase Auth)
+  initMessaging().then(async (messagingInstance) => {
+    if (messagingInstance) {
+      try {
+        await deleteToken(messagingInstance);
+        console.log("FCM Token deleted from client registration.");
+      } catch (tokenErr) {
+        console.warn("FCM deleteToken failed or token already deleted:", tokenErr);
+      }
+    }
+  }).catch(err => {
+    console.error("Error initializing messaging during background disable:", err);
+  });
 };
 
 
