@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
-import { DollarSign, ShoppingBag, TrendingUp, RefreshCw, AlertCircle, CheckCircle2, X, Info, ShieldAlert, Loader2 } from 'lucide-react';
+import { DollarSign, ShoppingBag, TrendingUp, RefreshCw, AlertCircle, CheckCircle2, X, Info, ShieldAlert, Loader2, Clock, Calendar, Layers } from 'lucide-react';
 
 interface FinanceTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
@@ -10,6 +10,8 @@ interface FinanceTabProps {
 export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) => {
   const [sales, setSales] = useState<any[]>([]);
   const [pendingAttempts, setPendingAttempts] = useState<any[]>([]);
+  const [completedAttempts, setCompletedAttempts] = useState<any[]>([]);
+  const [period, setPeriod] = useState<'all' | 'daily' | 'weekly' | 'monthly'>('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
@@ -25,11 +27,6 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
   const [stripeListenerActive, setStripeListenerActive] = useState(false);
   const [listenerLoading, setListenerLoading] = useState(false);
-
-  // Computed metrics
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [totalSalesCount, setTotalSalesCount] = useState(0);
-  const [avgSaleValue, setAvgSaleValue] = useState(0);
 
   const fetchSalesData = async () => {
     setLoading(true);
@@ -58,7 +55,6 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       const aSnap = await getDocs(attemptsRef);
       const pendingData: any[] = [];
       const completedData: any[] = [];
-      let totalAmountUSD = 0;
 
       const completedMethodsMap: Record<string, string> = {};
       aSnap.forEach((docSnap) => {
@@ -68,11 +64,11 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           pendingData.push(docWithId);
         } else if (data.status === 'completed') {
           completedData.push(docWithId);
-          totalAmountUSD += Number(data.price || 0);
           completedMethodsMap[docSnap.id] = data.completedMethod || 'webhook';
         }
       });
       setCompletedMethods(completedMethodsMap);
+      setCompletedAttempts(completedData);
 
       // Sort pending attempts by createdAt desc in-memory
       pendingData.sort((a, b) => {
@@ -92,11 +88,6 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         uMap[docSnap.id] = uData.email || uData.phoneNumber || '-';
       });
       setUsersMap(uMap);
-
-      // Set actual completed metrics
-      setTotalSalesCount(completedData.length);
-      setTotalRevenue(totalAmountUSD);
-      setAvgSaleValue(completedData.length > 0 ? totalAmountUSD / completedData.length : 0);
     } catch (err: any) {
       console.error(err);
       setError(`Finansal veriler çekilirken hata oluştu: ${err.message || err}`);
@@ -211,14 +202,92 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
     return new Date(val).toLocaleString('tr-TR');
   };
 
+  const getDocDateObject = (doc: any): Date | null => {
+    const val = doc.createdAt || doc.timestamp || doc.updatedAt;
+    if (!val) return null;
+    if (val.seconds) return new Date(val.seconds * 1000);
+    return new Date(val);
+  };
+
+  // Filter completed attempts, pending attempts, and sales based on the selected period
+  const filteredCompleted = completedAttempts.filter((item) => {
+    if (period === 'all') return true;
+    const itemDate = getDocDateObject(item);
+    if (!itemDate) return false;
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - itemDate.getTime());
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    if (period === 'daily') return diffDays <= 1;
+    if (period === 'weekly') return diffDays <= 7;
+    if (period === 'monthly') return diffDays <= 30;
+    return true;
+  });
+
+  const filteredPending = pendingAttempts.filter((item) => {
+    if (period === 'all') return true;
+    const itemDate = getDocDateObject(item);
+    if (!itemDate) return false;
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - itemDate.getTime());
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    if (period === 'daily') return diffDays <= 1;
+    if (period === 'weekly') return diffDays <= 7;
+    if (period === 'monthly') return diffDays <= 30;
+    return true;
+  });
+
+  const filteredSales = sales.filter((item) => {
+    if (period === 'all') return true;
+    const itemDate = getDocDateObject(item);
+    if (!itemDate) return false;
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - itemDate.getTime());
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    if (period === 'daily') return diffDays <= 1;
+    if (period === 'weekly') return diffDays <= 7;
+    if (period === 'monthly') return diffDays <= 30;
+    return true;
+  });
+
+  // Calculate metrics based on filtered completed attempts
+  const displaySalesCount = filteredCompleted.length;
+  const displayRevenue = filteredCompleted.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const displayAvgSaleValue = displaySalesCount > 0 ? displayRevenue / displaySalesCount : 0;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-[#ecd8a6]/10 pb-6">
         <div>
           <h2 className="font-serif text-3xl text-[#ecd8a6]">Stripe Finans & Satış</h2>
           <p className="text-sm text-[#ecd8a6]/60">Ödeme durumlarını, satın alma işlemlerini ve ciro grafiklerini izleyin.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Period Selector Buttons */}
+          <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
+            {([
+              { key: 'daily', label: 'Bugün', icon: Clock },
+              { key: 'weekly', label: 'Son 7 Gün', icon: Calendar },
+              { key: 'monthly', label: 'Son 30 Gün', icon: Calendar },
+              { key: 'all', label: 'Tümü', icon: Layers }
+            ] as const).map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setPeriod(item.key)}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                    period === item.key
+                      ? 'bg-purple-900/40 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/15'
+                      : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6] hover:bg-purple-950/20'
+                  }`}
+                >
+                  <Icon className="h-3 w-3" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
           {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
             <button
               disabled={listenerLoading}
@@ -249,7 +318,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
             <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Toplam Ciro (Completed)</span>
-            <h3 className="mt-2 font-serif text-3xl text-green-400 font-bold">{formatCurrency(totalRevenue)}</h3>
+            <h3 className="mt-2 font-serif text-3xl text-green-400 font-bold">{formatCurrency(displayRevenue)}</h3>
           </div>
           <div className="rounded-full bg-green-500/10 border border-green-500/30 p-3 text-green-400">
             <DollarSign className="h-6 w-6" />
@@ -259,7 +328,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
             <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Satış Hacmi</span>
-            <h3 className="mt-2 font-serif text-3xl text-[#ecd8a6] font-bold">{totalSalesCount} Adet</h3>
+            <h3 className="mt-2 font-serif text-3xl text-[#ecd8a6] font-bold">{displaySalesCount} Adet</h3>
           </div>
           <div className="rounded-full bg-purple-500/10 border border-purple-500/30 p-3 text-purple-400">
             <ShoppingBag className="h-6 w-6" />
@@ -269,7 +338,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
             <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Sepet Ortalaması (AOV)</span>
-            <h3 className="mt-2 font-serif text-3xl text-amber-300 font-bold">{formatCurrency(avgSaleValue)}</h3>
+            <h3 className="mt-2 font-serif text-3xl text-amber-300 font-bold">{formatCurrency(displayAvgSaleValue)}</h3>
           </div>
           <div className="rounded-full bg-amber-500/10 border border-amber-500/30 p-3 text-amber-300">
             <TrendingUp className="h-6 w-6" />
@@ -280,13 +349,13 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       {/* Basic Trend visualization */}
       <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6">
         <h3 className="font-serif text-xl mb-4 text-[#ecd8a6]">Satış Grafiği (Son İşlemler)</h3>
-        {sales.length === 0 ? (
+        {filteredSales.length === 0 ? (
           <div className="flex h-32 items-center justify-center text-xs text-[#ecd8a6]/40">
             Veri bulunamadığı için grafik çizilemiyor.
           </div>
         ) : (
           <div className="h-40 flex items-end gap-2 px-4 border-b border-l border-[#ecd8a6]/10 pb-2">
-            {sales.slice(0, 15).reverse().map((sale, idx) => {
+            {filteredSales.slice(0, 15).reverse().map((sale, idx) => {
               const heightPct = Math.min(100, Math.max(10, ((sale.amount || 1) / 10) * 100));
               return (
                 <div key={sale.id || idx} className="flex-1 flex flex-col items-center group relative cursor-pointer">
@@ -312,7 +381,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           <div className="flex h-32 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
             <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
           </div>
-        ) : pendingAttempts.length === 0 ? (
+        ) : filteredPending.length === 0 ? (
           <div className="flex h-24 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-xs">
             Bekleyen/Tamamlanmamış ödeme kaydı bulunmamaktadır.
           </div>
@@ -331,7 +400,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
-                  {pendingAttempts.map((attempt, idx) => (
+                  {filteredPending.map((attempt, idx) => (
                     <tr key={attempt.id || idx} className="hover:bg-yellow-950/5 transition">
                       <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(attempt)}</td>
                       <td className="px-6 py-4 text-xs max-w-[150px] truncate">{usersMap[attempt.userId] || attempt.userId}</td>
@@ -367,7 +436,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           <div className="rounded-xl border border-red-900/30 bg-red-950/10 p-4 text-center text-red-400 text-sm">
             {error}
           </div>
-        ) : sales.length === 0 ? (
+        ) : filteredSales.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-sm">
             <AlertCircle className="h-8 w-8 mb-2" />
             Henüz Stripe ödeme kaydı bulunmamaktadır.
@@ -388,7 +457,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
-                  {sales.map((sale, idx) => {
+                  {filteredSales.map((sale, idx) => {
                     let mappedPrice = '$0.00';
                     if (sale.amount === 3) mappedPrice = '$2.99';
                     else if (sale.amount === 10) mappedPrice = '$8.99';
