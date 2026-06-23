@@ -28,6 +28,10 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const [stripeListenerActive, setStripeListenerActive] = useState(false);
   const [listenerLoading, setListenerLoading] = useState(false);
 
+  // Sorting state for pending and sales tables
+  const [pendingSort, setPendingSort] = useState<{ field: string; direction: 'asc' | 'desc' }>({ field: 'createdAt', direction: 'desc' });
+  const [salesSort, setSalesSort] = useState<{ field: string; direction: 'asc' | 'desc' }>({ field: 'createdAt', direction: 'desc' });
+
   const fetchSalesData = async () => {
     setLoading(true);
     setError(null);
@@ -253,6 +257,88 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const displaySalesCount = filteredCompleted.length;
   const displayRevenue = filteredCompleted.reduce((sum, item) => sum + Number(item.price || 0), 0);
   const displayAvgSaleValue = displaySalesCount > 0 ? displayRevenue / displaySalesCount : 0;
+
+  // Sorting handlers and logic
+  const handleSortPending = (field: string) => {
+    setPendingSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === 'desc' ? 'asc' : 'desc',
+    }));
+  };
+
+  const handleSortSales = (field: string) => {
+    setSalesSort((prev) => ({
+      field,
+      direction: prev.field === field && prev.direction === 'desc' ? 'asc' : 'desc',
+    }));
+  };
+
+  const sortedPending = [...filteredPending].sort((a, b) => {
+    let aVal: any = a[pendingSort.field];
+    let bVal: any = b[pendingSort.field];
+
+    if (pendingSort.field === 'userId') {
+      aVal = usersMap[a.userId] || a.userId || '';
+      bVal = usersMap[b.userId] || b.userId || '';
+    } else if (pendingSort.field === 'createdAt') {
+      aVal = getDocDateObject(a)?.getTime() || 0;
+      bVal = getDocDateObject(b)?.getTime() || 0;
+    } else if (pendingSort.field === 'amount' || pendingSort.field === 'price') {
+      aVal = Number(aVal || 0);
+      bVal = Number(bVal || 0);
+    } else {
+      aVal = String(aVal || '').toLowerCase();
+      bVal = String(bVal || '').toLowerCase();
+    }
+
+    if (aVal < bVal) return pendingSort.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return pendingSort.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const sortedSales = [...filteredSales].sort((a, b) => {
+    let aVal: any = a[salesSort.field];
+    let bVal: any = b[salesSort.field];
+
+    if (salesSort.field === 'userId') {
+      aVal = usersMap[a.userId] || a.userId || '';
+      bVal = usersMap[b.userId] || b.userId || '';
+    } else if (salesSort.field === 'createdAt') {
+      aVal = getDocDateObject(a)?.getTime() || 0;
+      bVal = getDocDateObject(b)?.getTime() || 0;
+    } else if (salesSort.field === 'price') {
+      const getPrice = (item: any) => {
+        if (item.amount === 3) return 2.99;
+        if (item.amount === 10) return 8.99;
+        if (item.amount === 25) return 19.99;
+        return Number(item.amount || 0) * 0.8;
+      };
+      aVal = getPrice(a);
+      bVal = getPrice(b);
+    } else if (salesSort.field === 'completedMethod') {
+      aVal = completedMethods[a.idempotencyKey] || 'webhook';
+      bVal = completedMethods[b.idempotencyKey] || 'webhook';
+    } else if (salesSort.field === 'amount') {
+      aVal = Number(aVal || 0);
+      bVal = Number(bVal || 0);
+    } else {
+      aVal = String(aVal || '').toLowerCase();
+      bVal = String(bVal || '').toLowerCase();
+    }
+
+    if (aVal < bVal) return salesSort.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return salesSort.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const renderSortIcon = (currentField: string, activeSort: { field: string; direction: 'asc' | 'desc' }) => {
+    if (activeSort.field !== currentField) {
+      return <span className="text-[#ecd8a6]/25 ml-1 select-none">↕</span>;
+    }
+    return activeSort.direction === 'asc' 
+      ? <span className="text-green-400 ml-1 select-none">↑</span> 
+      : <span className="text-red-400 ml-1 select-none">↓</span>;
+  };
 
   // Generate chart data points based on selected period
   const getChartData = () => {
@@ -606,16 +692,41 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
               <table className="w-full text-left text-sm text-[#ecd8a6]/80">
                 <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
                   <tr>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">DATE</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">MAIL</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">SESSION</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">AMOUNT</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">PRICE</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">ACTION</th>
+                    <th 
+                      onClick={() => handleSortPending('createdAt')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      DATE {renderSortIcon('createdAt', pendingSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortPending('userId')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      MAIL {renderSortIcon('userId', pendingSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortPending('id')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      SESSION {renderSortIcon('id', pendingSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortPending('amount')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      AMOUNT {renderSortIcon('amount', pendingSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortPending('price')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      PRICE {renderSortIcon('price', pendingSort)}
+                    </th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10 select-none">ACTION</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
-                  {filteredPending.map((attempt, idx) => (
+                  {sortedPending.map((attempt, idx) => (
                     <tr key={attempt.id || idx} className="hover:bg-yellow-950/5 transition">
                       <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(attempt)}</td>
                       <td className="px-6 py-4 text-xs max-w-[150px] truncate">{usersMap[attempt.userId] || attempt.userId}</td>
@@ -662,17 +773,52 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
               <table className="w-full text-left text-sm text-[#ecd8a6]/80">
                 <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
                   <tr>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">DATE</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">MAIL</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">AMOUNT</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">PRICE</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">PROVIDER</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">STATUS</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">DESCRIPTION</th>
+                    <th 
+                      onClick={() => handleSortSales('createdAt')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      DATE {renderSortIcon('createdAt', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('userId')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      MAIL {renderSortIcon('userId', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('amount')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      AMOUNT {renderSortIcon('amount', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('price')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      PRICE {renderSortIcon('price', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('paymentProvider')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      PROVIDER {renderSortIcon('paymentProvider', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('completedMethod')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      STATUS {renderSortIcon('completedMethod', salesSort)}
+                    </th>
+                    <th 
+                      onClick={() => handleSortSales('description')} 
+                      className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
+                    >
+                      DESCRIPTION {renderSortIcon('description', salesSort)}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
-                  {filteredSales.map((sale, idx) => {
+                  {sortedSales.map((sale, idx) => {
                     let mappedPrice = '$0.00';
                     if (sale.amount === 3) mappedPrice = '$2.99';
                     else if (sale.amount === 10) mappedPrice = '$8.99';
