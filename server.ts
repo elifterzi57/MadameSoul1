@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import YAML from "yaml";
 import "dotenv/config";
 import crypto from "crypto";
+import { spawn } from "child_process";
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
@@ -234,6 +235,9 @@ async function startServer() {
     });
   }
   const adminDb = admin.firestore();
+
+  let stripeListenerProcess: any = null;
+  let stripeListenerStatus = "stopped";
 
   let useFirebaseAdmin = true;
   if (process.env.NODE_ENV !== "production") {
@@ -1499,6 +1503,52 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       await logServerError(err, "POST /api/admin/complete-payment", req.user?.uid);
       res.status(500).json({ error: err.message || "Failed to manually complete payment" });
     }
+  });
+
+  // Start/Stop Stripe CLI webhook listener (Local only)
+  app.post("/api/admin/stripe-listener/toggle", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
+    try {
+      const { action } = req.body;
+      if (action === "start") {
+        if (stripeListenerProcess) {
+          return res.json({ status: "running", message: "Stripe listener is already running" });
+        }
+        console.log("[Server] Starting local Stripe CLI webhook listener...");
+        stripeListenerProcess = spawn("npx", ["stripe", "listen", "--forward-to", "localhost:3000/api/stripe-webhook"]);
+        stripeListenerStatus = "running";
+
+        stripeListenerProcess.stdout?.on("data", (data: any) => {
+          console.log(`[Stripe CLI] ${data}`);
+        });
+
+        stripeListenerProcess.stderr?.on("data", (data: any) => {
+          console.error(`[Stripe CLI Error] ${data}`);
+        });
+
+        stripeListenerProcess.on("close", (code: any) => {
+          console.log(`[Stripe CLI] Exited with code ${code}`);
+          stripeListenerProcess = null;
+          stripeListenerStatus = "stopped";
+        });
+
+        return res.json({ status: "running", message: "Stripe listener started" });
+      } else {
+        if (!stripeListenerProcess) {
+          return res.json({ status: "stopped", message: "Stripe listener is not running" });
+        }
+        console.log("[Server] Stopping local Stripe CLI webhook listener...");
+        stripeListenerProcess.kill("SIGINT");
+        stripeListenerProcess = null;
+        stripeListenerStatus = "stopped";
+        return res.json({ status: "stopped", message: "Stripe listener stopped" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to control Stripe listener" });
+    }
+  });
+
+  app.get("/api/admin/stripe-listener/status", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    res.json({ status: stripeListenerStatus });
   });
 
   // Global Error Handler Middleware

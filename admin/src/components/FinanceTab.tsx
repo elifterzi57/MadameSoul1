@@ -23,6 +23,9 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const [usersMap, setUsersMap] = useState<Record<string, string>>({});
   const [completedMethods, setCompletedMethods] = useState<Record<string, string>>({});
 
+  const [stripeListenerActive, setStripeListenerActive] = useState(false);
+  const [listenerLoading, setListenerLoading] = useState(false);
+
   // Computed metrics
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalSalesCount, setTotalSalesCount] = useState(0);
@@ -143,8 +146,58 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
     }
   };
 
+  const fetchListenerStatus = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken(true);
+      const res = await fetch('/api/admin/stripe-listener/status', {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStripeListenerActive(data.status === 'running');
+      }
+    } catch (e) {
+      console.error("Failed to fetch Stripe listener status:", e);
+    }
+  };
+
+  const toggleStripeListener = async () => {
+    setListenerLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken(true);
+      const action = stripeListenerActive ? 'stop' : 'start';
+      const res = await fetch('/api/admin/stripe-listener/toggle', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ action })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStripeListenerActive(data.status === 'running');
+      } else {
+        const errText = await res.text();
+        alert(`Dinleyici kontrol hatası: ${errText}`);
+      }
+    } catch (e: any) {
+      console.error(e);
+      alert(`Hata: ${e.message || e}`);
+    } finally {
+      setListenerLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSalesData();
+    fetchListenerStatus();
   }, []);
 
   const formatCurrency = (val: number) => {
@@ -165,13 +218,30 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           <h2 className="font-serif text-3xl text-[#ecd8a6]">Stripe Finans & Satış</h2>
           <p className="text-sm text-[#ecd8a6]/60">Ödeme durumlarını, satın alma işlemlerini ve ciro grafiklerini izleyin.</p>
         </div>
-        <button
-          onClick={fetchSalesData}
-          className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Yenile
-        </button>
+        <div className="flex items-center gap-3">
+          {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+            <button
+              disabled={listenerLoading}
+              onClick={toggleStripeListener}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2 transition text-sm font-medium ${
+                stripeListenerActive 
+                  ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20' 
+                  : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20'
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${stripeListenerActive ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></span>
+              {stripeListenerActive ? 'Stripe CLI: Aktif' : 'Stripe CLI: Kapalı (Başlat)'}
+            </button>
+          )}
+
+          <button
+            onClick={fetchSalesData}
+            className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Yenile
+          </button>
+        </div>
       </div>
 
       {/* Metrics Cards */}
