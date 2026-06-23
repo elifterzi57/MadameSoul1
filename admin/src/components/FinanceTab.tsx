@@ -254,6 +254,85 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const displayRevenue = filteredCompleted.reduce((sum, item) => sum + Number(item.price || 0), 0);
   const displayAvgSaleValue = displaySalesCount > 0 ? displayRevenue / displaySalesCount : 0;
 
+  // Generate chart data points based on selected period
+  const getChartData = () => {
+    const now = new Date();
+    let startDate = new Date();
+    let numIntervals = 8;
+    let labelFormat: 'hour' | 'day' | 'month' = 'day';
+
+    if (period === 'daily') {
+      startDate.setHours(now.getHours() - 24);
+      numIntervals = 12; // every 2 hours
+      labelFormat = 'hour';
+    } else if (period === 'weekly') {
+      startDate.setDate(now.getDate() - 7);
+      numIntervals = 7; // daily
+      labelFormat = 'day';
+    } else if (period === 'monthly') {
+      startDate.setDate(now.getDate() - 30);
+      numIntervals = 10; // every 3 days
+      labelFormat = 'day';
+    } else {
+      // Find oldest transaction or default to 6 months
+      if (completedAttempts.length > 0) {
+        const dates = completedAttempts.map(tx => getDocDateObject(tx)).filter(d => d !== null) as Date[];
+        if (dates.length > 0) {
+          const oldest = new Date(Math.min(...dates.map(d => d.getTime())));
+          startDate = oldest;
+        } else {
+          startDate.setMonth(now.getMonth() - 6);
+        }
+      } else {
+        startDate.setMonth(now.getMonth() - 6);
+      }
+      numIntervals = 6;
+      labelFormat = 'month';
+    }
+
+    const duration = now.getTime() - startDate.getTime();
+    const intervalMs = duration / numIntervals;
+    const intervals: { start: Date; end: Date; total: number; label: string }[] = [];
+
+    for (let i = 0; i < numIntervals; i++) {
+      const intervalStart = new Date(startDate.getTime() + i * intervalMs);
+      const intervalEnd = new Date(startDate.getTime() + (i + 1) * intervalMs);
+      
+      let label = '';
+      if (labelFormat === 'hour') {
+        label = intervalEnd.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+      } else if (labelFormat === 'day') {
+        label = intervalEnd.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+      } else if (labelFormat === 'month') {
+        label = intervalEnd.toLocaleDateString('tr-TR', { month: 'short' });
+      }
+
+      intervals.push({
+        start: intervalStart,
+        end: intervalEnd,
+        total: 0,
+        label
+      });
+    }
+
+    // Sum transactions into intervals
+    filteredCompleted.forEach((tx) => {
+      const txDate = getDocDateObject(tx);
+      if (!txDate) return;
+      
+      // Find matching interval
+      for (let i = 0; i < numIntervals; i++) {
+        const interval = intervals[i];
+        if (txDate.getTime() >= interval.start.getTime() && txDate.getTime() <= interval.end.getTime()) {
+          interval.total += Number(tx.price || 0);
+          break;
+        }
+      }
+    });
+
+    return intervals;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-[#ecd8a6]/10 pb-6">
@@ -346,32 +425,168 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         </div>
       </div>
 
-      {/* Basic Trend visualization */}
+      {/* Dynamic Line Chart (Sally's Premium Design) */}
       <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6">
-        <h3 className="font-serif text-xl mb-4 text-[#ecd8a6]">Satış Grafiği (Son İşlemler)</h3>
-        {filteredSales.length === 0 ? (
-          <div className="flex h-32 items-center justify-center text-xs text-[#ecd8a6]/40">
-            Veri bulunamadığı için grafik çizilemiyor.
+        <h3 className="font-serif text-xl mb-4 text-[#ecd8a6] flex items-center justify-between">
+          <span>Stripe Satış Ciro Grafiği</span>
+          <span className="text-xs font-sans text-green-400 font-semibold px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20">
+            {period === 'daily' ? 'Son 24 Saat' : period === 'weekly' ? 'Son 7 Gün' : period === 'monthly' ? 'Son 30 Gün' : 'Tüm Zamanlar'}
+          </span>
+        </h3>
+        {filteredCompleted.length === 0 ? (
+          <div className="flex h-48 items-center justify-center text-xs text-[#ecd8a6]/40">
+            Bu dönemde gerçekleşen herhangi bir tamamlanmış satış bulunmadığı için grafik çizilemiyor.
           </div>
-        ) : (
-          <div className="h-40 flex items-end gap-2 px-4 border-b border-l border-[#ecd8a6]/10 pb-2">
-            {filteredSales.slice(0, 15).reverse().map((sale, idx) => {
-              const heightPct = Math.min(100, Math.max(10, ((sale.amount || 1) / 10) * 100));
-              return (
-                <div key={sale.id || idx} className="h-full flex-1 flex flex-col justify-end items-center group relative cursor-pointer">
-                  {/* Tooltip */}
-                  <span className="absolute bottom-full mb-2 bg-[#07040e] border border-[#ecd8a6]/20 px-2 py-1 text-[10px] rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none">
-                    {sale.amount} Moon ({formatCurrency(sale.amount * 1.5)})
-                  </span>
-                  <div 
-                    style={{ height: `${heightPct}%` }}
-                    className="w-full rounded-t-sm bg-gradient-to-t from-purple-950 to-[#ecd8a6]/50 hover:to-[#ecd8a6]/90 transition"
-                  ></div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        ) : (() => {
+          const chartData = getChartData();
+          const maxVal = Math.max(...chartData.map(d => d.total), 10);
+          
+          const svgWidth = 800;
+          const svgHeight = 240;
+          const paddingLeft = 60;
+          const paddingRight = 40;
+          const paddingTop = 30;
+          const paddingBottom = 40;
+          
+          const chartWidth = svgWidth - paddingLeft - paddingRight;
+          const chartHeight = svgHeight - paddingTop - paddingBottom;
+
+          const points = chartData.map((d, i) => {
+            const x = paddingLeft + (i / (chartData.length - 1)) * chartWidth;
+            const y = svgHeight - paddingBottom - (d.total / maxVal) * chartHeight;
+            return { x, y, val: d.total, label: d.label };
+          });
+
+          const pathD = points.reduce((acc, p, i) => {
+            return i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`;
+          }, '');
+
+          // Generate area curve filled path for the gradient
+          const areaD = points.length > 0 
+            ? `${pathD} L ${points[points.length - 1].x} ${svgHeight - paddingBottom} L ${points[0].x} ${svgHeight - paddingBottom} Z`
+            : '';
+
+          const gridValues = [0, 0.25, 0.5, 0.75, 1];
+
+          return (
+            <div className="w-full overflow-x-auto select-none">
+              <div className="min-w-[600px] h-60">
+                <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-full">
+                  <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ecd8a6" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#0c081a" stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  {/* Horizontal Grid lines and labels */}
+                  {gridValues.map((v, idx) => {
+                    const y = svgHeight - paddingBottom - v * chartHeight;
+                    return (
+                      <g key={idx} className="opacity-40">
+                        <line 
+                          x1={paddingLeft} 
+                          y1={y} 
+                          x2={svgWidth - paddingRight} 
+                          y2={y} 
+                          stroke="#ecd8a6" 
+                          strokeWidth="0.5" 
+                          strokeDasharray="4 4"
+                        />
+                        <text 
+                          x={paddingLeft - 10} 
+                          y={y + 4} 
+                          fill="#ecd8a6" 
+                          fontSize="9" 
+                          textAnchor="end"
+                          className="font-mono font-semibold"
+                        >
+                          {formatCurrency(v * maxVal)}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* Area fill path under line */}
+                  {areaD && (
+                    <path d={areaD} fill="url(#chartGradient)" />
+                  )}
+
+                  {/* Line Chart path */}
+                  {pathD && (
+                    <path 
+                      d={pathD} 
+                      fill="none" 
+                      stroke="#ecd8a6" 
+                      strokeWidth="2.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                      filter="url(#glow)"
+                    />
+                  )}
+
+                  {/* Data points (dots) and interactive tooltips */}
+                  {points.map((p, idx) => (
+                    <g key={idx} className="group/dot cursor-pointer">
+                      <circle 
+                        cx={p.x} 
+                        cy={p.y} 
+                        r="4" 
+                        fill="#0e0a1b" 
+                        stroke="#ecd8a6" 
+                        strokeWidth="2"
+                        className="transition hover:r-6 hover:fill-[#ecd8a6]"
+                      />
+                      {/* Tooltip background & text */}
+                      <g className="opacity-0 group-hover/dot:opacity-100 transition duration-200 pointer-events-none">
+                        <rect 
+                          x={p.x - 55} 
+                          y={p.y - 32} 
+                          width="110" 
+                          height="22" 
+                          rx="4" 
+                          fill="#07040e" 
+                          stroke="#ecd8a6" 
+                          strokeWidth="1"
+                          opacity="0.95"
+                        />
+                        <text 
+                          x={p.x} 
+                          y={p.y - 18} 
+                          fill="#ecd8a6" 
+                          fontSize="10" 
+                          fontWeight="bold"
+                          textAnchor="middle"
+                        >
+                          {formatCurrency(p.val)}
+                        </text>
+                      </g>
+                    </g>
+                  ))}
+
+                  {/* X Axis Labels */}
+                  {points.map((p, idx) => (
+                    <text 
+                      key={idx} 
+                      x={p.x} 
+                      y={svgHeight - 15} 
+                      fill="#ecd8a6" 
+                      fontSize="9" 
+                      textAnchor="middle" 
+                      className="opacity-60 font-semibold"
+                    >
+                      {p.label}
+                    </text>
+                  ))}
+                </svg>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Pending Transactions List */}
