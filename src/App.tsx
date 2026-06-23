@@ -410,7 +410,8 @@ function AppContent() {
                     ? data.termsAcceptedAt.toDate().toISOString() 
                     : new Date(data.termsAcceptedAt).toISOString()) 
                 : undefined,
-              termsVersion: data.termsVersion || ''
+              termsVersion: data.termsVersion || '',
+              isPremium: data.isPremium || false
             });
 
             // Onboarding Check (MS-257)
@@ -439,6 +440,7 @@ function AppContent() {
               birthplace: '',
               relationship: 'single',
               focus: 'general',
+              isPremium: false,
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
               lastLogin: serverTimestamp(),
@@ -447,7 +449,7 @@ function AppContent() {
               appVersion,
               metadata
             });
-            setUserInfo({ name: u.displayName || '' });
+            setUserInfo({ name: u.displayName || '', isPremium: false });
             setShowOnboarding(true); // New user, show onboarding
           }
           setIsUserDataLoading(false);
@@ -2049,7 +2051,7 @@ function AppContent() {
                 >
                   <button 
                     onClick={() => {
-                      if (pendingDeductedFrom.current !== 'purchased') {
+                      if (!userInfo.isPremium && pendingDeductedFrom.current !== 'purchased') {
                         showToast(t('profile.history.pdfLocked'), 'info');
                       } else {
                         handleDownload();
@@ -2060,7 +2062,7 @@ function AppContent() {
                   >
                     {isExportingPDF ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : pendingDeductedFrom.current === 'purchased' ? (
+                    ) : (userInfo.isPremium || pendingDeductedFrom.current === 'purchased') ? (
                       <Download className="w-4 h-4" />
                     ) : (
                       <div className="flex items-center gap-1.5">

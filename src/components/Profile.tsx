@@ -761,7 +761,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                 <div className="flex-1 min-w-0">
                                   <div className="text-[#ecd8a6] text-sm font-medium flex items-center gap-1.5 min-w-0">
                                     <span className="truncate">{item.customTitle || translateDescription(item.description)}</span>
-                                    {item.deductedFrom === 'purchased' && (
+                                    {(userInfo.isPremium || item.deductedFrom === 'purchased') && (
                                       <span title={userInfo.language === 'tr' ? "Premium Açılım" : "Premium Reading"} className="flex-shrink-0 flex items-center">
                                         <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20 animate-pulse" />
                                       </span>
@@ -786,7 +786,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                   </span>
                                 )}
                                 {item.readingText && (
-                                  item.deductedFrom === 'purchased' ? (
+                                  (userInfo.isPremium || item.deductedFrom === 'purchased') ? (
                                     <button 
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -932,7 +932,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                       </div>
                                     )}
 
-                                    {item.deductedFrom === 'purchased' ? (
+                                    {(userInfo.isPremium || item.deductedFrom === 'purchased') ? (
                                       <>
                                         {/* Edit Custom Title Form */}
                                         <div className="space-y-2">

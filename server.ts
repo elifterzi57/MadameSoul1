@@ -353,6 +353,7 @@ async function startServer() {
         const price = attemptData.price || 0;
         transaction.set(userRef, {
           lifetimeValue: currentLtv + price,
+          isPremium: true,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
         
