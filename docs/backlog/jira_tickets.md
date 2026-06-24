@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **136** | Açık: **0** | Tamamlanan: **132** | İptal Edilen: **4**
+Toplam Bilet: **137** | Açık: **0** | Tamamlanan: **133** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-305**](#-ms-305) | Feature / Dev / UX | Login Ekranından Apple Giriş Seçeneğinin Kaldırılması | Orta | Giriş ekranındaki Apple Giriş butonları, handleAppleLogin fonksiyonu ve Apple ikon importu tamamen temizlenerek Apple girişi iptal edildi. | Elif |
 | [**MS-304**](#-ms-304) | Documentation | Bütün Dokümanların Güncel Uygulamaya Göre Güncellenmesi | Orta | data-models.md, data-models-monolith.md, api-contracts.md, api-contracts-monolith.md ve development-guide.md dosyaları son premium özellikleri, yeni API endpoint'leri ve Stripe CLI entegrasyonuna göre güncellendi. | Paige |
 | [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | stripe-cli devDependency olarak kuruldu, login tamamlandı ve stripe listen arka planda başlatılarak elde edilen signing secret .env dosyasına yazıldı. | Elif |
 | [**MS-302**](#-ms-302) | Feature / UX / UI | Admin Manuel Onaylama Pop-up Pencerelerinde Kullanıcı İletişim Bilgisi ve Tam Session ID Gösterimi | Yüksek | Onaylama ve başarı modal pencerelerinde UID yerine mail/telefon bilgisi getirildi. Session ID'nin sonunun kesilmemesi için break-all kelime kaydırmalı tam genişlikte blok tasarımı entegre edildi. | Elif |
@@ -160,9 +161,26 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | [**MS-101**](#-ms-101) | Bug | Profil Bilgisi Durum Senkronizasyon Hatası | En Yüksek | `App.tsx` içindeki `onUpdateUserInfo` handler'ı güncellendi ... | Sally |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
+## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-305: Login Ekranından Apple Giriş Seçeneğinin Kaldırılması (Feature / Dev / UX)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer Agent / `bmad-agent-dev`)
+* **Bileşen:** Web Client / Authentication / UI
+* **Açıklama:**  
+  Apple geliştirici hesabı ücretli olduğu için giriş ekranından Apple Giriş Yap (Apple Sign-In) butonunu ve ilgili kod bloklarını kaldırdık.
+* **Kabul Kriterleri:**
+  1. `src/components/Login.tsx` dosyasındaki Apple Giriş butonları (hem E-posta hem de Telefon formlarında) kaldırıldı.
+  2. `handleAppleLogin` fonksiyonu temizlendi.
+  3. `Apple` ikonu importu temizlendi.
+  4. Uygulama hatasız derlendi ve çalıştı.
+
 ---
 
-## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
 
 ### 📋 MS-304: Bütün Dokümanların Güncel Uygulamaya Göre Güncellenmesi (Documentation)
 

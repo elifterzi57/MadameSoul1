@@ -30,7 +30,7 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 | **Sunucu (Backend)** | Express | `^4.21.2` | API isteklerini yönetme ve istemciye proxy sağlama. |
 | **Yapay Zeka (AI)** | Google GenAI SDK | `^1.29.0` | Gemini API ile yedekli model geçişli (fallback) fal üretimi. |
 | **Veritabanı** | Cloud Firestore (Firebase) | `^12.13.0` | Kullanıcı profili, bakiye ve işlem kayıtlarını saklama. |
-| **Kimlik Doğrulama** | Firebase Authentication | `^12.13.0` | Google, Apple, E-posta ve SMS ile giriş desteği. |
+| **Kimlik Doğrulama** | Firebase Authentication | `^12.13.0` | Google, E-posta ve SMS ile giriş desteği. |
 | **Stil / Tasarım** | Tailwind CSS / Motion | `^4.1.14` / `^12.23.24` | Modern stil ve akıcı mikro-animasyonlar. |
 | **PDF Dışa Aktarma** | html2canvas + jsPDF | `^1.4.1` / `^4.2.1` | Tarot okumalarını yerel olarak PDF formatına dönüştürme. |
 | **Derleme Araçları** | Vite + esbuild | `^6.2.3` / `^0.28.0` | Hızlı geliştirme ve sunucu kodunu paketleme. |
@@ -40,7 +40,7 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 ## Temel Özellikler (Key Features)
 
 1. **Çok Dilli Altyapı:** Türkçe, İngilizce, İspanyolca, Fransızca, Korece ve Çince (TR, EN, ES, FR, KO, ZH) dillerini YAML yerelleştirme dosyaları üzerinden destekler.
-2. **Giriş ve Kimlik Doğrulama:** E-posta/Şifre, Google Pop-up, Apple Sign-In ve SMS Telefon doğrulama yöntemleriyle zenginleştirilmiş güvenli kimlik doğrulama ekranı.
+2. **Giriş ve Kimlik Doğrulama:** E-posta/Şifre, Google Pop-up ve SMS Telefon doğrulama yöntemleriyle zenginleştirilmiş güvenli kimlik doğrulama ekranı.
 3. **Mistik Bakiye Sistemi (Moon):** Tarot okumaları yapabilmek için "Moon" kredileri kullanılır. Hoş geldin bonusu, harcamalar ve satın alımlar Firestore üzerinde transaction bazlı olarak yönetilir.
 4. **Onboarding Tanıtım Ekranı:** Uygulamayı ilk kez kullananlara yönelik premium, akıcı ve görsellerle zenginleştirilmiş tanıtım adımları.
 5. **Geçmiş Okumalar ve PDF:** Kullanıcılar daha önceki tarot yorumlarını profillerinden listeleyebilir, favorileyebilir ve bunları cihazlarına PDF olarak indirebilirler.

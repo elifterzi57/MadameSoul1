@@ -19,7 +19,6 @@ import { gatherUserMetadata } from '../lib/metadata';
 import { useAppStore } from '../store/useAppStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Apple,
   Mail, 
   Phone, 
   Lock, 
@@ -438,81 +437,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
     }
   };
 
-  const handleAppleLogin = async () => {
-    if (!consentAccepted) {
-      setError(language === 'tr' ? "Lütfen önce Kullanıcı Sözleşmesini ve KVKK Açık Rıza Metnini onaylayın." : "Please accept the User Agreement and KVKK Consent first.");
-      return;
-    }
-    setLoading(true);
-    setError('');
-    setIsSocialLoginInProgress(true);
-    try {
-      const provider = new OAuthProvider('apple.com');
-      provider.addScope('email');
-      provider.addScope('name');
-      
-      const result = await signInWithPopup(auth, provider);
-      const additionalInfo = getAdditionalUserInfo(result);
-
-      // Fallback: Check if another user with the same email already exists in Firestore (for multiple accounts console config)
-      if (result.user.email) {
-        const q = query(collection(db, 'users'), where('email', '==', result.user.email.toLowerCase()));
-        const snap = await getDocs(q);
-        const existingDocs = snap.docs.filter(d => d.id !== result.user.uid);
-        if (existingDocs.length > 0) {
-          const credential = OAuthProvider.credentialFromResult(result);
-          if (credential) {
-            setLinkingEmail(result.user.email);
-            setPendingCredential(credential);
-            setLinkingProvider('Apple');
-            setShowLinkingModal(true);
-            setLoading(false);
-            // Delete the temporary Firestore document if it was created
-            try {
-              await deleteDoc(doc(db, 'users', result.user.uid));
-            } catch (e) {
-              console.error("Error deleting temporary user document:", e);
-            }
-            // Delete the temporary Apple user to free the credential and sign out
-            await result.user.delete();
-            setIsSocialLoginInProgress(false);
-            return;
-          }
-        }
-      }
-
-      await saveUserToFirestore(result.user, undefined, additionalInfo);
-      onLogin();
-      setIsSocialLoginInProgress(false);
-    } catch (err: any) {
-      console.error("Apple login error:", err);
-      if (err.code === 'auth/account-exists-with-different-credential') {
-        const email = err.customData?.email || err.email;
-        const credential = OAuthProvider.credentialFromError(err);
-        if (email && credential) {
-          setLinkingEmail(email);
-          setPendingCredential(credential);
-          setLinkingProvider('Apple');
-          setShowLinkingModal(true);
-        } else {
-          setError(err.message || t('login.error'));
-        }
-      } else if (err.code === 'auth/popup-blocked') {
-        setError(t('login.errorPopupBlocked'));
-      } else if (err.code === 'auth/popup-closed-by-user') {
-        setError(t('login.errorPopupClosed'));
-      } else if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
-        setError(t('login.errorConfigNotFound'));
-      } else if (err.code === 'auth/unauthorized-domain') {
-        setError(t('login.errorUnauthorizedDomain'));
-      } else {
-        setError(err.message || t('login.error'));
-      }
-    } finally {
-      setLoading(false);
-      setIsSocialLoginInProgress(false);
-    }
-  };
 
   const handleLinkAccounts = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -714,17 +638,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {t('login.googleSignIn')}
                     </button>
 
-                    <button 
-                      type="button"
-                      onClick={handleAppleLogin}
-                      disabled={loading}
-                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
-                      }`}
-                    >
-                      <Apple className="w-4 h-4" />
-                      {t('login.appleSignIn')}
-                    </button>
 
                     <button 
                       type="button"
@@ -911,17 +824,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin, language, onLanguageChang
                       {t('login.googleSignIn')}
                     </button>
 
-                    <button 
-                      type="button"
-                      onClick={handleAppleLogin}
-                      disabled={loading}
-                      className={`w-full py-3.5 rounded-xl text-[10px] sm:text-xs font-serif uppercase tracking-widest border transition-all flex items-center justify-center gap-3 ${
-                        loading ? 'bg-white/5 border-[#ecd8a6]/5 text-[#ecd8a6]/30 cursor-not-allowed' : 'bg-white/5 hover:bg-white/10 border-[#ecd8a6]/10 text-[#ecd8a6] active:scale-[0.98]'
-                      }`}
-                    >
-                      <Apple className="w-4 h-4" />
-                      {t('login.appleSignIn')}
-                    </button>
 
                     <button 
                       type="button"
