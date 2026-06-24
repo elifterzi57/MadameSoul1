@@ -920,7 +920,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                             );
                           })()}
                         </td>
-                        <td className={`px-6 py-4 text-xs max-w-[200px] truncate ${sale.isCancelled ? 'text-rose-400/70' : ''}`}>{sale.description || 'Satın Alım'}</td>
+                        <td className={`px-6 py-4 text-xs max-w-[280px] break-words whitespace-normal ${sale.isCancelled ? 'text-rose-400/70' : ''}`}>{sale.description || 'Satın Alım'}</td>
                       </tr>
                     );
                   })}
