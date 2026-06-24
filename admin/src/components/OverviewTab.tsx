@@ -22,7 +22,8 @@ import {
   Globe,
   Compass,
   Activity,
-  Coins
+  Coins,
+  Sparkles
 } from 'lucide-react';
 
 interface OverviewTabProps {
@@ -256,6 +257,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
   // Basic Stats (Period Filtered vs All Time)
   const periodNewUsers = filteredUsers.length;
   const totalUsersCount = allUsers.length;
+  const premiumUsersCount = allUsers.filter(u => u.isPremium === true).length;
+  const premiumPercentage = totalUsersCount > 0 ? Math.round((premiumUsersCount / totalUsersCount) * 100) : 0;
   const periodFortunesRead = filteredTransactions.filter(tx => tx.type === 'spend').length;
   const totalFortunesRead = allTransactions.filter(tx => tx.type === 'spend').length;
   const periodMoonsAcquired = filteredCheckoutAttempts
@@ -413,7 +416,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       </div>
 
       {/* Basic Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         
         {/* Kullanıcı Sayısı Card */}
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
@@ -426,6 +429,20 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
               +{periodNewUsers} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {totalUsersCount} Toplam</span>
             </p>
             <span className="text-[10px] text-sky-400/60 font-semibold block mt-0.5">Seçili Dönem Kayıtları</span>
+          </div>
+        </div>
+
+        {/* Premium Kullanıcı Oranı Card */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Premium Kullanıcı (Oran / Sayı)</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              %{premiumPercentage} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {premiumUsersCount} Kullanıcı</span>
+            </p>
+            <span className="text-[10px] text-purple-400/60 font-semibold block mt-0.5">Aktif Premium Üyeler</span>
           </div>
         </div>
 
