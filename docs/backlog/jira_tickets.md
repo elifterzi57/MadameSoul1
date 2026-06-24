@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **140** | Açık: **0** | Tamamlanan: **136** | İptal Edilen: **4**
+Toplam Bilet: **141** | Açık: **0** | Tamamlanan: **137** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-309**](#-ms-309) | Feature / UX / UI / Dev | Fal Formu Girdi Alanlarının Büyük Harf (Uppercase) Yapılması | Yüksek | Form girdi alanlarına ve seçim kutularına uppercase Tailwind sınıfı eklenerek tüm girdiler arayüzde büyük harf yapıldı. | Elif |
 | [**MS-308**](#-ms-308) | Feature / UX / UI / Dev | Stripe Bekleyen Ödeme Talepleri İptal Etme Butonu ve Akışı | Yüksek | Bekleyen ödemeler listesine "İptal Et" butonu, rose renkli glassmorphic onay/yükleme/başarı modalları ve iptal endpoint'i eklenerek ödemesiz talepler temizlendi. | Elif |
 | [**MS-307**](#-ms-307) | Bug / Security / Dev | Stripe Manuel Ödeme Onayına Ödeme Durumu Doğrulama Koruması | Yüksek | `/api/admin/complete-payment` endpoint'ine Stripe API'den payment_status'ün "paid" olduğunu doğrulayan güvenlik kontrolü eklendi. | Elif |
 | [**MS-306**](#-ms-306) | Bug / Dev | Stripe Webhook Gecikmesi & Fallback Çakışması (Race Condition) Bug Düzeltmesi | Yüksek | Ödeme tamamlama akışı Firestore runTransaction bloğuna alınarak, webhook ve fallback isteklerinin mükerrer moon yüklemesi yapması engellendi. | Elif |
@@ -165,6 +166,21 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-309: Fal Formu Girdi Alanlarının Büyük Harf (Uppercase) Yapılması (Feature / UX / UI / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / FortuneForm
+* **Açıklama:**  
+  Kullanıcıların fal bakmak için form doldururken girdikleri veya seçtikleri tüm alanların arayüzde tamamen büyük harf (uppercase) olarak gösterilmesi sağlanmıştır.
+* **Kabul Kriterleri:**
+  1. Ad-Soyadı, Doğum Tarihi ve Doğum Yeri input alanlarına `uppercase` stili verilerek tüm karakterler büyük harf yapılmalıdır.
+  2. İlişki Durumu ve Odak Alanı select/option alanlarına `uppercase` stili verilerek gösterim büyük harfe dönüştürülmelidir.
+
+---
 
 ### 📋 MS-308: Stripe Bekleyen Ödeme Talepleri İptal Etme Butonu ve Akışı (Feature / UX / UI / Dev)
 

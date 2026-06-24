@@ -13,7 +13,6 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string; phoneNumber?: string }>>({});
-  const [moonsMap, setMoonsMap] = useState<Record<string, any>>({});
   
   // Filters & Sorting state
   const [startDate, setStartDate] = useState<string>('');
@@ -46,27 +45,34 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     setLoading(true);
     setError(null);
     try {
-      const colRef = collection(db, selectedCollection);
-      // Fetch up to 100 documents for visualization
-      const q = query(colRef, limit(100));
-      const querySnapshot = await getDocs(q);
-      const docsData: any[] = [];
-      querySnapshot.forEach((docSnap) => {
-        docsData.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      if (selectedCollection === 'users') {
-        try {
-          const moonsSnap = await getDocs(collection(db, 'user_moons'));
-          const mMapping: Record<string, any> = {};
-          moonsSnap.forEach((docSnap) => {
-            mMapping[docSnap.id] = docSnap.data();
+      if (selectedCollection === 'contact_us') {
+        const langs = ['en', 'tr', 'es', 'fr', 'zh', 'ko'];
+        const promises = langs.map(lang => getDocs(query(collection(db, `messages_${lang}`), limit(50))));
+        const snapshots = await Promise.all(promises);
+        const docsData: any[] = [];
+        snapshots.forEach((snap, idx) => {
+          const lang = langs[idx];
+          snap.forEach((docSnap) => {
+            docsData.push({ id: docSnap.id, lang, ...docSnap.data() });
           });
-          setMoonsMap(mMapping);
-        } catch (mErr) {
-          console.error("user_moons fetch failed:", mErr);
-        }
+        });
+        docsData.sort((a, b) => {
+          const tA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt).getTime();
+          const tB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt).getTime();
+          return tB - tA;
+        });
+        setDocuments(docsData.slice(0, 100));
+      } else {
+        const colRef = collection(db, selectedCollection);
+        // Fetch up to 100 documents for visualization
+        const q = query(colRef, limit(100));
+        const querySnapshot = await getDocs(q);
+        const docsData: any[] = [];
+        querySnapshot.forEach((docSnap) => {
+          docsData.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        setDocuments(docsData);
       }
-      setDocuments(docsData);
     } catch (err: any) {
       console.error(err);
       setError(`Veriler çekilirken hata oluştu: ${err.message || err}`);
@@ -115,7 +121,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of moon transaction fields mapped
   const getMoonTxValue = (doc: any, col: string): any => {
     const fieldMapping: Record<string, string> = {
-      'ID': 'id',
+      'USERID': 'id',
       'Username': 'userName',
       'createdat': 'createdAt',
       'Description': 'description',
@@ -167,23 +173,18 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of user fields mapped
   const getUserValue = (doc: any, col: string): any => {
     const fieldMapping: Record<string, string> = {
-      'ID': 'id',
+      'USERID': 'id',
       'NAME': 'displayName',
       'EMAIL': 'email',
-      'PHONENUMBER': 'phoneNumber',
+      'PHONE NUMBER': 'phoneNumber',
       'BIRTHDAY': 'dob',
-      'BIRTHPLACE': 'birthplace',
-      'RELATIONSHIP': 'relationship',
-      'FoCUS': 'focus',
-      'CREATEDAT': 'createdAt',
-      'UPDATEDAT': 'updatedAt',
+      'BIRTH PLACE': 'birthplace',
+      'CRETEDAT': 'createdAt',
+      'UPDATEAT': 'updatedAt',
       'CONSENTACCEPTEDAT': 'consentsAcceptedAt',
-      'TERMSACCEPTEDAT': 'termsAcceptedAt',
-      'ONBOARDINGCOMPLETED': 'onboardingCompleted',
       'TIMEZONE': 'timezone',
       'LASTLOGIN': 'lastLogin',
-      'DEVICEINFo': 'deviceInfo',
-      'PROVIDERID': 'providerId'
+      'DEVICEINFO': 'deviceInfo'
     };
 
     if (col === 'NAME') {
@@ -202,24 +203,67 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.metadata?.location || '-';
     }
 
-    if (col === 'BALANCE') {
-      return moonsMap[doc.id]?.balance !== undefined ? moonsMap[doc.id].balance : '-';
+    const dbKey = fieldMapping[col] || col;
+    return doc[dbKey];
+  };
+
+  // Helper to get value of user_moons fields mapped
+  const getUserMoonsValue = (doc: any, col: string): any => {
+    if (col === 'USERID') {
+      return doc.id || doc.userId || '-';
     }
-    if (col === 'PURCHASEDBALANCE') {
-      return moonsMap[doc.id]?.purchasedBalance !== undefined ? moonsMap[doc.id].purchasedBalance : '-';
+    if (col === 'MAIL') {
+      return usersMap[doc.id]?.email || '-';
+    }
+    if (col === 'NAME') {
+      return usersMap[doc.id]?.displayName || '-';
+    }
+    if (col === 'BALANCE') {
+      return doc.balance !== undefined ? doc.balance : '-';
+    }
+    if (col === 'purchasedBalance') {
+      return doc.purchasedBalance !== undefined ? doc.purchasedBalance : '-';
     }
     if (col === 'DAILYFREEBALANCE') {
-      return moonsMap[doc.id]?.dailyFreeBalance !== undefined ? moonsMap[doc.id].dailyFreeBalance : '-';
+      return doc.dailyFreeBalance !== undefined ? doc.dailyFreeBalance : '-';
     }
-    if (col === 'LASTDAILYCLAIMEDAT') {
-      const val = moonsMap[doc.id]?.lastDailyClaimedAt;
+    if (col === 'lastDailyClaimedAt') {
+      const val = doc.lastDailyClaimedAt;
       if (!val) return '-';
       if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
       return new Date(val).toLocaleString('tr-TR');
     }
+    if (col === 'updatedAt') {
+      const val = doc.updatedAt || doc.lastDailyClaimedAt;
+      if (!val) return '-';
+      if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
+      return new Date(val).toLocaleString('tr-TR');
+    }
+    return doc[col];
+  };
 
-    const dbKey = fieldMapping[col] || col;
-    return doc[dbKey];
+  // Helper to get value of contact_us fields mapped
+  const getContactUsValue = (doc: any, col: string): any => {
+    if (col === 'USERID') {
+      const foundUserId = Object.keys(usersMap).find(uid => usersMap[uid].email?.toLowerCase() === doc.email?.toLowerCase());
+      return foundUserId || '-';
+    }
+    if (col === 'MAIL') {
+      return doc.email || '-';
+    }
+    if (col === 'FULLNAME') {
+      return doc.fullName || '-';
+    }
+    if (col === 'CREATEDAT') {
+      return doc.createdAt;
+    }
+    if (col === 'SUBJECT') {
+      return doc.subject || '-';
+    }
+    if (col === 'MESSAGE') {
+      return doc.message || '-';
+    }
+    return doc[col];
   };
 
   // Helper to get value of ai_feedback fields mapped
@@ -286,6 +330,12 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       } else if (selectedCollection === 'ai_telemetry') {
         aVal = getTelemetryValue(a, sortByField);
         bVal = getTelemetryValue(b, sortByField);
+      } else if (selectedCollection === 'contact_us') {
+        aVal = getContactUsValue(a, sortByField);
+        bVal = getContactUsValue(b, sortByField);
+      } else if (selectedCollection === 'user_moons') {
+        aVal = getUserMoonsValue(a, sortByField);
+        bVal = getUserMoonsValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -351,6 +401,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           val = renderValue(getFeedbackValue(doc, col));
         } else if (selectedCollection === 'ai_telemetry') {
           val = renderValue(getTelemetryValue(doc, col));
+        } else if (selectedCollection === 'contact_us') {
+          val = renderValue(getContactUsValue(doc, col));
+        } else if (selectedCollection === 'user_moons') {
+          val = renderValue(getUserMoonsValue(doc, col));
         } else {
           val = renderValue(doc[col]);
         }
@@ -378,7 +432,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const getColumns = () => {
     if (selectedCollection === 'moon_transactions') {
       return [
-        'ID',
+        'USERID',
         'Username',
         'Mail',
         'createdat',
@@ -398,29 +452,22 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
     if (selectedCollection === 'users') {
       return [
-        'ID',
+        'USERID',
         'NAME',
         'EMAIL',
-        'PHONENUMBER',
+        'PHONE NUMBER',
         'BIRTHDAY',
-        'BIRTHPLACE',
-        'RELATIONSHIP',
-        'FoCUS',
-        'CREATEDAT',
-        'UPDATEDAT',
+        'BIRTH PLACE',
+        'CRETEDAT',
+        'UPDATEAT',
         'CONSENTACCEPTEDAT',
         'TERMSACCEPTEDAT',
         'ONBOARDINGCOMPLETED',
         'TIMEZONE',
         'LASTLOGIN',
-        'DEVICEINFo',
+        'DEVICEINFO',
         'METADATA BROWSER',
-        'METADATA LOCATION',
-        'PROVIDERID',
-        'BALANCE',
-        'PURCHASEDBALANCE',
-        'DAILYFREEBALANCE',
-        'LASTDAILYCLAIMEDAT'
+        'METADATA LOCATION'
       ];
     }
     if (selectedCollection === 'ai_feedback') {
@@ -442,6 +489,28 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'COMPLETIONTOKENS',
         'TOTALTOKENS',
         'LATENCYMS'
+      ];
+    }
+    if (selectedCollection === 'contact_us') {
+      return [
+        'USERID',
+        'MAIL',
+        'FULLNAME',
+        'CREATEDAT',
+        'SUBJECT',
+        'MESSAGE'
+      ];
+    }
+    if (selectedCollection === 'user_moons') {
+      return [
+        'USERID',
+        'MAIL',
+        'NAME',
+        'BALANCE',
+        'purchasedBalance',
+        'DAILYFREEBALANCE',
+        'lastDailyClaimedAt',
+        'updatedAt'
       ];
     }
     const cols = new Set<string>();
@@ -618,6 +687,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getFeedbackValue(doc, col))
                           : selectedCollection === 'ai_telemetry'
                           ? renderValue(getTelemetryValue(doc, col))
+                          : selectedCollection === 'contact_us'
+                          ? renderValue(getContactUsValue(doc, col))
+                          : selectedCollection === 'user_moons'
+                          ? renderValue(getUserMoonsValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}

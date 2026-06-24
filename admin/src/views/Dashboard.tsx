@@ -27,11 +27,13 @@ export const Dashboard: React.FC = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const collectionsList = [
+    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' },
+    { id: 'ai_telemetry', label: 'AI Telemetri' },
+    { id: 'contact_us', label: 'Contact Us' },
     { id: 'users', label: 'Kullanıcı Listesi' },
     { id: 'moon_transactions', label: 'Moon İşlemleri' },
     { id: 'error_logs', label: 'Sistem Hataları' },
-    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' },
-    { id: 'ai_telemetry', label: 'AI Telemetri' }
+    { id: 'user_moons', label: 'User Moons' }
   ];
 
   useEffect(() => {

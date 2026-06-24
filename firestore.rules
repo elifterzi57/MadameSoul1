@@ -209,27 +209,33 @@ service cloud.firestore {
 
     match /messages_en/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
     match /messages_tr/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
     match /messages_es/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
     match /messages_fr/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
     match /messages_zh/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
     match /messages_ko/{messageId} {
       allow create: if isValidMessage(request.resource.data);
-      allow read, update, delete: if false;
+      allow read: if isEmployee();
+      allow update, delete: if false;
     }
 
     match /phones/{phoneNumber} {
