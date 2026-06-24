@@ -192,6 +192,13 @@ service cloud.firestore {
       allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
+    match /reading_texts/{transactionId} {
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
+      allow create: if request.auth != null && (request.resource.data.userId == request.auth.uid || isEmployee());
+      allow update: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
     match /ai_feedback/{feedbackId} {
       allow get: if request.auth != null && (resource.data.userId == request.auth.uid || isEmployee());
       allow list: if request.auth != null && (request.auth.token.role == 'admin' || request.auth.token.role == 'employee' || resource.data.userId == request.auth.uid);

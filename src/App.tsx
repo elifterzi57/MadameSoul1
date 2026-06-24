@@ -901,8 +901,16 @@ function AppContent() {
 
       if (pendingTxId.current) {
         try {
+          // Write to reading_texts collection (Winston's optimization)
+          if (user) {
+            await setDoc(doc(db, 'reading_texts', pendingTxId.current), {
+              userId: user.uid,
+              readingText: data.text,
+              createdAt: serverTimestamp()
+            });
+          }
+
           await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
-            readingText: data.text,
             status: 'success',
             cached: data.cached
           });
@@ -1064,7 +1072,32 @@ function AppContent() {
     const isEvent = pastReading && pastReading.nativeEvent;
     const actualPastReading = isEvent ? undefined : pastReading;
 
-    const readingToUse = actualPastReading ? actualPastReading.readingText : reading;
+    let readingToUse = actualPastReading ? actualPastReading.readingText : reading;
+
+    // Fetch readingText dynamically from reading_texts (or legacy fallback) if it's a past reading and text is missing (Winston's optimization)
+    if (actualPastReading && !readingToUse) {
+      try {
+        const textDocRef = doc(db, 'reading_texts', actualPastReading.id);
+        const textDocSnap = await getDoc(textDocRef);
+        if (textDocSnap.exists()) {
+          readingToUse = textDocSnap.data().readingText;
+        } else {
+          console.warn("readingText not found in reading_texts collection, checking fallback in transaction");
+          const txDocRef = doc(db, 'moon_transactions', actualPastReading.id);
+          const txDocSnap = await getDoc(txDocRef);
+          if (txDocSnap.exists() && txDocSnap.data().readingText) {
+            readingToUse = txDocSnap.data().readingText;
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching readingText for PDF:", e);
+        if (showToast) {
+          showToast(userInfo.language === 'tr' ? "Fal metni yüklenirken hata oluştu." : "Error loading reading text.", "error");
+        }
+        return;
+      }
+    }
+
     const cardsToUse = actualPastReading?.cards || drawnCards;
     
     const userInfoToUse = actualPastReading ? {

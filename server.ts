@@ -838,8 +838,14 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           // Update transaction status to success
           await adminDb.collection("moon_transactions").doc(transactionId).update({
             status: "success",
-            readingText: response.text,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Save readingText to reading_texts collection
+          await adminDb.collection("reading_texts").doc(transactionId).set({
+            userId: uid,
+            readingText: response.text,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
 
           // Log AI Telemetry to Firestore

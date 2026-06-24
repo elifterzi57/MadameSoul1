@@ -785,7 +785,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                     {userInfo.language === 'tr' ? "Sistem Hatası" : "System Error"}
                                   </span>
                                 )}
-                                {item.readingText && (
+                                {(item.status === 'success' || item.status === 'cached' || item.readingText) && (
                                   (userInfo.isPremium || item.deductedFrom === 'purchased') ? (
                                     <button 
                                       onClick={(e) => {
@@ -838,25 +838,22 @@ export const Profile: React.FC<ProfileProps> = ({
                                       </div>
                                     )}
 
-                                    {/* Tarot Interpretation Reading Text */}
-                                    <div className="space-y-2">
-                                      <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
-                                        {translations?.profileDiary?.detailsTitle || "Reading Details"}
-                                      </h4>
-                                      <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-[#ecd8a6]/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
-                                        {item.readingText || (
+                                    {/* System Error message display if status is failed */}
+                                    {item.status === 'failed' && (
+                                      <div className="space-y-2">
+                                        <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-rose-500/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
                                           <span className="text-rose-400/80 flex items-center gap-2">
                                             <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                             {userInfo.language === 'tr' 
                                               ? "Bu açılım bir sistem hatası nedeniyle tamamlanamadı. Harcanan krediniz iade edilmiştir." 
                                               : "This reading could not be completed due to a system error. Your moon balance has been refunded."}
                                           </span>
-                                        )}
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
 
                                     {/* Tarot Feedback Module */}
-                                    {item.readingText && (
+                                    {((item.status === 'success' || item.status === 'cached' || item.readingText) && item.status !== 'failed') && (
                                       <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10">
                                         <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/60 uppercase">
                                           {profileT.history.evalTitle}
