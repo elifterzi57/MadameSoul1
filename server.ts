@@ -1583,6 +1583,40 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     }
   });
 
+  // Manually reject/cancel payment by administrative action (Winston/Sally's UX cleanup)
+  app.post("/api/admin/reject-payment", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+
+      await adminDb.collection("checkout_attempts").doc(sessionId).update({
+        status: "cancelled",
+        completedMethod: "manual_reject",
+        approvedBy: req.user?.uid || null,
+        completedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      try {
+        const operatorEmail = req.user?.email || "unknown_admin";
+        await adminDb.collection("admin_audit_logs").add({
+          operatorEmail,
+          actionType: "manual_payment_reject",
+          details: { sessionId },
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("[Server] Error writing manual payment reject audit log:", logErr);
+      }
+
+      res.json({ status: "success" });
+    } catch (err: any) {
+      await logServerError(err, "POST /api/admin/reject-payment", req.user?.uid);
+      res.status(500).json({ error: err.message || "Failed to manually reject payment" });
+    }
+  });
+
   // Start/Stop Stripe CLI webhook listener (Local only)
   app.post("/api/admin/stripe-listener/toggle", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
     try {

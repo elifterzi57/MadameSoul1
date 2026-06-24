@@ -21,6 +21,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
   const [selectedAttempt, setSelectedAttempt] = useState<any | null>(null);
   const [modalState, setModalState] = useState<'confirm' | 'loading' | 'success' | 'error'>('confirm');
   const [modalError, setModalError] = useState<string | null>(null);
+  const [modalAction, setModalAction] = useState<'approve' | 'reject'>('approve');
 
   const [usersMap, setUsersMap] = useState<Record<string, string>>({});
   const [completedMethods, setCompletedMethods] = useState<Record<string, string>>({});
@@ -102,9 +103,52 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
   const handleManualApprove = (attempt: any) => {
     setSelectedAttempt(attempt);
+    setModalAction('approve');
     setModalState('confirm');
     setModalError(null);
     setIsModalOpen(true);
+  };
+
+  const handleManualReject = (attempt: any) => {
+    setSelectedAttempt(attempt);
+    setModalAction('reject');
+    setModalState('confirm');
+    setModalError(null);
+    setIsModalOpen(true);
+  };
+
+  const executeManualReject = async () => {
+    if (!selectedAttempt) return;
+    setModalState('loading');
+    setActionLoadingId(selectedAttempt.id);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error("Giriş yapmış bir admin bulunamadı.");
+      const idToken = await currentUser.getIdToken(true);
+
+      const response = await fetch('/api/admin/reject-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ sessionId: selectedAttempt.id })
+      });
+
+      if (!response.ok) {
+        const resText = await response.text();
+        throw new Error(`İşlem iptal edilemedi: ${resText}`);
+      }
+
+      setModalState('success');
+      fetchSalesData();
+    } catch (err: any) {
+      console.error(err);
+      setModalError(err.message || "İşlem iptal edilirken hata oluştu.");
+      setModalState('error');
+    } finally {
+      setActionLoadingId(null);
+    }
   };
 
   const executeManualApprove = async () => {
@@ -741,6 +785,13 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                         >
                           Manuel Onayla
                         </button>
+                        <button
+                          disabled={actionLoadingId === attempt.id}
+                          onClick={() => handleManualReject(attempt)}
+                          className="rounded-lg bg-rose-500/10 border border-rose-500/30 px-3 py-1 text-xs text-rose-400 hover:bg-rose-500/20 transition disabled:opacity-50 ml-2"
+                        >
+                          İptal Et
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -860,7 +911,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         )}
       </div>
 
-      {/* Sally's Custom Approval Modal */}
+      {/* Sally's Custom Approval/Cancellation Modal */}
       {isModalOpen && selectedAttempt && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[#ecd8a6]/20 bg-[#0e0a1b] p-6 shadow-2xl shadow-purple-950/50 transition-all">
@@ -868,8 +919,12 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[#ecd8a6]/10 pb-4 mb-4">
               <h3 className="font-serif text-xl text-[#ecd8a6] flex items-center gap-2">
-                <ShieldAlert className="h-5 w-5 text-yellow-500" />
-                Ödeme Onaylama
+                {modalAction === 'reject' ? (
+                  <ShieldAlert className="h-5 w-5 text-rose-500" />
+                ) : (
+                  <ShieldAlert className="h-5 w-5 text-yellow-500" />
+                )}
+                {modalAction === 'reject' ? 'Ödeme Talebi İptali' : 'Ödeme Onaylama'}
               </h3>
               {modalState !== 'loading' && (
                 <button 
@@ -884,10 +939,17 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             {/* Modal Content depending on state */}
             {modalState === 'confirm' && (
               <div className="space-y-4">
-                <div className="rounded-lg bg-yellow-500/5 border border-yellow-500/20 p-3 text-xs text-yellow-500 flex gap-2">
-                  <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                  <p>Bu işlem, seçilen Stripe oturumunun ödemesini onaylayarak kullanıcının hesabına Katina Moon yüklemesi gerçekleştirecektir. Lütfen bilgileri kontrol edin.</p>
-                </div>
+                {modalAction === 'reject' ? (
+                  <div className="rounded-lg bg-rose-500/5 border border-rose-500/20 p-3 text-xs text-rose-400 flex gap-2">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <p>Bu işlem, seçilen Stripe ödeme teşebbüsünü iptal edecektir. Kullanıcıya herhangi bir Moon yüklemesi yapılmayacaktır. Bu işlem geri alınamaz.</p>
+                  </div>
+                ) : (
+                  <div className="rounded-lg bg-yellow-500/5 border border-yellow-500/20 p-3 text-xs text-yellow-500 flex gap-2">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <p>Bu işlem, seçilen Stripe oturumunun ödemesini onaylayarak kullanıcının hesabına Katina Moon yüklemesi gerçekleştirecektir. Lütfen bilgileri kontrol edin.</p>
+                  </div>
+                )}
 
                 <div className="space-y-2 rounded-xl bg-purple-950/20 border border-[#ecd8a6]/10 p-4 text-sm">
                   <div className="flex flex-col gap-1 py-2 border-b border-[#ecd8a6]/5 text-left">
@@ -917,37 +979,66 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                     onClick={() => setIsModalOpen(false)}
                     className="px-4 py-2 text-sm text-[#ecd8a6]/80 border border-[#ecd8a6]/20 rounded-lg hover:bg-white/5 transition"
                   >
-                    İptal
+                    Vazgeç
                   </button>
-                  <button
-                    onClick={executeManualApprove}
-                    className="px-5 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg shadow-lg shadow-yellow-500/10 transition"
-                  >
-                    Evet, Onayla ve Yükle
-                  </button>
+                  {modalAction === 'reject' ? (
+                    <button
+                      onClick={executeManualReject}
+                      className="px-5 py-2 text-sm text-white bg-rose-600 hover:bg-rose-700 font-semibold rounded-lg shadow-lg shadow-rose-600/10 transition"
+                    >
+                      Evet, İptal Et
+                    </button>
+                  ) : (
+                    <button
+                      onClick={executeManualApprove}
+                      className="px-5 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg shadow-lg shadow-yellow-500/10 transition"
+                    >
+                      Evet, Onayla ve Yükle
+                    </button>
+                  )}
                 </div>
               </div>
             )}
 
             {modalState === 'loading' && (
               <div className="flex flex-col items-center justify-center py-10 space-y-4">
-                <Loader2 className="h-10 w-10 text-yellow-500 animate-spin" />
+                <Loader2 className={`h-10 w-10 animate-spin ${modalAction === 'reject' ? 'text-rose-500' : 'text-yellow-500'}`} />
                 <div className="text-center">
-                  <p className="text-sm font-medium text-[#ecd8a6]">Ödeme Onaylanıyor</p>
-                  <p className="text-xs text-[#ecd8a6]/60 mt-1">Stripe oturumu tamamlanıyor ve Moon'lar aktarılıyor...</p>
+                  <p className="text-sm font-medium text-[#ecd8a6]">
+                    {modalAction === 'reject' ? 'İşlem İptal Ediliyor' : 'Ödeme Onaylanıyor'}
+                  </p>
+                  <p className="text-xs text-[#ecd8a6]/60 mt-1">
+                    {modalAction === 'reject' 
+                      ? 'Stripe ödeme teşebbüsü iptal ediliyor...' 
+                      : 'Stripe oturumu tamamlanıyor ve Moon\'lar aktarılıyor...'}
+                  </p>
                 </div>
               </div>
             )}
 
             {modalState === 'success' && (
               <div className="space-y-4 text-center py-4">
-                <div className="inline-flex rounded-full bg-green-500/10 border border-green-500/30 p-3 text-green-400">
-                  <CheckCircle2 className="h-8 w-8" />
-                </div>
-                <div>
-                  <h4 className="font-serif text-lg text-green-400">Ödeme Başarıyla Tamamlandı</h4>
-                  <p className="text-xs text-[#ecd8a6]/60 mt-1">Kullanıcı hesabına {selectedAttempt.amount} Moon başarıyla yüklendi.</p>
-                </div>
+                {modalAction === 'reject' ? (
+                  <>
+                    <div className="inline-flex rounded-full bg-rose-500/10 border border-rose-500/30 p-3 text-rose-400">
+                      <CheckCircle2 className="h-8 w-8" />
+                    </div>
+                    <div>
+                      <h4 className="font-serif text-lg text-rose-400">İşlem Başarıyla İptal Edildi</h4>
+                      <p className="text-xs text-[#ecd8a6]/60 mt-1">Stripe ödeme teşebbüsü iptal edildi ve bekleyen işlemleri listesinden kaldırıldı.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="inline-flex rounded-full bg-green-500/10 border border-green-500/30 p-3 text-green-400">
+                      <CheckCircle2 className="h-8 w-8" />
+                    </div>
+                    <div>
+                      <h4 className="font-serif text-lg text-green-400">Ödeme Başarıyla Tamamlandı</h4>
+                      <p className="text-xs text-[#ecd8a6]/60 mt-1">Kullanıcı hesabına {selectedAttempt.amount} Moon başarıyla yüklendi.</p>
+                    </div>
+                  </>
+                )}
                 <div className="rounded-xl bg-purple-950/20 border border-[#ecd8a6]/10 p-3 text-xs text-left max-w-sm mx-auto space-y-1">
                   <div><span className="text-[#ecd8a6]/60">Kullanıcı (Mail/Tel):</span> <span className="font-mono break-all">{usersMap[selectedAttempt.userId] || selectedAttempt.userId}</span></div>
                   <div><span className="text-[#ecd8a6]/60">Miktar:</span> <span className="font-bold text-yellow-500">{selectedAttempt.amount} Moon</span></div>
@@ -969,7 +1060,9 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                   <AlertCircle className="h-8 w-8" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-lg text-red-400">Onaylama Başarısız</h4>
+                  <h4 className="font-serif text-lg text-red-400">
+                    {modalAction === 'reject' ? 'İptal Etme Başarısız' : 'Onaylama Başarısız'}
+                  </h4>
                   <p className="text-xs text-red-400/80 mt-1 max-h-24 overflow-y-auto">{modalError}</p>
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -980,7 +1073,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                     Kapat
                   </button>
                   <button
-                    onClick={executeManualApprove}
+                    onClick={modalAction === 'reject' ? executeManualReject : executeManualApprove}
                     className="flex-1 px-4 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg transition"
                   >
                     Yeniden Dene
