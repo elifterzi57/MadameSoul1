@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **137** | Açık: **0** | Tamamlanan: **133** | İptal Edilen: **4**
+Toplam Bilet: **140** | Açık: **0** | Tamamlanan: **136** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,9 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-308**](#-ms-308) | Feature / UX / UI / Dev | Stripe Bekleyen Ödeme Talepleri İptal Etme Butonu ve Akışı | Yüksek | Bekleyen ödemeler listesine "İptal Et" butonu, rose renkli glassmorphic onay/yükleme/başarı modalları ve iptal endpoint'i eklenerek ödemesiz talepler temizlendi. | Elif |
+| [**MS-307**](#-ms-307) | Bug / Security / Dev | Stripe Manuel Ödeme Onayına Ödeme Durumu Doğrulama Koruması | Yüksek | `/api/admin/complete-payment` endpoint'ine Stripe API'den payment_status'ün "paid" olduğunu doğrulayan güvenlik kontrolü eklendi. | Elif |
+| [**MS-306**](#-ms-306) | Bug / Dev | Stripe Webhook Gecikmesi & Fallback Çakışması (Race Condition) Bug Düzeltmesi | Yüksek | Ödeme tamamlama akışı Firestore runTransaction bloğuna alınarak, webhook ve fallback isteklerinin mükerrer moon yüklemesi yapması engellendi. | Elif |
 | [**MS-305**](#-ms-305) | Feature / Dev / UX | Login Ekranından Apple Giriş Seçeneğinin Kaldırılması | Orta | Giriş ekranındaki Apple Giriş butonları, handleAppleLogin fonksiyonu ve Apple ikon importu tamamen temizlenerek Apple girişi iptal edildi. | Elif |
 | [**MS-304**](#-ms-304) | Documentation | Bütün Dokümanların Güncel Uygulamaya Göre Güncellenmesi | Orta | data-models.md, data-models-monolith.md, api-contracts.md, api-contracts-monolith.md ve development-guide.md dosyaları son premium özellikleri, yeni API endpoint'leri ve Stripe CLI entegrasyonuna göre güncellendi. | Paige |
 | [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | stripe-cli devDependency olarak kuruldu, login tamamlandı ve stripe listen arka planda başlatılarak elde edilen signing secret .env dosyasına yazıldı. | Elif |
@@ -162,6 +165,52 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-308: Stripe Bekleyen Ödeme Talepleri İptal Etme Butonu ve Akışı (Feature / UX / UI / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / FinanceTab / Backend / Admin API
+* **Açıklama:**  
+  Kullanıcıların satın alımı tamamlamayıp yarıda bıraktığı ve admin panelinde "pending" olarak biriken ödeme taleplerini listeden temizlemek için iptal akışı eklenmiştir.
+* **Kabul Kriterleri:**
+  1. Bekleyen işlemler tablosunda "Manuel Onayla" butonunun yanına rose/kırmızı tonlarında "İptal Et" butonu eklenmelidir.
+  2. Butona basıldığında Sally'nin glassmorphic tasarım diline uygun rose renkli "Ödeme Talebi İptali" onay penceresi açılmalıdır.
+  3. Arka planda `/api/admin/reject-payment` endpoint'i tetiklenerek ilgili `checkout_attempts` durumu `cancelled` yapılmalı ve loglanmalıdır.
+
+---
+
+### 📋 MS-307: Stripe Manuel Ödeme Onayına Ödeme Durumu Doğrulama Koruması (Bug / Security / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Backend / Admin API / Complete Payment
+* **Açıklama:**  
+  Kullanıcının aslında ödemediği ancak beklemede kalan Stripe oturumlarının admin panelinden manuel olarak onaylanıp haksız moon bakiyesi elde edilmesini önlemek için doğrulama koruması eklenmiştir.
+* **Kabul Kriterleri:**
+  1. Admin manuel onay endpoint'i (`/api/admin/complete-payment`), onaylanmaya çalışılan Stripe oturumunun durumunu Stripe API üzerinden sorgulamalıdır.
+  2. Eğer Stripe üzerinde ödeme durumu `paid` değilse, onaylama işlemi engellenmeli ve hata dönülmelidir.
+
+---
+
+### 📋 MS-306: Stripe Webhook Gecikmesi & Fallback Çakışması (Race Condition) Bug Düzeltmesi (Bug / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Backend / Stripe Webhook / Fallback API
+* **Açıklama:**  
+  Stripe ödeme webhook'unun geciktiği durumlarda istemcinin fallback API (`/api/verify-checkout-session`) ile webhook'un aynı anda tetiklenmesi durumunda oluşan race condition engellenmiştir.
+* **Kabul Kriterleri:**
+  1. Ödeme tamamlama ve bakiye yükleme mantığı Firestore `runTransaction` bloğuna alınarak atomik hale getirilmelidir.
+  2. Bir istek işlemi tamamlayıp statüyü `completed` yaptığında, diğer eşzamanlı istek bu durumu görüp işlemi tekrarlamamalı ve mükerrer bakiye yüklenmesi engellenmelidir.
+
+---
 
 ### 📋 MS-305: Login Ekranından Apple Giriş Seçeneğinin Kaldırılması (Feature / Dev / UX)
 
