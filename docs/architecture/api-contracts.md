@@ -134,10 +134,112 @@ Uygulamanın statik reklam konfigürasyonunu dinamik olarak güncellemek için i
 
 ---
 
+## 4. Log Buffer Uç Noktası (Log Buffer Endpoint)
+
+İstemci ve sunucu hatalarının toplu şekildeFirestore'a yazılması amacıyla tampon loglama yapar.
+
+- **URL:** `/api/logs`
+- **Yöntem (Method):** `POST`
+- **İstek Gövdesi (Request Body):**
+```json
+{
+  "logs": [
+    {
+      "source": "client",
+      "errorCode": "auth/popup-blocked",
+      "errorMessage": "Popup blocked by browser",
+      "stackTrace": "...",
+      "deviceMetadata": { "userAgent": "...", "os": "...", "appVersion": "..." }
+    }
+  ]
+}
+```
+
+---
+
+## 5. Stripe Ödeme Oturumu Uç Noktası (Stripe Checkout Session)
+
+Kullanıcıların Katina Moon kredisi satın almak üzere Stripe Checkout sayfası yönlendirme oturumu oluşturur.
+
+- **URL:** `/api/create-checkout-session`
+- **Yöntem (Method):** `POST`
+- **Kimlik Doğrulama (Auth):** Zorunlu.
+- **İstek Gövdesi (Request Body):**
+```json
+{
+  "priceId": "price_1XYZ...",
+  "packAmount": 10
+}
+```
+
+---
+
+## 6. Ödeme Doğrulama Uç Noktası (Payment Verification & Fallback)
+
+Webhook gecikmeleri durumunda istemci tarafının Stripe Checkout oturumunun başarı durumunu sorgulamasını ve bakiye yüklemesini sağlar.
+
+- **URL:** `/api/verify-checkout-session`
+- **Yöntem (Method):** `POST`
+- **Kimlik Doğrulama (Auth):** Zorunlu.
+- **İstek Gövdesi (Request Body):**
+```json
+{
+  "sessionId": "cs_test_abc123"
+}
+```
+
+---
+
+## 7. Fatura & Makbuz Uç Noktaları (Stripe Receipts)
+
+Oturum veya ödeme niyet kimliğine göre Stripe üzerinden dinamik fatura makbuzu URL'lerini döndürür.
+
+- **URL:** `/api/payments/receipt/:sessionId` ve `/api/payments/receipt-by-intent/:paymentIntentId`
+- **Yöntem (Method):** `GET`
+- **Yanıt (Response):**
+```json
+{
+  "receiptUrl": "https://stripe.com/receipt/acct_..."
+}
+```
+
+---
+
+## 8. Yönetici / Çalışan Özel İşlemleri (Admin Panel Endpoints)
+
+Admin panelindeki sekmelerden tetiklenen özel yönetim uç noktaları.
+
+### 📋 Manuel Ödeme Onaylama
+Fiziki veya webhook dışı bekleyen Stripe oturumlarını manuel olarak onaylar, bakiyeyi ve `isPremium` statüsünü günceller.
+- **URL:** `/api/admin/complete-payment`
+- **Yöntem (Method):** `POST`
+- **Kimlik Doğrulama (Auth):** Zorunlu (Rol: `employee` veya `admin`).
+- **İstek Gövdesi (Request Body):**
+```json
+{
+  "sessionId": "cs_test_abc123",
+  "reason": "Kullanıcı dekont ibraz etti."
+}
+```
+
+### 📋 Stripe Webhook Dinleyicisi Tetikleme
+Geliştirme veya test ortamlarında Stripe CLI webhook dinleyicisini uzaktan başlatır/durdurur.
+- **URL:** `/api/admin/stripe-listener/toggle`
+- **Yöntem (Method):** `POST`
+- **Kimlik Doğrulama (Auth):** Zorunlu (Rol: `admin`).
+- **İstek Gövdesi (Request Body):**
+```json
+{
+  "action": "start" // veya "stop"
+}
+```
+
+---
+
 ## İstemci Entegrasyonu ve Hata Yönetimi
 
 İstemci (`src/App.tsx`), yorum oluşturulurken sunucudan gelen yanıtı bekler:
 1. **İşlem Başlatma:** İstemci, Firestore'da yeni bir `moon_transactions` kaydı oluşturur ve bu kaydın ID'sini (`txRef.id`) alır.
-2. **API Çağrısı:** `/api/generate` uç noktasına oluşturulan prompt metnini gönderir.
-3. **Kaydetme ve Güncelleme:** Sunucudan başarılı yanıt (`data.text`) geldiğinde, istemci bu yorumu ilgili `moon_transactions` belgesine `readingText` alanı olarak kaydeder.
-4. **Hata Yakalama:** API isteği başarısız olursa veya sunucudan hata dönerse, istemci kullanıcıya hata mesajı (`t('errorInterrupted')`) gösterir ve işlemi sonlandırır.
+2. **API Çağrısı:** `/api/generate` veya `/api/generate/stream` (SSE) uç noktasına bilgileri gönderir.
+3. **Kaydetme ve Güncelleme:** Akış tamamlandığında veya sunucudan başarılı yanıt geldiğinde yorum ilgili belgeye `readingText` alanı olarak kaydedilir.
+4. **Hata Yakalama:** İstek başarısız olursa veya sunucudan hata dönerse, istemci hata mesajı gösterir, hata günlüğü logBuffer'a yazılır ve bakiye koruması sağlanır.

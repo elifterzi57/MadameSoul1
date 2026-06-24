@@ -99,6 +99,23 @@ Uygulama dil paketleri `src/locales/` dizinindedir. Mevcut bir çeviriyi düzelt
 ### Reklamları Yapılandırma
 Sponsorlu içerikler ve video reklamları dinamik olarak `public/ads/ads_config.json` üzerinden yönetilir. Reklam linklerini veya görsel/video yollarını değiştirmek için bu JSON dosyasını yerel olarak güncelleyebilirsiniz. Sunucu yeniden başlatılmadan değişiklikler anında yansır.
 
+### Yerel Stripe Webhook Entegrasyonu (Stripe CLI)
+
+Satın alma işlemlerinin yerel testlerini gerçekleştirmek amacıyla Stripe CLI webhook akışını yapılandırmak için:
+1. Terminal üzerinden Stripe hesabınızda oturum açın:
+   ```bash
+   npx stripe login
+   ```
+2. Webhook dinleyicisini arka planda başlatarak olayları yerel sunucuya yönlendirin:
+   ```bash
+   npx stripe listen --forward-to localhost:3000/api/stripe-webhook
+   ```
+3. Terminal çıktısında verilen `whsec_...` imza doğrulama anahtarını (Signing Secret) `.env` dosyanızda `STRIPE_WEBHOOK_SECRET` değişkenine ekleyin:
+   ```env
+   STRIPE_WEBHOOK_SECRET=whsec_your_signing_secret_here
+   ```
+Alternatif olarak, Admin Panelinde "Sistem Ayarları" altındaki **Stripe CLI Webhook Dinleyicisi** butonunu kullanarak dinleyiciyi panel üzerinden otomatik olarak başlatıp durdurabilirsiniz.
+
 ---
 
 ## 7. Git ve Sürüm Kontrol İş Akışı (Git Workflow)

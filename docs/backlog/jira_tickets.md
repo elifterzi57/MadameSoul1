@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **135** | Açık: **0** | Tamamlanan: **131** | İptal Edilen: **4**
+Toplam Bilet: **136** | Açık: **0** | Tamamlanan: **132** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-304**](#-ms-304) | Documentation | Bütün Dokümanların Güncel Uygulamaya Göre Güncellenmesi | Orta | data-models.md, data-models-monolith.md, api-contracts.md, api-contracts-monolith.md ve development-guide.md dosyaları son premium özellikleri, yeni API endpoint'leri ve Stripe CLI entegrasyonuna göre güncellendi. | Paige |
 | [**MS-303**](#-ms-303) | Task / Infra | Stripe CLI ve Webhook Entegrasyonu ile Otomatik Webhook Akışının Kurulması | Yüksek | stripe-cli devDependency olarak kuruldu, login tamamlandı ve stripe listen arka planda başlatılarak elde edilen signing secret .env dosyasına yazıldı. | Elif |
 | [**MS-302**](#-ms-302) | Feature / UX / UI | Admin Manuel Onaylama Pop-up Pencerelerinde Kullanıcı İletişim Bilgisi ve Tam Session ID Gösterimi | Yüksek | Onaylama ve başarı modal pencerelerinde UID yerine mail/telefon bilgisi getirildi. Session ID'nin sonunun kesilmemesi için break-all kelime kaydırmalı tam genişlikte blok tasarımı entegre edildi. | Elif |
 | [**MS-301**](#-ms-301) | Feature / Dev / DB | Stripe Ödemelerinde Otomatik Webhook ve Manuel Admin Onay Geçişlerinin Ayırt Edilmesi | Yüksek | checkout_attempts koleksiyonuna completedMethod (webhook/manual) ve onaylayan approvedBy alanları eklendi. "Son Stripe İşlemleri" tablosunun statü sütunu bu duruma göre Auto (Webhook) veya Manual (Admin) rozetlerini gösterecek şekilde uyarlandı. | Elif |
@@ -162,6 +163,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 ---
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-304: Bütün Dokümanların Güncel Uygulamaya Göre Güncellenmesi (Documentation)
+
+* **Öncelik:** Orta (Medium)
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Paige (📚 Technical Writer / `bmad-agent-tech-writer`)
+* **Bileşen:** Database / API / Documentation
+* **Açıklama:**  
+  Son eklenen Premium Üyelik (`isPremium`) flag ve yetki açılımları, manuel ödeme onaylama alanları, API uç noktaları (Stripe ödeme doğrulamaları, tampon loglama, fatura makbuzları vb.) ve Stripe CLI entegrasyonu rehberi doğrultusunda tüm mimari ve geliştirme kılavuzlarının güncellenmesi.
+* **Kabul Kriterleri:**
+  1. `data-models.md` ve `data-models-monolith.md` şemaları güncellenmeli.
+  2. `api-contracts.md` ve `api-contracts-monolith.md` yeni API uç noktalarını içerecek şekilde güncellenmeli.
+  3. `development-guide.md` yerel Stripe CLI webhook dinleme adımlarını barındırmalı.
+
+---
 
 ### ✅ MS-290: Çalışan Yetkileri Ekranından Şifre Güncelleme/Sıfırlama Desteği (Feature / Dev)
 
