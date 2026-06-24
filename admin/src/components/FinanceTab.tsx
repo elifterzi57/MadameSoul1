@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
-import { collection, getDocs, query, where, limit, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where, limit, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { DollarSign, ShoppingBag, TrendingUp, RefreshCw, AlertCircle, CheckCircle2, X, Info, ShieldAlert, Loader2, Clock, Calendar, Layers } from 'lucide-react';
 
 interface FinanceTabProps {
@@ -60,16 +60,33 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       const completedData: any[] = [];
 
       const completedMethodsMap: Record<string, string> = {};
+      const nowMs = Date.now();
       aSnap.forEach((docSnap) => {
         const data = docSnap.data();
         const docWithId = { id: docSnap.id, ...data };
-        if (data.status === 'pending') {
+        
+        let status = data.status;
+        const createdAtDate = data.createdAt?.seconds 
+          ? new Date(data.createdAt.seconds * 1000) 
+          : new Date(data.createdAt || nowMs);
+        const ageMinutes = (nowMs - createdAtDate.getTime()) / (1000 * 60);
+
+        if (status === 'pending' && ageMinutes > 10) {
+          status = 'cancelled';
+          const attemptRef = doc(db, 'checkout_attempts', docSnap.id);
+          updateDoc(attemptRef, {
+            status: 'cancelled',
+            completedMethod: 'auto_timeout',
+            completedAt: serverTimestamp()
+          }).catch(err => console.error("Error auto-cancelling pending session:", err));
+        }
+
+        if (status === 'pending') {
           pendingData.push(docWithId);
-        } else if (data.status === 'completed') {
+        } else if (status === 'completed') {
           completedData.push(docWithId);
           completedMethodsMap[docSnap.id] = data.completedMethod || 'webhook';
-        } else if (data.status === 'cancelled') {
-          // Push to salesData as a mock transaction object for visibility
+        } else if (status === 'cancelled') {
           salesData.push({
             id: docSnap.id,
             userId: data.userId,
@@ -81,7 +98,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             description: 'Ödemesi gerçekleşmeyen işlemin iptali',
             isCancelled: true
           });
-          completedMethodsMap[docSnap.id] = 'manual_reject';
+          completedMethodsMap[docSnap.id] = data.completedMethod || 'manual_reject';
         }
       });
       setSales(salesData);

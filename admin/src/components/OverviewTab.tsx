@@ -5,7 +5,10 @@ import {
   getDocs, 
   limit, 
   orderBy, 
-  query 
+  query,
+  doc,
+  updateDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { 
   Users, 
@@ -80,8 +83,27 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       // 6. Fetch checkout attempts (up to 300)
       const checkoutSnap = await getDocs(query(collection(db, 'checkout_attempts'), orderBy('createdAt', 'desc'), limit(300)));
       const checkoutList: any[] = [];
+      const nowMs = Date.now();
       checkoutSnap.forEach((docSnap) => {
-        checkoutList.push({ id: docSnap.id, ...docSnap.data() });
+        const data = docSnap.data();
+        let status = data.status;
+        
+        const createdAtDate = data.createdAt?.seconds 
+          ? new Date(data.createdAt.seconds * 1000) 
+          : new Date(data.createdAt || nowMs);
+        const ageMinutes = (nowMs - createdAtDate.getTime()) / (1000 * 60);
+
+        if (status === 'pending' && ageMinutes > 10) {
+          status = 'cancelled';
+          const attemptRef = doc(db, 'checkout_attempts', docSnap.id);
+          updateDoc(attemptRef, {
+            status: 'cancelled',
+            completedMethod: 'auto_timeout',
+            completedAt: serverTimestamp()
+          }).catch(err => console.error("Error auto-cancelling pending session in overview:", err));
+        }
+
+        checkoutList.push({ id: docSnap.id, ...data, status });
       });
       setAllCheckoutAttempts(checkoutList);
 
