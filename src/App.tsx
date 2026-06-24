@@ -1694,7 +1694,7 @@ function AppContent() {
                     type="text"
                     value={userInfo.name}
                     onChange={e => handleInputChange(e, 'name')}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans uppercase"
                     placeholder={t('namePlaceholder')}
                   />
                 </div>
@@ -1706,7 +1706,7 @@ function AppContent() {
                     type="date"
                     value={userInfo.dob}
                     onChange={e => setUserInfo({ dob: e.target.value })}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] custom-date-picker font-sans [color-scheme:dark]"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] custom-date-picker font-sans [color-scheme:dark] uppercase"
                   />
                   <style>{`
                     .custom-date-picker::-webkit-calendar-picker-indicator {
@@ -1722,7 +1722,7 @@ function AppContent() {
                     type="text"
                     value={userInfo.birthplace}
                     onChange={e => handleInputChange(e, 'birthplace')}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans uppercase"
                     placeholder={t('pobPlaceholder')}
                   />
                 </div>
@@ -1733,7 +1733,7 @@ function AppContent() {
                     <select 
                       value={userInfo.relationship}
                       onChange={e => setUserInfo({ relationship: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans uppercase"
                     >
                       {STATUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
@@ -1756,7 +1756,7 @@ function AppContent() {
                     <select 
                       value={userInfo.focus}
                       onChange={e => setUserInfo({ focus: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans uppercase"
                     >
                       {FOCUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
