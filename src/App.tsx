@@ -852,13 +852,24 @@ function AppContent() {
       const data = await response.json();
 
       if (data.status === 'pending') {
-        return new Promise<{ text: string; cached: boolean }>((resolve, reject) => {
-          const unsubscribe = onSnapshot(doc(db, 'moon_transactions', txRef.id), (docSnap) => {
+        return new Promise<{ text: string; cached: boolean; isAsync: boolean }>((resolve, reject) => {
+          const unsubscribe = onSnapshot(doc(db, 'moon_transactions', txRef.id), async (docSnap) => {
             if (docSnap.exists()) {
               const txData = docSnap.data();
               if (txData.status === 'success') {
                 unsubscribe();
-                resolve({ text: txData.readingText || '', cached: false });
+                try {
+                  // Fetch the actual reading text from reading_texts collection (Winston's optimization)
+                  const textDoc = await getDoc(doc(db, 'reading_texts', txRef.id));
+                  if (textDoc.exists()) {
+                    resolve({ text: textDoc.data().readingText || '', cached: false, isAsync: true });
+                  } else {
+                    resolve({ text: txData.readingText || '', cached: false, isAsync: true });
+                  }
+                } catch (e) {
+                  console.error("Error fetching reading text from reading_texts collection:", e);
+                  resolve({ text: txData.readingText || '', cached: false, isAsync: true });
+                }
               } else if (txData.status === 'failed') {
                 unsubscribe();
                 reject(new Error(userInfo.language === 'tr' ? "Mistik yorum oluşturulurken sunucuda bir hata oluştu." : "Server failed to generate mystical reading. Please try again."));
@@ -871,7 +882,7 @@ function AppContent() {
         });
       }
 
-      return { text: data.text || t('errorSilent'), cached: !!data.cached };
+      return { text: data.text || t('errorSilent'), cached: !!data.cached, isAsync: false };
     },
     onMutate: () => {
       setIsGenerating(true);
@@ -899,7 +910,9 @@ function AppContent() {
         }
       }
 
-      if (pendingTxId.current) {
+      // ONLY write to Firestore from client if it was a synchronous execution (local bypass or cache hit)
+      // If it was async, the server has already written these documents securely.
+      if (pendingTxId.current && !data.isAsync) {
         try {
           // Write to reading_texts collection (Winston's optimization)
           if (user) {
@@ -915,7 +928,7 @@ function AppContent() {
             cached: data.cached
           });
         } catch (e) {
-          console.error("Error saving reading text:", e);
+          console.error("Error saving reading text on client:", e);
         }
       }
 
