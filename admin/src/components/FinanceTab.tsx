@@ -53,8 +53,6 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         salesData.push({ id: docSnap.id, ...data });
       });
 
-      setSales(salesData);
-
       // Fetch all checkout_attempts to group by pending vs completed without index issues
       const attemptsRef = collection(db, 'checkout_attempts');
       const aSnap = await getDocs(attemptsRef);
@@ -70,8 +68,23 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         } else if (data.status === 'completed') {
           completedData.push(docWithId);
           completedMethodsMap[docSnap.id] = data.completedMethod || 'webhook';
+        } else if (data.status === 'cancelled') {
+          // Push to salesData as a mock transaction object for visibility
+          salesData.push({
+            id: docSnap.id,
+            userId: data.userId,
+            amount: data.amount,
+            price: data.price || (data.amount === 3 ? 2.99 : data.amount === 10 ? 8.99 : data.amount === 25 ? 19.99 : data.amount * 0.8),
+            paymentProvider: 'Stripe',
+            idempotencyKey: docSnap.id,
+            createdAt: data.completedAt || data.createdAt || new Date(),
+            description: 'Ödemesi gerçekleşmeyen işlemin iptali',
+            isCancelled: true
+          });
+          completedMethodsMap[docSnap.id] = 'manual_reject';
         }
       });
+      setSales(salesData);
       setCompletedMethods(completedMethodsMap);
       setCompletedAttempts(completedData);
 
@@ -877,14 +890,21 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                     else if (sale.amount) mappedPrice = `$${(sale.amount * 0.8).toFixed(2)}`;
 
                     return (
-                      <tr key={sale.id || idx} className="hover:bg-purple-950/10 transition">
+                      <tr key={sale.id || idx} className={`hover:bg-purple-950/10 transition ${sale.isCancelled ? 'opacity-70 bg-rose-950/5' : ''}`}>
                         <td className="px-6 py-4 whitespace-nowrap text-xs">{getDocDate(sale)}</td>
                         <td className="px-6 py-4 text-xs max-w-[150px] truncate">{usersMap[sale.userId] || sale.userId}</td>
-                        <td className="px-6 py-4 font-bold text-green-400">{sale.amount} Moon</td>
-                        <td className="px-6 py-4 text-xs font-bold text-[#ecd8a6]">{mappedPrice}</td>
+                        <td className={`px-6 py-4 font-bold ${sale.isCancelled ? 'text-rose-400/50 line-through' : 'text-green-400'}`}>{sale.amount} Moon</td>
+                        <td className={`px-6 py-4 text-xs font-bold ${sale.isCancelled ? 'text-[#ecd8a6]/40 line-through' : 'text-[#ecd8a6]'}`}>{mappedPrice}</td>
                         <td className="px-6 py-4 text-xs capitalize">{sale.paymentProvider || 'Stripe'}</td>
                         <td className="px-6 py-4 text-xs">
                           {(() => {
+                            if (sale.isCancelled) {
+                              return (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                  İptal Edildi
+                                </span>
+                              );
+                            }
                             const method = completedMethods[sale.idempotencyKey];
                             if (method === 'manual') {
                               return (
@@ -900,7 +920,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                             );
                           })()}
                         </td>
-                        <td className="px-6 py-4 text-xs max-w-[200px] truncate">{sale.description || 'Satın Alım'}</td>
+                        <td className={`px-6 py-4 text-xs max-w-[200px] truncate ${sale.isCancelled ? 'text-rose-400/70' : ''}`}>{sale.description || 'Satın Alım'}</td>
                       </tr>
                     );
                   })}
