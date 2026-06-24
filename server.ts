@@ -1164,7 +1164,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       // 2. Fallback to invoice hosted url if charge receipt not found
       if (!receiptUrl && session.invoice) {
         const invoice = await stripe.invoices.retrieve(session.invoice as string);
-        receiptUrl = invoice.hosted_invoice_url || invoice.receipt_url;
+        receiptUrl = invoice.hosted_invoice_url || (invoice as any).receipt_url;
       }
 
       if (receiptUrl) {

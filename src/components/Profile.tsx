@@ -38,6 +38,7 @@ interface ProfileProps {
     birthplace: string;
     relationship: string;
     language: string;
+    isPremium?: boolean;
   };
   moonsCount: number;
   readingCount: number;
