@@ -1545,6 +1545,19 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       if (!sessionId) {
         return res.status(400).json({ error: "Session ID is required" });
       }
+
+      // Verify payment status with Stripe before manually completing (Winston's logic validation)
+      if (stripe && sessionId.startsWith("cs_")) {
+        try {
+          const session = await stripe.checkout.sessions.retrieve(sessionId);
+          if (session.payment_status !== "paid") {
+            return res.status(400).json({ error: "Cannot manually approve: Stripe session payment status is NOT paid." });
+          }
+        } catch (err: any) {
+          console.error("[Server] Error verifying Stripe session for manual approval:", err);
+          return res.status(400).json({ error: "Failed to verify session status with Stripe. Make sure the session ID exists on Stripe." });
+        }
+      }
       
       const success = await completePayment(sessionId, "manual_admin_invoice_" + Date.now(), "https://stripe.com/mock-receipt", "manual", req.user?.uid);
       if (success) {
