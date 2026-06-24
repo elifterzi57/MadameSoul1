@@ -279,64 +279,58 @@ async function startServer() {
     });
   }
 
-
-
   async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string, method = "webhook", operatorUid: string | null = null) {
-    let attemptData: any = null;
-    let userEmail: string | null = null;
     try {
-      const attemptDoc = await adminDb.collection("checkout_attempts").doc(sessionId).get();
-      if (!attemptDoc.exists) {
-        console.warn(`[Server] Checkout attempt not found: ${sessionId}`);
-        return false;
-      }
-      
-      attemptData = attemptDoc.data()!;
-      if (attemptData.status === "completed") {
-        console.log(`[Server] Payment already completed for session: ${sessionId}`);
-        return true;
-      }
-      
-      const userId = attemptData.userId;
-      const amount = attemptData.amount;
+      const attemptRef = adminDb.collection("checkout_attempts").doc(sessionId);
+      let alreadyCompleted = false;
 
-      try {
-        const userDoc = await adminDb.collection("users").doc(userId).get();
-        if (userDoc.exists) {
-          userEmail = userDoc.data()?.email || null;
-        }
-      } catch (e) {
-        console.error("Failed to fetch user email for payment log:", e);
-      }
-      
-      await adminDb.collection("checkout_attempts").doc(sessionId).update({
-        status: "completed",
-        stripeInvoiceId: invoiceId || null,
-        stripeReceiptUrl: receiptUrl || null,
-        completedMethod: method,
-        approvedBy: operatorUid || null,
-        completedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-      
-      const moonRef = adminDb.collection("user_moons").doc(userId);
-      const userRef = adminDb.collection("users").doc(userId);
       await adminDb.runTransaction(async (transaction) => {
+        const attemptDoc = await transaction.get(attemptRef);
+        if (!attemptDoc.exists) {
+          throw new Error(`Checkout attempt not found: ${sessionId}`);
+        }
+
+        const attemptData = attemptDoc.data()!;
+        if (attemptData.status === "completed") {
+          console.log(`[Server] Payment already completed for session: ${sessionId}`);
+          alreadyCompleted = true;
+          return;
+        }
+
+        const userId = attemptData.userId;
+        const amount = attemptData.amount;
+
+        const moonRef = adminDb.collection("user_moons").doc(userId);
+        const userRef = adminDb.collection("users").doc(userId);
+
         const moonDoc = await transaction.get(moonRef);
         const userDoc = await transaction.get(userRef);
+
+        // 1. Update checkout_attempts status to completed
+        transaction.update(attemptRef, {
+          status: "completed",
+          stripeInvoiceId: invoiceId || null,
+          stripeReceiptUrl: receiptUrl || null,
+          completedMethod: method,
+          approvedBy: operatorUid || null,
+          completedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 2. Update user moons balance
         let daily = 0;
         let purchased = 0;
         let balance = 0;
-        
+
         if (moonDoc.exists) {
           const data = moonDoc.data()!;
           daily = data.dailyFreeBalance || 0;
           purchased = data.purchasedBalance || 0;
           balance = data.balance || 0;
         }
-        
+
         const newPurchased = purchased + amount;
         const newBalance = daily + newPurchased;
-        
+
         transaction.set(moonRef, {
           userId,
           dailyFreeBalance: daily,
@@ -345,7 +339,7 @@ async function startServer() {
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // Update user LTV (lifetimeValue) kümülatif olarak (MS-186)
+        // Update user LTV (lifetimeValue) cumulatively
         let currentLtv = 0;
         if (userDoc.exists) {
           currentLtv = userDoc.data()!.lifetimeValue || 0;
@@ -356,7 +350,8 @@ async function startServer() {
           isPremium: true,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        
+
+        // 3. Log the successful buy transaction
         const txRef = adminDb.collection("moon_transactions").doc();
         transaction.set(txRef, {
           userId,
@@ -383,11 +378,12 @@ async function startServer() {
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
       });
-      
-      console.log(`[Server] Payment successfully completed. UserId: ${userId}, Amount: ${amount}`);
-      
 
+      if (alreadyCompleted) {
+        return true;
+      }
 
+      console.log(`[Server] Payment successfully completed for session: ${sessionId}`);
       return true;
     } catch (err: any) {
       await logServerError(err, `completePayment sessionId=${sessionId}`);
