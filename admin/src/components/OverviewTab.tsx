@@ -165,7 +165,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
 
   // Conversion calculations
   const completedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'completed').length;
-  const abandonedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'abandoned' || c.status === 'pending').length;
+  const abandonedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'abandoned' || c.status === 'pending' || c.status === 'cancelled').length;
   const totalCheckouts = completedCheckouts + abandonedCheckouts;
   const checkoutConversionRate = totalCheckouts > 0 
     ? Math.round((completedCheckouts / totalCheckouts) * 100) 
@@ -197,7 +197,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       
       let hasAbandoned = false;
       for (const att of attempts) {
-        if (att.status === 'abandoned' || att.status === 'pending') {
+        if (att.status === 'abandoned' || att.status === 'pending' || att.status === 'cancelled') {
           hasAbandoned = true;
         } else if (att.status === 'completed' && hasAbandoned) {
           recoveredUsers.add(uid);
