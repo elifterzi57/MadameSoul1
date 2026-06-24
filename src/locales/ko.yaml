@@ -1,5 +1,6 @@
 transactionDesc: "카드를 사용한 리딩: {cards}"
 transactionBuy: "{amount} 카티나 문 구매 (데모)"
+transactionBuyReal: "{amount} 카티나 문 구매"
 welcomeBonus: "웰컴 보너스"
 dailyGift: "일일 무료 선물"
 dailyGiftClaimed: "오늘의 무료 카티나 문이 적립되었습니다!"

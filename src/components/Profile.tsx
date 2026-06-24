@@ -135,11 +135,19 @@ export const Profile: React.FC<ProfileProps> = ({
     if (desc === 'Welcome Bonus' || desc === 'Hoş Geldin Bonusu') {
       return (locales && locales[lang]?.welcomeBonus) || (locales?.en?.welcomeBonus) || desc;
     }
-    if (desc.startsWith('Demo purchase of') || desc.includes('Katina Moons satın alımı')) {
+    if (desc.startsWith('Demo purchase of') || desc.includes('Katina Moons satın alımı (Demo)') || desc.includes('Katina Moon satın alımı (Demo)')) {
       const amountMatch = desc.match(/\d+/);
       if (amountMatch) {
         const amount = amountMatch[0];
         const template = (locales && locales[lang]?.transactionBuy) || (locales?.en?.transactionBuy) || desc;
+        return template.replace('{amount}', amount);
+      }
+    }
+    if (desc.startsWith('Purchase of') || desc.includes('Katina Moons purchase') || desc.includes('Katina Moon satın alımı') || desc.includes('Katina Moons satın alımı')) {
+      const amountMatch = desc.match(/\d+/);
+      if (amountMatch) {
+        const amount = amountMatch[0];
+        const template = (locales && locales[lang]?.transactionBuyReal) || (locales?.en?.transactionBuyReal) || desc;
         return template.replace('{amount}', amount);
       }
     }

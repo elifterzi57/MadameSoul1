@@ -1,5 +1,6 @@
 transactionDesc: "{cards} kartları ile fal bakımı"
 transactionBuy: "{amount} Katina Moon satın alımı (Demo)"
+transactionBuyReal: "{amount} Katina Moon satın alımı"
 welcomeBonus: "Hoş Geldin Bonusu"
 dailyGift: "Günlük Hediye Katina Moon"
 dailyGiftClaimed: "Günlük ücretsiz Katina Moon krediniz tanımlandı!"

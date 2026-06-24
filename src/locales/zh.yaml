@@ -1,5 +1,6 @@
 transactionDesc: "カードを使ったリーディング：{cards}"
 transactionBuy: "购买 {amount} 个卡蒂娜之月 (演示)"
+transactionBuyReal: "购买 {amount} 个卡蒂娜之月"
 welcomeBonus: "欢迎赠礼"
 dailyGift: "每日免费赠礼"
 dailyGiftClaimed: "您的每日免费卡缇娜之月已领取！"
