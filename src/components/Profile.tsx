@@ -38,6 +38,7 @@ interface ProfileProps {
     birthplace: string;
     relationship: string;
     language: string;
+    isPremium?: boolean;
   };
   moonsCount: number;
   readingCount: number;
@@ -310,10 +311,32 @@ export const Profile: React.FC<ProfileProps> = ({
           limit(10)
         );
         const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs.map(doc => ({
+        const txItems = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+
+        // Fetch user reflections to merge customTitle and reflectionNotes
+        const reflectionsQuery = query(
+          collection(db, 'user_reflections'),
+          where('userId', '==', user.uid)
+        );
+        const reflectionsSnapshot = await getDocs(reflectionsQuery);
+        const reflectionsMap: Record<string, any> = {};
+        reflectionsSnapshot.forEach(docSnap => {
+          reflectionsMap[docSnap.id] = docSnap.data();
+        });
+
+        // Merge reflections data
+        const items = txItems.map(item => {
+          const refl = reflectionsMap[item.id] || {};
+          return {
+            ...item,
+            customTitle: refl.customTitle || '',
+            reflectionNotes: refl.reflectionNotes || ''
+          };
+        });
+
         setHistory(items);
       } catch (error) {
         console.error('Error fetching history:', error);
@@ -495,10 +518,12 @@ export const Profile: React.FC<ProfileProps> = ({
   const handleSaveNotes = async (itemId: string, title: string, notes: string) => {
     setIsSavingNotes(true);
     try {
-      await updateDoc(doc(db, 'moon_transactions', itemId), {
+      await setDoc(doc(db, 'user_reflections', itemId), {
+        userId: user.uid,
         customTitle: title,
-        reflectionNotes: notes
-      });
+        reflectionNotes: notes,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
       setHistory(prev => prev.map(item => item.id === itemId ? { ...item, customTitle: title, reflectionNotes: notes } : item));
       const successMsg = translations?.profileDiary?.saveSuccess || "Reading updated successfully!";
       setNotesStatus({ type: 'success', message: successMsg });
@@ -761,7 +786,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                 <div className="flex-1 min-w-0">
                                   <div className="text-[#ecd8a6] text-sm font-medium flex items-center gap-1.5 min-w-0">
                                     <span className="truncate">{item.customTitle || translateDescription(item.description)}</span>
-                                    {item.deductedFrom === 'purchased' && (
+                                    {(userInfo.isPremium || item.deductedFrom === 'purchased') && (
                                       <span title={userInfo.language === 'tr' ? "Premium Açılım" : "Premium Reading"} className="flex-shrink-0 flex items-center">
                                         <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 fill-amber-400/20 animate-pulse" />
                                       </span>
@@ -785,8 +810,8 @@ export const Profile: React.FC<ProfileProps> = ({
                                     {userInfo.language === 'tr' ? "Sistem Hatası" : "System Error"}
                                   </span>
                                 )}
-                                {item.readingText && (
-                                  item.deductedFrom === 'purchased' ? (
+                                {(item.status === 'success' || item.status === 'cached' || item.readingText) && (
+                                  (userInfo.isPremium || item.deductedFrom === 'purchased') ? (
                                     <button 
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -838,25 +863,22 @@ export const Profile: React.FC<ProfileProps> = ({
                                       </div>
                                     )}
 
-                                    {/* Tarot Interpretation Reading Text */}
-                                    <div className="space-y-2">
-                                      <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/40 uppercase">
-                                        {translations?.profileDiary?.detailsTitle || "Reading Details"}
-                                      </h4>
-                                      <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-[#ecd8a6]/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
-                                        {item.readingText || (
+                                    {/* System Error message display if status is failed */}
+                                    {item.status === 'failed' && (
+                                      <div className="space-y-2">
+                                        <div className="text-xs text-[#ecd8a6]/80 leading-relaxed font-sans bg-black/20 p-4 rounded-xl border border-rose-500/5 max-h-60 overflow-y-auto whitespace-pre-wrap">
                                           <span className="text-rose-400/80 flex items-center gap-2">
                                             <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                             {userInfo.language === 'tr' 
                                               ? "Bu açılım bir sistem hatası nedeniyle tamamlanamadı. Harcanan krediniz iade edilmiştir." 
                                               : "This reading could not be completed due to a system error. Your moon balance has been refunded."}
                                           </span>
-                                        )}
+                                        </div>
                                       </div>
-                                    </div>
+                                    )}
 
                                     {/* Tarot Feedback Module */}
-                                    {item.readingText && (
+                                    {((item.status === 'success' || item.status === 'cached' || item.readingText) && item.status !== 'failed') && (
                                       <div className="space-y-3 p-4 rounded-xl bg-white/5 border border-[#ecd8a6]/10">
                                         <h4 className="text-[10px] font-serif tracking-widest text-[#ecd8a6]/60 uppercase">
                                           {profileT.history.evalTitle}
@@ -932,7 +954,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                       </div>
                                     )}
 
-                                    {item.deductedFrom === 'purchased' ? (
+                                    {(userInfo.isPremium || item.deductedFrom === 'purchased') ? (
                                       <>
                                         {/* Edit Custom Title Form */}
                                         <div className="space-y-2">
@@ -1044,9 +1066,11 @@ export const Profile: React.FC<ProfileProps> = ({
                                   {item.amount !== undefined ? (item.amount > 0 ? `+${item.amount}` : item.amount) : '+1'} {userInfo.language === 'tr' ? "İade" : (userInfo.language === 'es' ? "Reembolso" : (userInfo.language === 'fr' ? "Remboursement" : (userInfo.language === 'ko' ? "환불" : (userInfo.language === 'zh' ? "退款" : "Refund"))))}
                                 </span>
                               )}
-                              {item.stripeReceiptUrl && (
+                              {(item.stripeReceiptUrl || (item.idempotencyKey && item.idempotencyKey.startsWith('cs_'))) && (
                                 <a 
-                                  href={item.stripeReceiptUrl}
+                                  href={item.stripeReceiptUrl && item.stripeReceiptUrl !== 'https://stripe.com/mock-receipt' 
+                                    ? item.stripeReceiptUrl 
+                                    : `/api/payments/receipt/${item.idempotencyKey}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="px-3 py-1.5 bg-[#ecd8a6]/10 hover:bg-[#ecd8a6]/20 rounded-lg text-[#ecd8a6] text-xs font-serif tracking-wider uppercase transition-all font-semibold"

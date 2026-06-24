@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import YAML from "yaml";
 import "dotenv/config";
 import crypto from "crypto";
+import { spawn } from "child_process";
 
 const KATINA_DECK = [
   { id: "Afyon", locKey: "afyon", name: "Afyon", desc: "Bağımlılıklar, göz boyama, illüzyonlar ve toksik bağlar." },
@@ -235,6 +236,9 @@ async function startServer() {
   }
   const adminDb = admin.firestore();
 
+  let stripeListenerProcess: any = null;
+  let stripeListenerStatus = "stopped";
+
   let useFirebaseAdmin = true;
   if (process.env.NODE_ENV !== "production") {
     try {
@@ -275,64 +279,58 @@ async function startServer() {
     });
   }
 
-
-
   async function completePayment(sessionId: string, invoiceId: string, receiptUrl: string, method = "webhook", operatorUid: string | null = null) {
-    let attemptData: any = null;
-    let userEmail: string | null = null;
     try {
-      const attemptDoc = await adminDb.collection("checkout_attempts").doc(sessionId).get();
-      if (!attemptDoc.exists) {
-        console.warn(`[Server] Checkout attempt not found: ${sessionId}`);
-        return false;
-      }
-      
-      attemptData = attemptDoc.data()!;
-      if (attemptData.status === "completed") {
-        console.log(`[Server] Payment already completed for session: ${sessionId}`);
-        return true;
-      }
-      
-      const userId = attemptData.userId;
-      const amount = attemptData.amount;
+      const attemptRef = adminDb.collection("checkout_attempts").doc(sessionId);
+      let alreadyCompleted = false;
 
-      try {
-        const userDoc = await adminDb.collection("users").doc(userId).get();
-        if (userDoc.exists) {
-          userEmail = userDoc.data()?.email || null;
-        }
-      } catch (e) {
-        console.error("Failed to fetch user email for payment log:", e);
-      }
-      
-      await adminDb.collection("checkout_attempts").doc(sessionId).update({
-        status: "completed",
-        stripeInvoiceId: invoiceId || null,
-        stripeReceiptUrl: receiptUrl || null,
-        completedMethod: method,
-        approvedBy: operatorUid || null,
-        completedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-      
-      const moonRef = adminDb.collection("user_moons").doc(userId);
-      const userRef = adminDb.collection("users").doc(userId);
       await adminDb.runTransaction(async (transaction) => {
+        const attemptDoc = await transaction.get(attemptRef);
+        if (!attemptDoc.exists) {
+          throw new Error(`Checkout attempt not found: ${sessionId}`);
+        }
+
+        const attemptData = attemptDoc.data()!;
+        if (attemptData.status === "completed") {
+          console.log(`[Server] Payment already completed for session: ${sessionId}`);
+          alreadyCompleted = true;
+          return;
+        }
+
+        const userId = attemptData.userId;
+        const amount = attemptData.amount;
+
+        const moonRef = adminDb.collection("user_moons").doc(userId);
+        const userRef = adminDb.collection("users").doc(userId);
+
         const moonDoc = await transaction.get(moonRef);
         const userDoc = await transaction.get(userRef);
+
+        // 1. Update checkout_attempts status to completed
+        transaction.update(attemptRef, {
+          status: "completed",
+          stripeInvoiceId: invoiceId || null,
+          stripeReceiptUrl: receiptUrl || null,
+          completedMethod: method,
+          approvedBy: operatorUid || null,
+          completedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 2. Update user moons balance
         let daily = 0;
         let purchased = 0;
         let balance = 0;
-        
+
         if (moonDoc.exists) {
           const data = moonDoc.data()!;
           daily = data.dailyFreeBalance || 0;
           purchased = data.purchasedBalance || 0;
           balance = data.balance || 0;
         }
-        
+
         const newPurchased = purchased + amount;
         const newBalance = daily + newPurchased;
-        
+
         transaction.set(moonRef, {
           userId,
           dailyFreeBalance: daily,
@@ -341,7 +339,7 @@ async function startServer() {
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
-        // Update user LTV (lifetimeValue) kümülatif olarak (MS-186)
+        // Update user LTV (lifetimeValue) cumulatively
         let currentLtv = 0;
         if (userDoc.exists) {
           currentLtv = userDoc.data()!.lifetimeValue || 0;
@@ -349,9 +347,11 @@ async function startServer() {
         const price = attemptData.price || 0;
         transaction.set(userRef, {
           lifetimeValue: currentLtv + price,
+          isPremium: true,
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        
+
+        // 3. Log the successful buy transaction
         const txRef = adminDb.collection("moon_transactions").doc();
         transaction.set(txRef, {
           userId,
@@ -378,11 +378,12 @@ async function startServer() {
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
       });
-      
-      console.log(`[Server] Payment successfully completed. UserId: ${userId}, Amount: ${amount}`);
-      
 
+      if (alreadyCompleted) {
+        return true;
+      }
 
+      console.log(`[Server] Payment successfully completed for session: ${sessionId}`);
       return true;
     } catch (err: any) {
       await logServerError(err, `completePayment sessionId=${sessionId}`);
@@ -833,8 +834,14 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           // Update transaction status to success
           await adminDb.collection("moon_transactions").doc(transactionId).update({
             status: "success",
-            readingText: response.text,
             updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+
+          // Save readingText to reading_texts collection
+          await adminDb.collection("reading_texts").doc(transactionId).set({
+            userId: uid,
+            readingText: response.text,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
           });
 
           // Log AI Telemetry to Firestore
@@ -1127,6 +1134,68 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     } catch (err: any) {
       await logServerError(err, "verify-checkout-session", req.user?.uid);
       res.status(500).json({ error: err.message || "Failed to verify checkout session" });
+    }
+  });
+
+  // Retrieve and redirect to Stripe receipt page by checkout session ID
+  app.get("/api/payments/receipt/:sessionId", async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.params;
+      if (!stripe) {
+        return res.status(400).json({ error: "Stripe is not configured" });
+      }
+
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session) {
+        return res.status(404).json({ error: "Checkout session not found" });
+      }
+
+      let receiptUrl = null;
+
+      // 1. Try to get from charge if payment intent exists
+      if (session.payment_intent) {
+        const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent as string);
+        if (paymentIntent.latest_charge) {
+          const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string);
+          receiptUrl = charge.receipt_url;
+        }
+      }
+
+      // 2. Fallback to invoice hosted url if charge receipt not found
+      if (!receiptUrl && session.invoice) {
+        const invoice = await stripe.invoices.retrieve(session.invoice as string);
+        receiptUrl = invoice.hosted_invoice_url || (invoice as any).receipt_url;
+      }
+
+      if (receiptUrl) {
+        return res.redirect(receiptUrl);
+      } else {
+        return res.status(404).json({ error: "Receipt URL not found for this session" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to retrieve receipt" });
+    }
+  });
+
+  // Retrieve and redirect to Stripe receipt page by Payment Intent ID (Payment ID)
+  app.get("/api/payments/receipt-by-intent/:paymentIntentId", async (req: any, res: any) => {
+    try {
+      const { paymentIntentId } = req.params;
+      if (!stripe) {
+        return res.status(400).json({ error: "Stripe is not configured" });
+      }
+
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      if (paymentIntent && paymentIntent.latest_charge) {
+        const charge = await stripe.charges.retrieve(paymentIntent.latest_charge as string);
+        if (charge.receipt_url) {
+          return res.redirect(charge.receipt_url);
+        }
+      }
+
+      return res.status(404).json({ error: "Receipt URL not found for this Payment Intent" });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to retrieve receipt" });
     }
   });
 
@@ -1476,6 +1545,19 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       if (!sessionId) {
         return res.status(400).json({ error: "Session ID is required" });
       }
+
+      // Verify payment status with Stripe before manually completing (Winston's logic validation)
+      if (stripe && sessionId.startsWith("cs_")) {
+        try {
+          const session = await stripe.checkout.sessions.retrieve(sessionId);
+          if (session.payment_status !== "paid") {
+            return res.status(400).json({ error: "Cannot manually approve: Stripe session payment status is NOT paid." });
+          }
+        } catch (err: any) {
+          console.error("[Server] Error verifying Stripe session for manual approval:", err);
+          return res.status(400).json({ error: "Failed to verify session status with Stripe. Make sure the session ID exists on Stripe." });
+        }
+      }
       
       const success = await completePayment(sessionId, "manual_admin_invoice_" + Date.now(), "https://stripe.com/mock-receipt", "manual", req.user?.uid);
       if (success) {
@@ -1499,6 +1581,92 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
       await logServerError(err, "POST /api/admin/complete-payment", req.user?.uid);
       res.status(500).json({ error: err.message || "Failed to manually complete payment" });
     }
+  });
+
+  // Manually reject/cancel payment by administrative action (Winston/Sally's UX cleanup)
+  app.post("/api/admin/reject-payment", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+
+      await adminDb.collection("checkout_attempts").doc(sessionId).update({
+        status: "cancelled",
+        completedMethod: "manual_reject",
+        approvedBy: req.user?.uid || null,
+        completedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      try {
+        const operatorEmail = req.user?.email || "unknown_admin";
+        await adminDb.collection("admin_audit_logs").add({
+          operatorEmail,
+          actionType: "manual_payment_reject",
+          details: { sessionId },
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("[Server] Error writing manual payment reject audit log:", logErr);
+      }
+
+      res.json({ status: "success" });
+    } catch (err: any) {
+      await logServerError(err, "POST /api/admin/reject-payment", req.user?.uid);
+      res.status(500).json({ error: err.message || "Failed to manually reject payment" });
+    }
+  });
+
+  // Start/Stop Stripe CLI webhook listener (Local only)
+  app.post("/api/admin/stripe-listener/toggle", authenticate, requireRole(["admin"]), async (req: any, res: any) => {
+    try {
+      const { action } = req.body;
+      if (action === "start") {
+        if (stripeListenerProcess) {
+          return res.json({ status: "running", message: "Stripe listener is already running" });
+        }
+        console.log("[Server] Starting local Stripe CLI webhook listener...");
+        stripeListenerProcess = spawn("npx", ["stripe", "listen", "--forward-to", "localhost:3000/api/stripe-webhook"], { shell: true });
+        stripeListenerStatus = "running";
+
+        stripeListenerProcess.on("error", (err: any) => {
+          console.error("[Server] Stripe CLI process error:", err);
+          stripeListenerProcess = null;
+          stripeListenerStatus = "stopped";
+        });
+
+        stripeListenerProcess.stdout?.on("data", (data: any) => {
+          console.log(`[Stripe CLI] ${data}`);
+        });
+
+        stripeListenerProcess.stderr?.on("data", (data: any) => {
+          console.error(`[Stripe CLI Error] ${data}`);
+        });
+
+        stripeListenerProcess.on("close", (code: any) => {
+          console.log(`[Stripe CLI] Exited with code ${code}`);
+          stripeListenerProcess = null;
+          stripeListenerStatus = "stopped";
+        });
+
+        return res.json({ status: "running", message: "Stripe listener started" });
+      } else {
+        if (!stripeListenerProcess) {
+          return res.json({ status: "stopped", message: "Stripe listener is not running" });
+        }
+        console.log("[Server] Stopping local Stripe CLI webhook listener...");
+        stripeListenerProcess.kill("SIGINT");
+        stripeListenerProcess = null;
+        stripeListenerStatus = "stopped";
+        return res.json({ status: "stopped", message: "Stripe listener stopped" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to control Stripe listener" });
+    }
+  });
+
+  app.get("/api/admin/stripe-listener/status", authenticate, requireRole(["employee", "admin"]), async (req: any, res: any) => {
+    res.json({ status: stripeListenerStatus });
   });
 
   // Global Error Handler Middleware

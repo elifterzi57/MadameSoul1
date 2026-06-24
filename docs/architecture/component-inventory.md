@@ -27,7 +27,7 @@ Kullanıcıların sisteme dahil olmasını sağlayan kapıdır. Birçok giriş m
 
 - **Dosya Konumu:** `src/components/Login.tsx`
 - **Temel Görevleri:**
-  - **Çoklu Giriş Yöntemleri:** E-posta/Şifre, Google ile Giriş, Apple ile Giriş ve Telefon SMS ile Giriş.
+  - **Çoklu Giriş Yöntemleri:** E-posta/Şifre, Google ile Giriş ve Telefon SMS ile Giriş.
   - **Meta Veri Toplama:** Kayıt esnasında kullanıcının tarayıcı, işletim sistemi, IP adresi ve konum bilgilerini `lib/metadata.ts` üzerinden toplar ve Firestore'a yazar.
   - **Bakiyelendirme:** Yeni kayıt olan kullanıcılara hoş geldin bonusu (kredi) tanımlar.
   - **ReCAPTCHA Verifier:** Telefon doğrulaması için güvenlik kontrolünü üstlenir.

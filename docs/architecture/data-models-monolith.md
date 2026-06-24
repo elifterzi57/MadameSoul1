@@ -54,6 +54,7 @@ Kullanıcıların temel hesap bilgileri, kabul edilen yasal sözleşmeler ve cih
 | `deviceInfo` | String | Hayır | Kullanıcı cihaz ve tarayıcı özeti (Maksimum 256 karakter). |
 | `appVersion` | String | Hayır | Uygulama sürümü (Maksimum 50 karakter). |
 | `lifetimeValue` | Number | Hayır | Kullanıcının yaptığı toplam ödeme değeri (LTV). |
+| `isPremium` | Boolean | Hayır | Kullanıcının Premium üye olup olmadığı bilgisi. |
 
 ---
 
@@ -187,6 +188,9 @@ Kullanıcıların ödeme sayfasına (Stripe Checkout) tıkladığı ancak işlem
 | `price` | Double | Evet | Paketin fiyatı (örn: `8.99`). |
 | `status` | String | Evet | Alabileceği değerler: `pending` (beklemede), `completed` (tamamlandı), `abandoned` (yarıda bırakıldı). |
 | `couponOffered` | String / null | Hayır | Terk edilen ödeme sonrası sunulan kurtarma kuponu kodu. |
+| `completedMethod` | String | Hayır | Ödemenin tamamlanma yöntemi (`webhook` veya `manual`). |
+| `approvedBy` | String | Hayır | Manuel olarak onaylayan yöneticinin/çalışanın Firebase Auth UID'si. |
+| `paymentIntentId` | String | Hayır | Stripe ödeme niyet (intent) ID'si. |
 | `createdAt` | Timestamp | Evet | İşlemin başladığı zaman damgası. |
 | `updatedAt` | Timestamp | Evet | Durumun güncellendiği zaman damgası. |
 

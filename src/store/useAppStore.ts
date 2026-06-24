@@ -20,6 +20,7 @@ export type UserInfo = {
   termsAccepted?: boolean;
   termsAcceptedAt?: string;
   termsVersion?: string;
+  isPremium?: boolean;
 };
 
 export type AppState = {

@@ -148,6 +148,7 @@ function AppContent() {
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [bannerCopied, setBannerCopied] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -410,7 +411,8 @@ function AppContent() {
                     ? data.termsAcceptedAt.toDate().toISOString() 
                     : new Date(data.termsAcceptedAt).toISOString()) 
                 : undefined,
-              termsVersion: data.termsVersion || ''
+              termsVersion: data.termsVersion || '',
+              isPremium: data.isPremium || false
             });
 
             // Onboarding Check (MS-257)
@@ -439,6 +441,7 @@ function AppContent() {
               birthplace: '',
               relationship: 'single',
               focus: 'general',
+              isPremium: false,
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp(),
               lastLogin: serverTimestamp(),
@@ -447,7 +450,7 @@ function AppContent() {
               appVersion,
               metadata
             });
-            setUserInfo({ name: u.displayName || '' });
+            setUserInfo({ name: u.displayName || '', isPremium: false });
             setShowOnboarding(true); // New user, show onboarding
           }
           setIsUserDataLoading(false);
@@ -849,13 +852,24 @@ function AppContent() {
       const data = await response.json();
 
       if (data.status === 'pending') {
-        return new Promise<{ text: string; cached: boolean }>((resolve, reject) => {
-          const unsubscribe = onSnapshot(doc(db, 'moon_transactions', txRef.id), (docSnap) => {
+        return new Promise<{ text: string; cached: boolean; isAsync: boolean }>((resolve, reject) => {
+          const unsubscribe = onSnapshot(doc(db, 'moon_transactions', txRef.id), async (docSnap) => {
             if (docSnap.exists()) {
               const txData = docSnap.data();
               if (txData.status === 'success') {
                 unsubscribe();
-                resolve({ text: txData.readingText || '', cached: false });
+                try {
+                  // Fetch the actual reading text from reading_texts collection (Winston's optimization)
+                  const textDoc = await getDoc(doc(db, 'reading_texts', txRef.id));
+                  if (textDoc.exists()) {
+                    resolve({ text: textDoc.data().readingText || '', cached: false, isAsync: true });
+                  } else {
+                    resolve({ text: txData.readingText || '', cached: false, isAsync: true });
+                  }
+                } catch (e) {
+                  console.error("Error fetching reading text from reading_texts collection:", e);
+                  resolve({ text: txData.readingText || '', cached: false, isAsync: true });
+                }
               } else if (txData.status === 'failed') {
                 unsubscribe();
                 reject(new Error(userInfo.language === 'tr' ? "Mistik yorum oluşturulurken sunucuda bir hata oluştu." : "Server failed to generate mystical reading. Please try again."));
@@ -868,7 +882,7 @@ function AppContent() {
         });
       }
 
-      return { text: data.text || t('errorSilent'), cached: !!data.cached };
+      return { text: data.text || t('errorSilent'), cached: !!data.cached, isAsync: false };
     },
     onMutate: () => {
       setIsGenerating(true);
@@ -896,15 +910,25 @@ function AppContent() {
         }
       }
 
-      if (pendingTxId.current) {
+      // ONLY write to Firestore from client if it was a synchronous execution (local bypass or cache hit)
+      // If it was async, the server has already written these documents securely.
+      if (pendingTxId.current && !data.isAsync) {
         try {
+          // Write to reading_texts collection (Winston's optimization)
+          if (user) {
+            await setDoc(doc(db, 'reading_texts', pendingTxId.current), {
+              userId: user.uid,
+              readingText: data.text,
+              createdAt: serverTimestamp()
+            });
+          }
+
           await updateDoc(doc(db, 'moon_transactions', pendingTxId.current), {
-            readingText: data.text,
             status: 'success',
             cached: data.cached
           });
         } catch (e) {
-          console.error("Error saving reading text:", e);
+          console.error("Error saving reading text on client:", e);
         }
       }
 
@@ -1061,7 +1085,32 @@ function AppContent() {
     const isEvent = pastReading && pastReading.nativeEvent;
     const actualPastReading = isEvent ? undefined : pastReading;
 
-    const readingToUse = actualPastReading ? actualPastReading.readingText : reading;
+    let readingToUse = actualPastReading ? actualPastReading.readingText : reading;
+
+    // Fetch readingText dynamically from reading_texts (or legacy fallback) if it's a past reading and text is missing (Winston's optimization)
+    if (actualPastReading && !readingToUse) {
+      try {
+        const textDocRef = doc(db, 'reading_texts', actualPastReading.id);
+        const textDocSnap = await getDoc(textDocRef);
+        if (textDocSnap.exists()) {
+          readingToUse = textDocSnap.data().readingText;
+        } else {
+          console.warn("readingText not found in reading_texts collection, checking fallback in transaction");
+          const txDocRef = doc(db, 'moon_transactions', actualPastReading.id);
+          const txDocSnap = await getDoc(txDocRef);
+          if (txDocSnap.exists() && txDocSnap.data().readingText) {
+            readingToUse = txDocSnap.data().readingText;
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching readingText for PDF:", e);
+        if (showToast) {
+          showToast(userInfo.language === 'tr' ? "Fal metni yüklenirken hata oluştu." : "Error loading reading text.", "error");
+        }
+        return;
+      }
+    }
+
     const cardsToUse = actualPastReading?.cards || drawnCards;
     
     const userInfoToUse = actualPastReading ? {
@@ -1127,6 +1176,8 @@ function AppContent() {
   };
 
   const handleSignOut = async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
     try {
       if (user) {
         await disablePushNotifications(user.uid);
@@ -1135,6 +1186,8 @@ function AppContent() {
       setShowOnboarding(false);
     } catch (err) {
       console.error("Sign out error:", err);
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -1249,13 +1302,18 @@ function AppContent() {
 
             <button 
               onClick={handleSignOut}
-              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto"
+              disabled={isSigningOut}
+              className={`h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3.5 bg-red-950/20 backdrop-blur-md rounded-full border border-red-900/30 text-red-200/60 hover:text-red-200 hover:border-red-900/60 transition-all group pointer-events-auto ${isSigningOut ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
               title="Sign Out"
             >
               <span className="text-[9px] sm:text-[10px] font-serif tracking-widest uppercase inline-block">
                 {t('store.logout')}
               </span>
-              <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {isSigningOut ? (
+                <Loader2 className="w-3.5 h-3.5 sm:w-4 h-4 animate-spin" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5 sm:w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              )}
             </button>
           </>
         )}
@@ -1649,7 +1707,7 @@ function AppContent() {
                     type="text"
                     value={userInfo.name}
                     onChange={e => handleInputChange(e, 'name')}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans uppercase"
                     placeholder={t('namePlaceholder')}
                   />
                 </div>
@@ -1661,7 +1719,7 @@ function AppContent() {
                     type="date"
                     value={userInfo.dob}
                     onChange={e => setUserInfo({ dob: e.target.value })}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] custom-date-picker font-sans [color-scheme:dark]"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] custom-date-picker font-sans [color-scheme:dark] uppercase"
                   />
                   <style>{`
                     .custom-date-picker::-webkit-calendar-picker-indicator {
@@ -1677,7 +1735,7 @@ function AppContent() {
                     type="text"
                     value={userInfo.birthplace}
                     onChange={e => handleInputChange(e, 'birthplace')}
-                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans"
+                    className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all text-[#ecd8a6] placeholder:text-[#ecd8a6]/30 font-sans uppercase"
                     placeholder={t('pobPlaceholder')}
                   />
                 </div>
@@ -1688,7 +1746,7 @@ function AppContent() {
                     <select 
                       value={userInfo.relationship}
                       onChange={e => setUserInfo({ relationship: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans uppercase"
                     >
                       {STATUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
@@ -1711,7 +1769,7 @@ function AppContent() {
                     <select 
                       value={userInfo.focus}
                       onChange={e => setUserInfo({ focus: e.target.value })}
-                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans"
+                      className="w-full bg-[#120a1c]/60 border border-[#ecd8a6]/20 rounded-lg px-4 py-3 outline-none focus:border-[#ecd8a6]/60 focus:ring-1 focus:ring-[#ecd8a6]/60 transition-all appearance-none text-[#ecd8a6] font-sans uppercase"
                     >
                       {FOCUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value} className="bg-[#0a0512]">
@@ -2049,7 +2107,7 @@ function AppContent() {
                 >
                   <button 
                     onClick={() => {
-                      if (pendingDeductedFrom.current !== 'purchased') {
+                      if (!userInfo.isPremium && pendingDeductedFrom.current !== 'purchased') {
                         showToast(t('profile.history.pdfLocked'), 'info');
                       } else {
                         handleDownload();
@@ -2060,7 +2118,7 @@ function AppContent() {
                   >
                     {isExportingPDF ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : pendingDeductedFrom.current === 'purchased' ? (
+                    ) : (userInfo.isPremium || pendingDeductedFrom.current === 'purchased') ? (
                       <Download className="w-4 h-4" />
                     ) : (
                       <div className="flex items-center gap-1.5">
