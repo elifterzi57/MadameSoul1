@@ -458,6 +458,19 @@ async function startServer() {
       }
       
       await completePayment(sessionId, invoiceId, receiptUrl);
+    } else if (event.type === "checkout.session.expired") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const sessionId = session.id;
+      try {
+        await adminDb.collection("checkout_attempts").doc(sessionId).update({
+          status: "cancelled",
+          completedMethod: "stripe_expiry",
+          completedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        console.log(`[Webhook] Session ${sessionId} expired and marked as cancelled.`);
+      } catch (err) {
+        console.error(`[Webhook] Error marking expired session ${sessionId}:`, err);
+      }
     }
 
     res.json({ received: true });
@@ -998,7 +1011,7 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
           }],
           mode: "payment",
           success_url: `${req.headers.origin}/?payment=success&session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${req.headers.origin}/?payment=cancel`,
+          cancel_url: `${req.headers.origin}/?payment=cancel&session_id={CHECKOUT_SESSION_ID}`,
           metadata: {
             userId: uid,
             amount: amount.toString(),
@@ -1614,6 +1627,40 @@ CRITICAL: The entire reading MUST be written in ${languageName}. Do not use any 
     } catch (err: any) {
       await logServerError(err, "POST /api/admin/reject-payment", req.user?.uid);
       res.status(500).json({ error: err.message || "Failed to manually reject payment" });
+    }
+  });
+
+  // Public endpoint for user to cancel their own payment attempt (user hits cancel)
+  app.post("/api/cancel-payment", authenticate, async (req: any, res: any) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) {
+        return res.status(400).json({ error: "Session ID is required" });
+      }
+
+      const attemptRef = adminDb.collection("checkout_attempts").doc(sessionId);
+      const attemptDoc = await attemptRef.get();
+
+      if (!attemptDoc.exists) {
+        return res.status(404).json({ error: "Checkout attempt not found" });
+      }
+
+      const attemptData = attemptDoc.data();
+      if (attemptData?.userId !== req.user.uid) {
+        return res.status(403).json({ error: "Unauthorized to cancel this checkout session" });
+      }
+
+      if (attemptData.status === "pending") {
+        await attemptRef.update({
+          status: "cancelled",
+          completedMethod: "user_cancel",
+          completedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      res.json({ status: "success" });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || "Failed to cancel payment attempt" });
     }
   });
 
