@@ -311,6 +311,30 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     return doc[dbKey];
   };
 
+  // Helper to get value of user_reflections fields mapped
+  const getUserReflectionsValue = (doc: any, col: string): any => {
+    if (col === 'USERID') {
+      return doc.userId || '-';
+    }
+    if (col === 'MAIL') {
+      const uInfo = usersMap[doc.userId];
+      return uInfo?.email || uInfo?.phoneNumber || '-';
+    }
+    if (col === 'customTitle') {
+      return doc.customTitle || '-';
+    }
+    if (col === 'reflectionNotes') {
+      return doc.reflectionNotes || '-';
+    }
+    if (col === 'updatedAt') {
+      const val = doc.updatedAt;
+      if (!val) return '-';
+      if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
+      return new Date(val).toLocaleString('tr-TR');
+    }
+    return doc[col];
+  };
+
   // Sort logic (sorting dynamically by selected sortByField)
   const getSortedDocs = (docs: any[]) => {
     if (!sortByField) return docs;
@@ -336,6 +360,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       } else if (selectedCollection === 'user_moons') {
         aVal = getUserMoonsValue(a, sortByField);
         bVal = getUserMoonsValue(b, sortByField);
+      } else if (selectedCollection === 'user_reflections') {
+        aVal = getUserReflectionsValue(a, sortByField);
+        bVal = getUserReflectionsValue(b, sortByField);
       }
 
       let aCompare = aVal;
@@ -405,6 +432,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           val = renderValue(getContactUsValue(doc, col));
         } else if (selectedCollection === 'user_moons') {
           val = renderValue(getUserMoonsValue(doc, col));
+        } else if (selectedCollection === 'user_reflections') {
+          val = renderValue(getUserReflectionsValue(doc, col));
         } else {
           val = renderValue(doc[col]);
         }
@@ -510,6 +539,16 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'purchasedBalance',
         'DAILYFREEBALANCE',
         'lastDailyClaimedAt',
+        'updatedAt'
+      ];
+    }
+    if (selectedCollection === 'user_reflections') {
+      return [
+        'id',
+        'USERID',
+        'MAIL',
+        'customTitle',
+        'reflectionNotes',
         'updatedAt'
       ];
     }

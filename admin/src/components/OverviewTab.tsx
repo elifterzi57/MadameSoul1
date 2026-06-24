@@ -5,18 +5,21 @@ import {
   getDocs, 
   limit, 
   orderBy, 
-  query, 
-  getCountFromServer 
+  query 
 } from 'firebase/firestore';
 import { 
   Users, 
-  Coins, 
   AlertOctagon, 
   MessageSquare, 
   TrendingUp, 
   Clock,
   Calendar,
-  Layers
+  Layers,
+  Percent,
+  Globe,
+  Compass,
+  Activity,
+  Coins
 } from 'lucide-react';
 
 interface OverviewTabProps {
@@ -27,47 +30,28 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<'all' | 'daily' | 'weekly' | 'monthly'>('all');
   
-  // Database counts (for overall metrics)
-  const [dbCounts, setDbCounts] = useState({
-    totalUsers: 0,
-    totalTransactions: 0,
-    totalErrors: 0
-  });
-
   // Raw fetched datasets
   const [allTransactions, setAllTransactions] = useState<any[]>([]);
   const [allFeedbacks, setAllFeedbacks] = useState<any[]>([]);
   const [allErrors, setAllErrors] = useState<any[]>([]);
-  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string }>>({});
+  const [allCheckoutAttempts, setAllCheckoutAttempts] = useState<any[]>([]);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Get total counts using getCountFromServer (fast and efficient)
-      const usersCountSnap = await getCountFromServer(collection(db, 'users'));
-      const txCountSnap = await getCountFromServer(collection(db, 'moon_transactions'));
-      const errorCountSnap = await getCountFromServer(collection(db, 'error_logs'));
 
-      setDbCounts({
-        totalUsers: usersCountSnap.data().count,
-        totalTransactions: txCountSnap.data().count,
-        totalErrors: errorCountSnap.data().count
-      });
-
-      // 2. Fetch users for email mapping
+      // 2. Fetch users for email mapping & demography
       const usersSnap = await getDocs(collection(db, 'users'));
-      const mapping: Record<string, { email: string; displayName?: string }> = {};
+      const usersList: any[] = [];
       usersSnap.forEach((docSnap) => {
         const data = docSnap.data();
-        mapping[docSnap.id] = {
-          email: data.email || '',
-          displayName: data.displayName || data.name || ''
-        };
+        usersList.push({ id: docSnap.id, ...data });
       });
-      setUsersMap(mapping);
+      setAllUsers(usersList);
 
-      // 3. Fetch large subset of transactions (up to 200) for local filtering
-      const txQuery = query(collection(db, 'moon_transactions'), orderBy('createdAt', 'desc'), limit(200));
+      // 3. Fetch transactions (up to 300)
+      const txQuery = query(collection(db, 'moon_transactions'), orderBy('createdAt', 'desc'), limit(300));
       const txSnap = await getDocs(txQuery);
       const txList: any[] = [];
       txSnap.forEach((docSnap) => {
@@ -75,8 +59,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       });
       setAllTransactions(txList);
 
-      // 4. Fetch large subset of feedbacks (up to 100)
-      const feedbackQuery = query(collection(db, 'ai_feedback'), orderBy('createdAt', 'desc'), limit(100));
+      // 4. Fetch feedbacks (up to 150)
+      const feedbackQuery = query(collection(db, 'ai_feedback'), orderBy('createdAt', 'desc'), limit(150));
       const feedbackSnap = await getDocs(feedbackQuery);
       const feedbackList: any[] = [];
       feedbackSnap.forEach((docSnap) => {
@@ -84,7 +68,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       });
       setAllFeedbacks(feedbackList);
 
-      // 5. Fetch large subset of errors (up to 100)
+      // 5. Fetch errors (up to 100)
       const errorQuery = query(collection(db, 'error_logs'), orderBy('createdAt', 'desc'), limit(100));
       const errorSnap = await getDocs(errorQuery);
       const errorList: any[] = [];
@@ -92,6 +76,16 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
         errorList.push({ id: docSnap.id, ...docSnap.data() });
       });
       setAllErrors(errorList);
+
+      // 6. Fetch checkout attempts (up to 300)
+      const checkoutSnap = await getDocs(query(collection(db, 'checkout_attempts'), orderBy('createdAt', 'desc'), limit(300)));
+      const checkoutList: any[] = [];
+      checkoutSnap.forEach((docSnap) => {
+        checkoutList.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      setAllCheckoutAttempts(checkoutList);
+
+
 
     } catch (err) {
       console.error("Dashboard overview data fetch failed:", err);
@@ -116,10 +110,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
   };
 
   const getDocDate = (doc: any): Date | null => {
-    const val = doc.createdAt || doc.timestamp || doc.updatedAt;
+    const val = doc.createdAt || doc.timestamp || doc.updatedAt || doc.lastLogin;
     if (!val) return null;
-    if (val.seconds) return new Date(val.seconds * 1000);
-    return new Date(val);
+    if (typeof val.toDate === 'function') return val.toDate();
+    if (typeof val.seconds === 'number') return new Date(val.seconds * 1000);
+    if (typeof val._seconds === 'number') return new Date(val._seconds * 1000);
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return d;
+    return null;
   };
 
   // Dynamic filter helper
@@ -139,17 +137,91 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
   };
 
   // Filtered lists
+  const filteredUsers = filterByPeriod(allUsers);
   const filteredTransactions = filterByPeriod(allTransactions);
   const filteredFeedbacks = filterByPeriod(allFeedbacks);
   const filteredErrors = filterByPeriod(allErrors);
+  const filteredCheckoutAttempts = filterByPeriod(allCheckoutAttempts);
 
-  // Compute stats based on selected period
-  const totalUsersCount = dbCounts.totalUsers; // Always show absolute total users
+  // A. FINANCIAL CALCULATIONS
+  // Gross Revenue (All time LTV of all users)
+  const totalLTV = allUsers.reduce((acc, u) => acc + (Number(u.lifetimeValue) || 0), 0);
+  
+  // Scoped revenue from completed checkouts in the selected period (Gross)
+  const periodRevenue = filteredCheckoutAttempts
+    .filter(c => c.status === 'completed')
+    .reduce((acc, c) => acc + (Number(c.price) || 0), 0);
 
-  // Spent moons calculation (Absolute sum of successful spend transactions in selected period)
-  const spentMoonsCount = filteredTransactions
-    .filter(tx => tx.type === 'spend' && (tx.status === 'success' || !tx.status))
-    .reduce((acc, tx) => acc + Math.abs(tx.amount || 0), 0);
+  // Stripe fee formula: (Price * 0.029) + 0.30
+  // Scoped net revenue after Stripe transaction fees
+  const periodNetRevenue = filteredCheckoutAttempts
+    .filter(c => c.status === 'completed')
+    .reduce((acc, c) => {
+      const price = Number(c.price) || 0;
+      if (price <= 0) return acc;
+      const stripeFee = price * 0.029 + 0.30;
+      return acc + (price - stripeFee);
+    }, 0);
+
+  // Conversion calculations
+  const completedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'completed').length;
+  const abandonedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'abandoned' || c.status === 'pending').length;
+  const totalCheckouts = completedCheckouts + abandonedCheckouts;
+  const checkoutConversionRate = totalCheckouts > 0 
+    ? Math.round((completedCheckouts / totalCheckouts) * 100) 
+    : 0;
+  const cartAbandonmentRate = totalCheckouts > 0 
+    ? Math.round((abandonedCheckouts / totalCheckouts) * 100) 
+    : 0;
+
+  // Scoped Natural checkout recovery yield
+  const computeNaturalRecovery = () => {
+    const abandonedUsers = new Set<string>();
+    const recoveredUsers = new Set<string>();
+    
+    const userAttempts: Record<string, any[]> = {};
+    filteredCheckoutAttempts.forEach(attempt => {
+      if (!attempt.userId) return;
+      if (!userAttempts[attempt.userId]) {
+        userAttempts[attempt.userId] = [];
+      }
+      userAttempts[attempt.userId].push(attempt);
+    });
+    
+    Object.keys(userAttempts).forEach(uid => {
+      const attempts = userAttempts[uid].sort((a, b) => {
+        const dA = getDocDate(a)?.getTime() || 0;
+        const dB = getDocDate(b)?.getTime() || 0;
+        return dA - dB;
+      });
+      
+      let hasAbandoned = false;
+      for (const att of attempts) {
+        if (att.status === 'abandoned' || att.status === 'pending') {
+          hasAbandoned = true;
+        } else if (att.status === 'completed' && hasAbandoned) {
+          recoveredUsers.add(uid);
+          break;
+        }
+      }
+      if (hasAbandoned) {
+        abandonedUsers.add(uid);
+      }
+    });
+    
+    return abandonedUsers.size > 0 
+      ? Math.round((recoveredUsers.size / abandonedUsers.size) * 100) 
+      : 0;
+  };
+  const naturalRecoveryRate = computeNaturalRecovery();
+
+  // B. USER ENGAGEMENT & PRODUCTS CALCULATIONS
+  // PDF download rate (Spend transactions with pdfDownloaded == 1 vs total Spend transactions)
+  const spendTx = filteredTransactions.filter(tx => tx.type === 'spend');
+  const pdfDownloadedTx = spendTx.filter(tx => tx.pdfDownloaded === 1 || tx.pdfDownloaded === true);
+  const pdfDownloadRate = spendTx.length > 0 
+    ? Math.round((pdfDownloadedTx.length / spendTx.length) * 100) 
+    : 0;
 
   // Average Rating
   const validFeedbacks = filteredFeedbacks.filter(fb => fb.rating);
@@ -157,23 +229,63 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
     ? (validFeedbacks.reduce((acc, fb) => acc + fb.rating, 0) / validFeedbacks.length) 
     : 0.0;
 
-  // Errors count
-  const errorsCount = period === 'all' ? dbCounts.totalErrors : filteredErrors.length;
+  // C. AI TELEMETRY & COST CALCULATIONS (Kaldırıldı)
 
-  // Transaction type counts for chart distribution (based on filtered list)
-  const txTypeCounts = filteredTransactions.reduce((acc, tx) => {
-    const type = tx.type as 'spend' | 'buy' | 'bonus' | 'refund';
-    if (type && acc[type] !== undefined) {
-      acc[type]++;
+  // Basic Stats (Period Filtered vs All Time)
+  const periodNewUsers = filteredUsers.length;
+  const totalUsersCount = allUsers.length;
+  const periodFortunesRead = filteredTransactions.filter(tx => tx.type === 'spend').length;
+  const totalFortunesRead = allTransactions.filter(tx => tx.type === 'spend').length;
+  const periodMoonsAcquired = filteredCheckoutAttempts
+    .filter(c => c.status === 'completed')
+    .reduce((acc, c) => acc + (Number(c.amount) || 0), 0);
+  const totalMoonsAcquired = allCheckoutAttempts
+    .filter(c => c.status === 'completed')
+    .reduce((acc, c) => acc + (Number(c.amount) || 0), 0);
+
+  // Helper to extract email or phone number for a transaction user
+  const getTransactionContact = (tx: any) => {
+    if (tx.userEmail) return tx.userEmail;
+    if (tx.userId) {
+      const user = allUsers.find(u => u.id === tx.userId);
+      if (user) {
+        return user.email || user.phoneNumber || user.phone || '';
+      }
     }
-    return acc;
-  }, { spend: 0, buy: 0, bonus: 0, refund: 0 });
-
-  const getPercentage = (value: number) => {
-    const total = txTypeCounts.spend + txTypeCounts.buy + txTypeCounts.bonus + txTypeCounts.refund;
-    if (total === 0) return 0;
-    return Math.round((value / total) * 100);
+    return '';
   };
+
+  // D. ACQUISITION CHANNELS & DEMOGRAPHICS
+  const getDistribution = (items: any[], fieldExtractor: (item: any) => string): { name: string; count: number }[] => {
+    const counts = items.reduce((acc, item) => {
+      const key = fieldExtractor(item) || 'Diğer / Belirtilmemiş';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count: count as number }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  };
+
+  const providerDistribution = getDistribution(filteredUsers, u => {
+    const provider = u.providerId || '';
+    if (provider === 'google.com') return 'Google';
+    if (provider === 'apple.com') return 'Apple';
+    if (provider === 'password') return 'E-posta & Şifre';
+    if (provider === 'phone') return 'Telefon Numarası';
+    
+    // Akıllı Fallback: Eski kayıtlarda providerId alanı olmayabilir
+    if (u.phoneNumber && !u.email) return 'Telefon Numarası';
+    if (u.email) {
+      if (u.email.endsWith('@gmail.com')) return 'Google';
+      return 'E-posta & Şifre';
+    }
+    return 'Diğer / Belirtilmemiş';
+  });
+  const browserDistribution = getDistribution(filteredUsers, u => u.metadata?.browser || u.deviceInfo);
+  const locationDistribution = getDistribution(filteredUsers, u => u.metadata?.location || u.timezone);
 
   if (loading) {
     return (
@@ -191,8 +303,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       {/* Header & Period Filters */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-[#ecd8a6]/10 pb-6">
         <div>
-          <h2 className="font-serif text-3xl text-[#ecd8a6]">Genel Bakış</h2>
-          <p className="text-sm text-[#ecd8a6]/60">Sistem performansı, kullanıcı istatistikleri ve bakiye harcamalarını takip edin.</p>
+          <h2 className="font-serif text-3xl text-[#ecd8a6]">Genel Bakış & Analitik</h2>
+          <p className="text-sm text-[#ecd8a6]/60">Uygulamanın gelir durumunu, verimliliğini ve AI performans metriklerini izleyin.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -232,111 +344,179 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
         </div>
       </div>
 
-      {/* Stats Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Users */}
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        
+        {/* Total & Scoped Revenue */}
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
-          <div className="p-3.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
-            <Users className="h-6 w-6" />
+          <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <TrendingUp className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Kullanıcılar</span>
-            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">{totalUsersCount}</p>
-            <span className="text-[10px] text-blue-400/60 font-semibold block mt-0.5">Toplam Kayıtlı Üye</span>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Dönemlik Gelir (Brüt / Net)</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              ${periodRevenue.toFixed(2)} <span className="text-xs text-emerald-400 font-semibold">/ ${periodNetRevenue.toFixed(2)} Net</span>
+            </p>
+            <span className="text-[10px] text-[#ecd8a6]/40 font-semibold block mt-0.5">Toplam LTV: ${totalLTV.toFixed(2)} (Brüt)</span>
           </div>
         </div>
 
-        {/* Total Spent Moons (Success Moons Only) */}
+        {/* Checkout Conversion */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400">
+            <Percent className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Ödeme Dönüşümü (Checkout)</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              %{checkoutConversionRate} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ Terk: %{cartAbandonmentRate}</span>
+            </p>
+            <span className="text-[10px] text-blue-400/60 font-semibold block mt-0.5">Dönüşüm & Sepet Terk Oranı</span>
+          </div>
+        </div>
+
+        {/* CSAT / Engagement */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <MessageSquare className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">CSAT Yıldız Skoru / PDF İndirme</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              ⭐ {averageRating ? averageRating.toFixed(1) : '0.0'} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ %{pdfDownloadRate} PDF</span>
+            </p>
+            <span className="text-[10px] text-amber-400/60 font-semibold block mt-0.5">Kullanıcı Memnuniyet Oranı</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Basic Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        
+        {/* Kullanıcı Sayısı Card */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
+            <Users className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Kullanıcı Sayısı (Yeni / Toplam)</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              +{periodNewUsers} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {totalUsersCount} Toplam</span>
+            </p>
+            <span className="text-[10px] text-sky-400/60 font-semibold block mt-0.5">Seçili Dönem Kayıtları</span>
+          </div>
+        </div>
+
+        {/* Bakılan Fal Sayısı Card */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <Compass className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Bakılan Fal Sayısı</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              {periodFortunesRead} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {totalFortunesRead} Tümü</span>
+            </p>
+            <span className="text-[10px] text-indigo-400/60 font-semibold block mt-0.5">Dönemlik Fal Bakımı</span>
+          </div>
+        </div>
+
+        {/* Alınan Katina Moon Sayısı Card */}
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
           <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
             <Coins className="h-6 w-6" />
           </div>
           <div>
-            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Harcanan Moon</span>
-            <p className="text-2xl font-bold mt-0.5 text-amber-400">{spentMoonsCount}</p>
-            <span className="text-[10px] text-amber-400/60 font-semibold block mt-0.5">
-              {period === 'all' ? 'Tüm Zamanlar Başarılı Tüketim' : `${period === 'daily' ? 'Bugün' : period === 'weekly' ? 'Bu Hafta' : 'Bu Ay'} Harcanan`}
-            </span>
-          </div>
-        </div>
-
-        {/* AI rating score */}
-        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
-          <div className="p-3.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">
-            <MessageSquare className="h-6 w-6" />
-          </div>
-          <div>
-            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">AI Memnuniyeti</span>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Alınan Katina Moon Sayısı</span>
             <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
-              {averageRating ? averageRating.toFixed(1) : '0.0'} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ 5</span>
+              {periodMoonsAcquired} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {totalMoonsAcquired} Tümü</span>
             </p>
-            <span className="text-[10px] text-purple-400/60 font-semibold block mt-0.5">
-              {validFeedbacks.length} Değerlendirme
-            </span>
-          </div>
-        </div>
-
-        {/* System Logs / errors */}
-        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
-          <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">
-            <AlertOctagon className="h-6 w-6" />
-          </div>
-          <div>
-            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Sistem Hataları</span>
-            <p className="text-2xl font-bold mt-0.5 text-red-400">{errorsCount}</p>
-            <span className="text-[10px] text-red-400/60 font-semibold block mt-0.5">
-              {period === 'all' ? 'Toplam Hata Kaydı' : `${period === 'daily' ? 'Son 24 Saatteki' : period === 'weekly' ? 'Bu Haftaki' : 'Bu Ayki'} Hatalar`}
-            </span>
+            <span className="text-[10px] text-amber-400/60 font-semibold block mt-0.5">Dönemlik Başarılı Moon Alımı</span>
           </div>
         </div>
       </div>
 
-      {/* Main Content Grid */}
+      {/* Main Analysis Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left 2 Columns - Activities */}
+        {/* Left 2 Columns: Financial details, Conversion funnel & AI Telemetry */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* Recent Moon Transactions */}
-          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#ecd8a6]/10 pb-3">
-              <h3 className="font-serif text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-amber-400" />
-                Son Bakiye İşlemleri
-              </h3>
+          {/* Detailed Financial & Checkout Conversion Metrics */}
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-5">
+            <h3 className="font-serif text-lg flex items-center gap-2 border-b border-[#ecd8a6]/10 pb-3">
+              <TrendingUp className="h-5 w-5 text-emerald-400" />
+              Finansal Performans & Dönüşüm Detayları
+            </h3>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
+                <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Toplam İstek</p>
+                <p className="text-xl font-bold text-[#ecd8a6] mt-1">{totalCheckouts}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
+                <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Başarılı Ödeme</p>
+                <p className="text-xl font-bold text-emerald-400 mt-1">{completedCheckouts}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
+                <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Yarıda Bırakanlar</p>
+                <p className="text-xl font-bold text-red-400 mt-1">{abandonedCheckouts}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
+                <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Kurtarılan Sepet</p>
+                <p className="text-xl font-bold text-blue-400 mt-1">%{naturalRecoveryRate}</p>
+              </div>
             </div>
+            
+            <div className="p-4 rounded-lg bg-[#07040e]/30 border border-[#ecd8a6]/10 text-xs text-[#ecd8a6]/70 leading-relaxed">
+              <strong>💡 Doğal Satın Alım Kurtarma Analizi:</strong> Ödeme adımını tamamlamayıp yarıda bırakan (abandoned), ancak sonrasında kupon ya da ekstra teşvik olmadan kendi isteğiyle geri dönüp başarılı ödeme gerçekleştiren kullanıcıların yüzdesini ifade eder.
+            </div>
+          </div>
+
+          {/* Son Bakiye İşlemleri (Wider Layout with User Details) */}
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-4">
+            <h4 className="font-serif text-base flex items-center gap-1.5 border-b border-[#ecd8a6]/10 pb-3">
+              <Activity className="h-5 w-5 text-amber-400" />
+              Son Bakiye İşlemleri
+            </h4>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#ecd8a6]/80 border-collapse">
+              <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-[#ecd8a6]/10 text-[#ecd8a6]/50 uppercase tracking-wider text-[10px]">
-                    <th className="py-2.5">Kullanıcı Adı</th>
-                    <th className="py-2.5">Tarih</th>
-                    <th className="py-2.5">Tür</th>
-                    <th className="py-2.5">Açıklama</th>
+                  <tr className="border-b border-[#ecd8a6]/10 text-[#ecd8a6]/50">
+                    <th className="py-2.5 font-semibold">Kullanıcı (E-posta / Telefon)</th>
+                    <th className="py-2.5 font-semibold">İşlem Türü</th>
+                    <th className="py-2.5 font-semibold">İşlem Tarihi</th>
+                    <th className="py-2.5 font-semibold text-right">Miktar</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#ecd8a6]/5">
-                  {filteredTransactions.slice(0, 7).map((tx) => (
-                    <tr key={tx.id} className="hover:bg-purple-950/5 transition">
-                      <td className="py-3 font-semibold">{tx.userName || 'Belirtilmemiş'}</td>
-                      <td className="py-3 text-[#ecd8a6]/60">{formatDate(tx.createdAt)}</td>
-                      <td className="py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold border ${
-                          tx.type === 'spend' 
-                            ? 'bg-red-500/10 text-red-300 border-red-500/20' 
-                            : tx.type === 'buy'
-                            ? 'bg-green-500/10 text-green-300 border-green-500/20'
-                            : 'bg-blue-500/10 text-blue-300 border-blue-500/20'
-                        }`}>
-                          {tx.type}
-                        </span>
-                      </td>
-                      <td className="py-3 text-[#ecd8a6]/60 max-w-[200px] truncate">{tx.description || '-'}</td>
-                    </tr>
-                  ))}
+                <tbody className="divide-y divide-[#ecd8a6]/5 text-[#ecd8a6]/80">
+                  {filteredTransactions.slice(0, 8).map((tx) => {
+                    const contact = getTransactionContact(tx);
+                    const userIdentifier = contact || tx.userName || 'Misafir';
+                    return (
+                      <tr key={tx.id} className="hover:bg-purple-950/10 transition">
+                        <td className="py-3 font-mono text-[11px] text-[#ecd8a6]">{userIdentifier}</td>
+                        <td className="py-3 font-medium capitalize">
+                          {tx.type === 'spend' ? (
+                            <span className="text-red-400/80">Harcama (AI Analiz)</span>
+                          ) : (
+                            <span className="text-green-400/80">Yükleme / Kazanç</span>
+                          )}
+                        </td>
+                        <td className="py-3 text-[11px] text-[#ecd8a6]/40">{formatDate(tx.createdAt)}</td>
+                        <td className="py-3 text-right">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            tx.type === 'spend' ? 'bg-red-500/10 text-red-300 border border-red-500/20' : 'bg-green-500/10 text-green-300 border border-green-500/20'
+                          }`}>
+                            {tx.amount > 0 ? `+${tx.amount}` : tx.amount}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {filteredTransactions.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-6 text-center text-[#ecd8a6]/40">Bu dönemde işlem bulunamadı.</td>
+                      <td colSpan={4} className="py-6 text-center text-[#ecd8a6]/40">Kayıtlı işlem bulunamadı.</td>
                     </tr>
                   )}
                 </tbody>
@@ -344,156 +524,128 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
             </div>
           </div>
 
-          {/* Recent AI Feedbacks */}
+          {/* Recent Feedbacks (Full Width Grid) */}
           <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-4">
-            <h3 className="font-serif text-lg flex items-center gap-2 border-b border-[#ecd8a6]/10 pb-3">
+            <h4 className="font-serif text-base flex items-center gap-1.5 border-b border-[#ecd8a6]/10 pb-3">
               <MessageSquare className="h-5 w-5 text-purple-400" />
-              Son AI Geri Bildirimleri
-            </h3>
-            <div className="space-y-3">
-              {filteredFeedbacks.slice(0, 5).map((fb) => {
-                const userEmail = usersMap[fb.userId]?.email;
+              Son Yorum Değerlendirmeleri
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto pr-1">
+              {filteredFeedbacks.slice(0, 6).map((fb) => {
+                const contact = getTransactionContact(fb);
+                const userIdentifier = contact || fb.userName || 'Kullanıcı';
                 return (
-                  <div key={fb.id} className="p-4 rounded-lg bg-[#07040e]/40 border border-[#ecd8a6]/5 text-xs flex justify-between items-start gap-4">
-                    <div className="space-y-1.5 flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-semibold text-[#ecd8a6]">{fb.userName || 'Kullanıcı'}</span>
-                        {userEmail && (
-                          <span className="text-[10px] bg-purple-900/30 text-[#ecd8a6]/80 px-2 py-0.5 rounded border border-[#ecd8a6]/10 font-mono truncate max-w-[220px]">
-                            {userEmail}
-                          </span>
-                        )}
-                        <span className="text-[10px] text-[#ecd8a6]/40">{formatDate(fb.createdAt)}</span>
-                      </div>
-                      <p className="text-[#ecd8a6]/70 leading-relaxed italic">"{fb.comment || 'Yorumsuz'}"</p>
+                  <div key={fb.id} className="p-3.5 rounded-lg bg-[#07040e]/40 border border-[#ecd8a6]/5 text-xs space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-[#ecd8a6] truncate max-w-[200px] font-mono text-[11px]">{userIdentifier}</span>
+                      <span className="text-amber-400 font-bold shrink-0">⭐ {fb.rating}</span>
                     </div>
-                    <div className="flex items-center shrink-0">
-                      <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2.5 py-1 rounded text-xs font-bold">
-                        ⭐ {fb.rating}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+                  <p className="text-[#ecd8a6]/70 leading-relaxed italic text-[11px] line-clamp-2">"{fb.comment || 'Yorumsuz'}"</p>
+                </div>
+              )})}
               {filteredFeedbacks.length === 0 && (
-                <p className="py-4 text-center text-[#ecd8a6]/40 text-xs">Bu dönemde geri bildirim bulunamadı.</p>
+                <p className="text-center text-[#ecd8a6]/40 text-xs py-6 col-span-2">Değerlendirme bulunamadı.</p>
               )}
             </div>
           </div>
 
         </div>
 
-        {/* Right 1 Column - Distribution Chart & Error Snippets */}
+        {/* Right 1 Column: Demographics and Channels */}
         <div className="space-y-6">
           
-          {/* Moon Transaction Type Distribution Chart */}
-          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-4">
+          {/* User Signups & Acquisition Channels */}
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-5">
             <h3 className="font-serif text-lg flex items-center gap-2 border-b border-[#ecd8a6]/10 pb-3">
-              <Coins className="h-5 w-5 text-amber-400" />
-              İşlem Dağılımı
+              <Globe className="h-5 w-5 text-sky-400" />
+              Edinim Kanalları & Büyüme
             </h3>
-            
-            {/* Visual representation */}
-            <div className="flex items-center justify-center py-4">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 32 32">
-                {/* Background circle */}
-                <circle cx="16" cy="16" r="14" fill="transparent" stroke="#0e0a1b" strokeWidth="4" />
-                
-                {/* SVG pie rendering based on counts */}
-                {(() => {
-                  const spend = getPercentage(txTypeCounts.spend);
-                  const buy = getPercentage(txTypeCounts.buy);
-                  const bonus = getPercentage(txTypeCounts.bonus);
-                  const refund = getPercentage(txTypeCounts.refund);
-                  
-                  let offset = 0;
-                  const strokeWidth = 4;
-                  const radius = 14;
-                  const circ = 2 * Math.PI * radius; // 87.96
 
-                  return (
-                    <>
-                      {spend > 0 && (() => {
-                        const dash = (spend / 100) * circ;
-                        const el = <circle cx="16" cy="16" r={radius} fill="transparent" stroke="#f87171" strokeWidth={strokeWidth} strokeDasharray={`${dash} ${circ}`} strokeDashoffset={-offset} />;
-                        offset += dash;
-                        return el;
-                      })()}
-                      {buy > 0 && (() => {
-                        const dash = (buy / 100) * circ;
-                        const el = <circle cx="16" cy="16" r={radius} fill="transparent" stroke="#4ade80" strokeWidth={strokeWidth} strokeDasharray={`${dash} ${circ}`} strokeDashoffset={-offset} />;
-                        offset += dash;
-                        return el;
-                      })()}
-                      {bonus > 0 && (() => {
-                        const dash = (bonus / 100) * circ;
-                        const el = <circle cx="16" cy="16" r={radius} fill="transparent" stroke="#60a5fa" strokeWidth={strokeWidth} strokeDasharray={`${dash} ${circ}`} strokeDashoffset={-offset} />;
-                        offset += dash;
-                        return el;
-                      })()}
-                      {refund > 0 && (() => {
-                        const dash = (refund / 100) * circ;
-                        const el = <circle cx="16" cy="16" r={radius} fill="transparent" stroke="#a78bfa" strokeWidth={strokeWidth} strokeDasharray={`${dash} ${circ}`} strokeDashoffset={-offset} />;
-                        offset += dash;
-                        return el;
-                      })()}
-                    </>
-                  );
-                })()}
-              </svg>
-            </div>
+            <div className="space-y-4">
+              {/* Total Growth */}
+              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] uppercase text-[#ecd8a6]/40 font-semibold">Yeni Kayıtlar (Bu Dönem)</span>
+                  <p className="text-2xl font-bold text-[#ecd8a6] mt-0.5">+{filteredUsers.length}</p>
+                </div>
+                <Users className="h-8 w-8 text-sky-400/40" />
+              </div>
 
-            {/* Legend / Info */}
-            <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                  <span>Spend (Harcama)</span>
+              {/* Providers list */}
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase text-[#ecd8a6]/50 tracking-wider font-semibold">Kayıt Yöntemleri Dağılımı</h4>
+                <div className="space-y-1.5 text-xs">
+                  {providerDistribution.map((item) => (
+                    <div key={item.name} className="flex justify-between items-center p-2 rounded bg-[#07040e]/40 border border-[#ecd8a6]/5">
+                      <span className="font-mono text-xs">{item.name}</span>
+                      <span className="font-semibold text-[#ecd8a6]">{item.count} Kayıt</span>
+                    </div>
+                  ))}
+                  {providerDistribution.length === 0 && (
+                    <p className="text-center text-[#ecd8a6]/40 text-xs py-2">Veri bulunamadı.</p>
+                  )}
                 </div>
-                <span className="font-semibold">{getPercentage(txTypeCounts.spend)}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                  <span>Buy (Satın Alım)</span>
-                </div>
-                <span className="font-semibold">{getPercentage(txTypeCounts.buy)}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-                  <span>Bonus (Hediye)</span>
-                </div>
-                <span className="font-semibold">{getPercentage(txTypeCounts.bonus)}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-400" />
-                  <span>Refund (İade)</span>
-                </div>
-                <span className="font-semibold">{getPercentage(txTypeCounts.refund)}%</span>
               </div>
             </div>
           </div>
 
-          {/* Recent System Error logs */}
-          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-4">
+          {/* Device & Demographics Distribution */}
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-6 space-y-5">
             <h3 className="font-serif text-lg flex items-center gap-2 border-b border-[#ecd8a6]/10 pb-3">
-              <AlertOctagon className="h-5 w-5 text-red-400" />
-              Son Kritik Hatalar
+              <Compass className="h-5 w-5 text-indigo-400" />
+              Demografi & Cihazlar
             </h3>
-            <div className="space-y-3">
-              {filteredErrors.slice(0, 5).map((err) => (
-                <div key={err.id} className="p-3 rounded bg-red-950/10 border border-red-900/20 text-[10px] space-y-1">
-                  <div className="flex justify-between items-center text-[#ecd8a6]/50">
-                    <span className="font-mono uppercase">{err.context || 'Sunucu'}</span>
-                    <span>{formatDate(err.createdAt)}</span>
-                  </div>
-                  <p className="text-red-400 font-semibold truncate">{err.message}</p>
+
+            <div className="space-y-4">
+              {/* Locations */}
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase text-[#ecd8a6]/50 tracking-wider font-semibold">Lokasyon Dağılımı (Top 5)</h4>
+                <div className="space-y-1.5 text-xs">
+                  {locationDistribution.map((item) => (
+                    <div key={item.name} className="flex justify-between items-center p-2 rounded bg-[#07040e]/40 border border-[#ecd8a6]/5">
+                      <span className="font-mono text-xs truncate max-w-[150px]">{item.name}</span>
+                      <span className="font-semibold text-[#ecd8a6]">{item.count}</span>
+                    </div>
+                  ))}
+                  {locationDistribution.length === 0 && (
+                    <p className="text-center text-[#ecd8a6]/40 text-xs py-2">Konum verisi bulunamadı.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Browsers */}
+              <div className="space-y-2">
+                <h4 className="text-xs uppercase text-[#ecd8a6]/50 tracking-wider font-semibold">Tarayıcı & Cihazlar (Top 5)</h4>
+                <div className="space-y-1.5 text-xs">
+                  {browserDistribution.map((item) => (
+                    <div key={item.name} className="flex justify-between items-center p-2 rounded bg-[#07040e]/40 border border-[#ecd8a6]/5">
+                      <span className="font-mono text-xs truncate max-w-[150px]">{item.name}</span>
+                      <span className="font-semibold text-[#ecd8a6]">{item.count}</span>
+                    </div>
+                  ))}
+                  {browserDistribution.length === 0 && (
+                    <p className="text-center text-[#ecd8a6]/40 text-xs py-2">Cihaz verisi bulunamadı.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* System Errors */}
+          <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/30 p-5 space-y-3">
+            <h4 className="font-serif text-sm flex items-center gap-1.5 text-red-400 border-b border-[#ecd8a6]/5 pb-2">
+              <AlertOctagon className="h-4 w-4" />
+              Kritik Sistem Hataları
+            </h4>
+            <div className="space-y-2">
+              {filteredErrors.slice(0, 3).map((err) => (
+                <div key={err.id} className="p-2.5 rounded bg-red-950/10 border border-red-900/20 text-[10px] space-y-1">
+                  <p className="text-red-400 font-semibold truncate">{err.errorMessage || err.message}</p>
+                  <p className="text-[#ecd8a6]/40 text-[9px]">{formatDate(err.createdAt)}</p>
                 </div>
               ))}
               {filteredErrors.length === 0 && (
-                <p className="text-center text-[#ecd8a6]/40 text-xs py-4">Bu dönemde hata kaydı bulunmamaktadır.</p>
+                <p className="text-center text-[#ecd8a6]/40 text-xs py-2">Kritik hata kaydı bulunmuyor.</p>
               )}
             </div>
           </div>

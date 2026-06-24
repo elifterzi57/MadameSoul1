@@ -310,10 +310,32 @@ export const Profile: React.FC<ProfileProps> = ({
           limit(10)
         );
         const querySnapshot = await getDocs(q);
-        const items = querySnapshot.docs.map(doc => ({
+        const txItems = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+
+        // Fetch user reflections to merge customTitle and reflectionNotes
+        const reflectionsQuery = query(
+          collection(db, 'user_reflections'),
+          where('userId', '==', user.uid)
+        );
+        const reflectionsSnapshot = await getDocs(reflectionsQuery);
+        const reflectionsMap: Record<string, any> = {};
+        reflectionsSnapshot.forEach(docSnap => {
+          reflectionsMap[docSnap.id] = docSnap.data();
+        });
+
+        // Merge reflections data
+        const items = txItems.map(item => {
+          const refl = reflectionsMap[item.id] || {};
+          return {
+            ...item,
+            customTitle: refl.customTitle || '',
+            reflectionNotes: refl.reflectionNotes || ''
+          };
+        });
+
         setHistory(items);
       } catch (error) {
         console.error('Error fetching history:', error);
@@ -495,10 +517,12 @@ export const Profile: React.FC<ProfileProps> = ({
   const handleSaveNotes = async (itemId: string, title: string, notes: string) => {
     setIsSavingNotes(true);
     try {
-      await updateDoc(doc(db, 'moon_transactions', itemId), {
+      await setDoc(doc(db, 'user_reflections', itemId), {
+        userId: user.uid,
         customTitle: title,
-        reflectionNotes: notes
-      });
+        reflectionNotes: notes,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
       setHistory(prev => prev.map(item => item.id === itemId ? { ...item, customTitle: title, reflectionNotes: notes } : item));
       const successMsg = translations?.profileDiary?.saveSuccess || "Reading updated successfully!";
       setNotesStatus({ type: 'success', message: successMsg });

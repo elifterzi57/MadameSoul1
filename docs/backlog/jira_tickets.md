@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **141** | Açık: **0** | Tamamlanan: **137** | İptal Edilen: **4**
+Toplam Bilet: **147** | Açık: **0** | Tamamlanan: **143** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,12 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-315**](#-ms-315) | Task / Admin / DB | CqVzXTTMcqQYUnpuszvBpETWbJ32 Kullanıcısına Admin Yetkisi Tanımlanması | Yüksek | set_admin scripti aracılığıyla UID custom claims üzerine admin rolü tanımlandı. | Elif |
+| [**MS-314**](#-ms-314) | Feature / UX / UI / Dev | Admin Paneli AI Maliyet Göstergelerinin Kaldırılması | Orta | Genel Bakış (Overview) sekmesindeki AI maliyet analiz göstergeleri arayüzden tamamen temizlendi. | Elif |
+| [**MS-313**](#-ms-313) | Feature / Dev / DB | Yansıma ve Gerçekleşme Notlarının user_reflections Koleksiyonuna Taşınması ve Güvenlik Kuralları | Yüksek | Günlük fal yansıma ve gerçekleşme notları user_reflections koleksiyonuna izole edildi, firestore.rules ve Profile.tsx güncellendi. | Elif |
+| [**MS-312**](#-ms-312) | Bug / Dev | Admin Paneli Edinim Kanalları ve Tarih Filtresi Senkronizasyonu | Yüksek | Edinim kanalları verileri üst tarih filtreleri (günlük/haftalık/aylık/tümü) ile senkronize çalışacak şekilde dinamik hale getirildi. | Elif |
+| [**MS-311**](#-ms-311) | Feature / UX / UI | Admin Overview Sekmesine Temel Metrikler ve Tarih Filtresi Entegrasyonu | Yüksek | Kullanıcı sayısı, fal sayısı ve Katina Moon sayısı göstergeleri eklendi ve tümü tarih filtrelerine bağlandı. | Elif |
+| [**MS-310**](#-ms-310) | Feature / UX / UI | Son Yorum Değerlendirmelerinde Kullanıcı İletişim Bilgisi Gösterimi | Yüksek | Son yorum değerlendirmeleri tablosunda kullanıcı adı yerine e-posta veya telefon numarası gösterilmesi sağlandı. | Elif |
 | [**MS-309**](#-ms-309) | Feature / UX / UI / Dev | Fal Formu Girdi Alanlarının Büyük Harf (Uppercase) Yapılması | Yüksek | Form girdi alanlarına ve seçim kutularına uppercase Tailwind sınıfı eklenerek tüm girdiler arayüzde büyük harf yapıldı. | Elif |
 | [**MS-308**](#-ms-308) | Feature / UX / UI / Dev | Stripe Bekleyen Ödeme Talepleri İptal Etme Butonu ve Akışı | Yüksek | Bekleyen ödemeler listesine "İptal Et" butonu, rose renkli glassmorphic onay/yükleme/başarı modalları ve iptal endpoint'i eklenerek ödemesiz talepler temizlendi. | Elif |
 | [**MS-307**](#-ms-307) | Bug / Security / Dev | Stripe Manuel Ödeme Onayına Ödeme Durumu Doğrulama Koruması | Yüksek | `/api/admin/complete-payment` endpoint'ine Stripe API'den payment_status'ün "paid" olduğunu doğrulayan güvenlik kontrolü eklendi. | Elif |
@@ -166,6 +172,97 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-315: CqVzXTTMcqQYUnpuszvBpETWbJ32 Kullanıcısına Admin Yetkisi Tanımlanması (Task / Admin / DB)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Backend / Firebase Admin
+* **Açıklama:**  
+  CqVzXTTMcqQYUnpuszvBpETWbJ32 UID'li kullanıcının admin paneline erişebilmesi amacıyla Firebase Auth Custom Claims yetkilendirmesi `set_admin` scripti ile `role: "admin"` olarak tanımlanmış ve oturumu doğrulanmıştır.
+* **Kabul Kriterleri:**
+  1. Belirtilen kullanıcı kimliğine (UID) ait hesaba custom claims ile admin rolü başarıyla tanımlanmalıdır.
+  2. Kullanıcı admin paneline giriş yapabilmelidir.
+
+---
+
+### 📋 MS-314: Admin Paneli AI Maliyet Göstergelerinin Kaldırılması (Feature / UX / UI / Dev)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin paneli genel bakış sayfasındaki AI (Gemini) maliyet göstergeleri, token maliyet tahminleri ve getiri analizi kartları kullanıcı talebi doğrultusunda arayüzden kaldırılmış, tasarımsal bütünlük yeniden kurulmuştur.
+* **Kabul Kriterleri:**
+  1. `OverviewTab.tsx` içerisindeki yapay zeka maliyet hesaplama fonksiyonları ve görsel maliyet kartları tasarımdan çıkarılmalıdır.
+  2. Arayüzün kalan bileşenleri düzgün hizalanmalı ve görsel bir hata oluşmamalıdır.
+
+---
+
+### 📋 MS-313: Yansıma ve Gerçekleşme Notlarının user_reflections Koleksiyonuna Taşınması ve Güvenlik Kuralları (Feature / Dev / DB)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Winston (📐 Architect) / Amelia (💻 Developer)
+* **Bileşen:** Client App / Profile / Firestore Rules
+* **Açıklama:**  
+  Kullanıcıların geçmiş falları için yazdıkları yansıma ve gerçekleşme notları, veri yalıtımı ve performans amacıyla `moon_transactions` koleksiyonu yerine müstakil `user_reflections` koleksiyonuna taşınmış, `firestore.rules` güvenlik kuralları güncellenmiş ve `Profile.tsx` entegrasyonu buna göre uyarlanmıştır.
+* **Kabul Kriterleri:**
+  1. Fal yansıma notu kaydetme işlemi `user_reflections` koleksiyonuna `setDoc` ile yapılmalıdır.
+  2. Firestore kurallarında `user_reflections` koleksiyonuna sadece ilgili kullanıcının yazma ve okuma izni olmalıdır.
+  3. Geçmiş falları listelerken yansıma notları dinamik olarak `user_reflections` üzerinden birleştirilerek (merge) gösterilmelidir.
+
+---
+
+### 📋 MS-312: Admin Paneli Edinim Kanalları ve Tarih Filtresi Senkronizasyonu (Bug / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin paneli genel bakış sekmesindeki "Edinim Kanalları" ve kayıt yöntemleri dağılımının üst kısımda yer alan tarih filtreleri (Bugün, Haftalık, Aylık, Tümü) ile senkronize çalışmama hatası giderilmiş ve tarih aralığına göre dinamik filtrelenmesi sağlanmıştır.
+* **Kabul Kriterleri:**
+  1. Edinim kanalları ve kayıt yöntemleri listelenirken seçilen tarih aralığı filtre parametreleri (`startDate`, `endDate`) Firestore sorgu sonuçlarında istemci tarafında süzülmelidir.
+  2. Filtre değiştiğinde edinim kanalları listesi de anında güncellenmelidir.
+
+---
+
+### 📋 MS-311: Admin Overview Sekmesine Temel Metrikler ve Tarih Filtresi Entegrasyonu (Feature / UX / UI)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin Genel Bakış tablosuna "Kullanıcı Sayısı", "Bakılan Fal Sayısı" ve "Alınan Katina Moon Sayısı" gibi temel performans göstergeleri (KPI) eklenmiş ve bu verilerin tamamı tarih filtreleriyle uyumlu hale getirilmiştir.
+* **Kabul Kriterleri:**
+  1. Genel bakış sekmesinin üstünde kullanıcı sayısı, fal sayısı ve satılan/alınan Katina Moon adetlerini gösteren kartlar yer almalıdır.
+  2. Bu kartlardaki değerler, tarih filtreleri (Bugün, Haftalık, Aylık, Tümü) değiştiğinde dinamik olarak güncellenmelidir.
+
+---
+
+### 📋 MS-310: Son Yorum Değerlendirmelerinde Kullanıcı İletişim Bilgisi Gösterimi (Feature / UX / UI)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Yapay zeka tarot yorum değerlendirmelerinin (ai_feedback) listelendiği "Son Yorum Değerlendirmeleri" tablosunda, anonim veya karmaşık kullanıcı ID'si (UID) yerine kullanıcının e-posta adresi (e-posta yoksa telefon numarası) gösterilerek okunabilirlik artırılmıştır.
+* **Kabul Kriterleri:**
+  1. Son Yorum Değerlendirmeleri bölümünde kullanıcıyı belirtmek için UID yerine e-posta adresi getirilmelidir.
+  2. Eğer kullanıcının kayıtlı e-postası bulunmuyorsa, fallback olarak telefon numarası görüntülenmelidir.
+
+---
 
 ### 📋 MS-309: Fal Formu Girdi Alanlarının Büyük Harf (Uppercase) Yapılması (Feature / UX / UI / Dev)
 
