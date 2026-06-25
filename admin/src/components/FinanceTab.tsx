@@ -73,6 +73,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
         if (status === 'pending' && ageMinutes > 10) {
           status = 'cancelled';
+          data.completedMethod = 'auto_timeout';
           const attemptRef = doc(db, 'checkout_attempts', docSnap.id);
           updateDoc(attemptRef, {
             status: 'cancelled',
@@ -87,6 +88,20 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           completedData.push(docWithId);
           completedMethodsMap[docSnap.id] = data.completedMethod || 'webhook';
         } else if (status === 'cancelled') {
+          let cancelReason = 'Ödemesi gerçekleşmeyen işlemin iptali';
+          const method = data.completedMethod;
+          if (method === 'auto_timeout') {
+            cancelReason = '10 dakika zaman aşımı nedeniyle sistem tarafından otomatik iptal edildi';
+          } else if (method === 'manual_reject') {
+            cancelReason = 'Yönetici tarafından manuel olarak reddedildi/iptal edildi';
+          } else if (method === 'user_cancel') {
+            cancelReason = 'Kullanıcı tarafından ödeme sayfasında iptal edildi';
+          } else if (method === 'stripe_expiry') {
+            cancelReason = 'Stripe ödeme süresi dolduğu için iptal edildi (Webhook)';
+          } else if (method) {
+            cancelReason = `İptal edildi (${method})`;
+          }
+
           salesData.push({
             id: docSnap.id,
             userId: data.userId,
@@ -95,7 +110,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             paymentProvider: 'Stripe',
             idempotencyKey: docSnap.id,
             createdAt: data.completedAt || data.createdAt || new Date(),
-            description: 'Ödemesi gerçekleşmeyen işlemin iptali',
+            description: cancelReason,
             isCancelled: true
           });
           completedMethodsMap[docSnap.id] = data.completedMethod || 'manual_reject';
@@ -915,14 +930,29 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                         <td className="px-6 py-4 text-xs capitalize">{sale.paymentProvider || 'Stripe'}</td>
                         <td className="px-6 py-4 text-xs">
                           {(() => {
+                            const method = completedMethods[sale.idempotencyKey];
                             if (sale.isCancelled) {
+                              let badgeColor = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                              let label = "İptal (Bilinmiyor)";
+                              if (method === 'auto_timeout') {
+                                label = "İptal (Sistem)";
+                                badgeColor = "bg-red-500/10 text-red-400 border border-red-500/20";
+                              } else if (method === 'manual_reject') {
+                                label = "İptal (Manuel)";
+                                badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                              } else if (method === 'user_cancel') {
+                                label = "İptal (Kullanıcı)";
+                                badgeColor = "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
+                              } else if (method === 'stripe_expiry') {
+                                label = "İptal (Stripe)";
+                                badgeColor = "bg-violet-500/10 text-violet-400 border border-violet-500/20";
+                              }
                               return (
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                                  İptal Edildi
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${badgeColor}`}>
+                                  {label}
                                 </span>
                               );
                             }
-                            const method = completedMethods[sale.idempotencyKey];
                             if (method === 'manual') {
                               return (
                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">

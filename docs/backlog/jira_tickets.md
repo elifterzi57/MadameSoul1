@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **156** | Açık: **0** | Tamamlanan: **152** | İptal Edilen: **4**
+Toplam Bilet: **157** | Açık: **0** | Tamamlanan: **153** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-325**](#-ms-325) | Feature / UX / UI | Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi | Orta | İptal edilen Stripe ödeme denemeleri için iptal sebebine göre (zaman aşımı, manuel, kullanıcı, stripe) detaylı açıklama metinleri ve durum rozetleri eklendi. | Elif |
 | [**MS-324**](#-ms-324) | Feature / UX / UI | Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu | Orta | Tarih periyot filtreleri sayfa başlığına taşındı, kaba alt kontrol barı kaldırıldı. | Elif |
 | [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
 | [**MS-322**](#-ms-322) | Feature / UX / UI | Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması | Orta | Kurtarılan Sepet kartı, açıklama bloğu ve ilişkili kodlar panelden temizlendi. | Elif |
@@ -181,6 +182,23 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-325: Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / FinanceTab
+* **Açıklama:**  
+  Stripe Finans tablosunda ödemesi tamamlanmamış/iptal edilmiş işlemlerin neden iptal edildiğini (10 dk sistem zaman aşımı, yönetici reddi, kullanıcı iptali, Stripe session zaman aşımı vb.) anlamak amacıyla dinamik açıklama satırları ve renk kodlu detaylı durum rozetleri (badge) eklendi.
+* **Kabul Kriterleri:**
+  1. `auto_timeout` ile iptal edilen işlemler için `10 dakika zaman aşımı nedeniyle sistem tarafından otomatik iptal edildi` açıklaması gösterilmeli ve `İptal (Sistem)` rozeti (kırmızı) eklenmelidir.
+  2. `manual_reject` ile iptal edilen işlemler için `Yönetici tarafından manuel olarak reddedildi/iptal edildi` açıklaması gösterilmeli ve `İptal (Manuel)` rozeti (sarı) eklenmelidir.
+  3. `user_cancel` ile iptal edilen işlemler için `Kullanıcı tarafından ödeme sayfasında iptal edildi` açıklaması gösterilmeli ve `İptal (Kullanıcı)` rozeti (gri) eklenmelidir.
+  4. `stripe_expiry` ile iptal edilen işlemler için `Stripe ödeme süresi dolduğu için iptal edildi (Webhook)` açıklaması gösterilmeli ve `İptal (Stripe)` rozeti (mor) eklenmelidir.
+
+---
 
 ### 📋 MS-324: Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu (Feature / UX / UI)
 
