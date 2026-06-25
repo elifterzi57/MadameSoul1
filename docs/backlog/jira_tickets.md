@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **154** | Açık: **0** | Tamamlanan: **150** | İptal Edilen: **4**
+Toplam Bilet: **155** | Açık: **0** | Tamamlanan: **151** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartlarının Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
 | [**MS-322**](#-ms-322) | Feature / UX / UI | Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması | Orta | Kurtarılan Sepet kartı, açıklama bloğu ve ilişkili kodlar panelden temizlendi. | Elif |
 | [**MS-321**](#-ms-321) | Bug / Dev | Firestore Bağlantı Sorunları İçin Long Polling Desteği | Yüksek | `src/lib/firebase.ts` long-polling otomatik algılamalı yapılandırmayla güncellendi. | Elif |
 | [**MS-320**](#-ms-320) | Bug / Security / Dev | Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı | Yüksek | Rules yetkilendirmesi güncellendi, admin panel eşleştirme fonksiyonu hata toleranslı hale getirildi. | Elif |
@@ -179,6 +180,25 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-323: Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartlarının Eklenmesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / CollectionsTab
+* **Açıklama:**  
+  Yönetici panelindeki "Veritabanı Koleksiyonları" ekranında listelenen verilerin daha okunabilir ve anlaşılır olması için seçili koleksiyona göre dinamik özet gösterge (stats) kartları eklenmiştir.
+* **Kabul Kriterleri:**
+  1. `users` için: Toplam Kullanıcı, Premium Sayısı, Premium Oranı, Onboarding Oranı.
+  2. `user_moons` için: Toplam Kullanıcı, Toplam Bakiye, Satın Alınan Bakiye, Ortalama Bakiye.
+  3. `moon_transactions` için: Toplam İşlem, Harcama, Satın Alma, Diğer İşlemler.
+  4. `ai_feedback` için: Toplam Geri Bildirim, Ortalama Puan.
+  5. `contact_us` için: Toplam Mesaj, Dil Dağılımı (TR, EN, Diğer).
+  6. `user_reflections` için: Toplam Yansıma Notu, Yansıma Yazan Eşsiz Kullanıcı Sayısı.
+
+---
 
 ### 📋 MS-322: Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması (Feature / UX / UI)
 

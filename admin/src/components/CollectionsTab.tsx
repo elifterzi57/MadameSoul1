@@ -655,6 +655,101 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   const columns = getColumns();
 
+  const getCollectionStats = () => {
+    if (sortedAndFilteredDocs.length === 0) return null;
+
+    if (selectedCollection === 'users') {
+      const total = sortedAndFilteredDocs.length;
+      const premiumCount = sortedAndFilteredDocs.filter(d => d.isPremium).length;
+      const onboardingCompleted = sortedAndFilteredDocs.filter(d => d.onboardingCompleted).length;
+      return {
+        total,
+        premiumCount,
+        premiumRate: total > 0 ? Math.round((premiumCount / total) * 100) : 0,
+        onboardingCompleted,
+        onboardingRate: total > 0 ? Math.round((onboardingCompleted / total) * 100) : 0
+      };
+    }
+
+    if (selectedCollection === 'user_moons') {
+      const total = sortedAndFilteredDocs.length;
+      let totalBalance = 0;
+      let totalPurchased = 0;
+      sortedAndFilteredDocs.forEach(d => {
+        totalBalance += Number(d.balance || 0);
+        totalPurchased += Number(d.purchasedBalance || 0);
+      });
+      return {
+        total,
+        totalBalance,
+        totalPurchased,
+        avgBalance: total > 0 ? Math.round((totalBalance / total) * 10) / 10 : 0
+      };
+    }
+
+    if (selectedCollection === 'moon_transactions') {
+      const total = sortedAndFilteredDocs.length;
+      let buyCount = 0;
+      let spendCount = 0;
+      let refundCount = 0;
+      let bonusCount = 0;
+      
+      sortedAndFilteredDocs.forEach(d => {
+        if (d.type === 'buy') buyCount++;
+        else if (d.type === 'spend') spendCount++;
+        else if (d.type === 'refund') refundCount++;
+        else if (d.type === 'bonus') bonusCount++;
+      });
+      return {
+        total,
+        buyCount,
+        spendCount,
+        refundCount,
+        bonusCount
+      };
+    }
+
+    if (selectedCollection === 'ai_feedback') {
+      const total = sortedAndFilteredDocs.length;
+      let totalRating = 0;
+      let ratingCount = 0;
+      sortedAndFilteredDocs.forEach(d => {
+        const r = Number(d.rating);
+        if (r && !isNaN(r)) {
+          totalRating += r;
+          ratingCount++;
+        }
+      });
+      return {
+        total,
+        avgRating: ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : '0.0',
+        ratingCount
+      };
+    }
+
+    if (selectedCollection === 'contact_us') {
+      const total = sortedAndFilteredDocs.length;
+      const trCount = sortedAndFilteredDocs.filter(d => d.lang === 'tr').length;
+      const enCount = sortedAndFilteredDocs.filter(d => d.lang === 'en').length;
+      const otherCount = total - trCount - enCount;
+      return {
+        total,
+        trCount,
+        enCount,
+        otherCount
+      };
+    }
+
+    if (selectedCollection === 'user_reflections') {
+      return {
+        total: sortedAndFilteredDocs.length,
+        uniqueUsers: new Set(sortedAndFilteredDocs.map(d => d.userId).filter(Boolean)).size
+      };
+    }
+
+    return null;
+  };
+
   const getTelemetryStats = () => {
     if (selectedCollection !== 'ai_telemetry' || sortedAndFilteredDocs.length === 0) {
       return null;
@@ -678,6 +773,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   };
 
   const stats = getTelemetryStats();
+  const collectionStats = getCollectionStats() as any;
 
   return (
     <div className="space-y-6">
@@ -703,6 +799,121 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           </button>
         </div>
       </div>
+
+      {/* Dynamic Collection Stats Widgets */}
+      {collectionStats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {selectedCollection === 'users' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.premiumCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Oranı</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">%{collectionStats.premiumRate}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Onboarding Tamamlanma</p>
+                <p className="mt-2 text-2xl font-semibold text-emerald-400">%{collectionStats.onboardingRate}</p>
+              </div>
+            </>
+          )}
+
+          {selectedCollection === 'user_moons' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Bakiye (Moon)</p>
+                <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.totalBalance}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alınan Moon</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.totalPurchased}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Bakiye</p>
+                <p className="mt-2 text-2xl font-semibold text-emerald-400">{collectionStats.avgBalance}</p>
+              </div>
+            </>
+          )}
+
+          {selectedCollection === 'moon_transactions' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam İşlem</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Harcama (Spend)</p>
+                <p className="mt-2 text-2xl font-semibold text-red-400">{collectionStats.spendCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alım (Buy)</p>
+                <p className="mt-2 text-2xl font-semibold text-green-400">{collectionStats.buyCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer (Bonus/İade)</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.bonusCount + collectionStats.refundCount}</p>
+              </div>
+            </>
+          )}
+
+          {selectedCollection === 'ai_feedback' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Geri Bildirim</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Puan</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">★ {collectionStats.avgRating} / 5.0</p>
+              </div>
+            </>
+          )}
+
+          {selectedCollection === 'contact_us' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Mesaj</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Türkçe (TR)</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.trCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">İngilizce (EN)</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.enCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer Diller</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.otherCount}</p>
+              </div>
+            </>
+          )}
+
+          {selectedCollection === 'user_reflections' && (
+            <>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Yansıma Notu</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Yansıma Yazan Kullanıcılar</p>
+                <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.uniqueUsers}</p>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Telemetry Stats Widgets */}
       {selectedCollection === 'ai_telemetry' && stats && (
