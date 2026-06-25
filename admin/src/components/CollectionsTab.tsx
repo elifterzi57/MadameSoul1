@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, query, limit, where } from 'firebase/firestore';
-import { ArrowUpDown, RefreshCw, FileText, Download } from 'lucide-react';
+import { ArrowUpDown, RefreshCw, FileText, Download, Clock, Calendar, Layers } from 'lucide-react';
 
 interface CollectionsTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
@@ -22,8 +22,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [lastPurchaseMap, setLastPurchaseMap] = useState<Record<string, { date: Date, raw: any }>>({});
   
   // Filters & Sorting state
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [sortByField, setSortByField] = useState<string>('id');
 
@@ -182,18 +181,16 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   // Filter logic
   const getFilteredDocs = () => {
+    if (period === 'all') return documents;
+    const now = new Date();
     return documents.filter((doc) => {
       const docDate = getDocDate(doc);
-      if (!docDate) {
-        if (startDate || endDate) return false;
-        return true;
-      }
-
-      const docDateStr = docDate.toISOString().split('T')[0];
-
-      if (startDate && docDateStr < startDate) return false;
-      if (endDate && docDateStr > endDate) return false;
-
+      if (!docDate) return false;
+      const diffTime = Math.abs(now.getTime() - docDate.getTime());
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      if (period === 'daily') return diffDays <= 1;
+      if (period === 'weekly') return diffDays <= 7;
+      if (period === 'monthly') return diffDays <= 30;
       return true;
     });
   };
@@ -201,7 +198,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of moon transaction fields mapped
   const getMoonTxValue = (doc: any, col: string): any => {
     const fieldMapping: Record<string, string> = {
-      'USERID': 'id',
+      'USERID': 'userId',
       'Username': 'userName',
       'createdat': 'createdAt',
       'Description': 'description',
@@ -276,6 +273,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (col === 'PHONE NUMBER') {
       return doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
     }
+    if (col === 'PREMIUM') {
+      return doc.isPremium ? 'Evet' : 'Hayır';
+    }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
     }
@@ -338,6 +338,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of contact_us fields mapped
   const getContactUsValue = (doc: any, col: string): any => {
     if (col === 'USERID') {
+      if (doc.userId) return doc.userId;
       const foundUserId = Object.keys(usersMap).find(uid => usersMap[uid].email?.toLowerCase() === doc.email?.toLowerCase());
       return foundUserId || '-';
     }
@@ -576,6 +577,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'NAME',
         'EMAIL',
         'PHONE NUMBER',
+        'PREMIUM',
         'BIRTHDAY',
         'BIRTH PLACE',
         'CRETEDAT',
@@ -655,6 +657,98 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   const columns = getColumns();
 
+  const getCollectionStats = () => {
+    if (sortedAndFilteredDocs.length === 0) return null;
+
+    if (selectedCollection === 'users') {
+      const total = sortedAndFilteredDocs.length;
+      const premiumCount = sortedAndFilteredDocs.filter(d => d.isPremium).length;
+      return {
+        total,
+        premiumCount,
+        premiumRate: total > 0 ? Math.round((premiumCount / total) * 100) : 0
+      };
+    }
+
+    if (selectedCollection === 'user_moons') {
+      const total = sortedAndFilteredDocs.length;
+      let totalBalance = 0;
+      let totalPurchased = 0;
+      sortedAndFilteredDocs.forEach(d => {
+        totalBalance += Number(d.balance || 0);
+        totalPurchased += Number(d.purchasedBalance || 0);
+      });
+      return {
+        total,
+        totalBalance,
+        totalPurchased,
+        avgBalance: total > 0 ? Math.round((totalBalance / total) * 10) / 10 : 0
+      };
+    }
+
+    if (selectedCollection === 'moon_transactions') {
+      const total = sortedAndFilteredDocs.length;
+      let buyCount = 0;
+      let spendCount = 0;
+      let refundCount = 0;
+      let bonusCount = 0;
+      
+      sortedAndFilteredDocs.forEach(d => {
+        if (d.type === 'buy') buyCount++;
+        else if (d.type === 'spend') spendCount++;
+        else if (d.type === 'refund') refundCount++;
+        else if (d.type === 'bonus') bonusCount++;
+      });
+      return {
+        total,
+        buyCount,
+        spendCount,
+        refundCount,
+        bonusCount
+      };
+    }
+
+    if (selectedCollection === 'ai_feedback') {
+      const total = sortedAndFilteredDocs.length;
+      let totalRating = 0;
+      let ratingCount = 0;
+      sortedAndFilteredDocs.forEach(d => {
+        const r = Number(d.rating);
+        if (r && !isNaN(r)) {
+          totalRating += r;
+          ratingCount++;
+        }
+      });
+      return {
+        total,
+        avgRating: ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : '0.0',
+        ratingCount
+      };
+    }
+
+    if (selectedCollection === 'contact_us') {
+      const total = sortedAndFilteredDocs.length;
+      const trCount = sortedAndFilteredDocs.filter(d => d.lang === 'tr').length;
+      const enCount = sortedAndFilteredDocs.filter(d => d.lang === 'en').length;
+      const otherCount = total - trCount - enCount;
+      return {
+        total,
+        trCount,
+        enCount,
+        otherCount
+      };
+    }
+
+    if (selectedCollection === 'user_reflections') {
+      return {
+        total: sortedAndFilteredDocs.length,
+        uniqueUsers: new Set(sortedAndFilteredDocs.map(d => d.userId).filter(Boolean)).size
+      };
+    }
+
+    return null;
+  };
+
   const getTelemetryStats = () => {
     if (selectedCollection !== 'ai_telemetry' || sortedAndFilteredDocs.length === 0) {
       return null;
@@ -678,15 +772,42 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   };
 
   const stats = getTelemetryStats();
+  const collectionStats = getCollectionStats() as any;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="font-serif text-3xl text-[#ecd8a6]">Veritabanı Görselleştirme</h2>
           <p className="text-sm text-[#ecd8a6]/60">Koleksiyonlar içerisindeki belgeleri izleyin ve filtreleyin.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Period Selector Buttons */}
+          <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
+            {([
+              { key: 'daily', label: 'Bugün', icon: Clock },
+              { key: 'weekly', label: 'Son 7 Gün', icon: Calendar },
+              { key: 'monthly', label: 'Son 30 Gün', icon: Calendar },
+              { key: 'all', label: 'Tümü', icon: Layers }
+            ] as const).map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setPeriod(item.key)}
+                  className={`flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition ${
+                    period === item.key
+                      ? 'bg-purple-900/40 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/15'
+                      : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6] hover:bg-purple-950/20'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
           <button
             onClick={exportToExcel}
             className="flex items-center gap-2 rounded-lg bg-[#ecd8a6]/10 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-[#ecd8a6]/20 transition text-sm text-[#ecd8a6]"
@@ -703,6 +824,117 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           </button>
         </div>
       </div>
+
+      {/* Dynamic Collection Stats Widgets */}
+      {collectionStats && (
+        <>
+          {selectedCollection === 'users' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.premiumCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Oranı</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">%{collectionStats.premiumRate}</p>
+              </div>
+            </div>
+          )}
+
+          {selectedCollection === 'user_moons' && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Bakiye (Moon)</p>
+                <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.totalBalance}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alınan Moon</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.totalPurchased}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Bakiye</p>
+                <p className="mt-2 text-2xl font-semibold text-emerald-400">{collectionStats.avgBalance}</p>
+              </div>
+            </div>
+          )}
+
+          {selectedCollection === 'moon_transactions' && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam İşlem</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Harcama (Spend)</p>
+                <p className="mt-2 text-2xl font-semibold text-red-400">{collectionStats.spendCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alım (Buy)</p>
+                <p className="mt-2 text-2xl font-semibold text-green-400">{collectionStats.buyCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer (Bonus/İade)</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.bonusCount + collectionStats.refundCount}</p>
+              </div>
+            </div>
+          )}
+
+          {selectedCollection === 'ai_feedback' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Geri Bildirim</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Puan</p>
+                <p className="mt-2 text-2xl font-semibold text-amber-400">★ {collectionStats.avgRating} / 5.0</p>
+              </div>
+            </div>
+          )}
+
+          {selectedCollection === 'contact_us' && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Mesaj</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Türkçe (TR)</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.trCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">İngilizce (EN)</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.enCount}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer Diller</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.otherCount}</p>
+              </div>
+            </div>
+          )}
+
+          {selectedCollection === 'user_reflections' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Yansıma Notu</p>
+                <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
+              </div>
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Yansıma Yazan Kullanıcılar</p>
+                <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.uniqueUsers}</p>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Telemetry Stats Widgets */}
       {selectedCollection === 'ai_telemetry' && stats && (
@@ -722,41 +954,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         </div>
       )}
 
-      {/* Control Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
-        {/* Date Filter Range */}
-        <div className="flex-1 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Başlangıç Tarihi</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Bitiş Tarihi</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
-            />
-          </div>
-          {(startDate || endDate) && (
-            <button
-              onClick={() => {
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="mt-6 sm:mt-auto rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2 text-xs text-red-400 hover:bg-red-950/40 transition h-[38px] flex items-center justify-center"
-            >
-              Filtreleri Temizle
-            </button>
-          )}
-        </div>
-      </div>
+
 
       {/* Table Data */}
       {loading ? (
@@ -784,7 +982,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                   {columns.map((col) => {
                     const isSorted = sortByField === col;
                     return (
-                      <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10">
+                      <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10 whitespace-nowrap">
                         <button
                           onClick={() => {
                             if (sortByField === col) {
@@ -808,7 +1006,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 {sortedAndFilteredDocs.map((doc, idx) => (
                   <tr key={doc.id || idx} className="hover:bg-purple-950/10 transition">
                     {columns.map((col) => (
-                      <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate">
+                      <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate whitespace-nowrap">
                         {selectedCollection === 'moon_transactions'
                           ? renderValue(getMoonTxValue(doc, col))
                           : selectedCollection === 'users'

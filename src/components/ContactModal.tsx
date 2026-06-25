@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { X, Check, RefreshCw, ChevronRight } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 
 interface ContactModalProps {
   language: string;
@@ -20,10 +20,15 @@ export const ContactModal: React.FC<ContactModalProps> = ({ language, locales, o
     e.preventDefault();
     setIsContactSubmitting(true);
     try {
-      await addDoc(collection(db, `messages_${language}`), {
+      const docData: any = {
         ...contactForm,
         createdAt: serverTimestamp()
-      });
+      };
+      if (auth.currentUser) {
+        docData.userId = auth.currentUser.uid;
+      }
+
+      await addDoc(collection(db, `messages_${language}`), docData);
       setContactSuccess(true);
       setContactForm({ fullName: '', email: '', subject: '', message: '' });
     } catch (error) {
@@ -32,6 +37,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ language, locales, o
       setIsContactSubmitting(false);
     }
   };
+
 
   return (
     <motion.div

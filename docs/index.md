@@ -31,6 +31,7 @@ MadameSoul, kullanıcılarına mistik tarot kartı açılımları (özellikle Ka
 - [Kaynak Kod Yapısı Analizi](./architecture/source-tree-analysis.md) - Dizin ağacı, kritik klasörler ve giriş noktaları.
 - [Bileşen Envanteri](./architecture/component-inventory.md) - Kullanıcı arayüzünü (UI) oluşturan ana React bileşenleri.
 - [Geliştirme Kılavuzu](./development-guide.md) - Yerel kurulum adımları, geliştirme ve derleme komutları.
+- [Canlıya Geçiş ve Dağıtım Kılavuzu](./production-deployment-guide.md) - Üretim ortamına kurulum, Stripe webhook ve Firebase canlı kurulum adımları.
 - [API Sözleşmeleri](./architecture/api-contracts.md) - API uç noktaları, istek/yanıt yapıları ve entegrasyonlar.
 - [Veri Modelleri](./architecture/data-models.md) - Firestore koleksiyon şemaları ve güvenlik kuralları.
 - [Test Rehberi](./testing.md) - Birim ve uçtan uca testlerin çalıştırılması ve izlenmesi.

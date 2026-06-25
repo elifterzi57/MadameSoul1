@@ -19,7 +19,7 @@ service cloud.firestore {
 
     function isValidMessage(data) {
       return data.keys().hasAll(['fullName', 'email', 'subject', 'message', 'createdAt']) && 
-             data.keys().size() == 5 &&
+             (data.keys().size() == 5 || (data.keys().size() == 6 && 'userId' in data && (data.userId is string && (request.auth != null && data.userId == request.auth.uid)))) &&
              data.fullName is string && data.fullName.size() <= 100 &&
              data.email is string && data.email.size() <= 200 &&
              data.subject is string && data.subject.size() <= 150 &&

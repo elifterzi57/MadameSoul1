@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **153** | Açık: **0** | Tamamlanan: **149** | İptal Edilen: **4**
+Toplam Bilet: **159** | Açık: **0** | Tamamlanan: **155** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,12 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-327**](#-ms-327) | Document / Dev | Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması | Orta | Canlıya geçiş öncesinde tüm teknik dokümanlar güncellendi, yeni canlıya geçiş kılavuzu ve go-live kontrol listesi dokümantasyonu üretildi. | Elif |
+| [**MS-326**](#-ms-326) | Feature / Security / DB | Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu | Orta | İletişim mesajlarında telefonla üye olan kullanıcıların da USERID olarak eşleşmesi için firestore kuralları güncellendi, mesaj gönderilirken userId alanı eklendi ve admin paneli listelemesi güncellendi. | Elif |
+| [**MS-325**](#-ms-325) | Feature / UX / UI | Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi | Orta | İptal edilen Stripe ödeme denemeleri için iptal sebebine göre (zaman aşımı, manuel, kullanıcı, stripe) detaylı açıklama metinleri ve durum rozetleri eklendi. | Elif |
+| [**MS-324**](#-ms-324) | Feature / UX / UI | Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu | Orta | Tarih periyot filtreleri sayfa başlığına taşındı, kaba alt kontrol barı kaldırıldı. | Elif |
+| [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
+| [**MS-322**](#-ms-322) | Feature / UX / UI | Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması | Orta | Kurtarılan Sepet kartı, açıklama bloğu ve ilişkili kodlar panelden temizlendi. | Elif |
 | [**MS-321**](#-ms-321) | Bug / Dev | Firestore Bağlantı Sorunları İçin Long Polling Desteği | Yüksek | `src/lib/firebase.ts` long-polling otomatik algılamalı yapılandırmayla güncellendi. | Elif |
 | [**MS-320**](#-ms-320) | Bug / Security / Dev | Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı | Yüksek | Rules yetkilendirmesi güncellendi, admin panel eşleştirme fonksiyonu hata toleranslı hale getirildi. | Elif |
 | [**MS-319**](#-ms-319) | Feature / UX / UI | Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi | Orta | Premium oranı / sayısı gösterge kartı eklendi ve Basic Metrics Grid 4 sütuna çıkarıldı. | Elif |
@@ -178,6 +184,108 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-327: Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması (Document / Dev)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Paige (📚 Technical Writer)
+* **Bileşen:** Documentation
+* **Açıklama:**  
+  MadameSoul projesinin canlıya (production) alınması öncesinde tüm teknik altyapı dokümanlarının güncel kod tabanına göre senkronize edilmesi sağlandı. Ayrıca canlıya geçiş adımlarını, SSL, Nginx ters vekil sunucu yapılandırmasını, Stripe webhook ayarlarını ve canlı ortam değişkenlerini detaylandıran bir Canlıya Geçiş Kılavuzu hazırlandı.
+* **Kabul Kriterleri:**
+  1. `docs/production-deployment-guide.md` dosyası oluşturulmalı ve go-live kontrol listesi içermelidir.
+  2. `docs/index.md` dosyası güncellenerek yeni doküman eklenmeli ve son güncelleme tarihi güncellenmelidir.
+  3. `docs/architecture/data-models.md` dosyasındaki şema değişiklikleri (messages koleksiyonu userId alanı) dokümante edilmelidir.
+
+---
+
+### 📋 MS-326: Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu (Feature / Security / DB)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / Admin Panel / Firestore Rules
+* **Açıklama:**  
+  Bize Ulaşın (Contact Us) mesajlarında, özellikle telefonla kaydolan ve e-postası veritabanında bulunmayan kullanıcıların admin panelinde USERID olarak doğru şekilde eşleşebilmesi için, mesaj gönderilirken oturum açmış kullanıcının ID'sinin (userId) belgelere eklenmesi sağlandı. Bu doğrultuda Firestore güvenlik kuralları isteğe bağlı userId alanını kabul edecek şekilde esnetildi ve admin panelindeki listeleme kodu güncellendi.
+* **Kabul Kriterleri:**
+  1. `firestore.rules` dosyasında `isValidMessage` fonksiyonu, 6 alan olması durumunda `userId` alanının doğruluğunu ve auth uid ile eşleştiğini doğrulamalıdır.
+  2. `ContactModal.tsx` form gönderiminde kullanıcı oturum açmışsa Firestore belgesine `userId` alanı eklenmelidir.
+  3. `CollectionsTab.tsx` dosyasında `getContactUsValue` fonksiyonunda `USERID` sütunu için öncelikle belgedeki `userId` alanı okunmalıdır.
+
+---
+
+### 📋 MS-325: Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / FinanceTab
+* **Açıklama:**  
+  Stripe Finans tablosunda ödemesi tamamlanmamış/iptal edilmiş işlemlerin neden iptal edildiğini (10 dk sistem zaman aşımı, yönetici reddi, kullanıcı iptali, Stripe session zaman aşımı vb.) anlamak amacıyla dinamik açıklama satırları ve renk kodlu detaylı durum rozetleri (badge) eklendi.
+* **Kabul Kriterleri:**
+  1. `auto_timeout` ile iptal edilen işlemler için `10 dakika zaman aşımı nedeniyle sistem tarafından otomatik iptal edildi` açıklaması gösterilmeli ve `İptal (Sistem)` rozeti (kırmızı) eklenmelidir.
+  2. `manual_reject` ile iptal edilen işlemler için `Yönetici tarafından manuel olarak reddedildi/iptal edildi` açıklaması gösterilmeli ve `İptal (Manuel)` rozeti (sarı) eklenmelidir.
+  3. `user_cancel` ile iptal edilen işlemler için `Kullanıcı tarafından ödeme sayfasında iptal edildi` açıklaması gösterilmeli ve `İptal (Kullanıcı)` rozeti (gri) eklenmelidir.
+  4. `stripe_expiry` ile iptal edilen işlemler için `Stripe ödeme süresi dolduğu için iptal edildi (Webhook)` açıklaması gösterilmeli ve `İptal (Stripe)` rozeti (mor) eklenmelidir.
+
+---
+
+### 📋 MS-324: Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / CollectionsTab
+* **Açıklama:**  
+  Koleksiyon görselleştirme sayfalarındaki tarih periyot filtrelerinin sayfanın alt kısmında çok geniş yer kaplamasını önlemek ve tasarımı sadeleştirmek amacıyla periyot butonları sağ üst köşedeki başlık kontrol alanına (Excel İndir ve Yenile butonlarının yanına) taşındı. Eski kalın gri alt kontrol barı tamamen kaldırıldı.
+* **Kabul Kriterleri:**
+  1. `CollectionsTab.tsx` üzerinde alt kısımdaki `Control Bar` bileşeni kaldırılmalıdır.
+  2. Periyot filtre butonları üst sağ taraftaki eylem butonlarının soluna eklenmeli ve segmented picker görünümünde olmalıdır.
+  3. Değişiklik sonrasında arayüz derleme hatası vermemelidir.
+
+---
+
+### 📋 MS-323: Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / CollectionsTab
+* **Açıklama:**  
+  Yönetici panelindeki "Veritabanı Koleksiyonları" ekranında listelenen verilerin daha okunabilir olması için dinamik özet gösterge (stats) kartları eklendi. Ayrıca kullanıcı listesine "PHONE NUMBER" sütunundan sonra "PREMIUM" sütunu eklendi, onboarding tamamlama göstergesi kaldırıldı, ve koleksiyon sayfalarındaki tarih aralığı filtreleri yerine genel bakış sekmesindeki gibi period filtreleri ("Bugün", "Son 7 Gün", "Son 30 Gün", "Tümü") entegre edildi. Göstergeler ve tablo satırları bu filtrelere göre dinamik olarak filtrelenmektedir.
+* **Kabul Kriterleri:**
+  1. `users` için: Toplam Kullanıcı, Premium Sayısı, Premium Oranı gösterge kartları (Onboarding kaldırıldı).
+  2. `users` tablosunda `PHONE NUMBER` sütunundan sonra `PREMIUM` sütununun eklenmesi.
+  3. `user_moons` için: Toplam Kullanıcı, Toplam Bakiye, Satın Alınan Bakiye, Ortalama Bakiye.
+  4. `moon_transactions` için: Toplam İşlem, Harcama, Satın Alma, Diğer İşlemler.
+  5. `ai_feedback` için: Toplam Geri Bildirim, Ortalama Puan.
+  6. `contact_us` için: Toplam Mesaj, Dil Dağılımı (TR, EN, Diğer).
+  7. `user_reflections` için: Toplam Yansıma Notu, Yansıma Yazan Eşsiz Kullanıcı Sayısı.
+  8. Koleksiyon sayfalarında tarih aralığı input'ları yerine period selector butonlarının eklenmesi ve filtrelerin dinamik çalışması.
+
+---
+
+### 📋 MS-322: Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Uygulamanın mevcut ödeme akışında yarım bırakılan ödemelere tekrar dönülemediği için "Kurtarılan Sepet" (Abandoned Cart Recovery) metriği anlamsız kalmaktaydı. Bu nedenle, genel bakış sekmesindeki bu gösterge kartı, altındaki açıklama yazısı ve ilişkili tüm hesaplama kodları panelden tamamen kaldırılmıştır.
+* **Kabul Kriterleri:**
+  1. `OverviewTab.tsx` içerisindeki "Kurtarılan Sepet" bilgi kutusu kaldırılmalıdır.
+  2. "Doğal Satın Alım Kurtarma Analizi" açıklama satırı kaldırılmalıdır.
+  3. `computeNaturalRecovery` fonksiyonu ve `naturalRecoveryRate` değişkenleri kullanılmadığı için temizlenmelidir.
+
+---
 
 ### 📋 MS-321: Firestore Bağlantı Sorunları İçin Long Polling Desteği (Bug / Dev)
 
