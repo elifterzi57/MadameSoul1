@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, query, limit, where } from 'firebase/firestore';
-import { ArrowUpDown, RefreshCw, FileText, Download } from 'lucide-react';
+import { ArrowUpDown, RefreshCw, FileText, Download, Clock, Calendar, Layers } from 'lucide-react';
 
 interface CollectionsTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
@@ -22,8 +22,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [lastPurchaseMap, setLastPurchaseMap] = useState<Record<string, { date: Date, raw: any }>>({});
   
   // Filters & Sorting state
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'all'>('all');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [sortByField, setSortByField] = useState<string>('id');
 
@@ -182,18 +181,16 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   // Filter logic
   const getFilteredDocs = () => {
+    if (period === 'all') return documents;
+    const now = new Date();
     return documents.filter((doc) => {
       const docDate = getDocDate(doc);
-      if (!docDate) {
-        if (startDate || endDate) return false;
-        return true;
-      }
-
-      const docDateStr = docDate.toISOString().split('T')[0];
-
-      if (startDate && docDateStr < startDate) return false;
-      if (endDate && docDateStr > endDate) return false;
-
+      if (!docDate) return false;
+      const diffTime = Math.abs(now.getTime() - docDate.getTime());
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      if (period === 'daily') return diffDays <= 1;
+      if (period === 'weekly') return diffDays <= 7;
+      if (period === 'monthly') return diffDays <= 30;
       return true;
     });
   };
@@ -275,6 +272,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
     if (col === 'PHONE NUMBER') {
       return doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
+    }
+    if (col === 'PREMIUM') {
+      return doc.isPremium ? 'Evet' : 'Hayır';
     }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
@@ -576,6 +576,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'NAME',
         'EMAIL',
         'PHONE NUMBER',
+        'PREMIUM',
         'BIRTHDAY',
         'BIRTH PLACE',
         'CRETEDAT',
@@ -661,13 +662,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (selectedCollection === 'users') {
       const total = sortedAndFilteredDocs.length;
       const premiumCount = sortedAndFilteredDocs.filter(d => d.isPremium).length;
-      const onboardingCompleted = sortedAndFilteredDocs.filter(d => d.onboardingCompleted).length;
       return {
         total,
         premiumCount,
-        premiumRate: total > 0 ? Math.round((premiumCount / total) * 100) : 0,
-        onboardingCompleted,
-        onboardingRate: total > 0 ? Math.round((onboardingCompleted / total) * 100) : 0
+        premiumRate: total > 0 ? Math.round((premiumCount / total) * 100) : 0
       };
     }
 
@@ -777,12 +775,38 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="font-serif text-3xl text-[#ecd8a6]">Veritabanı Görselleştirme</h2>
           <p className="text-sm text-[#ecd8a6]/60">Koleksiyonlar içerisindeki belgeleri izleyin ve filtreleyin.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Period Selector Buttons */}
+          <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
+            {([
+              { key: 'daily', label: 'Bugün', icon: Clock },
+              { key: 'weekly', label: 'Son 7 Gün', icon: Calendar },
+              { key: 'monthly', label: 'Son 30 Gün', icon: Calendar },
+              { key: 'all', label: 'Tümü', icon: Layers }
+            ] as const).map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setPeriod(item.key)}
+                  className={`flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition ${
+                    period === item.key
+                      ? 'bg-purple-900/40 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/15'
+                      : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6] hover:bg-purple-950/20'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
           <button
             onClick={exportToExcel}
             className="flex items-center gap-2 rounded-lg bg-[#ecd8a6]/10 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-[#ecd8a6]/20 transition text-sm text-[#ecd8a6]"
@@ -802,9 +826,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
       {/* Dynamic Collection Stats Widgets */}
       {collectionStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <>
           {selectedCollection === 'users' && (
-            <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
@@ -817,15 +841,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Oranı</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">%{collectionStats.premiumRate}</p>
               </div>
-              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Onboarding Tamamlanma</p>
-                <p className="mt-2 text-2xl font-semibold text-emerald-400">%{collectionStats.onboardingRate}</p>
-              </div>
-            </>
+            </div>
           )}
 
           {selectedCollection === 'user_moons' && (
-            <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
@@ -842,11 +862,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Bakiye</p>
                 <p className="mt-2 text-2xl font-semibold text-emerald-400">{collectionStats.avgBalance}</p>
               </div>
-            </>
+            </div>
           )}
 
           {selectedCollection === 'moon_transactions' && (
-            <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam İşlem</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
@@ -863,24 +883,24 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer (Bonus/İade)</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.bonusCount + collectionStats.refundCount}</p>
               </div>
-            </>
+            </div>
           )}
 
           {selectedCollection === 'ai_feedback' && (
-            <>
-              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Geri Bildirim</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
-              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Puan</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">★ {collectionStats.avgRating} / 5.0</p>
               </div>
-            </>
+            </div>
           )}
 
           {selectedCollection === 'contact_us' && (
-            <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Mesaj</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
@@ -897,22 +917,22 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer Diller</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.otherCount}</p>
               </div>
-            </>
+            </div>
           )}
 
           {selectedCollection === 'user_reflections' && (
-            <>
-              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Yansıma Notu</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
-              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center md:col-span-2">
+              <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
                 <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Yansıma Yazan Kullanıcılar</p>
                 <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.uniqueUsers}</p>
               </div>
-            </>
+            </div>
           )}
-        </div>
+        </>
       )}
 
       {/* Telemetry Stats Widgets */}
@@ -933,41 +953,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         </div>
       )}
 
-      {/* Control Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-4">
-        {/* Date Filter Range */}
-        <div className="flex-1 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="flex-1">
-            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Başlangıç Tarihi</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
-            />
-          </div>
-          <div className="flex-1">
-            <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Bitiş Tarihi</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/50 transition"
-            />
-          </div>
-          {(startDate || endDate) && (
-            <button
-              onClick={() => {
-                setStartDate('');
-                setEndDate('');
-              }}
-              className="mt-6 sm:mt-auto rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2 text-xs text-red-400 hover:bg-red-950/40 transition h-[38px] flex items-center justify-center"
-            >
-              Filtreleri Temizle
-            </button>
-          )}
-        </div>
-      </div>
+
 
       {/* Table Data */}
       {loading ? (

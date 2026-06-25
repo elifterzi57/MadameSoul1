@@ -181,7 +181,7 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
 
-### 📋 MS-323: Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartlarının Eklenmesi (Feature / UX / UI)
+### 📋 MS-323: Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi (Feature / UX / UI)
 
 * **Öncelik:** Orta
 * **Durum:** ✅ Tamamlandı (Completed)
@@ -189,14 +189,16 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 * **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
 * **Bileşen:** Admin Panel / CollectionsTab
 * **Açıklama:**  
-  Yönetici panelindeki "Veritabanı Koleksiyonları" ekranında listelenen verilerin daha okunabilir ve anlaşılır olması için seçili koleksiyona göre dinamik özet gösterge (stats) kartları eklenmiştir.
+  Yönetici panelindeki "Veritabanı Koleksiyonları" ekranında listelenen verilerin daha okunabilir olması için dinamik özet gösterge (stats) kartları eklendi. Ayrıca kullanıcı listesine "PHONE NUMBER" sütunundan sonra "PREMIUM" sütunu eklendi, onboarding tamamlama göstergesi kaldırıldı, ve koleksiyon sayfalarındaki tarih aralığı filtreleri yerine genel bakış sekmesindeki gibi period filtreleri ("Bugün", "Son 7 Gün", "Son 30 Gün", "Tümü") entegre edildi. Göstergeler ve tablo satırları bu filtrelere göre dinamik olarak filtrelenmektedir.
 * **Kabul Kriterleri:**
-  1. `users` için: Toplam Kullanıcı, Premium Sayısı, Premium Oranı, Onboarding Oranı.
-  2. `user_moons` için: Toplam Kullanıcı, Toplam Bakiye, Satın Alınan Bakiye, Ortalama Bakiye.
-  3. `moon_transactions` için: Toplam İşlem, Harcama, Satın Alma, Diğer İşlemler.
-  4. `ai_feedback` için: Toplam Geri Bildirim, Ortalama Puan.
-  5. `contact_us` için: Toplam Mesaj, Dil Dağılımı (TR, EN, Diğer).
-  6. `user_reflections` için: Toplam Yansıma Notu, Yansıma Yazan Eşsiz Kullanıcı Sayısı.
+  1. `users` için: Toplam Kullanıcı, Premium Sayısı, Premium Oranı gösterge kartları (Onboarding kaldırıldı).
+  2. `users` tablosunda `PHONE NUMBER` sütunundan sonra `PREMIUM` sütununun eklenmesi.
+  3. `user_moons` için: Toplam Kullanıcı, Toplam Bakiye, Satın Alınan Bakiye, Ortalama Bakiye.
+  4. `moon_transactions` için: Toplam İşlem, Harcama, Satın Alma, Diğer İşlemler.
+  5. `ai_feedback` için: Toplam Geri Bildirim, Ortalama Puan.
+  6. `contact_us` için: Toplam Mesaj, Dil Dağılımı (TR, EN, Diğer).
+  7. `user_reflections` için: Toplam Yansıma Notu, Yansıma Yazan Eşsiz Kullanıcı Sayısı.
+  8. Koleksiyon sayfalarında tarih aralığı input'ları yerine period selector butonlarının eklenmesi ve filtrelerin dinamik çalışması.
 
 ---
 
