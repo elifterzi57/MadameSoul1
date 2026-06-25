@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **155** | Açık: **0** | Tamamlanan: **151** | İptal Edilen: **4**
+Toplam Bilet: **156** | Açık: **0** | Tamamlanan: **152** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,7 +25,8 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
-| [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartlarının Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
+| [**MS-324**](#-ms-324) | Feature / UX / UI | Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu | Orta | Tarih periyot filtreleri sayfa başlığına taşındı, kaba alt kontrol barı kaldırıldı. | Elif |
+| [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
 | [**MS-322**](#-ms-322) | Feature / UX / UI | Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması | Orta | Kurtarılan Sepet kartı, açıklama bloğu ve ilişkili kodlar panelden temizlendi. | Elif |
 | [**MS-321**](#-ms-321) | Bug / Dev | Firestore Bağlantı Sorunları İçin Long Polling Desteği | Yüksek | `src/lib/firebase.ts` long-polling otomatik algılamalı yapılandırmayla güncellendi. | Elif |
 | [**MS-320**](#-ms-320) | Bug / Security / Dev | Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı | Yüksek | Rules yetkilendirmesi güncellendi, admin panel eşleştirme fonksiyonu hata toleranslı hale getirildi. | Elif |
@@ -180,6 +181,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-324: Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / CollectionsTab
+* **Açıklama:**  
+  Koleksiyon görselleştirme sayfalarındaki tarih periyot filtrelerinin sayfanın alt kısmında çok geniş yer kaplamasını önlemek ve tasarımı sadeleştirmek amacıyla periyot butonları sağ üst köşedeki başlık kontrol alanına (Excel İndir ve Yenile butonlarının yanına) taşındı. Eski kalın gri alt kontrol barı tamamen kaldırıldı.
+* **Kabul Kriterleri:**
+  1. `CollectionsTab.tsx` üzerinde alt kısımdaki `Control Bar` bileşeni kaldırılmalıdır.
+  2. Periyot filtre butonları üst sağ taraftaki eylem butonlarının soluna eklenmeli ve segmented picker görünümünde olmalıdır.
+  3. Değişiklik sonrasında arayüz derleme hatası vermemelidir.
+
+---
 
 ### 📋 MS-323: Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi (Feature / UX / UI)
 
