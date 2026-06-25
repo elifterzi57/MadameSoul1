@@ -198,45 +198,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
     : 0;
 
   // Scoped Natural checkout recovery yield
-  const computeNaturalRecovery = () => {
-    const abandonedUsers = new Set<string>();
-    const recoveredUsers = new Set<string>();
-    
-    const userAttempts: Record<string, any[]> = {};
-    filteredCheckoutAttempts.forEach(attempt => {
-      if (!attempt.userId) return;
-      if (!userAttempts[attempt.userId]) {
-        userAttempts[attempt.userId] = [];
-      }
-      userAttempts[attempt.userId].push(attempt);
-    });
-    
-    Object.keys(userAttempts).forEach(uid => {
-      const attempts = userAttempts[uid].sort((a, b) => {
-        const dA = getDocDate(a)?.getTime() || 0;
-        const dB = getDocDate(b)?.getTime() || 0;
-        return dA - dB;
-      });
-      
-      let hasAbandoned = false;
-      for (const att of attempts) {
-        if (att.status === 'abandoned' || att.status === 'pending' || att.status === 'cancelled') {
-          hasAbandoned = true;
-        } else if (att.status === 'completed' && hasAbandoned) {
-          recoveredUsers.add(uid);
-          break;
-        }
-      }
-      if (hasAbandoned) {
-        abandonedUsers.add(uid);
-      }
-    });
-    
-    return abandonedUsers.size > 0 
-      ? Math.round((recoveredUsers.size / abandonedUsers.size) * 100) 
-      : 0;
-  };
-  const naturalRecoveryRate = computeNaturalRecovery();
 
   // B. USER ENGAGEMENT & PRODUCTS CALCULATIONS
   // PDF download rate (Spend transactions with pdfDownloaded == 1 vs total Spend transactions)
@@ -488,7 +449,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
               Finansal Performans & Dönüşüm Detayları
             </h3>
             
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
                 <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Toplam İstek</p>
                 <p className="text-xl font-bold text-[#ecd8a6] mt-1">{totalCheckouts}</p>
@@ -501,14 +462,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
                 <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Yarıda Bırakanlar</p>
                 <p className="text-xl font-bold text-red-400 mt-1">{abandonedCheckouts}</p>
               </div>
-              <div className="p-4 rounded-lg bg-[#07040e]/60 border border-[#ecd8a6]/5">
-                <p className="text-xs text-[#ecd8a6]/50 uppercase tracking-wider">Kurtarılan Sepet</p>
-                <p className="text-xl font-bold text-blue-400 mt-1">%{naturalRecoveryRate}</p>
-              </div>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-[#07040e]/30 border border-[#ecd8a6]/10 text-xs text-[#ecd8a6]/70 leading-relaxed">
-              <strong>💡 Doğal Satın Alım Kurtarma Analizi:</strong> Ödeme adımını tamamlamayıp yarıda bırakan (abandoned), ancak sonrasında kupon ya da ekstra teşvik olmadan kendi isteğiyle geri dönüp başarılı ödeme gerçekleştiren kullanıcıların yüzdesini ifade eder.
             </div>
           </div>
 

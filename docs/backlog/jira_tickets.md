@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **153** | Açık: **0** | Tamamlanan: **149** | İptal Edilen: **4**
+Toplam Bilet: **154** | Açık: **0** | Tamamlanan: **150** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-322**](#-ms-322) | Feature / UX / UI | Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması | Orta | Kurtarılan Sepet kartı, açıklama bloğu ve ilişkili kodlar panelden temizlendi. | Elif |
 | [**MS-321**](#-ms-321) | Bug / Dev | Firestore Bağlantı Sorunları İçin Long Polling Desteği | Yüksek | `src/lib/firebase.ts` long-polling otomatik algılamalı yapılandırmayla güncellendi. | Elif |
 | [**MS-320**](#-ms-320) | Bug / Security / Dev | Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı | Yüksek | Rules yetkilendirmesi güncellendi, admin panel eşleştirme fonksiyonu hata toleranslı hale getirildi. | Elif |
 | [**MS-319**](#-ms-319) | Feature / UX / UI | Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi | Orta | Premium oranı / sayısı gösterge kartı eklendi ve Basic Metrics Grid 4 sütuna çıkarıldı. | Elif |
@@ -178,6 +179,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-322: Admin Dashboard'dan Kurtarılan Sepet Metriğinin Kaldırılması (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Uygulamanın mevcut ödeme akışında yarım bırakılan ödemelere tekrar dönülemediği için "Kurtarılan Sepet" (Abandoned Cart Recovery) metriği anlamsız kalmaktaydı. Bu nedenle, genel bakış sekmesindeki bu gösterge kartı, altındaki açıklama yazısı ve ilişkili tüm hesaplama kodları panelden tamamen kaldırılmıştır.
+* **Kabul Kriterleri:**
+  1. `OverviewTab.tsx` içerisindeki "Kurtarılan Sepet" bilgi kutusu kaldırılmalıdır.
+  2. "Doğal Satın Alım Kurtarma Analizi" açıklama satırı kaldırılmalıdır.
+  3. `computeNaturalRecovery` fonksiyonu ve `naturalRecoveryRate` değişkenleri kullanılmadığı için temizlenmelidir.
+
+---
 
 ### 📋 MS-321: Firestore Bağlantı Sorunları İçin Long Polling Desteği (Bug / Dev)
 
