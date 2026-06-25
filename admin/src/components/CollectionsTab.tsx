@@ -8,11 +8,17 @@ interface CollectionsTabProps {
   selectedCollection: string;
 }
 
+interface UserContactInfo {
+  email: string;
+  displayName?: string;
+  phoneNumber?: string;
+}
+
 export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userRole, selectedCollection }) => {
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string; phoneNumber?: string }>>({});
+  const [usersMap, setUsersMap] = useState<Record<string, UserContactInfo>>({});
   const [lastPurchaseMap, setLastPurchaseMap] = useState<Record<string, { date: Date, raw: any }>>({});
   
   // Filters & Sorting state
@@ -24,16 +30,42 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   useEffect(() => {
     const fetchUsersMap = async () => {
       try {
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const mapping: Record<string, { email: string; displayName?: string; phoneNumber?: string }> = {};
-        usersSnap.forEach((docSnap) => {
-          const data = docSnap.data();
-          mapping[docSnap.id] = {
-            email: data.email || '',
-            displayName: data.displayName || data.name || '',
-            phoneNumber: data.phoneNumber || ''
-          };
-        });
+        let usersSnap: any = null;
+        let phonesSnap: any = null;
+
+        try {
+          usersSnap = await getDocs(collection(db, 'users'));
+        } catch (e) {
+          console.error("Failed to fetch users for mapping:", e);
+        }
+
+        try {
+          phonesSnap = await getDocs(collection(db, 'phones'));
+        } catch (e) {
+          console.warn("Failed to fetch phones for mapping, proceeding without phones:", e);
+        }
+
+        const phoneByUserId: Record<string, string> = {};
+        if (phonesSnap) {
+          phonesSnap.forEach((docSnap: any) => {
+            const data = docSnap.data();
+            if (data.userId && data.phoneNumber) {
+              phoneByUserId[data.userId] = data.phoneNumber;
+            }
+          });
+        }
+
+        const mapping: Record<string, UserContactInfo> = {};
+        if (usersSnap) {
+          usersSnap.forEach((docSnap: any) => {
+            const data = docSnap.data();
+            mapping[docSnap.id] = {
+              email: data.email || '',
+              displayName: data.displayName || data.name || '',
+              phoneNumber: data.phoneNumber || data.phone || phoneByUserId[docSnap.id] || ''
+            };
+          });
+        }
         setUsersMap(mapping);
       } catch (err) {
         console.error("Kullanıcı haritası yüklenirken hata oluştu:", err);
@@ -41,6 +73,27 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     };
     fetchUsersMap();
   }, []);
+
+  const getUserContact = (userId?: string, fallbackEmail?: string): string => {
+    if (userId) {
+      const userInfo = usersMap[userId];
+      if (userInfo?.email) return userInfo.email;
+      if (userInfo?.phoneNumber) return userInfo.phoneNumber;
+    }
+
+    return fallbackEmail || '-';
+  };
+
+  const getContactEmailOrPhone = (email?: string): string => {
+    if (!email) return '-';
+
+    const normalizedEmail = email.toLowerCase();
+    const userInfo = Object.values(usersMap).find(u => u.email?.toLowerCase() === normalizedEmail);
+    if (userInfo?.email) return userInfo.email;
+    if (userInfo?.phoneNumber) return userInfo.phoneNumber;
+
+    return email;
+  };
 
   const fetchCollectionData = async () => {
     setLoading(true);
@@ -172,7 +225,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
 
     if (col === 'Mail') {
-      return usersMap[doc.userId]?.email || doc.userEmail || '-';
+      return getUserContact(doc.userId, doc.userEmail);
     }
 
     // Format cards array nicely
@@ -217,6 +270,12 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (col === 'NAME') {
       return doc.displayName || doc.name || '-';
     }
+    if (col === 'EMAIL') {
+      return getUserContact(doc.id, doc.email);
+    }
+    if (col === 'PHONE NUMBER') {
+      return doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
+    }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
     }
@@ -240,7 +299,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.id || doc.userId || '-';
     }
     if (col === 'MAIL') {
-      return usersMap[doc.id]?.email || '-';
+      return getUserContact(doc.id);
     }
     if (col === 'NAME') {
       return usersMap[doc.id]?.displayName || '-';
@@ -283,7 +342,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return foundUserId || '-';
     }
     if (col === 'MAIL') {
-      return doc.email || '-';
+      return getContactEmailOrPhone(doc.email);
     }
     if (col === 'FULLNAME') {
       return doc.fullName || '-';
@@ -337,8 +396,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
 
     if (col === 'MAIL') {
-      const uInfo = usersMap[doc.userId];
-      return uInfo?.email || uInfo?.phoneNumber || doc.userEmail || '-';
+      return getUserContact(doc.userId, doc.userEmail);
     }
 
     const dbKey = fieldMapping[col] || col;
@@ -351,16 +409,15 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.userId || '-';
     }
     if (col === 'MAIL') {
-      const uInfo = usersMap[doc.userId];
-      return uInfo?.email || uInfo?.phoneNumber || '-';
+      return getUserContact(doc.userId);
     }
-    if (col === 'customTitle') {
+    if (col === 'CUSTOMTITLE') {
       return doc.customTitle || '-';
     }
-    if (col === 'reflectionNotes') {
+    if (col === 'REFLECTIONNOTES') {
       return doc.reflectionNotes || '-';
     }
-    if (col === 'updatedAt') {
+    if (col === 'UPDATEDAT') {
       const val = doc.updatedAt;
       if (!val) return '-';
       if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
@@ -579,12 +636,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
     if (selectedCollection === 'user_reflections') {
       return [
-        'id',
         'USERID',
         'MAIL',
-        'customTitle',
-        'reflectionNotes',
-        'updatedAt'
+        'CUSTOMTITLE',
+        'REFLECTIONNOTES',
+        'UPDATEDAT'
       ];
     }
     const cols = new Set<string>();
@@ -765,6 +821,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getContactUsValue(doc, col))
                           : selectedCollection === 'user_moons'
                           ? renderValue(getUserMoonsValue(doc, col))
+                          : selectedCollection === 'user_reflections'
+                          ? renderValue(getUserReflectionsValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}

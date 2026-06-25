@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **151** | Açık: **0** | Tamamlanan: **147** | İptal Edilen: **4**
+Toplam Bilet: **153** | Açık: **0** | Tamamlanan: **149** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,8 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-321**](#-ms-321) | Bug / Dev | Firestore Bağlantı Sorunları İçin Long Polling Desteği | Yüksek | `src/lib/firebase.ts` long-polling otomatik algılamalı yapılandırmayla güncellendi. | Elif |
+| [**MS-320**](#-ms-320) | Bug / Security / Dev | Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı | Yüksek | Rules yetkilendirmesi güncellendi, admin panel eşleştirme fonksiyonu hata toleranslı hale getirildi. | Elif |
 | [**MS-319**](#-ms-319) | Feature / UX / UI | Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi | Orta | Premium oranı / sayısı gösterge kartı eklendi ve Basic Metrics Grid 4 sütuna çıkarıldı. | Elif |
 | [**MS-318**](#-ms-318) | Feature / Dev / DB | Bekleyen Ödemeler İçin 10 Dakikalık Otomatik Zaman Aşımı ve Temizlik | Yüksek | 10 dakikadan eski pending durumundaki checkout_attempts otomatik olarak cancelled durumuna güncellenerek pending listesi temizlendi. | Elif |
 | [**MS-317**](#-ms-317) | Bug / Analytics / Dev | Manuel İptal Edilen Ödemelerin Dashboard Metriklerine Dahil Edilmesi | Yüksek | Durumu cancelled olan ödeme talepleri de sepet terk (abandoned) ve dönüşüm oranları hesaplamalarına dahil edildi. | Elif |
@@ -176,6 +178,35 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-321: Firestore Bağlantı Sorunları İçin Long Polling Desteği (Bug / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Client App / Firebase
+* **Açıklama:**  
+  Kullanıcıların kısıtlı ağlarda (güvenlik duvarı, VPN vb.) karşılaştığı Firestore bağlantı zaman aşımı hatalarını çözmek üzere istemci tarafında `experimentalAutoDetectLongPolling` özelliği devreye alındı.
+* **Kabul Kriterleri:**
+  1. `src/lib/firebase.ts` üzerinde default `getFirestore` yerine `initializeFirestore` kullanılarak `experimentalAutoDetectLongPolling` konfigürasyonu tanımlanmalıdır.
+
+---
+
+### 📋 MS-320: Firestore Phones Koleksiyonu Yetkilendirme ve İstemci Hata Toleransı (Bug / Security / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / Firestore Rules
+* **Açıklama:**  
+  Admin panelinde veritabanı koleksiyon listelerinde `mail` ve `name` alanlarının `-` gelmesine neden olan `phones` okuma yetki hatası düzeltildi ve istemci tarafındaki veri çekme süreci hata toleranslı hale getirildi.
+* **Kabul Kriterleri:**
+  1. `firestore.rules` dosyasında `phones` okuma yetkisi çalışan/admin rolüne (`isEmployee()`) açılmalıdır.
+  2. `CollectionsTab.tsx` içindeki `fetchUsersMap` veri çekme akışı `Promise.all` yerine bağımsız `try-catch` blokları ile hata toleranslı hale getirilmelidir.
+
+---
 
 ### 📋 MS-319: Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi (Feature / UX / UI)
 
