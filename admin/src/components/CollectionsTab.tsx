@@ -172,7 +172,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
 
     if (col === 'Mail') {
-      return usersMap[doc.userId]?.email || doc.userEmail || '-';
+      const uInfo = usersMap[doc.userId];
+      return uInfo?.email || doc.userEmail || uInfo?.phoneNumber || '-';
     }
 
     // Format cards array nicely
@@ -217,6 +218,9 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (col === 'NAME') {
       return doc.displayName || doc.name || '-';
     }
+    if (col === 'EMAIL') {
+      return doc.email || doc.phoneNumber || '-';
+    }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
     }
@@ -240,7 +244,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.id || doc.userId || '-';
     }
     if (col === 'MAIL') {
-      return usersMap[doc.id]?.email || '-';
+      const uInfo = usersMap[doc.id];
+      return uInfo?.email || uInfo?.phoneNumber || '-';
     }
     if (col === 'NAME') {
       return usersMap[doc.id]?.displayName || '-';
@@ -283,7 +288,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return foundUserId || '-';
     }
     if (col === 'MAIL') {
-      return doc.email || '-';
+      const uInfo = Object.values(usersMap).find(u => u.email?.toLowerCase() === doc.email?.toLowerCase());
+      return doc.email || uInfo?.phoneNumber || '-';
     }
     if (col === 'FULLNAME') {
       return doc.fullName || '-';
@@ -338,7 +344,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
     if (col === 'MAIL') {
       const uInfo = usersMap[doc.userId];
-      return uInfo?.email || uInfo?.phoneNumber || doc.userEmail || '-';
+      return uInfo?.email || doc.userEmail || uInfo?.phoneNumber || '-';
     }
 
     const dbKey = fieldMapping[col] || col;
