@@ -1,5 +1,6 @@
 transactionDesc: "Reading with cards: {cards}"
 transactionBuy: "Demo purchase of {amount} Katina Moons"
+transactionBuyReal: "Purchase of {amount} Katina Moons"
 welcomeBonus: "Welcome Bonus"
 dailyGift: "Daily Free Gift"
 dailyGiftClaimed: "Your daily free Katina Moon has been claimed!"

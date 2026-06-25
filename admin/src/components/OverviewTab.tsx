@@ -5,7 +5,10 @@ import {
   getDocs, 
   limit, 
   orderBy, 
-  query 
+  query,
+  doc,
+  updateDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { 
   Users, 
@@ -19,7 +22,8 @@ import {
   Globe,
   Compass,
   Activity,
-  Coins
+  Coins,
+  Sparkles
 } from 'lucide-react';
 
 interface OverviewTabProps {
@@ -80,8 +84,27 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       // 6. Fetch checkout attempts (up to 300)
       const checkoutSnap = await getDocs(query(collection(db, 'checkout_attempts'), orderBy('createdAt', 'desc'), limit(300)));
       const checkoutList: any[] = [];
+      const nowMs = Date.now();
       checkoutSnap.forEach((docSnap) => {
-        checkoutList.push({ id: docSnap.id, ...docSnap.data() });
+        const data = docSnap.data();
+        let status = data.status;
+        
+        const createdAtDate = data.createdAt?.seconds 
+          ? new Date(data.createdAt.seconds * 1000) 
+          : new Date(data.createdAt || nowMs);
+        const ageMinutes = (nowMs - createdAtDate.getTime()) / (1000 * 60);
+
+        if (status === 'pending' && ageMinutes > 10) {
+          status = 'cancelled';
+          const attemptRef = doc(db, 'checkout_attempts', docSnap.id);
+          updateDoc(attemptRef, {
+            status: 'cancelled',
+            completedMethod: 'auto_timeout',
+            completedAt: serverTimestamp()
+          }).catch(err => console.error("Error auto-cancelling pending session in overview:", err));
+        }
+
+        checkoutList.push({ id: docSnap.id, ...data, status });
       });
       setAllCheckoutAttempts(checkoutList);
 
@@ -165,7 +188,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
 
   // Conversion calculations
   const completedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'completed').length;
-  const abandonedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'abandoned' || c.status === 'pending').length;
+  const abandonedCheckouts = filteredCheckoutAttempts.filter(c => c.status === 'abandoned' || c.status === 'pending' || c.status === 'cancelled').length;
   const totalCheckouts = completedCheckouts + abandonedCheckouts;
   const checkoutConversionRate = totalCheckouts > 0 
     ? Math.round((completedCheckouts / totalCheckouts) * 100) 
@@ -197,7 +220,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       
       let hasAbandoned = false;
       for (const att of attempts) {
-        if (att.status === 'abandoned' || att.status === 'pending') {
+        if (att.status === 'abandoned' || att.status === 'pending' || att.status === 'cancelled') {
           hasAbandoned = true;
         } else if (att.status === 'completed' && hasAbandoned) {
           recoveredUsers.add(uid);
@@ -234,6 +257,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
   // Basic Stats (Period Filtered vs All Time)
   const periodNewUsers = filteredUsers.length;
   const totalUsersCount = allUsers.length;
+  const premiumUsersCount = allUsers.filter(u => u.isPremium === true).length;
+  const premiumPercentage = totalUsersCount > 0 ? Math.round((premiumUsersCount / totalUsersCount) * 100) : 0;
   const periodFortunesRead = filteredTransactions.filter(tx => tx.type === 'spend').length;
   const totalFortunesRead = allTransactions.filter(tx => tx.type === 'spend').length;
   const periodMoonsAcquired = filteredCheckoutAttempts
@@ -391,7 +416,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
       </div>
 
       {/* Basic Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         
         {/* Kullanıcı Sayısı Card */}
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
@@ -404,6 +429,20 @@ export const OverviewTab: React.FC<OverviewTabProps> = () => {
               +{periodNewUsers} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {totalUsersCount} Toplam</span>
             </p>
             <span className="text-[10px] text-sky-400/60 font-semibold block mt-0.5">Seçili Dönem Kayıtları</span>
+          </div>
+        </div>
+
+        {/* Premium Kullanıcı Oranı Card */}
+        <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 flex items-center gap-4 hover:border-[#ecd8a6]/25 transition duration-300">
+          <div className="p-3.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <div>
+            <span className="text-[10px] text-[#ecd8a6]/50 block uppercase tracking-wider font-semibold">Premium Kullanıcı (Oran / Sayı)</span>
+            <p className="text-2xl font-bold mt-0.5 text-[#ecd8a6]">
+              %{premiumPercentage} <span className="text-xs text-[#ecd8a6]/40 font-normal">/ {premiumUsersCount} Kullanıcı</span>
+            </p>
+            <span className="text-[10px] text-purple-400/60 font-semibold block mt-0.5">Aktif Premium Üyeler</span>
           </div>
         </div>
 

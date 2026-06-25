@@ -673,6 +673,22 @@ function AppContent() {
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'cancel') {
       showToast(t('notification.paymentCancelled'), 'info');
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      if (sessionId && user) {
+        user.getIdToken().then((token: string) => {
+          fetch('/api/cancel-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ sessionId })
+          }).catch(err => console.error("Failed to cancel payment attempt:", err));
+        });
+      }
+      
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [user]);

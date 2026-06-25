@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs, query, limit } from 'firebase/firestore';
+import { collection, getDocs, query, limit, where } from 'firebase/firestore';
 import { ArrowUpDown, RefreshCw, FileText, Download } from 'lucide-react';
 
 interface CollectionsTabProps {
@@ -13,6 +13,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [usersMap, setUsersMap] = useState<Record<string, { email: string; displayName?: string; phoneNumber?: string }>>({});
+  const [lastPurchaseMap, setLastPurchaseMap] = useState<Record<string, { date: Date, raw: any }>>({});
   
   // Filters & Sorting state
   const [startDate, setStartDate] = useState<string>('');
@@ -72,6 +73,32 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           docsData.push({ id: docSnap.id, ...docSnap.data() });
         });
         setDocuments(docsData);
+
+        if (selectedCollection === 'user_moons') {
+          try {
+            const buyTxQuery = query(collection(db, 'moon_transactions'), where('type', '==', 'buy'));
+            const buyTxSnap = await getDocs(buyTxQuery);
+            const purchaseMap: Record<string, any> = {};
+            buyTxSnap.forEach(docSnap => {
+              const data = docSnap.data();
+              const userId = data.userId;
+              const createdAt = data.createdAt;
+              if (userId && createdAt) {
+                const date = createdAt.seconds ? new Date(createdAt.seconds * 1000) : new Date(createdAt);
+                const currentLatest = purchaseMap[userId];
+                if (!currentLatest || date > currentLatest.date) {
+                  purchaseMap[userId] = {
+                    date,
+                    raw: createdAt
+                  };
+                }
+              }
+            });
+            setLastPurchaseMap(purchaseMap);
+          } catch (err) {
+            console.error("Last purchase date loading error:", err);
+          }
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -236,6 +263,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     if (col === 'updatedAt') {
       const val = doc.updatedAt || doc.lastDailyClaimedAt;
       if (!val) return '-';
+      if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
+      return new Date(val).toLocaleString('tr-TR');
+    }
+    if (col === 'LASTPURCHASEDAT') {
+      const purchase = lastPurchaseMap[doc.id];
+      if (!purchase) return '-';
+      const val = purchase.raw;
       if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
       return new Date(val).toLocaleString('tr-TR');
     }
@@ -539,6 +573,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         'purchasedBalance',
         'DAILYFREEBALANCE',
         'lastDailyClaimedAt',
+        'LASTPURCHASEDAT',
         'updatedAt'
       ];
     }

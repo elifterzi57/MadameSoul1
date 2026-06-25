@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **147** | Açık: **0** | Tamamlanan: **143** | İptal Edilen: **4**
+Toplam Bilet: **151** | Açık: **0** | Tamamlanan: **147** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,10 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-319**](#-ms-319) | Feature / UX / UI | Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi | Orta | Premium oranı / sayısı gösterge kartı eklendi ve Basic Metrics Grid 4 sütuna çıkarıldı. | Elif |
+| [**MS-318**](#-ms-318) | Feature / Dev / DB | Bekleyen Ödemeler İçin 10 Dakikalık Otomatik Zaman Aşımı ve Temizlik | Yüksek | 10 dakikadan eski pending durumundaki checkout_attempts otomatik olarak cancelled durumuna güncellenerek pending listesi temizlendi. | Elif |
+| [**MS-317**](#-ms-317) | Bug / Analytics / Dev | Manuel İptal Edilen Ödemelerin Dashboard Metriklerine Dahil Edilmesi | Yüksek | Durumu cancelled olan ödeme talepleri de sepet terk (abandoned) ve dönüşüm oranları hesaplamalarına dahil edildi. | Elif |
+| [**MS-316**](#-ms-316) | Bug / Dev / i18n | Satın Alım Geçmişi Dil Seçeneğine Göre Çeviri Düzeltmesi | Orta | Stripe satın alım açıklamaları locales altındaki transactionBuyReal anahtarı kullanılarak çok dilli hale getirildi. | Elif |
 | [**MS-315**](#-ms-315) | Task / Admin / DB | CqVzXTTMcqQYUnpuszvBpETWbJ32 Kullanıcısına Admin Yetkisi Tanımlanması | Yüksek | set_admin scripti aracılığıyla UID custom claims üzerine admin rolü tanımlandı. | Elif |
 | [**MS-314**](#-ms-314) | Feature / UX / UI / Dev | Admin Paneli AI Maliyet Göstergelerinin Kaldırılması | Orta | Genel Bakış (Overview) sekmesindeki AI maliyet analiz göstergeleri arayüzden tamamen temizlendi. | Elif |
 | [**MS-313**](#-ms-313) | Feature / Dev / DB | Yansıma ve Gerçekleşme Notlarının user_reflections Koleksiyonuna Taşınması ve Güvenlik Kuralları | Yüksek | Günlük fal yansıma ve gerçekleşme notları user_reflections koleksiyonuna izole edildi, firestore.rules ve Profile.tsx güncellendi. | Elif |
@@ -172,6 +176,66 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-319: Admin Dashboard Panelinde Premium Kullanıcı Oranı Göstergesi (Feature / UX / UI)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin paneli genel bakış sekmesindeki temel metrikler arasına, sistemdeki aktif premium kullanıcıların sayısını ve tüm kullanıcılara oranını gösteren mor renkli, parıltı (Sparkles) ikonlu gösterge kartı eklenmiş ve ızgara düzeni 4 sütuna genişletilmiştir.
+* **Kabul Kriterleri:**
+  1. Toplam kullanıcılar arasından `isPremium === true` olan kullanıcılar filtre edilerek premium kullanıcı oranı ve sayısı hesaplanmalıdır.
+  2. Arayüzde (OverviewTab) bu oran ve sayıyı gösteren yeni bir bilgi kartı yer almalıdır.
+
+---
+
+### 📋 MS-318: Bekleyen Ödemeler İçin 10 Dakikalık Otomatik Zaman Aşımı ve Temizlik (Feature / Dev / DB)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / FinanceTab / OverviewTab
+* **Açıklama:**  
+  Ödeme adımı başlatıldıktan sonra yarıda bırakılan veya tarayıcı sekmesi kapatılan işlemlerin admin panelindeki "Bekleyen Ödemeler" listesinde kalıcı olarak birikmesini önlemek amacıyla, 10 dakikadan daha eski olan `pending` durumundaki ödeme taleplerini otomatik olarak `cancelled` durumuna güncelleyen zaman aşımı temizlik mekanizması kurulmuştur.
+* **Kabul Kriterleri:**
+  1. Finans sekmesi veya Genel bakış sekmesi yüklendiğinde, oluşturulma zamanı üzerinden 10 dakikadan fazla geçmiş ve durumu `pending` olan checkout_attempts belgeleri saptanmalıdır.
+  2. Bu belgelerin durumu veritabanında otomatik olarak `cancelled` (`completedMethod: "auto_timeout"`) şeklinde güncellenmeli ve listeden kaldırılmalıdır.
+
+---
+
+### 📋 MS-317: Manuel İptal Edilen Ödemelerin Dashboard Metriklerine Dahil Edilmesi (Bug / Analytics / Dev)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel / OverviewTab
+* **Açıklama:**  
+  Admin tarafından finans ekranında "İptal Et" butonuyla veya zaman aşımıyla durumu `cancelled` durumuna getirilen ödeme taleplerinin dashboarddaki dönüşüm hunisi ve "Yarıda Bırakanlar" (Abandoned) göstergesinden eksilmesi hatası giderilmiş, `cancelled` durumundakiler de bu metriklere dahil edilmiştir.
+* **Kabul Kriterleri:**
+  1. `OverviewTab.tsx` dönüşüm hunisi ve sepet terk oranları hesaplanırken status değeri `cancelled` olan ödeme denemeleri de terkedilen işlemler (abandonedCheckouts) içinde sayılmalıdır.
+  2. Doğal kurtarma yield hesaplamalarında `cancelled` statüsü göz önüne alınmalıdır.
+
+---
+
+### 📋 MS-316: Satın Alım Geçmişi Dil Seçeneğine Göre Çeviri Düzeltmesi (Bug / Dev / i18n)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Paige (📚 Tech Writer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / Profile / Locales
+* **Açıklama:**  
+  Profil sayfasındaki satın alım geçmişi listesinde, Stripe ödemeleri sonucu oluşan gerçek ödemelerin açıklamalarının hardcoded İngilizce ("Purchase of X Katina Moons") olarak kalma sorunu giderilmiş, tüm diller için `transactionBuyReal` anahtarıyla yerelleştirme desteği eklenmiştir.
+* **Kabul Kriterleri:**
+  1. `en.yaml`, `tr.yaml`, `es.yaml`, `fr.yaml`, `ko.yaml` ve `zh.yaml` dosyalarına `transactionBuyReal` yerelleştirme şablonları eklenmelidir.
+  2. `Profile.tsx` satın alım açıklamalarını formatlarken bu anahtarları kullanmalı ve seçilen dile uygun çevirmelidir.
+
+---
 
 ### 📋 MS-315: CqVzXTTMcqQYUnpuszvBpETWbJ32 Kullanıcısına Admin Yetkisi Tanımlanması (Task / Admin / DB)
 
