@@ -764,6 +764,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                           ? renderValue(getContactUsValue(doc, col))
                           : selectedCollection === 'user_moons'
                           ? renderValue(getUserMoonsValue(doc, col))
+                          : selectedCollection === 'user_reflections'
+                          ? renderValue(getUserReflectionsValue(doc, col))
                           : renderValue(doc[col])}
                       </td>
                     ))}
