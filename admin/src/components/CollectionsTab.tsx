@@ -24,14 +24,26 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   useEffect(() => {
     const fetchUsersMap = async () => {
       try {
-        const usersSnap = await getDocs(collection(db, 'users'));
+        const [usersSnap, phonesSnap] = await Promise.all([
+          getDocs(collection(db, 'users')),
+          getDocs(collection(db, 'phones'))
+        ]);
+
+        const phoneByUserId: Record<string, string> = {};
+        phonesSnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.userId && data.phoneNumber) {
+            phoneByUserId[data.userId] = data.phoneNumber;
+          }
+        });
+
         const mapping: Record<string, { email: string; displayName?: string; phoneNumber?: string }> = {};
         usersSnap.forEach((docSnap) => {
           const data = docSnap.data();
           mapping[docSnap.id] = {
             email: data.email || '',
             displayName: data.displayName || data.name || '',
-            phoneNumber: data.phoneNumber || ''
+            phoneNumber: data.phoneNumber || phoneByUserId[docSnap.id] || ''
           };
         });
         setUsersMap(mapping);
@@ -219,7 +231,10 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.displayName || doc.name || '-';
     }
     if (col === 'EMAIL') {
-      return doc.email || doc.phoneNumber || '-';
+      return doc.email || doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
+    }
+    if (col === 'PHONE NUMBER') {
+      return doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
     }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
