@@ -338,6 +338,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of contact_us fields mapped
   const getContactUsValue = (doc: any, col: string): any => {
     if (col === 'USERID') {
+      if (doc.userId) return doc.userId;
       const foundUserId = Object.keys(usersMap).find(uid => usersMap[uid].email?.toLowerCase() === doc.email?.toLowerCase());
       return foundUserId || '-';
     }

@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **157** | Açık: **0** | Tamamlanan: **153** | İptal Edilen: **4**
+Toplam Bilet: **158** | Açık: **0** | Tamamlanan: **154** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-326**](#-ms-326) | Feature / Security / DB | Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu | Orta | İletişim mesajlarında telefonla üye olan kullanıcıların da USERID olarak eşleşmesi için firestore kuralları güncellendi, mesaj gönderilirken userId alanı eklendi ve admin paneli listelemesi güncellendi. | Elif |
 | [**MS-325**](#-ms-325) | Feature / UX / UI | Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi | Orta | İptal edilen Stripe ödeme denemeleri için iptal sebebine göre (zaman aşımı, manuel, kullanıcı, stripe) detaylı açıklama metinleri ve durum rozetleri eklendi. | Elif |
 | [**MS-324**](#-ms-324) | Feature / UX / UI | Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu | Orta | Tarih periyot filtreleri sayfa başlığına taşındı, kaba alt kontrol barı kaldırıldı. | Elif |
 | [**MS-323**](#-ms-323) | Feature / UX / UI | Veritabanı Koleksiyon Sayfalarına Dinamik Özet Gösterge Kartları ve Filtrelerin Eklenmesi | Orta | Koleksiyonların türüne göre dinamik özet veri kartları eklendi. | Elif |
@@ -182,6 +183,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-326: Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu (Feature / Security / DB)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Sally (🎨 UX Designer) / Amelia (💻 Developer)
+* **Bileşen:** Client App / Admin Panel / Firestore Rules
+* **Açıklama:**  
+  Bize Ulaşın (Contact Us) mesajlarında, özellikle telefonla kaydolan ve e-postası veritabanında bulunmayan kullanıcıların admin panelinde USERID olarak doğru şekilde eşleşebilmesi için, mesaj gönderilirken oturum açmış kullanıcının ID'sinin (userId) belgelere eklenmesi sağlandı. Bu doğrultuda Firestore güvenlik kuralları isteğe bağlı userId alanını kabul edecek şekilde esnetildi ve admin panelindeki listeleme kodu güncellendi.
+* **Kabul Kriterleri:**
+  1. `firestore.rules` dosyasında `isValidMessage` fonksiyonu, 6 alan olması durumunda `userId` alanının doğruluğunu ve auth uid ile eşleştiğini doğrulamalıdır.
+  2. `ContactModal.tsx` form gönderiminde kullanıcı oturum açmışsa Firestore belgesine `userId` alanı eklenmelidir.
+  3. `CollectionsTab.tsx` dosyasında `getContactUsValue` fonksiyonunda `USERID` sütunu için öncelikle belgedeki `userId` alanı okunmalıdır.
+
+---
 
 ### 📋 MS-325: Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi (Feature / UX / UI)
 
