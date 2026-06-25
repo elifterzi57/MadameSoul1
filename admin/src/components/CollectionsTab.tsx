@@ -354,13 +354,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       const uInfo = usersMap[doc.userId];
       return uInfo?.email || uInfo?.phoneNumber || '-';
     }
-    if (col === 'customTitle') {
+    if (col === 'CUSTOMTITLE') {
       return doc.customTitle || '-';
     }
-    if (col === 'reflectionNotes') {
+    if (col === 'REFLECTIONNOTES') {
       return doc.reflectionNotes || '-';
     }
-    if (col === 'updatedAt') {
+    if (col === 'UPDATEDAT') {
       const val = doc.updatedAt;
       if (!val) return '-';
       if (val.seconds) return new Date(val.seconds * 1000).toLocaleString('tr-TR');
@@ -579,12 +579,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     }
     if (selectedCollection === 'user_reflections') {
       return [
-        'id',
         'USERID',
         'MAIL',
-        'customTitle',
-        'reflectionNotes',
-        'updatedAt'
+        'CUSTOMTITLE',
+        'REFLECTIONNOTES',
+        'UPDATEDAT'
       ];
     }
     const cols = new Set<string>();
