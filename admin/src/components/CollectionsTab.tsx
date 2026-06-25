@@ -198,7 +198,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
   // Helper to get value of moon transaction fields mapped
   const getMoonTxValue = (doc: any, col: string): any => {
     const fieldMapping: Record<string, string> = {
-      'USERID': 'id',
+      'USERID': 'userId',
       'Username': 'userName',
       'createdat': 'createdAt',
       'Description': 'description',
@@ -982,7 +982,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                   {columns.map((col) => {
                     const isSorted = sortByField === col;
                     return (
-                      <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10">
+                      <th key={col} className="px-6 py-4 font-semibold border-b border-[#ecd8a6]/10 whitespace-nowrap">
                         <button
                           onClick={() => {
                             if (sortByField === col) {
@@ -1006,7 +1006,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
                 {sortedAndFilteredDocs.map((doc, idx) => (
                   <tr key={doc.id || idx} className="hover:bg-purple-950/10 transition">
                     {columns.map((col) => (
-                      <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate">
+                      <td key={col} className="px-6 py-4 font-mono text-xs max-w-[250px] truncate whitespace-nowrap">
                         {selectedCollection === 'moon_transactions'
                           ? renderValue(getMoonTxValue(doc, col))
                           : selectedCollection === 'users'

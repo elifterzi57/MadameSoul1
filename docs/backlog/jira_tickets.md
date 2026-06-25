@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **158** | Açık: **0** | Tamamlanan: **154** | İptal Edilen: **4**
+Toplam Bilet: **159** | Açık: **0** | Tamamlanan: **155** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-327**](#-ms-327) | Document / Dev | Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması | Orta | Canlıya geçiş öncesinde tüm teknik dokümanlar güncellendi, yeni canlıya geçiş kılavuzu ve go-live kontrol listesi dokümantasyonu üretildi. | Elif |
 | [**MS-326**](#-ms-326) | Feature / Security / DB | Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu | Orta | İletişim mesajlarında telefonla üye olan kullanıcıların da USERID olarak eşleşmesi için firestore kuralları güncellendi, mesaj gönderilirken userId alanı eklendi ve admin paneli listelemesi güncellendi. | Elif |
 | [**MS-325**](#-ms-325) | Feature / UX / UI | Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi | Orta | İptal edilen Stripe ödeme denemeleri için iptal sebebine göre (zaman aşımı, manuel, kullanıcı, stripe) detaylı açıklama metinleri ve durum rozetleri eklendi. | Elif |
 | [**MS-324**](#-ms-324) | Feature / UX / UI | Veritabanı Koleksiyon Sayfaları Tarih Filtrelerinin Optimizasyonu | Orta | Tarih periyot filtreleri sayfa başlığına taşındı, kaba alt kontrol barı kaldırıldı. | Elif |
@@ -183,6 +184,22 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-327: Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması (Document / Dev)
+
+* **Öncelik:** Orta
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Paige (📚 Technical Writer)
+* **Bileşen:** Documentation
+* **Açıklama:**  
+  MadameSoul projesinin canlıya (production) alınması öncesinde tüm teknik altyapı dokümanlarının güncel kod tabanına göre senkronize edilmesi sağlandı. Ayrıca canlıya geçiş adımlarını, SSL, Nginx ters vekil sunucu yapılandırmasını, Stripe webhook ayarlarını ve canlı ortam değişkenlerini detaylandıran bir Canlıya Geçiş Kılavuzu hazırlandı.
+* **Kabul Kriterleri:**
+  1. `docs/production-deployment-guide.md` dosyası oluşturulmalı ve go-live kontrol listesi içermelidir.
+  2. `docs/index.md` dosyası güncellenerek yeni doküman eklenmeli ve son güncelleme tarihi güncellenmelidir.
+  3. `docs/architecture/data-models.md` dosyasındaki şema değişiklikleri (messages koleksiyonu userId alanı) dokümante edilmelidir.
+
+---
 
 ### 📋 MS-326: Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu (Feature / Security / DB)
 

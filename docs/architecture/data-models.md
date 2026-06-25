@@ -137,7 +137,7 @@ SMS pazarlaması, kampanya takibi veya telefon numarası doğrulamaları için t
 Uygulamadaki iletişim formu üzerinden gönderilen destek veya geri bildirim mesajlarını tutar. Dile göre ayrı koleksiyonlarda saklanır (`messages_en`, `messages_tr`, `messages_es`, `messages_fr`, `messages_zh`, `messages_ko`).
 
 - **Belge ID (Document ID):** Rastgele oluşturulan belge ID'si.
-- **Güvenlik Kuralları:** Herkes (misafirler dahil) yeni belge oluşturabilir (`create`), ancak kimsenin okumasına (`read`), güncellemesine (`update`) veya silmesine (`delete`) izin verilmez (`if false`).
+- **Güvenlik Kuralları:** Herkes (misafirler dahil) yeni belge oluşturabilir (`create`). Çalışanların/yöneticilerin okumasına (`read`) izin verilir (`isEmployee()`). Güncelleme (`update`) veya silme (`delete`) izinleri kapalıdır (`if false`).
 
 ### Şema (Schema)
 
@@ -147,6 +147,7 @@ Uygulamadaki iletişim formu üzerinden gönderilen destek veya geri bildirim me
 | `email` | String | Evet | Gönderenin e-posta adresi (Maksimum 200 karakter). |
 | `subject` | String | Evet | Mesaj konusu (Maksimum 150 karakter). |
 | `message` | String | Evet | İletişim mesajı (Maksimum 2000 karakter). |
+| `userId` | String | Hayır | Giriş yapmış kullanıcının UID'si (Mevcutsa `request.auth.uid` ile eşleşmelidir). |
 | `createdAt` | Timestamp | Evet | Mesajın oluşturulma zaman damgası (Sunucu saati ile eşleşmelidir). |
 
 ---
