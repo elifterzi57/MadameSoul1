@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
+import { useTranslation } from '../context/LanguageContext';
 import { collection, getDocs, query, limit, where } from 'firebase/firestore';
 import { ArrowUpDown, RefreshCw, FileText, Download, Clock, Calendar, Layers } from 'lucide-react';
+
 
 interface CollectionsTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
@@ -15,6 +17,7 @@ interface UserContactInfo {
 }
 
 export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userRole, selectedCollection }) => {
+  const { t } = useTranslation();
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -274,13 +277,13 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       return doc.phoneNumber || usersMap[doc.id]?.phoneNumber || '-';
     }
     if (col === 'PREMIUM') {
-      return doc.isPremium ? 'Evet' : 'Hayır';
+      return doc.isPremium ? t('collections.yesVal') : t('collections.noVal');
     }
     if (col === 'TERMSACCEPTEDAT') {
       return doc.termsAcceptedAt || doc.legalAcceptedAt || '-';
     }
     if (col === 'ONBOARDINGCOMPLETED') {
-      return doc.onboardingCompleted !== undefined ? (doc.onboardingCompleted ? 'Evet' : 'Hayır') : '-';
+      return doc.onboardingCompleted !== undefined ? (doc.onboardingCompleted ? t('collections.yesVal') : t('collections.noVal')) : '-';
     }
     if (col === 'METADATA BROWSER') {
       return doc.metadata?.browser || '-';
@@ -501,7 +504,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
 
   const exportToExcel = () => {
     if (sortedAndFilteredDocs.length === 0) {
-      alert(selectedCollection === 'users' ? 'İndirilecek kullanıcı verisi bulunamadı.' : 'İndirilecek veri bulunamadı.');
+      alert(t('collections.noExportData'));
       return;
     }
 
@@ -778,26 +781,27 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="font-serif text-3xl text-[#ecd8a6]">Veritabanı Görselleştirme</h2>
-          <p className="text-sm text-[#ecd8a6]/60">Koleksiyonlar içerisindeki belgeleri izleyin ve filtreleyin.</p>
+          <h2 className="font-serif text-3xl text-[#ecd8a6]">{t('collections.title')}</h2>
+          <p className="text-sm text-[#ecd8a6]/60">{t('collections.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {/* Period Selector Buttons */}
           <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
-            {([
-              { key: 'daily', label: 'Bugün', icon: Clock },
-              { key: 'weekly', label: 'Son 7 Gün', icon: Calendar },
-              { key: 'monthly', label: 'Son 30 Gün', icon: Calendar },
-              { key: 'all', label: 'Tümü', icon: Layers }
-            ] as const).map((item) => {
+            {[
+              { key: 'daily', label: t('overview.periods.daily'), icon: Clock },
+              { key: 'weekly', label: t('overview.periods.weekly'), icon: Calendar },
+              { key: 'monthly', label: t('overview.periods.monthly'), icon: Calendar },
+              { key: 'all', label: t('overview.periods.all'), icon: Layers }
+            ].map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.key}
-                  onClick={() => setPeriod(item.key)}
-                  className={`flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition ${
+                  onClick={() => setPeriod(item.key as any)}
+                  className={`flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer ${
                     period === item.key
                       ? 'bg-purple-900/40 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/15'
+
                       : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6] hover:bg-purple-950/20'
                   }`}
                 >
@@ -813,14 +817,14 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
             className="flex items-center gap-2 rounded-lg bg-[#ecd8a6]/10 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-[#ecd8a6]/20 transition text-sm text-[#ecd8a6]"
           >
             <Download className="h-4 w-4" />
-            Excel İndir
+            {t('collections.exportExcel')}
           </button>
           <button
             onClick={fetchCollectionData}
             className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
           >
             <RefreshCw className="h-4 w-4" />
-            Yenile
+            {t('overview.refresh')}
           </button>
         </div>
       </div>
@@ -831,15 +835,15 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'users' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalUsers')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Kullanıcı</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.premiumUsers')}</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.premiumCount}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Premium Oranı</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.premiumRate')}</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">%{collectionStats.premiumRate}</p>
               </div>
             </div>
@@ -848,19 +852,19 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'user_moons' && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Kullanıcı</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalUsers')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Bakiye (Moon)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalBalance')}</p>
                 <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.totalBalance}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alınan Moon</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.purchasedMoon')}</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.totalPurchased}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Bakiye</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.avgBalance')}</p>
                 <p className="mt-2 text-2xl font-semibold text-emerald-400">{collectionStats.avgBalance}</p>
               </div>
             </div>
@@ -869,19 +873,19 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'moon_transactions' && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam İşlem</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalTransactions')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Harcama (Spend)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.spendTx')}</p>
                 <p className="mt-2 text-2xl font-semibold text-red-400">{collectionStats.spendCount}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Satın Alım (Buy)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.buyTx')}</p>
                 <p className="mt-2 text-2xl font-semibold text-green-400">{collectionStats.buyCount}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer (Bonus/İade)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.otherTx')}</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">{collectionStats.bonusCount + collectionStats.refundCount}</p>
               </div>
             </div>
@@ -890,11 +894,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'ai_feedback' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Geri Bildirim</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalFeedback')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Puan</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.avgRating')}</p>
                 <p className="mt-2 text-2xl font-semibold text-amber-400">★ {collectionStats.avgRating} / 5.0</p>
               </div>
             </div>
@@ -903,19 +907,19 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'contact_us' && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Mesaj</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalMessages')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Türkçe (TR)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.turkish')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.trCount}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">İngilizce (EN)</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.english')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.enCount}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Diğer Diller</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.otherLanguages')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.otherCount}</p>
               </div>
             </div>
@@ -924,11 +928,11 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
           {selectedCollection === 'user_reflections' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Toplam Yansıma Notu</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.totalReflections')}</p>
                 <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{collectionStats.total}</p>
               </div>
               <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Yansıma Yazan Kullanıcılar</p>
+                <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.reflectionUsers')}</p>
                 <p className="mt-2 text-2xl font-semibold text-purple-400">{collectionStats.uniqueUsers}</p>
               </div>
             </div>
@@ -940,15 +944,15 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       {selectedCollection === 'ai_telemetry' && stats && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Prompt Tokens</p>
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.avgPromptTokens')}</p>
             <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgPrompt}</p>
           </div>
           <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Completion Tokens</p>
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.avgCompletionTokens')}</p>
             <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgCompletion}</p>
           </div>
           <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-4 text-center">
-            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">Ortalama Total Tokens</p>
+            <p className="text-xs uppercase tracking-wider text-[#ecd8a6]/60">{t('collections.avgTotalTokens')}</p>
             <p className="mt-2 text-2xl font-semibold text-[#ecd8a6]">{stats.avgTotal}</p>
           </div>
         </div>
@@ -961,7 +965,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
         <div className="flex h-64 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
           <div className="text-center">
             <div className="h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6] mx-auto"></div>
-            <p className="mt-3 text-sm text-[#ecd8a6]/60">Veriler Yükleniyor...</p>
+            <p className="mt-3 text-sm text-[#ecd8a6]/60">{t('collections.loadingData')}</p>
           </div>
         </div>
       ) : error ? (
@@ -971,7 +975,7 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
       ) : sortedAndFilteredDocs.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40">
           <FileText className="h-12 w-12 stroke-[1]" />
-          <p className="mt-3 text-sm">Filtrelere uygun veri bulunamadı.</p>
+          <p className="mt-3 text-sm">{t('collections.noMatchingData')}</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 backdrop-blur-md">
@@ -1030,8 +1034,8 @@ export const CollectionsTab: React.FC<CollectionsTabProps> = ({ userRole: _userR
             </table>
           </div>
           <div className="bg-[#0e0a1b]/80 px-6 py-3 border-t border-[#ecd8a6]/10 text-xs text-[#ecd8a6]/60 flex justify-between">
-            <span>Toplam {sortedAndFilteredDocs.length} kayıt listeleniyor</span>
-            <span>En fazla 100 kayıt gösterilir</span>
+            <span>{t('collections.totalRecordsListing').replace('{count}', String(sortedAndFilteredDocs.length))}</span>
+            <span>{t('collections.maxRecordsWarning')}</span>
           </div>
         </div>
       )}

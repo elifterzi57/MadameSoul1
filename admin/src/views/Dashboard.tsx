@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { useTranslation } from '../context/LanguageContext';
 import { 
   Database, 
   Coins, 
@@ -20,6 +21,7 @@ import { PermissionsTab } from '../components/PermissionsTab';
 import { OverviewTab } from '../components/OverviewTab';
 
 export const Dashboard: React.FC = () => {
+  const { t, language, setLanguage } = useTranslation();
   const [activeTab, setActiveTab] = useState<'overview' | 'collections' | 'balance' | 'finance' | 'logs' | 'permissions'>('overview');
   const [selectedCollection, setSelectedCollection] = useState<string>('users');
   const [isCollectionsOpen, setIsCollectionsOpen] = useState(true);
@@ -27,14 +29,14 @@ export const Dashboard: React.FC = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const collectionsList = [
-    { id: 'ai_feedback', label: 'AI Geri Bildirimleri' },
-    { id: 'ai_telemetry', label: 'AI Telemetri' },
-    { id: 'contact_us', label: 'Contact Us' },
-    { id: 'users', label: 'Kullanıcı Listesi' },
-    { id: 'moon_transactions', label: 'Moon İşlemleri' },
-    { id: 'error_logs', label: 'Sistem Hataları' },
-    { id: 'user_moons', label: 'User Moons' },
-    { id: 'user_reflections', label: 'Yansıma Notları' }
+    { id: 'ai_feedback', label: t('dashboard.collections.ai_feedback') },
+    { id: 'ai_telemetry', label: t('dashboard.collections.ai_telemetry') },
+    { id: 'contact_us', label: t('dashboard.collections.contact_us') },
+    { id: 'users', label: t('dashboard.collections.users') },
+    { id: 'moon_transactions', label: t('dashboard.collections.moon_transactions') },
+    { id: 'error_logs', label: t('dashboard.collections.error_logs') },
+    { id: 'user_moons', label: t('dashboard.collections.user_moons') },
+    { id: 'user_reflections', label: t('dashboard.collections.user_reflections') }
   ];
 
   useEffect(() => {
@@ -54,10 +56,10 @@ export const Dashboard: React.FC = () => {
 
   const getRoleLabel = () => {
     switch (userRole) {
-      case 'admin': return 'Süper Admin';
-      case 'employee': return 'Çalışan (Moderatör)';
-      case 'viewer': return 'Görüntüleyen (Salt Okunur)';
-      default: return 'Görüntüleyen';
+      case 'admin': return t('dashboard.roles.admin');
+      case 'employee': return t('dashboard.roles.employee');
+      case 'viewer': return t('dashboard.roles.viewer');
+      default: return t('dashboard.roles.default');
     }
   };
 
@@ -78,7 +80,7 @@ export const Dashboard: React.FC = () => {
           {/* Logo */}
           <div className="mb-8 text-center border-b border-[#ecd8a6]/10 pb-6">
             <h1 className="font-serif text-2xl tracking-widest text-[#ecd8a6]">MADAME SOUL</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#ecd8a6]/50">Yönetici Paneli</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#ecd8a6]/50">{t('dashboard.subtitle')}</p>
           </div>
 
           {/* Navigation Menu */}
@@ -88,14 +90,14 @@ export const Dashboard: React.FC = () => {
                 setActiveTab('overview');
                 setIsCollectionsOpen(false);
               }}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                 activeTab === 'overview'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
               <LayoutDashboard className="h-4 w-4 shrink-0" />
-              <span className="text-left">Genel Bakış</span>
+              <span className="text-left">{t('dashboard.overview')}</span>
             </button>
 
             <div className="space-y-1">
@@ -104,7 +106,7 @@ export const Dashboard: React.FC = () => {
                   setActiveTab('collections');
                   setIsCollectionsOpen(!isCollectionsOpen);
                 }}
-                className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+                className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                   activeTab === 'collections'
                     ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                     : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
@@ -112,7 +114,7 @@ export const Dashboard: React.FC = () => {
               >
                 <div className="flex items-center gap-3">
                   <Database className="h-4 w-4 shrink-0" />
-                  <span className="text-left">Veritabanı Koleksiyonları</span>
+                  <span className="text-left">{t('dashboard.databaseCollections')}</span>
                 </div>
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isCollectionsOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -126,7 +128,7 @@ export const Dashboard: React.FC = () => {
                         setActiveTab('collections');
                         setSelectedCollection(col.id);
                       }}
-                      className={`flex w-full items-center justify-start rounded-md px-3 py-2 text-xs font-medium text-left transition ${
+                      className={`flex w-full items-center justify-start rounded-md px-3 py-2 text-xs font-medium text-left transition cursor-pointer ${
                         activeTab === 'collections' && selectedCollection === col.id
                           ? 'bg-purple-900/50 text-[#ecd8a6] border border-[#ecd8a6]/10'
                           : 'text-[#ecd8a6]/50 hover:bg-purple-950/10 hover:text-[#ecd8a6]/80'
@@ -141,57 +143,84 @@ export const Dashboard: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('balance')}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                 activeTab === 'balance'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
               <Coins className="h-4 w-4 shrink-0" />
-              <span className="text-left">Moon Bakiye Yönetimi</span>
+              <span className="text-left">{t('dashboard.moonBalanceManagement')}</span>
             </button>
 
             <button
               onClick={() => setActiveTab('finance')}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                 activeTab === 'finance'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
               <CreditCard className="h-4 w-4 shrink-0" />
-              <span className="text-left">Stripe Finans & Satış</span>
+              <span className="text-left">{t('dashboard.stripeFinanceSales')}</span>
             </button>
 
             <button
               onClick={() => setActiveTab('logs')}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                 activeTab === 'logs'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
               <Terminal className="h-4 w-4 shrink-0" />
-              <span className="text-left">Sistem Hata Logları</span>
+              <span className="text-left">{t('dashboard.systemErrorLogs')}</span>
             </button>
 
             <button
               onClick={() => setActiveTab('permissions')}
-              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition ${
+              className={`flex w-full items-center justify-start gap-3 rounded-lg px-4 py-3 text-sm font-medium text-left transition cursor-pointer ${
                 activeTab === 'permissions'
                   ? 'bg-purple-900/30 text-[#ecd8a6] border border-[#ecd8a6]/20'
                   : 'text-[#ecd8a6]/60 hover:bg-purple-950/20 hover:text-[#ecd8a6]'
               }`}
             >
               <ShieldAlert className="h-4 w-4 shrink-0" />
-              <span className="text-left">Çalışan Yetkileri</span>
+              <span className="text-left">{t('dashboard.employeePermissions')}</span>
             </button>
           </nav>
         </div>
 
-        {/* User Info & Signout */}
-        <div className="border-t border-[#ecd8a6]/10 pt-6">
-          <div className="flex items-center gap-3 mb-4">
+        {/* User Info, Language Switcher & Signout */}
+        <div className="border-t border-[#ecd8a6]/10 pt-6 space-y-4">
+          {/* Language Switcher inside Sidebar */}
+          <div className="flex items-center justify-between px-2">
+            <span className="text-[10px] uppercase tracking-wider text-[#ecd8a6]/50 font-medium">Language</span>
+            <div className="flex gap-1">
+              <button
+                onClick={() => setLanguage('tr')}
+                className={`px-2 py-0.5 text-[10px] font-bold rounded transition cursor-pointer border ${
+                  language === 'tr'
+                    ? 'border-[#ecd8a6] bg-[#ecd8a6]/20 text-[#ecd8a6]'
+                    : 'border-transparent text-[#ecd8a6]/40 hover:text-[#ecd8a6]/85'
+                }`}
+              >
+                TR
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 text-[10px] font-bold rounded transition cursor-pointer border ${
+                  language === 'en'
+                    ? 'border-[#ecd8a6] bg-[#ecd8a6]/20 text-[#ecd8a6]'
+                    : 'border-transparent text-[#ecd8a6]/40 hover:text-[#ecd8a6]/85'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
             <div className="rounded-full bg-purple-900/30 p-2 border border-[#ecd8a6]/20">
               <UserIcon className="h-4 w-4 text-[#ecd8a6]" />
             </div>
@@ -204,10 +233,10 @@ export const Dashboard: React.FC = () => {
           </div>
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center justify-start gap-3 rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40 transition"
+            className="flex w-full items-center justify-start gap-3 rounded-lg bg-red-950/20 border border-red-900/30 px-4 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40 transition cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
-            Çıkış Yap
+            {t('dashboard.signOut')}
           </button>
         </div>
       </aside>
@@ -229,3 +258,4 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+

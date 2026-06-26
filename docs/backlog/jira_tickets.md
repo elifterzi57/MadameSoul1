@@ -4,7 +4,7 @@ Bu belge, MadameSoul projesinde kullanıcı deneyimi, güvenlik, performans, mim
 
 ---
 
-Toplam Bilet: **159** | Açık: **0** | Tamamlanan: **155** | İptal Edilen: **4**
+Toplam Bilet: **160** | Açık: **0** | Tamamlanan: **156** | İptal Edilen: **4**
 
 ### 📋 Açık Biletler (Active Backlog)
 Bu biletler henüz tamamlanmamış olup, geliştirilmeyi bekleyen işlerdir.
@@ -25,6 +25,7 @@ Bu biletler geliştirilmesinden veya takibinden vazgeçilerek iptal edilmiştir.
 Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 
 | Bilet ID | Türü | Özet | Öncelik | Çözüm Özeti | Oluşturan (Reporter) |
+| [**MS-328**](#-ms-328) | Feature / Admin / i18n | Admin Paneli Çok Dilli Dil Desteği Entegrasyonu | Yüksek | Admin panelindeki tüm sekmeler ve giriş ekranı için Türkçe ve İngilizce dil desteği (i18n) entegrasyonu tamamlandı. | Elif |
 | [**MS-327**](#-ms-327) | Document / Dev | Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması | Orta | Canlıya geçiş öncesinde tüm teknik dokümanlar güncellendi, yeni canlıya geçiş kılavuzu ve go-live kontrol listesi dokümantasyonu üretildi. | Elif |
 | [**MS-326**](#-ms-326) | Feature / Security / DB | Bize Ulaşın (Contact Us) Mesajlarına Giriş Yapmış Kullanıcı ID Entegrasyonu | Orta | İletişim mesajlarında telefonla üye olan kullanıcıların da USERID olarak eşleşmesi için firestore kuralları güncellendi, mesaj gönderilirken userId alanı eklendi ve admin paneli listelemesi güncellendi. | Elif |
 | [**MS-325**](#-ms-325) | Feature / UX / UI | Finans Ekranı İptal Edilen İşlemlerin Açıklama ve Durum Gösterimi Geliştirmesi | Orta | İptal edilen Stripe ödeme denemeleri için iptal sebebine göre (zaman aşımı, manuel, kullanıcı, stripe) detaylı açıklama metinleri ve durum rozetleri eklendi. | Elif |
@@ -184,6 +185,24 @@ Bu biletler başarıyla tamamlanmış ve çözüme kavuşturulmuştur.
 | :--- | :--- | :--- | :--- | :--- | :--- |
 
 ## 📋 Tamamlanan Bilet Detayları (Completed Ticket Details)
+
+### 📋 MS-328: Admin Paneli Çok Dilli Dil Desteği Entegrasyonu (Feature / Admin / i18n)
+
+* **Öncelik:** Yüksek
+* **Durum:** ✅ Tamamlandı (Completed)
+* **Oluşturan (Reporter):** Elif (USER)
+* **Atanan (Assignee):** Amelia (💻 Developer)
+* **Bileşen:** Admin Panel
+* **Açıklama:**  
+  Admin panelindeki tüm sekmeler ve giriş ekranı için Türkçe ve İngilizce dil desteği (i18n) entegrasyonu tamamlandı. Dil dosyaları YAML biçiminde `locales` altında yönetilmekte ve `@rollup/plugin-yaml` aracılığıyla Vite tarafından derlenmektedir. `LanguageProvider` ile uygulama genelinde aktif dil durumu yönetilmektedir.
+* **Kabul Kriterleri:**
+  1. `@rollup/plugin-yaml` paketi devDependencies arasına eklendi ve `vite.config.ts` yapılandırıldı.
+  2. `LanguageContext` ve `LanguageProvider` oluşturularak `admin/src/main.tsx` içerisine entegre edildi.
+  3. `admin/src/locales/en.yaml` ve `admin/src/locales/tr.yaml` dil dosyaları oluşturuldu.
+  4. Giriş (Login) ekranı, Dashboard ana görünümü ve tüm sekmeler (Overview, Collections, Finance, Balance, Logs, Permissions) dile duyarlı hale getirildi.
+  5. Navigasyon barına dil değiştirme (TR/EN) butonu eklendi.
+
+---
 
 ### 📋 MS-327: Teknik Dokümantasyon Güncellemesi ve Canlıya Geçiş Kılavuzu Hazırlanması (Document / Dev)
 
