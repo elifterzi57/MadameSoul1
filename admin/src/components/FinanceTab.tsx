@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
+import { useTranslation } from '../context/LanguageContext';
 import { collection, getDocs, query, where, limit, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { DollarSign, ShoppingBag, TrendingUp, RefreshCw, AlertCircle, CheckCircle2, X, Info, ShieldAlert, Loader2, Clock, Calendar, Layers } from 'lucide-react';
+
 
 interface FinanceTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
 }
 
 export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) => {
+  const { t } = useTranslation();
   const [sales, setSales] = useState<any[]>([]);
   const [pendingAttempts, setPendingAttempts] = useState<any[]>([]);
   const [completedAttempts, setCompletedAttempts] = useState<any[]>([]);
@@ -88,18 +91,18 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
           completedData.push(docWithId);
           completedMethodsMap[docSnap.id] = data.completedMethod || 'webhook';
         } else if (status === 'cancelled') {
-          let cancelReason = 'Ödemesi gerçekleşmeyen işlemin iptali';
+          let cancelReason = t('finance.transactions.desc.cancelUnknown');
           const method = data.completedMethod;
           if (method === 'auto_timeout') {
-            cancelReason = '10 dakika zaman aşımı nedeniyle sistem tarafından otomatik iptal edildi';
+            cancelReason = t('finance.transactions.desc.cancelSystem');
           } else if (method === 'manual_reject') {
-            cancelReason = 'Yönetici tarafından manuel olarak reddedildi/iptal edildi';
+            cancelReason = t('finance.transactions.desc.cancelAdmin');
           } else if (method === 'user_cancel') {
-            cancelReason = 'Kullanıcı tarafından ödeme sayfasında iptal edildi';
+            cancelReason = t('finance.transactions.desc.cancelUser');
           } else if (method === 'stripe_expiry') {
-            cancelReason = 'Stripe ödeme süresi dolduğu için iptal edildi (Webhook)';
+            cancelReason = t('finance.transactions.desc.cancelStripe');
           } else if (method) {
-            cancelReason = `İptal edildi (${method})`;
+            cancelReason = t('finance.transactions.desc.cancelMethod').replace('{method}', method);
           }
 
           salesData.push({
@@ -508,28 +511,29 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
     return intervals;
   };
 
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-[#ecd8a6]/10 pb-6">
         <div>
-          <h2 className="font-serif text-3xl text-[#ecd8a6]">Stripe Finans & Satış</h2>
-          <p className="text-sm text-[#ecd8a6]/60">Ödeme durumlarını, satın alma işlemlerini ve ciro grafiklerini izleyin.</p>
+          <h2 className="font-serif text-3xl text-[#ecd8a6]">{t('finance.title')}</h2>
+          <p className="text-sm text-[#ecd8a6]/60">{t('finance.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {/* Period Selector Buttons */}
-          <div className="flex rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
-            {([
-              { key: 'daily', label: 'Bugün', icon: Clock },
-              { key: 'weekly', label: 'Son 7 Gün', icon: Calendar },
-              { key: 'monthly', label: 'Son 30 Gün', icon: Calendar },
-              { key: 'all', label: 'Tümü', icon: Layers }
-            ] as const).map((item) => {
+          <div className="flex h-9 rounded-lg border border-[#ecd8a6]/20 bg-[#0c081a] p-0.5 shadow-inner">
+            {[
+              { key: 'daily', label: t('overview.periods.daily'), icon: Clock },
+              { key: 'weekly', label: t('overview.periods.weekly'), icon: Calendar },
+              { key: 'monthly', label: t('overview.periods.monthly'), icon: Calendar },
+              { key: 'all', label: t('overview.periods.all'), icon: Layers }
+            ].map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.key}
-                  onClick={() => setPeriod(item.key)}
-                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                  onClick={() => setPeriod(item.key as any)}
+                  className={`flex items-center gap-1.5 rounded-md px-3 text-xs font-semibold transition cursor-pointer active:scale-95 ${
                     period === item.key
                       ? 'bg-purple-900/40 text-[#ecd8a6] shadow-sm border border-[#ecd8a6]/15'
                       : 'text-[#ecd8a6]/50 hover:text-[#ecd8a6] hover:bg-purple-950/20'
@@ -546,23 +550,23 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
             <button
               disabled={listenerLoading}
               onClick={toggleStripeListener}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-2 transition text-sm font-medium ${
+              className={`flex h-9 items-center gap-2 rounded-lg border px-4 transition duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs font-semibold cursor-pointer ${
                 stripeListenerActive 
-                  ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20' 
-                  : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20'
+                  ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20 shadow-lg shadow-green-500/5' 
+                  : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20 shadow-lg shadow-yellow-500/5'
               }`}
             >
               <span className={`h-2 w-2 rounded-full ${stripeListenerActive ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></span>
-              {stripeListenerActive ? 'Stripe CLI: Aktif' : 'Stripe CLI: Kapalı (Başlat)'}
+              {stripeListenerActive ? t('finance.listenerActive') : t('finance.listenerInactive')}
             </button>
           )}
 
           <button
             onClick={fetchSalesData}
-            className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
+            className="flex h-9 items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 hover:bg-purple-900/35 transition duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs font-semibold cursor-pointer shadow-lg shadow-purple-950/20 text-[#ecd8a6]"
           >
             <RefreshCw className="h-4 w-4" />
-            Yenile
+            {t('finance.refresh')}
           </button>
         </div>
       </div>
@@ -571,7 +575,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
-            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Toplam Ciro (Completed)</span>
+            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">{t('finance.metrics.totalRevenue')}</span>
             <h3 className="mt-2 font-serif text-3xl text-green-400 font-bold">{formatCurrency(displayRevenue)}</h3>
           </div>
           <div className="rounded-full bg-green-500/10 border border-green-500/30 p-3 text-green-400">
@@ -581,8 +585,8 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
-            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Satış Hacmi</span>
-            <h3 className="mt-2 font-serif text-3xl text-[#ecd8a6] font-bold">{displaySalesCount} Adet</h3>
+            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">{t('finance.metrics.salesVolume')}</span>
+            <h3 className="mt-2 font-serif text-3xl text-[#ecd8a6] font-bold">{displaySalesCount} {t('finance.metrics.salesCountUnit')}</h3>
           </div>
           <div className="rounded-full bg-purple-500/10 border border-purple-500/30 p-3 text-purple-400">
             <ShoppingBag className="h-6 w-6" />
@@ -591,7 +595,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b] p-6 flex items-center justify-between shadow-lg shadow-purple-950/5">
           <div>
-            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">Sepet Ortalaması (AOV)</span>
+            <span className="text-xs uppercase tracking-wider text-[#ecd8a6]/60 font-medium">{t('finance.metrics.avgSaleValue')}</span>
             <h3 className="mt-2 font-serif text-3xl text-amber-300 font-bold">{formatCurrency(displayAvgSaleValue)}</h3>
           </div>
           <div className="rounded-full bg-amber-500/10 border border-amber-500/30 p-3 text-amber-300">
@@ -603,14 +607,14 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
       {/* Dynamic Line Chart (Sally's Premium Design) */}
       <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6">
         <h3 className="font-serif text-xl mb-4 text-[#ecd8a6] flex items-center justify-between">
-          <span>Stripe Satış Ciro Grafiği</span>
+          <span>{t('finance.chart.title')}</span>
           <span className="text-xs font-sans text-green-400 font-semibold px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20">
-            {period === 'daily' ? 'Son 24 Saat' : period === 'weekly' ? 'Son 7 Gün' : period === 'monthly' ? 'Son 30 Gün' : 'Tüm Zamanlar'}
+            {period === 'daily' ? t('finance.chart.last24Hours') : period === 'weekly' ? t('finance.chart.last7Days') : period === 'monthly' ? t('finance.chart.last30Days') : t('finance.chart.allTime')}
           </span>
         </h3>
         {filteredCompleted.length === 0 ? (
           <div className="flex h-48 items-center justify-center text-xs text-[#ecd8a6]/40">
-            Bu dönemde gerçekleşen herhangi bir tamamlanmış satış bulunmadığı için grafik çizilemiyor.
+            {t('finance.chart.noCompletedSales')}
           </div>
         ) : (() => {
           const chartData = getChartData();
@@ -766,14 +770,14 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
       {/* Pending Transactions List */}
       <div className="space-y-4">
-        <h3 className="font-serif text-xl text-[#ecd8a6]">Bekleyen Ödeme Talepleri (Pending)</h3>
+        <h3 className="font-serif text-xl text-[#ecd8a6]">{t('finance.pending.title')}</h3>
         {loading ? (
           <div className="flex h-32 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
             <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
           </div>
         ) : filteredPending.length === 0 ? (
           <div className="flex h-24 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-xs">
-            Bekleyen/Tamamlanmamış ödeme kaydı bulunmamaktadır.
+            {t('finance.pending.noPending')}
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border border-yellow-500/20 bg-[#0e0a1b]/40">
@@ -785,33 +789,33 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                       onClick={() => handleSortPending('createdAt')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      DATE {renderSortIcon('createdAt', pendingSort)}
+                      {t('finance.pending.cols.date')} {renderSortIcon('createdAt', pendingSort)}
                     </th>
                     <th 
                       onClick={() => handleSortPending('userId')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      MAIL {renderSortIcon('userId', pendingSort)}
+                      {t('finance.pending.cols.mail')} {renderSortIcon('userId', pendingSort)}
                     </th>
                     <th 
                       onClick={() => handleSortPending('id')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      SESSION {renderSortIcon('id', pendingSort)}
+                      {t('finance.pending.cols.session')} {renderSortIcon('id', pendingSort)}
                     </th>
                     <th 
                       onClick={() => handleSortPending('amount')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      AMOUNT {renderSortIcon('amount', pendingSort)}
+                      {t('finance.pending.cols.amount')} {renderSortIcon('amount', pendingSort)}
                     </th>
                     <th 
                       onClick={() => handleSortPending('price')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      PRICE {renderSortIcon('price', pendingSort)}
+                      {t('finance.pending.cols.price')} {renderSortIcon('price', pendingSort)}
                     </th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10 select-none">ACTION</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10 select-none">{t('finance.pending.cols.action')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
@@ -828,14 +832,14 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                           onClick={() => handleManualApprove(attempt)}
                           className="rounded-lg bg-yellow-500/10 border border-yellow-500/30 px-3 py-1 text-xs text-yellow-400 hover:bg-yellow-500/20 transition disabled:opacity-50"
                         >
-                          Manuel Onayla
+                          {t('finance.pending.manualApprove')}
                         </button>
                         <button
                           disabled={actionLoadingId === attempt.id}
                           onClick={() => handleManualReject(attempt)}
                           className="rounded-lg bg-rose-500/10 border border-rose-500/30 px-3 py-1 text-xs text-rose-400 hover:bg-rose-500/20 transition disabled:opacity-50 ml-2"
                         >
-                          İptal Et
+                          {t('finance.pending.cancelBtn')}
                         </button>
                       </td>
                     </tr>
@@ -849,7 +853,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
 
       {/* Transaction List */}
       <div className="space-y-4">
-        <h3 className="font-serif text-xl text-[#ecd8a6]">Son Stripe İşlemleri (Limit 100)</h3>
+        <h3 className="font-serif text-xl text-[#ecd8a6]">{t('finance.transactions.title')}</h3>
         {loading ? (
           <div className="flex h-48 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
             <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
@@ -861,7 +865,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
         ) : filteredSales.length === 0 ? (
           <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 text-[#ecd8a6]/40 text-sm">
             <AlertCircle className="h-8 w-8 mb-2" />
-            Henüz Stripe ödeme kaydı bulunmamaktadır.
+            {t('finance.transactions.noTransactions')}
           </div>
         ) : (
           <div className="overflow-hidden rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
@@ -873,43 +877,43 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                       onClick={() => handleSortSales('createdAt')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      DATE {renderSortIcon('createdAt', salesSort)}
+                      {t('finance.transactions.cols.date')} {renderSortIcon('createdAt', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('userId')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      MAIL {renderSortIcon('userId', salesSort)}
+                      {t('finance.transactions.cols.mail')} {renderSortIcon('userId', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('amount')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      AMOUNT {renderSortIcon('amount', salesSort)}
+                      {t('finance.transactions.cols.amount')} {renderSortIcon('amount', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('price')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      PRICE {renderSortIcon('price', salesSort)}
+                      {t('finance.transactions.cols.price')} {renderSortIcon('price', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('paymentProvider')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      PROVIDER {renderSortIcon('paymentProvider', salesSort)}
+                      {t('finance.transactions.cols.provider')} {renderSortIcon('paymentProvider', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('completedMethod')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      STATUS {renderSortIcon('completedMethod', salesSort)}
+                      {t('finance.transactions.cols.status')} {renderSortIcon('completedMethod', salesSort)}
                     </th>
                     <th 
                       onClick={() => handleSortSales('description')} 
                       className="px-6 py-4 border-b border-[#ecd8a6]/10 cursor-pointer hover:bg-[#ecd8a6]/5 select-none transition"
                     >
-                      DESCRIPTION {renderSortIcon('description', salesSort)}
+                      {t('finance.transactions.cols.description')} {renderSortIcon('description', salesSort)}
                     </th>
                   </tr>
                 </thead>
@@ -933,18 +937,18 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                             const method = completedMethods[sale.idempotencyKey];
                             if (sale.isCancelled) {
                               let badgeColor = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                              let label = "İptal (Bilinmiyor)";
+                              let label = t('finance.transactions.status.cancelUnknown');
                               if (method === 'auto_timeout') {
-                                label = "İptal (Sistem)";
+                                label = t('finance.transactions.status.cancelSystem');
                                 badgeColor = "bg-red-500/10 text-red-400 border border-red-500/20";
                               } else if (method === 'manual_reject') {
-                                label = "İptal (Manuel)";
+                                label = t('finance.transactions.status.cancelAdmin');
                                 badgeColor = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
                               } else if (method === 'user_cancel') {
-                                label = "İptal (Kullanıcı)";
+                                label = t('finance.transactions.status.cancelUser');
                                 badgeColor = "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
                               } else if (method === 'stripe_expiry') {
-                                label = "İptal (Stripe)";
+                                label = t('finance.transactions.status.cancelStripe');
                                 badgeColor = "bg-violet-500/10 text-violet-400 border border-violet-500/20";
                               }
                               return (
@@ -956,18 +960,18 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                             if (method === 'manual') {
                               return (
                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                                  Manual (Admin)
+                                  {t('finance.transactions.status.manualAdmin')}
                                 </span>
                               );
                             }
                             return (
                               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20">
-                                Auto (Webhook)
+                                {t('finance.transactions.status.autoWebhook')}
                               </span>
                             );
                           })()}
                         </td>
-                        <td className={`px-6 py-4 text-xs max-w-[280px] break-words whitespace-normal ${sale.isCancelled ? 'text-rose-400/70' : ''}`}>{sale.description || 'Satın Alım'}</td>
+                        <td className={`px-6 py-4 text-xs max-w-[280px] break-words whitespace-normal ${sale.isCancelled ? 'text-rose-400/70' : ''}`}>{sale.description || t('finance.transactions.purchaseDesc')}</td>
                       </tr>
                     );
                   })}
@@ -991,7 +995,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                 ) : (
                   <ShieldAlert className="h-5 w-5 text-yellow-500" />
                 )}
-                {modalAction === 'reject' ? 'Ödeme Talebi İptali' : 'Ödeme Onaylama'}
+                {modalAction === 'reject' ? t('finance.modal.titleReject') : t('finance.modal.titleApprove')}
               </h3>
               {modalState !== 'loading' && (
                 <button 
@@ -1009,34 +1013,34 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                 {modalAction === 'reject' ? (
                   <div className="rounded-lg bg-rose-500/5 border border-rose-500/20 p-3 text-xs text-rose-400 flex gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <p>Bu işlem, seçilen Stripe ödeme teşebbüsünü iptal edecektir. Kullanıcıya herhangi bir Moon yüklemesi yapılmayacaktır. Bu işlem geri alınamaz.</p>
+                    <p>{t('finance.modal.rejectWarning')}</p>
                   </div>
                 ) : (
                   <div className="rounded-lg bg-yellow-500/5 border border-yellow-500/20 p-3 text-xs text-yellow-500 flex gap-2">
                     <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                    <p>Bu işlem, seçilen Stripe oturumunun ödemesini onaylayarak kullanıcının hesabına Katina Moon yüklemesi gerçekleştirecektir. Lütfen bilgileri kontrol edin.</p>
+                    <p>{t('finance.modal.approveWarning')}</p>
                   </div>
                 )}
 
                 <div className="space-y-2 rounded-xl bg-purple-950/20 border border-[#ecd8a6]/10 p-4 text-sm">
                   <div className="flex flex-col gap-1 py-2 border-b border-[#ecd8a6]/5 text-left">
-                    <span className="text-[#ecd8a6]/60 text-xs">Oturum (Session) ID</span>
+                    <span className="text-[#ecd8a6]/60 text-xs">{t('finance.modal.sessionId')}</span>
                     <span className="font-mono text-xs select-all break-all bg-black/30 p-1.5 rounded">{selectedAttempt.id}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-[#ecd8a6]/5 items-center">
-                    <span className="text-[#ecd8a6]/60 text-xs">Kullanıcı (Mail/Tel)</span>
+                    <span className="text-[#ecd8a6]/60 text-xs">{t('finance.modal.user')}</span>
                     <span className="font-mono text-xs select-all text-right break-all max-w-[250px]">{usersMap[selectedAttempt.userId] || selectedAttempt.userId}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-[#ecd8a6]/5 items-center">
-                    <span className="text-[#ecd8a6]/60 text-xs">Satın Alınacak Tutar</span>
+                    <span className="text-[#ecd8a6]/60 text-xs">{t('finance.modal.amount')}</span>
                     <span className="font-bold text-yellow-500">{selectedAttempt.amount} Moon</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-[#ecd8a6]/5 items-center">
-                    <span className="text-[#ecd8a6]/60 text-xs">Fiyat</span>
+                    <span className="text-[#ecd8a6]/60 text-xs">{t('finance.modal.price')}</span>
                     <span className="font-bold text-green-400">${selectedAttempt.price || '0.00'}</span>
                   </div>
                   <div className="flex justify-between py-2 items-center">
-                    <span className="text-[#ecd8a6]/60 text-xs">Oluşturulma Tarihi</span>
+                    <span className="text-[#ecd8a6]/60 text-xs">{t('finance.modal.date')}</span>
                     <span className="text-xs">{getDocDate(selectedAttempt)}</span>
                   </div>
                 </div>
@@ -1046,21 +1050,21 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                     onClick={() => setIsModalOpen(false)}
                     className="px-4 py-2 text-sm text-[#ecd8a6]/80 border border-[#ecd8a6]/20 rounded-lg hover:bg-white/5 transition"
                   >
-                    Vazgeç
+                    {t('finance.modal.dismissBtn')}
                   </button>
                   {modalAction === 'reject' ? (
                     <button
                       onClick={executeManualReject}
                       className="px-5 py-2 text-sm text-white bg-rose-600 hover:bg-rose-700 font-semibold rounded-lg shadow-lg shadow-rose-600/10 transition"
                     >
-                      Evet, İptal Et
+                      {t('finance.modal.rejectConfirmBtn')}
                     </button>
                   ) : (
                     <button
                       onClick={executeManualApprove}
                       className="px-5 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg shadow-lg shadow-yellow-500/10 transition"
                     >
-                      Evet, Onayla ve Yükle
+                      {t('finance.modal.approveConfirmBtn')}
                     </button>
                   )}
                 </div>
@@ -1072,12 +1076,12 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                 <Loader2 className={`h-10 w-10 animate-spin ${modalAction === 'reject' ? 'text-rose-500' : 'text-yellow-500'}`} />
                 <div className="text-center">
                   <p className="text-sm font-medium text-[#ecd8a6]">
-                    {modalAction === 'reject' ? 'İşlem İptal Ediliyor' : 'Ödeme Onaylanıyor'}
+                    {modalAction === 'reject' ? t('finance.modal.statusRejecting') : t('finance.modal.statusApproving')}
                   </p>
                   <p className="text-xs text-[#ecd8a6]/60 mt-1">
                     {modalAction === 'reject' 
-                      ? 'Stripe ödeme teşebbüsü iptal ediliyor...' 
-                      : 'Stripe oturumu tamamlanıyor ve Moon\'lar aktarılıyor...'}
+                      ? t('finance.modal.statusRejectingDesc') 
+                      : t('finance.modal.statusApprovingDesc')}
                   </p>
                 </div>
               </div>
@@ -1091,8 +1095,8 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
                     <div>
-                      <h4 className="font-serif text-lg text-rose-400">İşlem Başarıyla İptal Edildi</h4>
-                      <p className="text-xs text-[#ecd8a6]/60 mt-1">Stripe ödeme teşebbüsü iptal edildi ve bekleyen işlemleri listesinden kaldırıldı.</p>
+                      <h4 className="font-serif text-lg text-rose-400">{t('finance.modal.successRejectTitle')}</h4>
+                      <p className="text-xs text-[#ecd8a6]/60 mt-1">{t('finance.modal.successRejectDesc')}</p>
                     </div>
                   </>
                 ) : (
@@ -1101,21 +1105,21 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                       <CheckCircle2 className="h-8 w-8" />
                     </div>
                     <div>
-                      <h4 className="font-serif text-lg text-green-400">Ödeme Başarıyla Tamamlandı</h4>
-                      <p className="text-xs text-[#ecd8a6]/60 mt-1">Kullanıcı hesabına {selectedAttempt.amount} Moon başarıyla yüklendi.</p>
+                      <h4 className="font-serif text-lg text-green-400">{t('finance.modal.successApproveTitle')}</h4>
+                      <p className="text-xs text-[#ecd8a6]/60 mt-1">{t('finance.modal.successApproveDesc').replace('{amount}', selectedAttempt.amount)}</p>
                     </div>
                   </>
                 )}
                 <div className="rounded-xl bg-purple-950/20 border border-[#ecd8a6]/10 p-3 text-xs text-left max-w-sm mx-auto space-y-1">
-                  <div><span className="text-[#ecd8a6]/60">Kullanıcı (Mail/Tel):</span> <span className="font-mono break-all">{usersMap[selectedAttempt.userId] || selectedAttempt.userId}</span></div>
-                  <div><span className="text-[#ecd8a6]/60">Miktar:</span> <span className="font-bold text-yellow-500">{selectedAttempt.amount} Moon</span></div>
+                  <div><span className="text-[#ecd8a6]/60">{t('finance.modal.user')}:</span> <span className="font-mono break-all">{usersMap[selectedAttempt.userId] || selectedAttempt.userId}</span></div>
+                  <div><span className="text-[#ecd8a6]/60">{t('finance.modal.amount')}:</span> <span className="font-bold text-yellow-500">{selectedAttempt.amount} Moon</span></div>
                 </div>
                 <div className="pt-2">
                   <button
                     onClick={() => setIsModalOpen(false)}
                     className="w-full px-4 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg transition"
                   >
-                    Kapat
+                    {t('finance.modal.closeBtn')}
                   </button>
                 </div>
               </div>
@@ -1128,7 +1132,7 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                 </div>
                 <div>
                   <h4 className="font-serif text-lg text-red-400">
-                    {modalAction === 'reject' ? 'İptal Etme Başarısız' : 'Onaylama Başarısız'}
+                    {modalAction === 'reject' ? t('finance.modal.failedRejectTitle') : t('finance.modal.failedApproveTitle')}
                   </h4>
                   <p className="text-xs text-red-400/80 mt-1 max-h-24 overflow-y-auto">{modalError}</p>
                 </div>
@@ -1137,13 +1141,13 @@ export const FinanceTab: React.FC<FinanceTabProps> = ({ userRole: _userRole }) =
                     onClick={() => setIsModalOpen(false)}
                     className="flex-1 px-4 py-2 text-sm text-[#ecd8a6]/80 border border-[#ecd8a6]/20 rounded-lg hover:bg-white/5 transition"
                   >
-                    Kapat
+                    {t('finance.modal.closeBtn')}
                   </button>
                   <button
                     onClick={modalAction === 'reject' ? executeManualReject : executeManualApprove}
                     className="flex-1 px-4 py-2 text-sm text-[#0e0a1b] bg-[#ecd8a6] hover:bg-[#ecd8a6]/90 font-semibold rounded-lg transition"
                   >
-                    Yeniden Dene
+                    {t('finance.modal.retryBtn')}
                   </button>
                 </div>
               </div>

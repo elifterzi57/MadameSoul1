@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { ShieldAlert, UserPlus, RefreshCw, UserCheck } from 'lucide-react';
+import { useTranslation } from '../context/LanguageContext';
 
 interface PermissionsTabProps {
   userRole: 'admin' | 'employee' | 'viewer' | null;
 }
 
 export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
+  const { t } = useTranslation();
   const [workers, setWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
       setWorkers(workersData);
     } catch (err: any) {
       console.error(err);
-      setError(`Yetkili çalışanlar listesi alınamadı: ${err.message || err}`);
+      setError(`${t('permissions.errorFetch')}${err.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,7 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
 
     try {
       const currentUser = auth.currentUser;
-      if (!currentUser) throw new Error("Giriş yapmış bir admin bulunamadı.");
+      if (!currentUser) throw new Error(t('permissions.errorNoAdmin'));
 
       // Fetch fresh ID token to authenticate with Express backend
       const idToken = await currentUser.getIdToken(true);
@@ -76,25 +78,25 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
         try {
           data = JSON.parse(responseText);
         } catch (e) {
-          throw new Error(`Geçersiz sunucu yanıtı: ${responseText.slice(0, 100)}`);
+          throw new Error(`${t('permissions.errorInvalidResponse')}${responseText.slice(0, 100)}`);
         }
       }
 
       if (!response.ok) {
-        throw new Error(data.error || `Sunucu hatası: Status ${response.status}`);
+        throw new Error(data.error || `${t('permissions.errorServer')}${response.status}`);
       }
 
       if (data.status === 'password_required') {
-        setFormError('Kullanıcı sistemde kayıtlı değil. Lütfen admin paneline erişebilmesi için bir şifre belirleyin.');
+        setFormError(t('permissions.errorPasswordRequired'));
       } else {
-        setFormSuccess(password ? 'Kullanıcı bilgileri ve şifresi başarıyla güncellendi.' : `Kullanıcı '${selectedRole}' rolüyle başarıyla tanımlandı.`);
+        setFormSuccess(password ? t('permissions.successUpdate') : t('permissions.successCreate', { role: selectedRole }));
         setEmail('');
         setPassword('');
         fetchWorkers(); // Refresh list
       }
     } catch (err: any) {
       console.error(err);
-      setFormError(err.message || 'Yetki ataması sırasında hata oluştu.');
+      setFormError(err.message || t('permissions.errorGeneric'));
     } finally {
       setFormLoading(false);
     }
@@ -102,9 +104,9 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Süper Admin';
-      case 'employee': return 'Çalışan';
-      case 'viewer': return 'Sadece Görüntüleyen';
+      case 'admin': return t('dashboard.roles.admin');
+      case 'employee': return t('dashboard.roles.employee');
+      case 'viewer': return t('dashboard.roles.viewer');
       default: return role;
     }
   };
@@ -113,22 +115,22 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-serif text-3xl text-[#ecd8a6]">Çalışan Yetkileri</h2>
-          <p className="text-sm text-[#ecd8a6]/60">Sistem yöneticileri, çalışanlar ve salt-okunur gözlemcilerin yetkilerini atayın.</p>
+          <h2 className="font-serif text-3xl text-[#ecd8a6]">{t('permissions.title')}</h2>
+          <p className="text-sm text-[#ecd8a6]/60">{t('permissions.subtitle')}</p>
         </div>
         <button
           onClick={fetchWorkers}
-          className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm"
+          className="flex items-center gap-2 rounded-lg bg-purple-900/20 border border-[#ecd8a6]/20 px-4 py-2 hover:bg-purple-900/30 transition text-sm cursor-pointer"
         >
           <RefreshCw className="h-4 w-4" />
-          Yenile
+          {t('permissions.refresh')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Workers List Table */}
         <div className="md:col-span-2 space-y-4">
-          <h3 className="font-serif text-xl">Aktif Yetkili Çalışanlar</h3>
+          <h3 className="font-serif text-xl">{t('permissions.activeWorkers')}</h3>
           {loading ? (
             <div className="flex h-64 items-center justify-center rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40">
               <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-[#ecd8a6]"></div>
@@ -142,9 +144,9 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
               <table className="w-full text-left text-sm text-[#ecd8a6]/80 border-collapse">
                 <thead className="bg-[#0e0a1b] text-xs uppercase tracking-wider text-[#ecd8a6]/60">
                   <tr>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">E-posta</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Yetki Rolü</th>
-                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">Kullanıcı Kimliği (UID)</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">{t('permissions.email')}</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">{t('permissions.role')}</th>
+                    <th className="px-6 py-4 border-b border-[#ecd8a6]/10">{t('permissions.uid')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#ecd8a6]/10">
@@ -175,13 +177,13 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
         <div className="rounded-xl border border-[#ecd8a6]/10 bg-[#0e0a1b]/40 p-6 space-y-4 h-fit">
           <h3 className="font-serif text-xl border-b border-[#ecd8a6]/10 pb-3 flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-[#ecd8a6]" />
-            Yetki Ata / Oluştur
+            {t('permissions.addRole')}
           </h3>
 
           {userRole !== 'admin' ? (
             <div className="rounded-lg border border-yellow-900/30 bg-yellow-950/10 p-4 text-yellow-400 flex gap-2">
               <ShieldAlert className="h-5 w-5 shrink-0" />
-              <p className="text-xs">Sadece Süper Admin rolüne sahip yöneticiler yeni yetkili ataması yapabilir.</p>
+              <p className="text-xs">{t('permissions.onlyAdminAlert')}</p>
             </div>
           ) : (
             <form onSubmit={handleCreateOrUpdateWorker} className="space-y-4">
@@ -197,7 +199,7 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
               )}
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">E-posta Adresi</label>
+                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">{t('permissions.emailLabel')}</label>
                 <input
                   type="email"
                   value={email}
@@ -209,25 +211,25 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Rol Ataması</label>
+                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">{t('permissions.roleLabel')}</label>
                 <select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as any)}
                   className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none"
                 >
-                  <option value="admin">Süper Admin (admin)</option>
-                  <option value="employee">Çalışan (employee)</option>
-                  <option value="viewer">Sadece Görüntüleyen (viewer)</option>
+                  <option value="admin">{t('permissions.roles.admin')}</option>
+                  <option value="employee">{t('permissions.roles.employee')}</option>
+                  <option value="viewer">{t('permissions.roles.viewer')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">Şifre (Yeni Kullanıcı veya Şifre Güncelleme)</label>
+                <label className="block text-xs uppercase tracking-wider text-[#ecd8a6]/60 mb-2 font-medium">{t('permissions.passwordLabel')}</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Şifreyi sıfırlamak/belirlemek için girin"
+                  placeholder={t('permissions.passwordPlaceholder')}
                   className="block w-full rounded-lg border border-[#ecd8a6]/20 bg-[#07040e] px-3 py-2 text-sm text-[#ecd8a6] outline-none focus:border-[#ecd8a6]/40"
                 />
               </div>
@@ -235,10 +237,10 @@ export const PermissionsTab: React.FC<PermissionsTabProps> = ({ userRole }) => {
               <button
                 type="submit"
                 disabled={formLoading}
-                className="w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-purple-800 to-[#ecd8a6]/60 px-4 py-2.5 font-semibold text-[#07040e] shadow-lg transition hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 text-sm"
+                className="w-full flex justify-center items-center gap-2 rounded-lg bg-gradient-to-r from-purple-800 to-[#ecd8a6]/60 px-4 py-2.5 font-semibold text-[#07040e] shadow-lg transition hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 text-sm cursor-pointer"
               >
                 <UserCheck className="h-4 w-4" />
-                {formLoading ? 'Tanımlanıyor...' : 'Yetkiyi Tanımla'}
+                {formLoading ? t('permissions.submitBtnLoading') : t('permissions.submitBtn')}
               </button>
             </form>
           )}
