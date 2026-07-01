@@ -6,4 +6,18 @@
     "edition": "ENTERPRISE",
     "dataAccessMode": "FIRESTORE_NATIVE"
   }
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
 }
