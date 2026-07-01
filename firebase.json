@@ -5,7 +5,7 @@
     "indexes": "firestore.indexes.json",
     "edition": "ENTERPRISE",
     "dataAccessMode": "FIRESTORE_NATIVE"
-  }
+  },
   "hosting": {
     "public": "dist",
     "ignore": [
